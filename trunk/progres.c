@@ -24,10 +24,12 @@ int ehEspaco(char c)
     return (c == ' ' || c == '\t' || c == '\n');
 }
 
-void copiaSimbolo(char c){
+void copiaSimbolo(char c)
+{
 }
 
-void copiaTok(char* tok){
+void copiaTok(char* tok)
+{
 }
 
 int ehSimbolo(char c)
@@ -82,40 +84,41 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
             else
             {
-                if(isalnum(c)){
-                  //tok += c;
-                  while(1)
-                  {
-                    c = fgetc(arquivo);
-                    if(isspace(c))
+                if(isalnum(c))
+                {
+                    //tok += c;
+                    while(1)
                     {
-                        //copiaTok(c);
-                        continue;
-                    }
-                    else
-                    {
-                        if(ehSimbolo(c))
+                        c = fgetc(arquivo);
+                        if(isspace(c))
                         {
                             //copiaTok(c);
-                            copiaSimbolo(c);
                             continue;
                         }
                         else
                         {
-                            if(isalnum(c))
+                            if(ehSimbolo(c))
                             {
-                                //tok += c
+                                //copiaTok(c);
+                                copiaSimbolo(c);
+                                continue;
                             }
                             else
                             {
-                                printf("Erro: Caracter nao pertimitido.");
-                                //variavel local recebera indicativo de erro
-                                erro = 1
-                                break;
+                                if(isalnum(c))
+                                {
+                                    //tok += c
+                                }
+                                else
+                                {
+                                    printf("Erro: Caracter nao pertimitido.");
+                                    //variavel local recebera indicativo de erro
+                                    erro = 1
+                                           break;
+                                }
                             }
                         }
                     }
-                  }
                 }
                 else
                 {
@@ -140,12 +143,12 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
-	FILE *arquivo = fopen(argv[1], "r");
+    FILE *arquivo = fopen(argv[1], "r");
 
     if(!arquivo)
-	{
-		printf("Impossibilitado de abrir o arquivo: %s\n", argv[1]);
-		exit(1);
+    {
+        printf("Impossibilitado de abrir o arquivo: %s\n", argv[1]);
+        exit(1);
     }
 
     t_circuito *circuto1 = carregaCircuito(arquivo);
