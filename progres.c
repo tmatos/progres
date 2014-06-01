@@ -73,26 +73,35 @@ t_circuito* carregaCircuito(FILE *arquivo)
         {
             // B
             // ...
-            if(ehSimbolo()){
+            if(ehSimbolo())
+            {
                 //copiaSimbolo(c);
                 continue;
-            }else{
+            }else
+            {
                 if(isalnum(c)){
                   //tok += c;
-                  while(1){
+                  while(1)
+                  {
                     c = fgetc(arquivo);
-                    if(isspace(c)){
+                    if(isspace(c))
+                    {
                         //copiaTok(c);
                         continue;
-                    }else{
-                        if(ehSimbolo(c)){
+                    }else
+                    {
+                        if(ehSimbolo(c))
+                        {
                             //copiaTok(c);
                             copiaSimbolo(c);
                             continue;
-                        }else{
-                            if(isalnum(c)){
+                        }else
+                        {
+                            if(isalnum(c))
+                            {
                                 //tok += c
-                            }else{
+                            }else
+                            {
                                 printf("Erro: Caracter nao pertimitido.");
                                 //variavel local recebera indicativo de erro
                                 erro = 1
@@ -101,7 +110,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                         }
                     }
                   }
-                }else{
+                }else
+                {
                     printf("Erro: Caracter nao pertimitido.");
                     break;
                 }
