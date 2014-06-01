@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1401586984 source:c:\users\tico\documents\projects\progres\progres.c
+1401586984 source:progres.c
 	<stdio.h>
 	<stdlib.h>
 	"estruturas.h"
 
-1401582720 c:\users\tico\documents\projects\progres\estruturas.h
+1401582720 estruturas.h
 
