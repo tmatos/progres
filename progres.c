@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "estruturas.h"
 
 t_circuito* novoCircuito()
@@ -38,7 +39,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
         if(feof(arquivo))
             break;
 
-        if(ehEspaco(c))
+        if(isspace(c))
             continue;
 
         if(c == '/')
