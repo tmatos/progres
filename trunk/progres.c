@@ -18,45 +18,53 @@ t_componente novoComponente()
     return (t_componente) malloc(sizeof(struct st_componente));
 }
 
+int ehEspaco(char c)
+{
+    return (c == ' ' || c == '\t' || c == '\n');
+}
+
 t_circuito* carregaCircuito(FILE *arquivo)
 {
-    char c = '\0';
-    int coment = 0;
-    int multEspaco = 0;
+    t_circuito *circuto = novoCircuito();
+    t_circuito *retorno = NULL;
 
-    while(!feof(arquivo))
+    char c = '\0';
+
+    while(1)
     {
+        // A
         c = fgetc(arquivo);
 
-        if(c == '#')
-        {
-            multEspaco = 0;
-            coment = 1;
-        }
-        else if(c == '\n')
-        {
-            coment = 0;
-        }
+        if(feof(arquivo))
+            break;
 
-        if(!coment)
+        if(ehEspaco(c))
+            continue;
+
+        if(c == '/')
         {
-            if(c == ' ' || c == '\n' || c == '\t')
+            c = fgetc(arquivo);
+
+            if(c == '/')
             {
-                multEspaco++;
-            }
-            else
-            {
-                if(multEspaco)
-                    printf("\n");
+                while(c != '\n')
+                {
+                    c = fgetc(arquivo);
+                }
 
-                multEspaco = 0;
-
-                printf("%c", c);
+                continue; // volta pra A
             }
         }
+        else
+        {
+            // B
+            // ...
+        }
+
+        // ...
     }
 
-    return NULL;
+    return retorno;
 }
 
 int main(int argc, char* argv[])
