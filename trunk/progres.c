@@ -24,12 +24,25 @@ int ehEspaco(char c)
     return (c == ' ' || c == '\t' || c == '\n');
 }
 
+void copiaSimbolo(char c){
+}
+
+void copiaTok(char* tok){
+}
+
+int ehSimbolo(char c)
+{
+    return (c == '(' || c == ')' || c == ',' || c == ';');
+}
+
 t_circuito* carregaCircuito(FILE *arquivo)
 {
     t_circuito *circuto = novoCircuito();
     t_circuito *retorno = NULL;
 
     char c = '\0';
+    int erro = 0;
+    //char* tok;
 
     while(1)
     {
@@ -60,8 +73,42 @@ t_circuito* carregaCircuito(FILE *arquivo)
         {
             // B
             // ...
+            if(ehSimbolo()){
+                //copiaSimbolo(c);
+                continue;
+            }else{
+                if(isalnum(c)){
+                  //tok += c;
+                  while(1){
+                    c = fgetc(arquivo);
+                    if(isspace(c)){
+                        //copiaTok(c);
+                        continue;
+                    }else{
+                        if(ehSimbolo(c)){
+                            //copiaTok(c);
+                            copiaSimbolo(c);
+                            continue;
+                        }else{
+                            if(isalnum(c)){
+                                //tok += c
+                            }else{
+                                printf("Erro: Caracter nao pertimitido.");
+                                //variavel local recebera indicativo de erro
+                                erro = 1
+                                break;
+                            }
+                        }
+                    }
+                  }
+                }else{
+                    printf("Erro: Caracter nao pertimitido.");
+                    break;
+                }
+            }
         }
-
+        if(erro == 1)
+            break;
         // ...
     }
 
