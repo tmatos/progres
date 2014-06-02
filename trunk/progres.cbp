@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="sample\comentario.v" />
+				<Option parameters="sample\coisa.v" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -32,7 +32,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="estruturas.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="estruturas.h" />
+		<Unit filename="lex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lex.h" />
 		<Unit filename="progres.c">
 			<Option compilerVar="CC" />
 		</Unit>
