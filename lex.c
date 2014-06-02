@@ -2,8 +2,7 @@
 #include <string.h>
 #include "lex.h"
 
-ListaToken* novaListaToken()
-{
+ListaToken* novaListaToken() {
     ListaToken* l = (ListaToken*) malloc(sizeof(ListaToken));
     l->primeiro = NULL;
     l->ultimo = NULL;
@@ -12,31 +11,31 @@ ListaToken* novaListaToken()
     return l;
 }
 
-int insereToken(ListaToken* lista, char tok)
-{
+int insereToken(ListaToken* lista, char tok) {
     char s[2] = {tok, '\0'};
 
     return insereTokenString(lista, s);
 }
 
-int insereTokenString(ListaToken* lista, char* tok)
-{
-    Token novo;
-    strcpy(novo.valor, tok);
-    novo.seguinte = NULL;
+int insereTokenString(ListaToken* lista, char* tok) {
+    Token* novo = (Token*) malloc(sizeof(Token));
+    strcpy(novo->valor, tok);
+    novo->seguinte = NULL;
 
     // TODO: Preencher o tipo
     // TODO: Checagens...
 
-    if(lista->tamanho == 0)
-    {
-        lista->primeiro = &novo;
-        lista->ultimo = &novo;
+    if(lista->tamanho == 0) {
+        lista->primeiro = novo;
+        lista->ultimo = novo;
     }
-    else
-    {
-        lista->ultimo->seguinte = &novo;
-        lista->ultimo = &novo;
+    else if(lista->tamanho == 1) {
+        lista->primeiro->seguinte = novo;
+        lista->ultimo = novo;
+    }
+    else {
+        lista->ultimo->seguinte = novo;
+        lista->ultimo = novo;
     }
 
     lista->tamanho++;
@@ -45,8 +44,7 @@ int insereTokenString(ListaToken* lista, char* tok)
 }
 
 // Faz o apend de um char numa string qualquer
-int anexa(char* str, char c)
-{
+int anexa(char* str, char c) {
     char tmp[2] = {c, '\0'};
 
     strcat(str, tmp);
