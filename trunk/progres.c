@@ -39,7 +39,7 @@ int ehSimbolo(char c)
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
-    t_circuito *circuto = novoCircuito();
+    t_circuito *circuito = novoCircuito();
     t_circuito *retorno = NULL;
 
     char c = '\0';
@@ -77,7 +77,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
         {
             // B
             // ...
-            if(ehSimbolo())
+            if(ehSimbolo(c))
             {
                 //copiaSimbolo(c);
                 continue;
@@ -111,10 +111,10 @@ t_circuito* carregaCircuito(FILE *arquivo)
                                 }
                                 else
                                 {
-                                    printf("Erro: Caracter nao pertimitido.");
+                                    printf("Erro: Caracter nao permitido.");
                                     //variavel local recebera indicativo de erro
-                                    erro = 1
-                                           break;
+                                    erro = 1;
+                                    break;
                                 }
                             }
                         }
