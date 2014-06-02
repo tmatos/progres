@@ -25,7 +25,7 @@ typedef struct st_componente {
     int numSaida;
     t_tipo tipo;
     t_sinal saida;
-} *t_componente;
+} * t_componente;
 
 typedef struct st_circuito {
     int numEntrada;
@@ -35,5 +35,11 @@ typedef struct st_circuito {
     int numSaida;
     struct st_sinal *sinaisSaida;
 } t_circuito;
+
+t_circuito* novoCircuito();
+
+t_componente* novaListaCompon(int tamanho);
+
+t_componente novoComponente();
 
 #endif
