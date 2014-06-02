@@ -1,23 +1,14 @@
+/*
+ Progres - Simulador de circuitos combinacionais em Verilog
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
+
 #include "estruturas.h"
-
-t_circuito* novoCircuito()
-{
-    return (t_circuito*) malloc(sizeof(t_circuito));
-}
-
-t_componente* novaListaCompon(int tamanho)
-{
-    return (t_componente*) malloc(sizeof(t_componente) * tamanho);
-}
-
-t_componente novoComponente()
-{
-    return (t_componente) malloc(sizeof(struct st_componente));
-}
+#include "lex.h"
 
 int ehEspaco(char c)
 {
@@ -32,104 +23,163 @@ void copiaTok(char* tok)
 {
 }
 
-int ehSimbolo(char c)
+int isSimbolo(char c)
 {
     return (c == '(' || c == ')' || c == ',' || c == ';');
 }
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
+    int linha = 1, coluna = 0;
+
+    ListaToken* tokens = novaListaToken();
+
     t_circuito *circuito = novoCircuito();
     t_circuito *retorno = NULL;
 
     char c = '\0';
     int erro = 0;
-    //char* tok;
+
+    char* tok = (char*) malloc(sizeof(char));
+    strcpy(tok, "");
 
     while(1)
     {
         // A
         c = fgetc(arquivo);
 
-        if(c == EOF) printf("Arquivo vazio.\n");
-
-        if(feof(arquivo))
+        if(c == EOF)
+        {
+            printf("Arquivo vazio.\n");
             break;
+        }
 
         if(isspace(c))
-            continue;
+        {
+            if(c == '\n')
+            {
+                coluna = 0;
+                linha++;
+            }
+            else
+            {
+                coluna++;
+            }
+
+            continue; // Volta para A
+        }
 
         if(c == '/')
         {
+            coluna++;
             c = fgetc(arquivo);
 
             if(c == '/')
             {
+                coluna++;
+
                 while(c != '\n')
                 {
                     c = fgetc(arquivo);
+                    coluna++;
                 }
 
+                coluna = 0;
+                linha++;
+
                 continue; // volta pra A
+            }
+            /*else if(c == '*')
+            {
+                coluna++;
+
+                c = fgetc(arquivo);
+
+                // TODO: Comentario de multiplas linhas
+            }*/
+            else
+            {
+                printf("Simbolo nao esperado na linha %d, coluna %d.\n", linha, coluna);
+                break;
             }
         }
         else
         {
             // B
-            // ...
-            if(ehSimbolo(c))
+            if(isSimbolo(c))
             {
-                //copiaSimbolo(c);
+                insereToken(tokens, c);
                 continue;
             }
             else
             {
                 if(isalnum(c))
                 {
-                    //tok += c;
+                    anexa(tok, c);
+
                     while(1)
                     {
                         c = fgetc(arquivo);
+
                         if(isspace(c))
                         {
-                            //copiaTok(c);
+                            if(c == '\n')
+                            {
+                                coluna = 0;
+                                linha++;
+                            }
+                            else
+                            {
+                                coluna++;
+                            }
+
+                            insereTokenString(tokens, tok);
+
+                            break; // TODO: Verificar se esta indo para A
+                        }
+                        else if(isSimbolo(c))
+                        {
+                            coluna++;
+                            insereTokenString(tokens, tok);
+                            insereToken(tokens, c);
+
+                            break; // TODO: Verificar se esta indo para A
+                        }
+                        else if(isalnum(c))
+                        {
+                            coluna++;
+                            anexa(tok, c);
                             continue;
                         }
                         else
                         {
-                            if(ehSimbolo(c))
-                            {
-                                //copiaTok(c);
-                                copiaSimbolo(c);
-                                continue;
-                            }
-                            else
-                            {
-                                if(isalnum(c))
-                                {
-                                    //tok += c
-                                }
-                                else
-                                {
-                                    printf("Erro: Caracter nao permitido.");
-                                    //variavel local recebera indicativo de erro
-                                    erro = 1;
-                                    break;
-                                }
-                            }
+                            printf("Erro: Caracter nao permitido, linha %d, coluna %d.", linha, coluna);
+                            erro = 1; //variavel local recebera indicativo de erro
+
+                            break;
                         }
                     }
                 }
                 else
                 {
-                    printf("Erro: Caracter nao pertimitido.");
+                    printf("Erro: Caracter nao pertimitido, linha %d, coluna %d.", linha, coluna);
                     break;
                 }
             }
         }
+
         if(erro == 1)
             break;
-        // ...
+
+    }
+
+    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
+
+    Token* it = tokens->primeiro;
+    while(it)
+    {
+        printf("%s\n", it->valor);
+        it = it->seguinte;
     }
 
     return retorno;
