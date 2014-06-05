@@ -18,6 +18,15 @@ int isSimbolo(char c) {
     return (c == '(' || c == ')' || c == ',' || c == ';');
 }
 
+void exibeListaDeToken(ListaToken* tokens) {
+    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
+    Token* it = tokens->primeiro;
+    while(it) {
+        printf("%s\n", it->valor);
+        it = it->seguinte;
+    }
+}
+
 t_circuito* carregaCircuito(FILE *arquivo) {
     int linha = 1, coluna = 0;
 
@@ -86,11 +95,13 @@ t_circuito* carregaCircuito(FILE *arquivo) {
         else {
             // B
             if(isSimbolo(c)) {
+                coluna++;
                 insereToken(tokens, c);
                 continue;
             }
             else {
                 if(isalnum(c)) {
+                    coluna++;
                     anexa(tok, c);
 
                     while(1) {
@@ -107,14 +118,14 @@ t_circuito* carregaCircuito(FILE *arquivo) {
 
                             insereTokenString(tokens, tok);
 
-                            break; // TODO: Verificar se esta indo para A
+                            break;
                         }
                         else if(isSimbolo(c)) {
                             coluna++;
                             insereTokenString(tokens, tok);
                             insereToken(tokens, c);
 
-                            break; // TODO: Verificar se esta indo para A
+                            break;
                         }
                         else if(isalnum(c)) {
                             coluna++;
@@ -135,23 +146,18 @@ t_circuito* carregaCircuito(FILE *arquivo) {
                     }
                 }
                 else {
-                    printf("Erro: Caracter nao pertimitido, linha %d, coluna %d.\n", linha, coluna);
+                    printf("Erro: Caractere nao permitido, linha %d, coluna %d.\n", linha, coluna);
                     break;
                 }
             }
         }
 
-        if(erro == 1 || fim == 1)
+        if(erro || fim)
             break;
 
     }
 
-    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
-    Token* it = tokens->primeiro;
-    while(it) {
-        printf("%s\n", it->valor);
-        it = it->seguinte;
-    }
+    exibeListaDeToken(tokens);
 
     return retorno;
 }
