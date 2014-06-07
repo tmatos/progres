@@ -10,30 +10,12 @@
 #include "estruturas.h"
 #include "lex.h"
 
-int ehEspaco(char c) {
-    return (c == ' ' || c == '\t' || c == '\n');
-}
-
-int isSimbolo(char c) {
-    return (c == '(' || c == ')' || c == ',' || c == ';');
-}
-
-void exibeListaDeToken(ListaToken* tokens) {
-    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
-    Token* it = tokens->primeiro;
-    while(it) {
-        printf("%s\n", it->valor);
-        it = it->seguinte;
-    }
-}
-
-t_circuito* carregaCircuito(FILE *arquivo) {
+ListaToken* tokeniza(FILE *arquivo) {
     int linha = 1, coluna = 0;
 
     ListaToken* tokens = novaListaToken();
 
-    t_circuito *circuito = novoCircuito();
-    t_circuito *retorno = NULL;
+    ListaToken* retorno = NULL;
 
     char c = '\0';
     int erro = 0, fim = 0;
@@ -96,7 +78,7 @@ t_circuito* carregaCircuito(FILE *arquivo) {
             // B
             if(isSimbolo(c)) {
                 coluna++;
-                insereToken(tokens, c);
+                insereToken(tokens, c, linha, coluna);
                 continue;
             }
             else {
@@ -116,14 +98,14 @@ t_circuito* carregaCircuito(FILE *arquivo) {
                                 coluna++;
                             }
 
-                            insereTokenString(tokens, tok);
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
 
                             break;
                         }
                         else if(isSimbolo(c)) {
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
                             coluna++;
-                            insereTokenString(tokens, tok);
-                            insereToken(tokens, c);
+                            insereToken(tokens, c, linha, coluna);
 
                             break;
                         }
@@ -133,7 +115,7 @@ t_circuito* carregaCircuito(FILE *arquivo) {
                             continue;
                         }
                         else if(c == EOF) {
-                            insereTokenString(tokens, tok);
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
                             fim = 1;
                             break;
                         }
@@ -157,9 +139,38 @@ t_circuito* carregaCircuito(FILE *arquivo) {
 
     }
 
-    exibeListaDeToken(tokens);
+    //exibeListaDeToken(tokens);
+
+    retorno = tokens;
 
     return retorno;
+}
+
+t_circuito* carregaCircuito(FILE *arquivo)
+{
+    t_circuito *circuito = novoCircuito();
+
+    ListaToken* tokens = tokeniza(arquivo);
+    ListaToken* identificadores = novaListaToken();
+
+    // TODO: Checagens!!!
+
+    Token* it = tokens->primeiro;
+
+    if(!iguais(it->valor, "module"))
+    {
+        printf("Erro na linha %d, coluna %d. Esperava a palavra-chave '%s', no lugar esta '%s'.\n",
+               it->linha, it->coluna, "module", it->valor);
+
+        return NULL;
+    }
+
+    while(it) {
+
+        it = it->seguinte;
+    }
+
+    return NULL;
 }
 
 int main(int argc, char* argv[])

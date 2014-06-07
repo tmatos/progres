@@ -1,7 +1,17 @@
+#include <stdlib.h>
 #include "estruturas.h"
 
 t_circuito* novoCircuito() {
-    return (t_circuito*) malloc(sizeof(t_circuito));
+    t_circuito* circuito = (t_circuito*) malloc(sizeof(t_circuito));
+
+    circuito->numEntrada = 0;
+    circuito->numSaida = 0;
+    circuito->sinaisEntrada = NULL;
+    circuito->sinaisSaida = NULL;
+    circuito->listaFiosEntrada = NULL;
+    circuito->listaFiosSaida = NULL;
+
+    return circuito;
 }
 
 t_componente* novaListaCompon(int tamanho) {
