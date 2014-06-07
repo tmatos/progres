@@ -1,3 +1,5 @@
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "lex.h"
@@ -11,15 +13,17 @@ ListaToken* novaListaToken() {
     return l;
 }
 
-int insereToken(ListaToken* lista, char tok) {
+int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna) {
     char s[2] = {tok, '\0'};
 
-    return insereTokenString(lista, s);
+    return insereTokenString(lista, s, p_linha, p_coluna);
 }
 
-int insereTokenString(ListaToken* lista, char* tok) {
+int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
     Token* novo = (Token*) malloc(sizeof(Token));
     strcpy(novo->valor, tok);
+    novo->linha = p_linha;
+    novo->coluna = p_coluna;
     novo->seguinte = NULL;
 
     // TODO: Preencher o tipo
@@ -52,4 +56,22 @@ int anexa(char* str, char c) {
     // TODO: Checagens...
 
     return 1;
+}
+
+int isSimbolo(char c) {
+    return (c == '(' || c == ')' || c == ',' || c == ';');
+}
+
+void exibeListaDeToken(ListaToken* tokens) {
+    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
+    Token* it = tokens->primeiro;
+    while(it) {
+        printf("%s\n", it->valor);
+        it = it->seguinte;
+    }
+    printf("\n");
+}
+
+int iguais(char* a, char* b) {
+    return !strcmp(a, b);
 }
