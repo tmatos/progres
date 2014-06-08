@@ -2,11 +2,13 @@
 
 #define LEX_H
 
+#define MAX_TOKEN_SIZE 80
+
 typedef enum en_grupoToken {tokenSimbolo, tokenPalavra, tokenIdent} GrupoToken;
 
 // Tipo basico para o elemento que representa um Token
 typedef struct st_token {
-    char valor[80];
+    char valor[MAX_TOKEN_SIZE];
     int linha;
     int coluna;
     GrupoToken tipo;
@@ -40,5 +42,14 @@ void exibeListaDeToken(ListaToken* tokens);
 
 // Retorna verdadeiro se duas strings são iguais
 int iguais(char* a, char* b);
+
+// Avanca o iterador de token para o proximo da lista
+void avanca(Token** t);
+
+// Retorna verdadeiro se um token for uma palavra reservada em Verilog
+int isPalavra(Token* tk);
+
+//
+int isIdentificador(Token* tk);
 
 #endif

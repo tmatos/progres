@@ -7,4 +7,3 @@ t_circuito* carregaCircuito(FILE *arquivo);
 ListaToken* tokeniza(FILE *arquivo);
 
 #endif
-
