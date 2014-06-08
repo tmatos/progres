@@ -112,6 +112,7 @@ ListaToken* tokeniza(FILE *arquivo) {
                         else if(isalnum(c)) {
                             coluna++;
                             anexa(tok, c);
+                            // TODO: verificar tamanho maximo de palavra
                             continue;
                         }
                         else if(c == EOF) {
@@ -139,7 +140,7 @@ ListaToken* tokeniza(FILE *arquivo) {
 
     }
 
-    //exibeListaDeToken(tokens);
+    exibeListaDeToken(tokens);
 
     retorno = tokens;
 
@@ -153,9 +154,13 @@ t_circuito* carregaCircuito(FILE *arquivo)
     ListaToken* tokens = tokeniza(arquivo);
     ListaToken* identificadores = novaListaToken();
 
-    // TODO: Checagens!!!
+    if(!tokens)
+        return NULL;
 
     Token* it = tokens->primeiro;
+
+    if(!it)
+        return NULL;
 
     if(!iguais(it->valor, "module"))
     {
@@ -165,9 +170,54 @@ t_circuito* carregaCircuito(FILE *arquivo)
         return NULL;
     }
 
+    avanca(&it);
+
+    if(!it) {
+        printf("Final do arquivo não esperado. Era esperado um identificador.\n");
+        return NULL;
+    }
+    else if(!isIdentificador(it)) {
+        printf("Erro na linha %d, coluna %d. Esperava-se um identificador valido, no lugar esta '%s'.\n",
+               it->linha, it->coluna, it->valor);
+
+        return NULL;
+    }
+    else {
+        // senao, adicione-o a lista de identificadores
+        insereTokenString(identificadores, it->valor, -1, -1);
+    }
+
+    avanca(&it);
+
+    if(!it) {
+        printf("Final do arquivo não esperado. Era esperado '('.\n");
+        return NULL;
+    }
+    else if(!iguais(it->valor, "(")) {
+        // se it->valor não é '(', pare
+        printf("Erro na linha %d, coluna %d. Esperava-se '(', no lugar esta '%s'.\n",
+               it->linha, it->coluna, it->valor);
+
+        return NULL;
+    }
+
+    avanca(&it);
+
+    // devemos agora ler os parametros do modulo
+
+    if(!it) {
+        printf("Final do arquivo não esperado. Era esperado um identificador valido ou ')'.\n");
+        return NULL;
+    }
+
+    while(!iguais(it->valor, ")")) {
+        //
+        avanca(&it);
+    }
+
     while(it) {
 
-        it = it->seguinte;
+        avanca(&it);
     }
 
     return NULL;

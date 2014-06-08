@@ -47,7 +47,6 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
     return 1;
 }
 
-// Faz o apend de um char numa string qualquer
 int anexa(char* str, char c) {
     char tmp[2] = {c, '\0'};
 
@@ -67,11 +66,71 @@ void exibeListaDeToken(ListaToken* tokens) {
     Token* it = tokens->primeiro;
     while(it) {
         printf("%s\n", it->valor);
-        it = it->seguinte;
+        avanca(&it);
     }
     printf("\n");
 }
 
 int iguais(char* a, char* b) {
     return !strcmp(a, b);
+}
+
+void avanca(Token** t) {
+    if(*t)
+        *t = (*t)->seguinte;
+}
+
+int isPalavra(Token* tk) {
+    if(!tk)
+        return 0;
+
+    char* valor = (char*) malloc(sizeof(char) * MAX_TOKEN_SIZE);
+    strcpy(valor, tk->valor);
+
+    if(iguais(valor, "module")) return 1;
+    if(iguais(valor, "parameter")) return 1;
+    if(iguais(valor, "localparam")) return 1;
+    if(iguais(valor, "input")) return 1;
+    if(iguais(valor, "output")) return 1;
+    if(iguais(valor, "reg")) return 1;
+    if(iguais(valor, "integer")) return 1;
+    if(iguais(valor, "wire")) return 1;
+    if(iguais(valor, "always")) return 1;
+    if(iguais(valor, "assign")) return 1;
+    if(iguais(valor, "while")) return 1;
+    if(iguais(valor, "begin")) return 1;
+    if(iguais(valor, "if")) return 1;
+    if(iguais(valor, "else")) return 1;
+    if(iguais(valor, "end")) return 1;
+    if(iguais(valor, "case")) return 1;
+    if(iguais(valor, "endcase")) return 1;
+    if(iguais(valor, "endmodule")) return 1;
+
+    return 0;
+}
+
+int isIdentificador(Token* tk) {
+    int i = 0;
+    int simbol = 0;
+
+    if(!tk)
+        return 0;
+
+    if(!isalpha(tk->valor[0])) // se nao comeca com letra, nao eh identificador valido
+        return 0;
+
+    for(i = 1 ; i < strlen(tk->valor) ; i++) {
+        if(!isalnum(tk->valor[i])) {
+            simbol = 1;
+            break;
+        }
+    }
+
+    if(simbol) // se contem algo a mais que letras ou numeros, nao eh identificador valido
+        return 0;
+
+    if(isPalavra(tk)) // palavra reservada nao pode ser identificador
+        return 0;
+
+    return 1;
 }
