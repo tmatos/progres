@@ -52,4 +52,7 @@ int isPalavra(Token* tk);
 //
 int isIdentificador(Token* tk);
 
+// Retorna true se a string esta contida em algum token da lista
+int identExiste(ListaToken* lst, char* str);
+
 #endif

@@ -205,14 +205,85 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     // devemos agora ler os parametros do modulo
 
+    int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
+
+    while(1) {
+        if(!it) {
+            if(virgula)
+                printf("Final do arquivo não esperado. Era esperada uma virgula.\n");
+            else
+                printf("Final do arquivo não esperado. Era esperado um identificador valido ou ')'.\n");
+
+            return NULL;
+        }
+
+        if(iguais(it->valor, ")"))
+            break;
+
+        if(virgula) {
+            if(iguais(it->valor, ",")) {
+                virgula = 0;
+                avanca(&it);
+                continue;
+                // TODO: bug de virgula a mais...
+            }
+            else {
+                printf("Erro na linha %d, coluna %d. Esperava-se uma virgula ou ')', no lugar esta '%s'.\n",
+                      it->linha, it->coluna, it->valor);
+                return NULL;
+            }
+        }
+
+        if(isIdentificador(it)) {
+            if(identExiste(identificadores, it->valor)) {
+                printf("Erro na linha %d, coluna %d. O identificador '%s' ja estava sendo utilizado.\n",
+                      it->linha, it->coluna, it->valor);
+                return NULL;
+            }
+            else {
+                insereTokenString(identificadores, it->valor, -1, -1);
+                virgula = 1;
+            }
+        }
+        else {
+            printf("Erro na linha %d, coluna %d. Esperava-se um identificador, no lugar esta '%s'.\n",
+                  it->linha, it->coluna, it->valor);
+            return NULL;
+        }
+
+        avanca(&it);
+    }
+
+    avanca(&it);
+
     if(!it) {
-        printf("Final do arquivo não esperado. Era esperado um identificador valido ou ')'.\n");
+        printf("Final do arquivo não esperado. Era esperado ';'.\n");
         return NULL;
     }
 
-    while(!iguais(it->valor, ")")) {
-        //
-        avanca(&it);
+    if(!iguais(it->valor, ";")) {
+        printf("Erro na linha %d, coluna %d. Esperava-se ';', no lugar esta '%s'.\n",
+              it->linha, it->coluna, it->valor);
+        return NULL;
+    }
+
+    avanca(&it);
+
+    if(!it) {
+        printf("Final do arquivo não esperado. Era esperado ';'.\n");
+        return NULL;
+    }
+
+    // (continuar aqui...)
+
+    if(iguais(it->valor, "input")) {
+
+    }
+    else if(iguais(it->valor, "output")) {
+
+    }
+    else if(iguais(it->valor, "wire")) {
+
     }
 
     while(it) {

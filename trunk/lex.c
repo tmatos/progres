@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "lex.h"
 
 ListaToken* novaListaToken() {
@@ -69,6 +70,28 @@ void exibeListaDeToken(ListaToken* tokens) {
         avanca(&it);
     }
     printf("\n");
+}
+
+int identExiste(ListaToken* lst, char* str) {
+    int retorno = 0;
+
+    if(!lst || !str)
+        return retorno;
+
+    if(!lst->primeiro)
+        return retorno;
+
+    Token* it = lst->primeiro;
+    while(it) {
+        if(iguais(it->valor, str)) {
+            retorno = 1;
+            break;
+        }
+
+        avanca(&it);
+    }
+
+    return retorno;
 }
 
 int iguais(char* a, char* b) {
