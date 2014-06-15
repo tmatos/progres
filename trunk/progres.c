@@ -1,5 +1,8 @@
 /*
  Progres - Simulador de circuitos combinacionais em Verilog
+ (C) 2014, Tiago Matos, Joao Victor, Luciano Almeida
+
+ Under the terms of the MIT license.
 */
 
 #include <stdio.h>
@@ -9,6 +12,28 @@
 
 #include "estruturas.h"
 #include "lex.h"
+
+void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
+    if(linha > 0)
+    {
+        printf("%d:", linha);
+
+        if(coluna > 0)
+            printf("%d:", coluna);
+    }
+
+    if(msg)
+    {
+        printf(" erro: %s.", msg);
+
+        if(esperado)
+        {
+            printf(" Esperava-se '%s', mas foi encontrado '%s'.", esperado, encontrado);
+        }
+    }
+
+    printf("\n");
+}
 
 ListaToken* tokeniza(FILE *arquivo) {
     int linha = 1, coluna = 0;
@@ -70,7 +95,7 @@ ListaToken* tokeniza(FILE *arquivo) {
                 // TODO: Comentario de multiplas linhas
             }*/
             else {
-                printf("Simbolo nao esperado na linha %d, coluna %d.\n", linha, coluna);
+                exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
                 break;
             }
         }
@@ -121,7 +146,7 @@ ListaToken* tokeniza(FILE *arquivo) {
                             break;
                         }
                         else {
-                            printf("Erro: Caractere nao permitido, linha %d, coluna %d.\n", linha, coluna);
+                            exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
                             erro = 1; //variavel local recebera indicativo de erro
 
                             break;
@@ -129,7 +154,7 @@ ListaToken* tokeniza(FILE *arquivo) {
                     }
                 }
                 else {
-                    printf("Erro: Caractere nao permitido, linha %d, coluna %d.\n", linha, coluna);
+                    exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
                     break;
                 }
             }
@@ -140,7 +165,7 @@ ListaToken* tokeniza(FILE *arquivo) {
 
     }
 
-    exibeListaDeToken(tokens);
+    //exibeListaDeToken(tokens);
 
     retorno = tokens;
 
@@ -164,8 +189,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     if(!iguais(it->valor, "module"))
     {
-        printf("Erro na linha %d, coluna %d. Esperava a palavra-chave '%s', no lugar esta '%s'.\n",
-               it->linha, it->coluna, "module", it->valor);
+        exibeMsgErro("Palavra-chave nao encontrada onde esperado", it->linha, it->coluna, "module", it->valor);
 
         return NULL;
     }
@@ -173,13 +197,11 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        printf("Final do arquivo não esperado. Era esperado um identificador.\n");
+        exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador", -1, -1, NULL, NULL);
         return NULL;
     }
     else if(!isIdentificador(it)) {
-        printf("Erro na linha %d, coluna %d. Esperava-se um identificador valido, no lugar esta '%s'.\n",
-               it->linha, it->coluna, it->valor);
-
+        exibeMsgErro("Identificador nao encontrado", it->linha, it->coluna, "identificador valido", it->valor);
         return NULL;
     }
     else {
@@ -190,14 +212,12 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        printf("Final do arquivo não esperado. Era esperado '('.\n");
+        exibeMsgErro("Final do arquivo não esperado. Era esperado '('", -1, -1, NULL, NULL);
         return NULL;
     }
     else if(!iguais(it->valor, "(")) {
         // se it->valor não é '(', pare
-        printf("Erro na linha %d, coluna %d. Esperava-se '(', no lugar esta '%s'.\n",
-               it->linha, it->coluna, it->valor);
-
+        exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "(", it->valor);
         return NULL;
     }
 
@@ -210,9 +230,9 @@ t_circuito* carregaCircuito(FILE *arquivo)
     while(1) {
         if(!it) {
             if(virgula)
-                printf("Final do arquivo não esperado. Era esperada uma virgula.\n");
+                exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
             else
-                printf("Final do arquivo não esperado. Era esperado um identificador valido ou ')'.\n");
+                exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido ou ')'", -1, -1, NULL, NULL);
 
             return NULL;
         }
@@ -228,16 +248,14 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 // TODO: bug de virgula a mais...
             }
             else {
-                printf("Erro na linha %d, coluna %d. Esperava-se uma virgula ou ')', no lugar esta '%s'.\n",
-                      it->linha, it->coluna, it->valor);
+                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "uma virgula ou )", it->valor);
                 return NULL;
             }
         }
 
         if(isIdentificador(it)) {
             if(identExiste(identificadores, it->valor)) {
-                printf("Erro na linha %d, coluna %d. O identificador '%s' ja estava sendo utilizado.\n",
-                      it->linha, it->coluna, it->valor);
+                printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n", it->linha, it->coluna, it->valor);
                 return NULL;
             }
             else {
@@ -246,8 +264,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
         }
         else {
-            printf("Erro na linha %d, coluna %d. Esperava-se um identificador, no lugar esta '%s'.\n",
-                  it->linha, it->coluna, it->valor);
+            exibeMsgErro("Identificador nao foi encontrado", it->linha, it->coluna, "um identificador", it->valor);
             return NULL;
         }
 
@@ -257,20 +274,19 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        printf("Final do arquivo não esperado. Era esperado ';'.\n");
+        exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'", -1, -1, NULL, NULL);
         return NULL;
     }
 
     if(!iguais(it->valor, ";")) {
-        printf("Erro na linha %d, coluna %d. Esperava-se ';', no lugar esta '%s'.\n",
-              it->linha, it->coluna, it->valor);
+        exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ";", it->valor);
         return NULL;
     }
 
     avanca(&it);
 
     if(!it) {
-        printf("Final do arquivo não esperado. Era esperado ';'.\n");
+        exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'", -1, -1, NULL, NULL);
         return NULL;
     }
 

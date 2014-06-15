@@ -1,3 +1,6 @@
+/*
+ Progres - Simulador de circuitos combinacionais em Verilog
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
