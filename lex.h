@@ -4,7 +4,13 @@
 
 #define MAX_TOKEN_SIZE 80
 
-typedef enum en_grupoToken {tokenSimbolo, tokenPalavra, tokenIdent} GrupoToken;
+typedef enum en_keyword {
+    kw_module, kw_endmodule // nao sei se isso vai ficar mesmo
+} KeywordId;
+
+typedef enum en_grupoToken {
+    tokenSimbolo, tokenPalavra, tokenIdent
+} GrupoToken;
 
 // Tipo basico para o elemento que representa um Token
 typedef struct st_token {
