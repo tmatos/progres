@@ -55,6 +55,7 @@ const long IDEFrame::ID_MENUITEM2 = wxNewId();
 const long IDEFrame::ID_MENUITEM3 = wxNewId();
 const long IDEFrame::ID_MENUITEM1 = wxNewId();
 const long IDEFrame::idMenuOpen = wxNewId();
+const long IDEFrame::ID_MENUITEM8 = wxNewId();
 const long IDEFrame::idMenuQuit = wxNewId();
 const long IDEFrame::ID_MENUITEM6 = wxNewId();
 const long IDEFrame::ID_MENUITEM4 = wxNewId();
@@ -106,6 +107,8 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     MenuArquivo->Append(ID_MENUITEM1, _("Novo"), MenuItem2, wxEmptyString);
     MenuItem1 = new wxMenuItem(MenuArquivo, idMenuOpen, _("Abrir\tCtrl-O"), _("Abrir um fonte Verilog"), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem1);
+    MenuItem4 = new wxMenuItem(MenuArquivo, ID_MENUITEM8, _("Recentes"), wxEmptyString, wxITEM_NORMAL);
+    MenuArquivo->Append(MenuItem4);
     MenuItemSair = new wxMenuItem(MenuArquivo, idMenuQuit, _("Sair\tAlt-F4"), _("Encerrar o aplicativo."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSair);
     MenuBarPrincipal->Append(MenuArquivo, _("&Arquivo"));

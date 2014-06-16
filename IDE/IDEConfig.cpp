@@ -38,7 +38,7 @@ IDEConfig::IDEConfig(wxWindow* parent,wxWindowID id)
 
 	config = new wxConfig(_("ProgresIDE"));
 
-	if ( config->Read(_("SimuladorExePath"), &simuladorExePath) ) {
+    if ( config->Read(_("SimuladorExePath"), &simuladorExePath) ) {
         txtSimuladorPath->ChangeValue(simuladorExePath);
     }
     else {

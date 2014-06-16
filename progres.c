@@ -177,7 +177,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
     t_circuito *circuito = novoCircuito();
 
     ListaToken* tokens = tokeniza(arquivo);
-    ListaToken* identificadores = novaListaToken();
+    ListaToken* identificadores = novaListaToken(); // lista de todos os identificadores
+    ListaToken* identificLivre = novaListaToken(); // lista de ident. de entrada ou saida ainda nao definidos como tal
 
     if(!tokens)
         return NULL;

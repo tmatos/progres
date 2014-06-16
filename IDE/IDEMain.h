@@ -19,7 +19,6 @@
 #include <wx/filedlg.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
-#include <wx/config.h>
 //*)
 
 class IDEFrame: public wxFrame
@@ -54,6 +53,7 @@ class IDEFrame: public wxFrame
         static const long ID_MENUITEM3;
         static const long ID_MENUITEM1;
         static const long idMenuOpen;
+        static const long ID_MENUITEM8;
         static const long idMenuQuit;
         static const long ID_MENUITEM6;
         static const long ID_MENUITEM4;
@@ -69,6 +69,7 @@ class IDEFrame: public wxFrame
         wxTextCtrl* EditBox;
         wxMenu* Menu3;
         wxMenuItem* MenuItem1;
+        wxMenuItem* MenuItem4;
         wxMenu* MenuOpcoes;
         wxMenuItem* MenuItemNovaOnda;
         wxNotebook* bookFontes;
