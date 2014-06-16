@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxFrame" name="IDEFrame">
+		<title>Progres IDE</title>
+		<size>640,480</size>
+		<id_arg>0</id_arg>
+		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
+			<sashpos>400</sashpos>
+			<minsize>10</minsize>
+			<pos>128,272</pos>
+			<size>656,325</size>
+			<minsize>10,10</minsize>
+			<object class="wxNotebook" name="ID_NOTEBOOK1" variable="bookFontes" member="yes">
+				<pos>156,100</pos>
+				<size>176,64</size>
+				<object class="notebookpage">
+					<object class="wxTextCtrl" name="ID_TEXTCTRL_FONTE" variable="EditBox" member="yes">
+						<pos>191,70</pos>
+						<size>543,208</size>
+						<font>
+							<size>11</size>
+							<style>normal</style>
+							<weight>normal</weight>
+							<underlined>0</underlined>
+							<family>swiss</family>
+							<face>Courier New</face>
+						</font>
+						<minsize>-1,-1</minsize>
+						<maxsize>-1,-1</maxsize>
+						<style>wxTE_MULTILINE|wxTE_RICH2|wxTE_DONTWRAP</style>
+						<handler function="OnEditBoxText" entry="EVT_TEXT" />
+					</object>
+				</object>
+			</object>
+			<object class="wxListBox" name="ID_LISTBOXERROS" variable="ListBoxErros" member="yes">
+				<pos>0,276</pos>
+				<size>551,49</size>
+				<minsize>-1,-1</minsize>
+				<maxsize>-1,-1</maxsize>
+				<handler function="OnListBoxErrosDClick" entry="EVT_LISTBOX_DCLICK" />
+			</object>
+		</object>
+		<object class="wxMenuBar" variable="MenuBarPrincipal" member="no">
+			<object class="wxMenu" variable="MenuArquivo" member="no">
+				<label>&amp;Arquivo</label>
+				<object class="wxMenu" name="ID_MENUITEM1" variable="MenuItem2" member="yes">
+					<label>Novo</label>
+					<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItemNovoCircuito" member="yes">
+						<label>Circuto</label>
+						<handler function="OnMenuItemNovoCircuitoSelected" entry="EVT_MENU" />
+					</object>
+					<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItemNovaOnda" member="yes">
+						<label>Onda</label>
+						<handler function="OnMenuItemNovaOndaSelected" entry="EVT_MENU" />
+					</object>
+				</object>
+				<object class="wxMenuItem" name="idMenuOpen" variable="MenuItem1" member="yes">
+					<label>Abrir</label>
+					<accel>Ctrl-O</accel>
+					<help>Abrir um fonte Verilog</help>
+					<handler function="OnMenuItemOpen" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItemSair" member="no">
+					<label>Sair</label>
+					<accel>Alt-F4</accel>
+					<help>Encerrar o aplicativo.</help>
+					<handler function="OnQuit" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu2" member="yes">
+				<label>Editar</label>
+				<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItemSelecionarTudo" member="yes">
+					<label>Selecionar tudo</label>
+					<accel>Ctrl-A</accel>
+					<handler function="OnMenuItemSelecionarTudoSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu3" member="yes">
+				<label>Exibir</label>
+			</object>
+			<object class="wxMenu" variable="Menu1" member="yes">
+				<label>Simulação</label>
+				<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItemAnalisar" member="yes">
+					<label>Analisar circuito</label>
+					<accel>F5</accel>
+					<handler function="OnMenuItemAnalisarSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="MenuOpcoes" member="yes">
+				<label>Opções</label>
+				<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem3" member="yes">
+					<label>Teste</label>
+				</object>
+			</object>
+			<object class="wxMenu" variable="MenuAjuda" member="no">
+				<label>Ajuda</label>
+				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItemSobre" member="no">
+					<label>Sobre</label>
+					<accel>F1</accel>
+					<help>Exibir info sobre o aplicativo.</help>
+					<handler function="OnAbout" entry="EVT_MENU" />
+				</object>
+			</object>
+		</object>
+		<object class="wxStatusBar" name="ID_STATUSBAR1" variable="StatusBarPrincipal" member="yes">
+			<fields>3</fields>
+			<widths>-80,-10,-10</widths>
+			<styles>wxSB_NORMAL,wxSB_NORMAL,wxSB_NORMAL</styles>
+		</object>
+		<object class="wxFileDialog" variable="FileDialogFonte" member="yes">
+			<message>Selecionar arquivo</message>
+			<style>wxFD_DEFAULT_STYLE|wxFD_OPEN|wxFD_FILE_MUST_EXIST</style>
+		</object>
+	</object>
+</wxsmith>
