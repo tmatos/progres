@@ -19,6 +19,7 @@
 #include <wx/filedlg.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
+#include <wx/config.h>
 //*)
 
 class IDEFrame: public wxFrame
@@ -27,6 +28,8 @@ class IDEFrame: public wxFrame
 
         IDEFrame(wxWindow* parent,wxWindowID id = -1);
         virtual ~IDEFrame();
+
+        void carregaConfigs();
 
     private:
         //(*Handlers(IDEFrame)
@@ -39,6 +42,7 @@ class IDEFrame: public wxFrame
         void OnEditBoxText(wxCommandEvent& event);
         void OnListBoxErrosDClick(wxCommandEvent& event);
         void OnMenuItemSelecionarTudoSelected(wxCommandEvent& event);
+        void OnMenuItemConfigSelected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(IDEFrame)
@@ -54,6 +58,7 @@ class IDEFrame: public wxFrame
         static const long ID_MENUITEM6;
         static const long ID_MENUITEM4;
         static const long ID_MENUITEM5;
+        static const long ID_MENUITEM7;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
         //*)
@@ -69,6 +74,7 @@ class IDEFrame: public wxFrame
         wxNotebook* bookFontes;
         wxMenu* Menu1;
         wxMenuItem* MenuItem3;
+        wxMenuItem* MenuItemConfig;
         wxFileDialog* FileDialogFonte;
         wxMenuItem* MenuItemAnalisar;
         wxSplitterWindow* SplitterWindow1;
@@ -79,6 +85,7 @@ class IDEFrame: public wxFrame
         //*)
 
         wxString verilogFilePath;
+        wxString simuladorExePath;
         wxString defaultWindowTitle;
         long textLenght;
 

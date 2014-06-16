@@ -8,8 +8,11 @@
  **************************************************************/
 
 #include "IDEMain.h"
+#include "IDEConfig.h"
 #include <wx/msgdlg.h>
 #include <wx/dcclient.h>
+#include <wx/textfile.h>
+#include <wx/filename.h>
 
 //(*InternalHeaders(IDEFrame)
 #include <wx/font.h>
@@ -56,6 +59,7 @@ const long IDEFrame::idMenuQuit = wxNewId();
 const long IDEFrame::ID_MENUITEM6 = wxNewId();
 const long IDEFrame::ID_MENUITEM4 = wxNewId();
 const long IDEFrame::ID_MENUITEM5 = wxNewId();
+const long IDEFrame::ID_MENUITEM7 = wxNewId();
 const long IDEFrame::idMenuAbout = wxNewId();
 const long IDEFrame::ID_STATUSBAR1 = wxNewId();
 //*)
@@ -118,6 +122,8 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     MenuOpcoes = new wxMenu();
     MenuItem3 = new wxMenuItem(MenuOpcoes, ID_MENUITEM5, _("Teste"), wxEmptyString, wxITEM_NORMAL);
     MenuOpcoes->Append(MenuItem3);
+    MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENUITEM7, _("Configura"), wxEmptyString, wxITEM_NORMAL);
+    MenuOpcoes->Append(MenuItemConfig);
     MenuBarPrincipal->Append(MenuOpcoes, _("Opções"));
     MenuAjuda = new wxMenu();
     MenuItemSobre = new wxMenuItem(MenuAjuda, idMenuAbout, _("Sobre\tF1"), _("Exibir info sobre o aplicativo."), wxITEM_NORMAL);
@@ -140,17 +146,30 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnQuit);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSelecionarTudoSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemAnalisarSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemConfigSelected);
     Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnAbout);
     //*)
 
     defaultWindowTitle = _("Progres IDE");
     SetTitle(defaultWindowTitle);
+
+    carregaConfigs();
 }
 
 IDEFrame::~IDEFrame()
 {
     //(*Destroy(IDEFrame)
     //*)
+}
+
+void IDEFrame::carregaConfigs()
+{
+    wxConfig *config = new wxConfig(_("ProgresIDE"));
+    config->Read(_("SimuladorExePath"), &simuladorExePath);
+    delete config;
+
+    if(simuladorExePath.IsEmpty())
+        wxMessageBox(_("O executável do simulador não foi definido. Por-favor selecione-o nas configurações."), _("Aviso"));
 }
 
 void IDEFrame::OnQuit(wxCommandEvent& event)
@@ -190,7 +209,7 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
     else
     {
         wxArrayString saida;
-        wxString comando = _("C:\\Users\\TICO\\Documents\\Projects\\progres\\bin\\Debug\\progres ") + verilogFilePath;
+        wxString comando = simuladorExePath + _(" ") + verilogFilePath;
 
         wxExecute(comando, saida);
 
@@ -240,4 +259,10 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
     //EditBox->SelectAll();
+}
+
+void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)
+{
+    IDEConfig* janelaCfg = new IDEConfig(this);
+    janelaCfg->Show();
 }
