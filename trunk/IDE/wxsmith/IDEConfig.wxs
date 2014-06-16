@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="IDEConfig">
+		<title>Configura</title>
+		<size>480,340</size>
+		<id_arg>0</id_arg>
+		<object class="wxButton" name="ID_BUTTON1" variable="btnSalvar" member="yes">
+			<label>Salvar</label>
+			<pos>304,304</pos>
+			<handler function="OnbtnSalvarClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxButton" name="ID_BUTTON2" variable="btnCancelar" member="yes">
+			<label>Cancelar</label>
+			<pos>392,304</pos>
+			<handler function="OnbtnCancelarClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxStaticText" name="ID_STATICTEXT1" variable="lblSimuladorPath" member="yes">
+			<label>Simulador:</label>
+			<pos>24,23</pos>
+		</object>
+		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="txtSimuladorPath" member="yes">
+			<pos>80,20</pos>
+			<size>304,21</size>
+		</object>
+		<object class="wxButton" name="ID_BUTTON3" variable="btnSimuladorPath" member="yes">
+			<label>Selecionar</label>
+			<pos>392,19</pos>
+			<handler function="OnbtnSimuladorPathClick" entry="EVT_BUTTON" />
+		</object>
+		<object class="wxFileDialog" variable="fileDiagSimuladorPath" member="yes">
+			<message>Selecionar o executavel do simulador</message>
+			<style>wxFD_DEFAULT_STYLE|wxFD_FILE_MUST_EXIST</style>
+		</object>
+	</object>
+</wxsmith>
