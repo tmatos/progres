@@ -12,42 +12,42 @@
 
 class IDEConfig: public wxDialog
 {
-	public:
+    public:
 
-		IDEConfig(wxWindow* parent,wxWindowID id=wxID_ANY);
-		virtual ~IDEConfig();
+        IDEConfig(wxWindow* parent,wxWindowID id=wxID_ANY);
+        virtual ~IDEConfig();
 
-		//(*Declarations(IDEConfig)
-		wxTextCtrl* txtSimuladorPath;
-		wxButton* btnSimuladorPath;
-		wxStaticText* lblSimuladorPath;
-		wxButton* btnSalvar;
-		wxButton* btnCancelar;
-		wxFileDialog* fileDiagSimuladorPath;
-		//*)
+        //(*Declarations(IDEConfig)
+        wxTextCtrl* txtSimuladorPath;
+        wxButton* btnSimuladorPath;
+        wxStaticText* lblSimuladorPath;
+        wxButton* btnSalvar;
+        wxButton* btnCancelar;
+        wxFileDialog* fileDiagSimuladorPath;
+        //*)
 
-	protected:
+    protected:
 
-		//(*Identifiers(IDEConfig)
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		static const long ID_STATICTEXT1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_BUTTON3;
-		//*)
+        //(*Identifiers(IDEConfig)
+        static const long ID_BUTTON1;
+        static const long ID_BUTTON2;
+        static const long ID_STATICTEXT1;
+        static const long ID_TEXTCTRL1;
+        static const long ID_BUTTON3;
+        //*)
 
-	private:
+    private:
 
-		//(*Handlers(IDEConfig)
-		void OnbtnCancelarClick(wxCommandEvent& event);
-		void OnbtnSimuladorPathClick(wxCommandEvent& event);
-		void OnbtnSalvarClick(wxCommandEvent& event);
-		//*)
+        //(*Handlers(IDEConfig)
+        void OnbtnCancelarClick(wxCommandEvent& event);
+        void OnbtnSimuladorPathClick(wxCommandEvent& event);
+        void OnbtnSalvarClick(wxCommandEvent& event);
+        //*)
 
         wxString simuladorExePath;
         wxConfig *config;
 
-		DECLARE_EVENT_TABLE()
+        DECLARE_EVENT_TABLE()
 };
 
 #endif

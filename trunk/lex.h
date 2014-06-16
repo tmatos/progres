@@ -1,18 +1,28 @@
+/**
+ * @file lex.h
+ * @brief Funcoes elementares de processamento lexico dos arquivos fonte.
+ */
+
 #ifndef LEX_H
 
 #define LEX_H
 
 #define MAX_TOKEN_SIZE 80
 
+/** @brief .
+ */
 typedef enum en_keyword {
     kw_module, kw_endmodule // nao sei se isso vai ficar mesmo
 } KeywordId;
 
+/** @brief .
+ */
 typedef enum en_grupoToken {
     tokenSimbolo, tokenPalavra, tokenIdent
 } GrupoToken;
 
-// Tipo basico para o elemento que representa um Token
+/** @brief Tipo basico para o elemento que representa um Token.
+ */
 typedef struct st_token {
     char valor[MAX_TOKEN_SIZE];
     int linha;
@@ -21,44 +31,61 @@ typedef struct st_token {
     struct st_token* seguinte;
 } Token;
 
-// Tipo para uma lista encadeada de Tokens
+/** @brief Tipo para uma lista encadeada de Tokens.
+ */
 typedef struct st_listaToken {
     Token* primeiro;
     Token* ultimo;
     int tamanho;
 } ListaToken;
 
-// Inicializa uma lista vazia, i. e., com zero elementos
+/** @brief Inicializa uma lista vazia, i. e., com zero elementos.
+ */
 ListaToken* novaListaToken();
 
-// Insere na lista um novo token a partir de um caractere, deve-se especificar a posicao do mesmo
+/** @brief Insere na lista um novo token a partir de um caractere, deve-se especificar a posicao do mesmo.
+ */
 int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
 
-// Insere na lista um novo token a partir de uma string, deve-se especificar a posicao do mesmo
+/** @brief Insere na lista um novo token a partir de uma string, deve-se especificar a posicao do mesmo.
+ */
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna);
 
-// Faz o apend de um char numa string qualquer
+/** @brief Faz o apend de um char numa string qualquer.
+ */
 int anexa(char* str, char c);
 
-// Retorna verdadeiro se c for um simbolo em verilog
+/** @brief Retorna verdadeiro se c for um simbolo em verilog.
+ *  @param c Um char qualquer.
+ *  @return True se c for simbolo, False caso contrario.
+ */
 int isSimbolo(char c);
 
-// Imprime na tela os tokens dessa lista, um por linha
+/** @brief Imprime na tela os tokens dessa lista, um por linha.
+ *  @return Void.
+ */
 void exibeListaDeToken(ListaToken* tokens);
 
-// Retorna verdadeiro se duas strings são iguais
+/** @brief Retorna verdadeiro se duas strings são iguais.
+ */
 int iguais(char* a, char* b);
 
-// Avanca o iterador de token para o proximo da lista
+/** @brief Avanca o iterador de token para o proximo da lista.
+ *  @param t Um ponteiro para um ponteiro de um Token.
+ *  @return Void.
+ */
 void avanca(Token** t);
 
-// Retorna verdadeiro se um token for uma palavra reservada em Verilog
+/** @brief Retorna verdadeiro se um token for uma palavra reservada em Verilog.
+ */
 int isPalavra(Token* tk);
 
-//
+/** @brief .
+ */
 int isIdentificador(Token* tk);
 
-// Retorna true se a string esta contida em algum token da lista
+/** @brief Retorna true se a string esta contida em algum token da lista.
+ */
 int identExiste(ListaToken* lst, char* str);
 
 #endif

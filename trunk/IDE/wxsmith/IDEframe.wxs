@@ -60,6 +60,9 @@
 					<help>Abrir um fonte Verilog</help>
 					<handler function="OnMenuItemOpen" entry="EVT_MENU" />
 				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
+					<label>Recentes</label>
+				</object>
 				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItemSair" member="no">
 					<label>Sair</label>
 					<accel>Alt-F4</accel>
