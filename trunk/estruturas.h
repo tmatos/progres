@@ -29,7 +29,7 @@ typedef struct st_sinal {
     int tempo;
 } t_sinal;
 
-/** @brief .
+/** @brief Estrutura que representa um componente do circuito (uma porta lógica)
  */
 typedef struct st_componente {
     char nome[16];
@@ -42,7 +42,7 @@ typedef struct st_componente {
     t_sinal saida;
 } * t_componente;
 
-/** @brief .
+/** @brief Estrutura que representa um circuito, mais especificamente um 'module'
  */
 typedef struct st_circuito {
     int numEntrada;
@@ -53,15 +53,16 @@ typedef struct st_circuito {
     struct st_sinal *sinaisSaida;
 } t_circuito;
 
-/** @brief .
+/** @brief Inicialização de uma estrutura de circuito
  */
 t_circuito* novoCircuito();
 
-/** @brief .
+/** @brief Inicialização de uma estrutura de
  */
 t_componente* novaListaCompon(int tamanho);
 
-/** @brief .
+/** @brief Inicialização de uma estrutura de componente.
+ *  @return Uma struct do componente.
  */
 t_componente novoComponente();
 
