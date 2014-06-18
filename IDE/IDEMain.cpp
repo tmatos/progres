@@ -158,10 +158,22 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     SetTitle(defaultWindowTitle);
 
     carregaConfigs();
+
+    if(AbrirUltimoAoIniciar) {
+        if(!UltimoArquivoVerilog.IsEmpty())
+            CarregarArquivoVerilog(UltimoArquivoVerilog);
+    }
 }
 
 IDEFrame::~IDEFrame()
 {
+    if(AbrirUltimoAoIniciar)
+    {
+        wxConfig *config = new wxConfig(_("ProgresIDE"));
+        config->Write(_("UltimoArquivoVerilog"), verilogFilePath);
+        delete config;
+    }
+
     //(*Destroy(IDEFrame)
     //*)
 }
@@ -169,7 +181,14 @@ IDEFrame::~IDEFrame()
 void IDEFrame::carregaConfigs()
 {
     wxConfig *config = new wxConfig(_("ProgresIDE"));
+
     config->Read(_("SimuladorExePath"), &simuladorExePath);
+
+    if(config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar))
+        config->Read(_("UltimoArquivoVerilog"), &UltimoArquivoVerilog);
+    else
+        AbrirUltimoAoIniciar = false;
+
     delete config;
 
     if(simuladorExePath.IsEmpty())
@@ -191,17 +210,22 @@ void IDEFrame::OnMenuItemOpen(wxCommandEvent& event)
 {
     if(FileDialogFonte->ShowModal() == wxID_OK)
     {
-        verilogFilePath = FileDialogFonte->GetPath();
-
-        EditBox->LoadFile(verilogFilePath);
-
-        SetTitle(defaultWindowTitle + _(" - ") + verilogFilePath);
-
-        textLenght = EditBox->GetNumberOfLines();
-        StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
-
-        ListBoxErros->Clear();
+        CarregarArquivoVerilog(FileDialogFonte->GetPath());
     }
+}
+
+void IDEFrame::CarregarArquivoVerilog(wxString arquivo)
+{
+    verilogFilePath = arquivo;
+
+    EditBox->LoadFile(verilogFilePath);
+
+    SetTitle(defaultWindowTitle + _(" - ") + verilogFilePath);
+
+    textLenght = EditBox->GetNumberOfLines();
+    StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
+
+    ListBoxErros->Clear();
 }
 
 void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
@@ -277,7 +301,8 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
-    EditBox->SelectAll(); // TODO
+    EditBox->SelectAll();
+    EditBox->SetFocus();
 }
 
 void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)
