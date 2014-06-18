@@ -27,6 +27,11 @@
 			<pos>392,19</pos>
 			<handler function="OnbtnSimuladorPathClick" entry="EVT_BUTTON" />
 		</object>
+		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="ChkAbrirUltimoAoIniciar" member="yes">
+			<label>Reabrir último documento ao iniciar</label>
+			<pos>24,168</pos>
+			<handler function="OnChkAbrirUltimoAoIniciarClick" entry="EVT_CHECKBOX" />
+		</object>
 		<object class="wxFileDialog" variable="fileDiagSimuladorPath" member="yes">
 			<message>Selecionar o executavel do simulador</message>
 			<style>wxFD_DEFAULT_STYLE|wxFD_FILE_MUST_EXIST</style>

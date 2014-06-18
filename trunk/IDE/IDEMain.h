@@ -29,6 +29,7 @@ class IDEFrame: public wxFrame
         virtual ~IDEFrame();
 
         void carregaConfigs();
+        void CarregarArquivoVerilog(wxString arquivo);
 
     private:
         //(*Handlers(IDEFrame)
@@ -86,7 +87,11 @@ class IDEFrame: public wxFrame
         //*)
 
         wxString verilogFilePath;
+
         wxString simuladorExePath;
+        bool AbrirUltimoAoIniciar;
+        wxString UltimoArquivoVerilog;
+
         wxString defaultWindowTitle;
         long textLenght;
 

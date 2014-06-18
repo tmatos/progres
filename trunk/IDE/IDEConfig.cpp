@@ -12,6 +12,7 @@ const long IDEConfig::ID_BUTTON2 = wxNewId();
 const long IDEConfig::ID_STATICTEXT1 = wxNewId();
 const long IDEConfig::ID_TEXTCTRL1 = wxNewId();
 const long IDEConfig::ID_BUTTON3 = wxNewId();
+const long IDEConfig::ID_CHECKBOX1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(IDEConfig,wxDialog)
@@ -29,11 +30,14 @@ IDEConfig::IDEConfig(wxWindow* parent,wxWindowID id)
 	lblSimuladorPath = new wxStaticText(this, ID_STATICTEXT1, _("Simulador:"), wxPoint(24,23), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	txtSimuladorPath = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(80,20), wxSize(304,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	btnSimuladorPath = new wxButton(this, ID_BUTTON3, _("Selecionar"), wxPoint(392,19), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	ChkAbrirUltimoAoIniciar = new wxCheckBox(this, ID_CHECKBOX1, _("Reabrir último documento ao iniciar"), wxPoint(24,168), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	ChkAbrirUltimoAoIniciar->SetValue(false);
 	fileDiagSimuladorPath = new wxFileDialog(this, _("Selecionar o executavel do simulador"), wxEmptyString, wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_DEFAULT_STYLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSalvarClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnCancelarClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSimuladorPathClick);
+	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&IDEConfig::OnChkAbrirUltimoAoIniciarClick);
 	//*)
 
 	config = new wxConfig(_("ProgresIDE"));
@@ -42,7 +46,12 @@ IDEConfig::IDEConfig(wxWindow* parent,wxWindowID id)
         txtSimuladorPath->ChangeValue(simuladorExePath);
     }
     else {
+    }
 
+    if ( config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar) ) {
+        ChkAbrirUltimoAoIniciar->SetValue(AbrirUltimoAoIniciar);
+    }
+    else {
     }
 
 }
@@ -73,6 +82,9 @@ void IDEConfig::OnbtnSalvarClick(wxCommandEvent& event)
     simuladorExePath = txtSimuladorPath->GetValue();
     config->Write(_("SimuladorExePath"), simuladorExePath);
 
+    AbrirUltimoAoIniciar = ChkAbrirUltimoAoIniciar->GetValue();
+    config->Write(_("AbrirUltimoAoIniciar"), AbrirUltimoAoIniciar);
+
     delete config; // deve salvar as configs
 
     IDEFrame* pai = (IDEFrame*) this->GetParent();
@@ -80,4 +92,8 @@ void IDEConfig::OnbtnSalvarClick(wxCommandEvent& event)
     pai->carregaConfigs();
 
     this->Close();
+}
+
+void IDEConfig::OnChkAbrirUltimoAoIniciarClick(wxCommandEvent& event)
+{
 }
