@@ -55,7 +55,7 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna);
  */
 int anexa(char* str, char c);
 
-/** @brief Retorna verdadeiro se c for um simbolo em verilog.
+/** @brief Retorna verdadeiro se c for um simbolo em Verilog.
  *  @param c Um char qualquer.
  *  @return True se c for simbolo, False caso contrario.
  */
@@ -70,21 +70,28 @@ void exibeListaDeToken(ListaToken* tokens);
  */
 int iguais(char* a, char* b);
 
-/** @brief Avanca o iterador de token para o proximo da lista.
+/** @brief Avanca o iterador de token para o próximo da lista.
  *  @param t Um ponteiro para um ponteiro de um Token.
  *  @return Void.
  */
 void avanca(Token** t);
 
-/** @brief Retorna verdadeiro se um token for uma palavra reservada em Verilog.
+/** @brief Verifica se um token é uma palavra reservada em Verilog.
+ *  @param tk Um objeto Token.
+ *  @return Verdadeiro se o valor do token for palavra reservada em Verilog, falso c. c.
  */
 int isPalavra(Token* tk);
 
-/** @brief .
+/** @brief Verifica se um token é um nome permitido de identificador.
+ *  @param str Uma string qualquer.
+ *  @return Verdadeiro se o valor do token for um nome permitido de identificador, falso c.c.
  */
 int isIdentificador(Token* tk);
 
-/** @brief Retorna true se a string esta contida em algum token da lista.
+/** @brief Retorna verdadeiro se a string esta contida em algum token da lista.
+ *  @param lst Uma lista de Tokens.
+ *  @param str Uma string qualquer.
+ *  @return Verdadeiro se str é o valor de algum Token em lst, falso caso contrário.
  */
 int identExiste(ListaToken* lst, char* str);
 

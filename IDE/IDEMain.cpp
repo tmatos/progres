@@ -13,6 +13,7 @@
 #include <wx/dcclient.h>
 #include <wx/textfile.h>
 #include <wx/filename.h>
+#include <wx/tokenzr.h>
 
 //(*InternalHeaders(IDEFrame)
 #include <wx/font.h>
@@ -250,18 +251,33 @@ void IDEFrame::OnEditBoxText(wxCommandEvent& event)
 
 void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 {
-    long line = 1;
-    long posicao = EditBox->XYToPosition(line, 0);
-    long lineSize = EditBox->GetLineLength(line);
-    StatusBarPrincipal->SetStatusText(wxString::Format(wxT("DBG: %i"), lineSize), 2);
-    EditBox->SetStyle(posicao, posicao+lineSize, wxTextAttr(*wxBLACK, *wxRED));
+    long line = 0; // primeira linha (origem em zero)
+
+    wxString msg = ListBoxErros->GetString(ListBoxErros->GetSelection());
+
+    wxStringTokenizer partes(msg, _(":"));
+
+    if ( partes.HasMoreTokens() )
+    {
+        wxString token = partes.GetNextToken();
+
+        if ( token.ToLong(&line) );
+            line--; // reajuste da origem das linhas
+    }
+
+    long posicao = EditBox->XYToPosition(0, line); // posicao na seq. completa do texto
+    long lineSize = EditBox->GetLineLength(line); // comprimento do texto nessa linha
+
+    //StatusBarPrincipal->SetStatusText(wxString::Format(wxT("DBG: %i"), lineSize), 2); // DEBG
+    //EditBox->SetStyle(posicao, posicao+lineSize, wxTextAttr(*wxBLACK, *wxRED));
+
     EditBox->SetInsertionPoint(posicao+lineSize);
     EditBox->SetFocus();
 }
 
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
-    //EditBox->SelectAll();
+    EditBox->SelectAll(); // TODO
 }
 
 void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)
