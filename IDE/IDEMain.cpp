@@ -60,7 +60,6 @@ const long IDEFrame::ID_MENUITEM8 = wxNewId();
 const long IDEFrame::idMenuQuit = wxNewId();
 const long IDEFrame::ID_MENUITEM6 = wxNewId();
 const long IDEFrame::ID_MENUITEM4 = wxNewId();
-const long IDEFrame::ID_MENUITEM5 = wxNewId();
 const long IDEFrame::ID_MENUITEM7 = wxNewId();
 const long IDEFrame::idMenuAbout = wxNewId();
 const long IDEFrame::ID_STATUSBAR1 = wxNewId();
@@ -124,8 +123,6 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Menu1->Append(MenuItemAnalisar);
     MenuBarPrincipal->Append(Menu1, _("Simulação"));
     MenuOpcoes = new wxMenu();
-    MenuItem3 = new wxMenuItem(MenuOpcoes, ID_MENUITEM5, _("Teste"), wxEmptyString, wxITEM_NORMAL);
-    MenuOpcoes->Append(MenuItem3);
     MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENUITEM7, _("Configura"), wxEmptyString, wxITEM_NORMAL);
     MenuOpcoes->Append(MenuItemConfig);
     MenuBarPrincipal->Append(MenuOpcoes, _("Opções"));
@@ -261,7 +258,42 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
 
     wxClientDC *canvas = new wxClientDC(panel);
     canvas->SetBrush( *wxRED_BRUSH );
-    canvas->DrawRectangle( 15, 15, 50, 70 );
+    //canvas->DrawRectangle( 15, 15, 50, 70 );
+
+    int n = 5; // num. de tempos
+    int un = 20; // qtd de pixels de uma unidadde
+    int x0 = 20, y0 = 30; // inicio do desenho
+    int x = x0, y = y0;
+    int vlr = 1; // valor lógico
+
+    int tx = x + un; // deslc. de pixel relat. ao tempo q passou
+    y = vlr ? y : y + 15;
+    canvas->DrawLine(x, y, tx, y);
+    x = tx;
+
+    vlr = 0;
+    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+
+    tx = x + un;
+    y = vlr ? y0 : y0 + 15;
+    canvas->DrawLine(x, y, tx, y);
+    x = tx;
+
+    vlr = 1;
+    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+
+    tx = x + (un * n);
+    y = vlr ? y0 : y0 + 15;
+    canvas->DrawLine(x, y, tx, y);
+    x = tx;
+
+    vlr = 0;
+    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+
+    tx = x + un* 234;
+    y = vlr ? y0 : y0 + 15;
+    canvas->DrawLine(x, y, tx, y);
+    x = tx;
 }
 
 void IDEFrame::OnEditBoxText(wxCommandEvent& event)
@@ -301,8 +333,10 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
-    EditBox->SelectAll();
-    EditBox->SetFocus();
+    if(bookFontes->GetSelection() == 0) {
+        EditBox->SelectAll();
+        EditBox->SetFocus();
+    }
 }
 
 void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)

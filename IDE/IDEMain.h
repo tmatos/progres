@@ -58,7 +58,6 @@ class IDEFrame: public wxFrame
         static const long idMenuQuit;
         static const long ID_MENUITEM6;
         static const long ID_MENUITEM4;
-        static const long ID_MENUITEM5;
         static const long ID_MENUITEM7;
         static const long idMenuAbout;
         static const long ID_STATUSBAR1;
@@ -75,7 +74,6 @@ class IDEFrame: public wxFrame
         wxMenuItem* MenuItemNovaOnda;
         wxNotebook* bookFontes;
         wxMenu* Menu1;
-        wxMenuItem* MenuItem3;
         wxMenuItem* MenuItemConfig;
         wxFileDialog* FileDialogFonte;
         wxMenuItem* MenuItemAnalisar;
