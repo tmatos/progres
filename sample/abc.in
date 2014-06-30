@@ -1,22 +1,22 @@
-# Exemplo de arquivo de entrada
-#
-# Em x(t), 1(t) e 0(t), t é a duração do sinal.
-# Em period(i, p, t), temos a geração de sinal periódico com
-# 'i' sendo o valor inicial (1 ou 0), 'p' o período e 't' a duração.
+// Exemplo de arquivo de entrada
+//
+// Em x(t), 1(t) e 0(t), t é a duração do sinal.
+// Em period(i, p, t), temos a geração de sinal periódico com
+// 'i' sendo o valor inicial (1 ou 0), 'p' o período e 't' a duração.
 
 a
 {
-x(10), 1(20), 0(30), 1(20)
+x(5), 1(10), 0(7), 1(15), X(20)
 }
 
 b
 {
-period(1;5;50),
+//period(1;5;50),
 1(40)
 }
 
 c
 {
-period(0;10;70),
+//period(0;10;70)
 }
 

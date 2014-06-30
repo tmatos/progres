@@ -11,166 +11,8 @@
 #include <ctype.h>
 
 #include "estruturas.h"
+#include "erros.h"
 #include "lex.h"
-
-void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
-    if(linha > 0)
-    {
-        printf("%d:", linha);
-
-        if(coluna > 0)
-            printf("%d:", coluna);
-    }
-
-    if(msg)
-    {
-        printf(" erro: %s.", msg);
-
-        if(esperado)
-        {
-            printf(" Esperava-se '%s', mas foi encontrado '%s'.", esperado, encontrado);
-        }
-    }
-
-    printf("\n");
-}
-
-ListaToken* tokeniza(FILE *arquivo) {
-    int linha = 1, coluna = 0;
-
-    ListaToken* tokens = novaListaToken();
-
-    ListaToken* retorno = NULL;
-
-    char c = '\0';
-    int erro = 0, fim = 0;
-
-    char* tok = (char*) malloc(sizeof(char));
-    strcpy(tok, "");
-
-    while(1) {
-        // A
-        strcpy(tok, "");
-        c = fgetc(arquivo);
-
-        if(c == EOF) {
-            printf("Final de arquivo alcancado.\n");
-            break;
-        }
-
-        if(isspace(c)) {
-            if(c == '\n') {
-                coluna = 0;
-                linha++;
-            }
-            else {
-                coluna++;
-            }
-
-            continue; // Volta para A
-        }
-
-        if(c == '/') {
-            coluna++;
-            c = fgetc(arquivo);
-
-            if(c == '/') {
-                coluna++;
-
-                while(c != '\n') {
-                    c = fgetc(arquivo);
-                    coluna++;
-                }
-
-                coluna = 0;
-                linha++;
-
-                continue; // volta pra A
-            }
-            /*else if(c == '*') {
-                coluna++;
-
-                c = fgetc(arquivo);
-
-                // TODO: Comentario de multiplas linhas
-            }*/
-            else {
-                exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
-                break;
-            }
-        }
-        else {
-            // B
-            if(isSimbolo(c)) {
-                coluna++;
-                insereToken(tokens, c, linha, coluna);
-                continue;
-            }
-            else {
-                if(isalnum(c)) {
-                    coluna++;
-                    anexa(tok, c);
-
-                    while(1) {
-                        c = fgetc(arquivo);
-
-                        if(isspace(c)) {
-                            if(c == '\n') {
-                                coluna = 0;
-                                linha++;
-                            }
-                            else {
-                                coluna++;
-                            }
-
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
-
-                            break;
-                        }
-                        else if(isSimbolo(c)) {
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
-                            coluna++;
-                            insereToken(tokens, c, linha, coluna);
-
-                            break;
-                        }
-                        else if(isalnum(c)) {
-                            coluna++;
-                            anexa(tok, c);
-                            // TODO: verificar tamanho maximo de palavra
-                            continue;
-                        }
-                        else if(c == EOF) {
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
-                            fim = 1;
-                            break;
-                        }
-                        else {
-                            exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
-                            erro = 1; //variavel local recebera indicativo de erro
-
-                            break;
-                        }
-                    }
-                }
-                else {
-                    exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
-                    break;
-                }
-            }
-        }
-
-        if(erro || fim)
-            break;
-
-    }
-
-    //exibeListaDeToken(tokens);
-
-    retorno = tokens;
-
-    return retorno;
-}
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
@@ -311,10 +153,145 @@ t_circuito* carregaCircuito(FILE *arquivo)
     return NULL;
 }
 
+Sinais* carregaEntradas(FILE *arquivo) {
+    int indice = -1; // indexador do vetor de sinais de entrada
+    Sinais* entradas = novaSinais();
+
+    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
+
+    ListaToken* tokens = tokeniza(arquivo);
+
+    if(!tokens)
+        return NULL;
+
+    Token* it = tokens->primeiro;
+
+    if(!it) {
+        printf("Arquivo de entrada aparentemente vazio.\n");
+        return NULL;
+    }
+
+    while(1) {
+        if( isSimbolo( it->valor[0] ) ) {
+            printf("Arquivo de entrada corrompido.\n");
+            return NULL;
+        }
+
+        insereTokenString(nomesUsados, it->valor, it->linha, it->coluna);
+
+        addSinal(entradas, it->valor);
+        indice++;
+
+        avanca(&it);
+
+        if(!it) {
+            printf("Arquivo de entrada corrompido.\n");
+            return NULL;
+        }
+
+        if( iguais(it->valor, "{") ) {
+            // loop para um sinal
+            while(1) {
+                avanca(&it);
+
+                if(!it) {
+                    printf("Arquivo de entrada corrompido.\n");
+                    return NULL;
+                }
+
+                t_valor valorLogico = nulo;
+
+                if(iguais(it->valor, "0")) {
+                    valorLogico = zero;
+                }
+                else if(iguais(it->valor, "1")) {
+                    valorLogico = um;
+                }
+                else if(iguais(it->valor, "x") || iguais(it->valor, "X")) {
+                    valorLogico = x;
+                }
+                else if(iguais(it->valor, "}")){
+                    break;
+                }
+                else {
+                    printf("Arquivo de entrada corrompido.\n");
+                    return NULL;
+                }
+
+                avanca(&it);
+
+                if(!it) {
+                    printf("Arquivo de entrada corrompido.\n");
+                    return NULL;
+                }
+
+                if(iguais(it->valor, "(")) {
+                    avanca(&it);
+
+                    if(!it) {
+                        printf("Arquivo de entrada corrompido.\n");
+                        return NULL;
+                    }
+
+                    if( apenasDigitos(it->valor) && (strlen(it->valor) < 5) ) { // importante não ser um valor muito grande
+                        addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
+                    }
+                    else {
+                        printf("Arquivo de entrada corrompido.\n");
+                        return NULL;
+                    }
+
+                    avanca(&it);
+
+                    if(!it) {
+                        printf("Arquivo de entrada corrompido.\n");
+                        return NULL;
+                    }
+
+                    if( iguais(it->valor, ")") ) {
+                        avanca(&it);
+
+                        if(!it) {
+                            printf("Arquivo de entrada corrompido.\n");
+                            return NULL;
+                        }
+
+                        if( iguais(it->valor, ",") )
+                            continue;
+                        else if( iguais(it->valor, "}") )
+                            break;
+                    }
+                    else {
+                        printf("Arquivo de entrada corrompido.\n");
+                        return NULL;
+                    }
+                }
+                else {
+                    printf("Arquivo de entrada corrompido.\n");
+                    return NULL;
+                }
+            }
+        }
+        else {
+            printf("Arquivo de entrada corrompido.\n");
+            return NULL;
+        }
+
+        avanca(&it);
+
+        if(!it) {
+            printf("Arquivo de entrada completamente lido.\n");
+            break;
+        }
+    }
+
+    return entradas;
+}
+
 int main(int argc, char* argv[])
 {
     if(argc < 2) {
-        printf("Uso: progres [nome de arquivo verilog]\n");
+        printf("Uso: progres [arquivo verilog] [arquivo de entradas]\n");
         exit(0);
     }
 
@@ -327,6 +304,8 @@ int main(int argc, char* argv[])
 
     t_circuito *circuto1 = carregaCircuito(arquivo);
 
+    fclose(arquivo);
+
     if(circuto1) {
         printf("Circuito carregado com sucesso.\n");
     }
@@ -334,7 +313,45 @@ int main(int argc, char* argv[])
         printf("Erro com o fonte.\n");
     }
 
-    fclose(arquivo);
+    // parte do arquivo wave_in (meieiro isso aqui...)
+    if(argc > 2)
+    {
+        FILE *wavein = fopen(argv[2], "r");
+
+        if(!wavein) {
+            printf("Impossibilitado de abrir o arquivo de entrada: %s\n", argv[2]);
+            exit(1);
+        }
+
+        printf("Abrindo o arquivo de entrada: %s\n", argv[2]);
+
+        Sinais* entradas = carregaEntradas(wavein);
+
+        fclose(wavein);
+
+        /// DBG
+        int i;
+
+        Pulso* it = entradas->lista[0].pulsos;
+        while(it->valor != nulo) {
+            for(i = 0 ; i < it->tempo ; i++) {
+                switch(it->valor) {
+                    case um:
+                        printf("-");
+                    break;
+                    case zero:
+                        printf("_");
+                        break;
+                    case x:
+                        printf("x");
+                        break;
+                }
+            }
+
+            it++;
+        }
+        /// DBG
+    }
 
     return 0;
 }

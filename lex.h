@@ -43,11 +43,23 @@ typedef struct st_listaToken {
  */
 ListaToken* novaListaToken();
 
-/** @brief Insere na lista um novo token a partir de um caractere, deve-se especificar a posicao do mesmo.
+/** @brief Insere na lista um novo token a partir de um caractere,
+            deve-se especificar a posicao do mesmo no arquivo.
+ *  @param lista Onde sera inserido o token.
+ *  @param tok Um token de apenas um caractere.
+ *  @param p_linha Linha no arquivo onde está o token.
+ *  @param p_coluna Coluna no arquivo onde inicia-se o token.
+ *  @return Verdadeiro caso sucesso, falso caso falhe.
  */
 int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
 
-/** @brief Insere na lista um novo token a partir de uma string, deve-se especificar a posicao do mesmo.
+/** @brief Insere na lista um novo token a partir de uma string,
+            deve-se especificar a posicao do mesmo no arquivo.
+ *  @param lista Onde sera inserido o token.
+ *  @param tok Uma string contendo o token.
+ *  @param p_linha Linha no arquivo onde está o token.
+ *  @param p_coluna Coluna no arquivo onde inicia-se o token.
+ *  @return Verdadeiro caso sucesso, falso caso falhe.
  */
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna);
 
@@ -94,5 +106,18 @@ int isIdentificador(Token* tk);
  *  @return Verdadeiro se str é o valor de algum Token em lst, falso caso contrário.
  */
 int identExiste(ListaToken* lst, char* str);
+
+/** @brief Cria uma lista de Tokens que tem significado para o processamento
+            sintatico, a partir do arquivo com o codigo fonte em Verilog.
+ *  @param arquivo O handler do arquivo a ser processado.
+ *  @return A lista de tokens.
+ */
+ListaToken* tokeniza(FILE *arquivo);
+
+/** @brief Verifica se uma string contém apenas dígitos (0, 1, 2, ..., 9).
+ *  @param str Uma string qualquer.
+ *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
+ */
+int apenasDigitos(char* str);
 
 #endif
