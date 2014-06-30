@@ -1,11 +1,15 @@
 /*
  Progres - Simulador de circuitos combinacionais em Verilog
+ (C) 2014, Tiago Matos, Joao Victor, Luciano Almeida
+
+ Under the terms of the MIT license.
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "erros.h"
 #include "lex.h"
 
 ListaToken* novaListaToken() {
@@ -62,7 +66,7 @@ int anexa(char* str, char c) {
 }
 
 int isSimbolo(char c) {
-    return (c == '(' || c == ')' || c == ',' || c == ';');
+    return (c == '(' || c == ')' || c == ',' || c == ';' || c == '{' || c == '}');
 }
 
 void exibeListaDeToken(ListaToken* tokens) {
@@ -159,4 +163,157 @@ int isIdentificador(Token* tk) {
         return 0;
 
     return 1;
+}
+
+ListaToken* tokeniza(FILE *arquivo) {
+    int linha = 1, coluna = 0;
+
+    ListaToken* tokens = novaListaToken();
+
+    ListaToken* retorno = NULL;
+
+    char c = '\0';
+    int erro = 0, fim = 0;
+
+    char* tok = (char*) malloc(sizeof(char));
+    strcpy(tok, "");
+
+    while(1) {
+        // A
+        strcpy(tok, "");
+        c = fgetc(arquivo);
+
+        if(c == EOF) {
+            printf("Final de arquivo alcancado.\n");
+            break;
+        }
+
+        if(isspace(c)) {
+            if(c == '\n') {
+                coluna = 0;
+                linha++;
+            }
+            else {
+                coluna++;
+            }
+
+            continue; // Volta para A
+        }
+
+        if(c == '/') {
+            coluna++;
+            c = fgetc(arquivo);
+
+            if(c == '/') {
+                coluna++;
+
+                while(c != '\n') {
+                    c = fgetc(arquivo);
+                    coluna++;
+                }
+
+                coluna = 0;
+                linha++;
+
+                continue; // volta pra A
+            }
+            /*else if(c == '*') {
+                coluna++;
+
+                c = fgetc(arquivo);
+
+                // TODO: Comentario de multiplas linhas
+            }*/
+            else {
+                exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
+                break;
+            }
+        }
+        else {
+            // B
+            if(isSimbolo(c)) {
+                coluna++;
+                insereToken(tokens, c, linha, coluna);
+                continue;
+            }
+            else {
+                if(isalnum(c)) {
+                    coluna++;
+                    anexa(tok, c);
+
+                    while(1) {
+                        c = fgetc(arquivo);
+
+                        if(isspace(c)) {
+                            if(c == '\n') {
+                                coluna = 0;
+                                linha++;
+                            }
+                            else {
+                                coluna++;
+                            }
+
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+
+                            break;
+                        }
+                        else if(isSimbolo(c)) {
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            coluna++;
+                            insereToken(tokens, c, linha, coluna);
+
+                            break;
+                        }
+                        else if(isalnum(c)) {
+                            coluna++;
+                            anexa(tok, c);
+                            // TODO: verificar tamanho maximo de palavra
+                            continue;
+                        }
+                        else if(c == EOF) {
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            fim = 1;
+                            break;
+                        }
+                        else {
+                            exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                            erro = 1; //variavel local recebera indicativo de erro
+
+                            break;
+                        }
+                    }
+                }
+                else {
+                    exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                    break;
+                }
+            }
+        }
+
+        if(erro || fim)
+            break;
+
+    }
+
+    //exibeListaDeToken(tokens);
+
+    retorno = tokens;
+
+    return retorno;
+}
+
+int apenasDigitos(char* str) {
+    int i, ret = 1;
+
+    if(!str)
+        return 0;
+
+    for( i=0 ; i < strlen(str) ; i++ ) {
+        if( !isdigit(str[i]) ) {
+            ret = 0;
+            break;
+        }
+    }
+
+    return ret;
 }

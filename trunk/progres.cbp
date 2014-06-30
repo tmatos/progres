@@ -32,6 +32,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="erros.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="erros.h" />
 		<Unit filename="estruturas.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -44,6 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="progres.h" />
+		<Unit filename="sinais.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sinais.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -14,22 +14,11 @@
  */
 t_circuito* carregaCircuito(FILE* arquivo);
 
-/** @brief Cria uma lista de Tokens que tem significado para o processamento
-            sintatico, a partir do arquivo com o codigo fonte em Verilog.
- *  @param arquivo O handler do arquivo a ser processado.
- *  @return A lista de tokens.
+/** @brief Cria uma estrutura de dados representando todos os sinas de entrada
+            lidos partir do arquivo de entrada correspondente (extensão *.in).
+ *  @param arquivo O handler do arquivo de entrada com sinais a ser processado.
+ *  @return A estrutura de dados contendo todos os sinais lidos do arquivo.
  */
-ListaToken* tokeniza(FILE *arquivo);
-
-/** @brief Exibe na saida padrao, uma mensagem de erro relativa a analise
-            lexica ou sintatica do arquivo fonte em questao.
- *  @param msg O texto da mensagem de erro a ser exibida.
- *  @param linha A linha onde ocorre o erro no fonte. -1 para omitir.
- *  @param coluna A coluna onde ocorre o erro no fonte. -1 para omitir.
- *  @param esperado Uma string com o que era esperado. NULL para omitir.
- *  @param encontrado Uma string com o que foi encontrado no lugar. NULL para omitir.
- *  @return Void.
- */
-void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
+Sinais* carregaEntradas(FILE *arquivo)
 
 #endif

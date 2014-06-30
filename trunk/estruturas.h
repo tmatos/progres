@@ -7,13 +7,11 @@
 
 #define ESTRUTURAS_H
 
-/** @brief .
- */
-typedef enum en_operador {op_and, op_or, op_not, op_nand, op_xor, wire} t_operador;
+#include "sinais.h"
 
 /** @brief .
  */
-typedef enum en_valor {zero = 0, um = 1, x} t_valor;
+typedef enum en_operador {op_and, op_or, op_not, op_nand, op_xor, wire} t_operador;
 
 /** @brief .
  */
@@ -22,24 +20,17 @@ typedef struct st_tipo {
     int atraso;
 } t_tipo;
 
-/** @brief .
- */
-typedef struct st_sinal {
-    t_valor valor;
-    int tempo;
-} t_sinal;
-
 /** @brief Estrutura que representa um componente do circuito (uma porta lógica)
  */
 typedef struct st_componente {
     char nome[16];
     struct st_componente **listaEntrada;
     int numEntrada;
-    t_sinal *sinalEntrada;
+    Sinal sinalEntrada;
     struct st_componente **listaSaida;
     int numSaida;
     t_tipo tipo;
-    t_sinal saida;
+    Sinal saida;
 } * t_componente;
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'
