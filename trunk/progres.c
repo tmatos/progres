@@ -329,10 +329,14 @@ int main(int argc, char* argv[])
 
         fclose(wavein);
 
-        /// DBG
-        int i;
+        // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
+        // e com o mesmo formato do arquivo de entrada.
+        //salvarSinais(entradas, "saida.out");
 
-        Pulso* it = entradas->lista[0].pulsos;
+        /// DBG - O codigo abaixo mostra na tela um array de pulosos, isto e, um sinal
+        /*int i;
+
+        Pulso* it = entradas->lista[0].pulsos; // Aqui, o indice 0 indica qual dos sinas na lista
         while(it->valor != nulo) {
             for(i = 0 ; i < it->tempo ; i++) {
                 switch(it->valor) {
@@ -349,7 +353,7 @@ int main(int argc, char* argv[])
             }
 
             it++;
-        }
+        }*/
         /// DBG
     }
 
