@@ -1,8 +1,12 @@
 // Exemplo de arquivo de entrada
 //
-// Em x(t), 1(t) e 0(t), t é a duração do sinal.
-// Em period(i, p, t), temos a geração de sinal periódico com
+// Tudo após uma '//' é comentário e será descartado.
+//
+// Em x(t), 1(t) e 0(t), 't' é a duração do sinal e 'x', '1' ou '0', os possíveis valores.
+//
+// Em period(i; p; t), temos a geração de sinal periódico com
 // 'i' sendo o valor inicial (1 ou 0), 'p' o período e 't' a duração.
+// Mas até hoje, 30 de junho, isto não está implementado, tb não é prioridade.
 
 a
 {
