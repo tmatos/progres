@@ -3,7 +3,7 @@
 
 module ok(a , b, c);
 
-input a;// sinal de entrada
+input a,b;// sinal de entrada
 
 and(a, x, y);
 

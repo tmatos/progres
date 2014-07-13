@@ -55,6 +55,65 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
     return 1;
 }
 
+int removeTokensPorValor(ListaToken* lst, char* tok) {
+    if(!lst || !tok)
+        return 0;
+
+    if(!lst->primeiro)
+        return 1;
+
+    Token* tmp = NULL;
+
+    Token* anterior = NULL;
+    Token* it = lst->primeiro;
+    while(it) {
+        if(iguais(it->valor, tok)) {
+            if(anterior) {
+                if(it->seguinte) {
+                    anterior->seguinte = it->seguinte;
+                    tmp = it;
+                    anterior = it;
+                    avanca(&it);
+                    free(tmp);
+                    lst->tamanho--;
+                    continue;
+                }
+                else { // caso em que removemos do final da lista
+                    tmp = it;
+                    anterior->seguinte = NULL;
+                    lst->ultimo = anterior;
+                    lst->tamanho--;
+                    free(tmp);
+                    break;
+                }
+            }
+            else {
+                if(it->seguinte) {
+                    tmp = it;
+                    lst->primeiro = it->seguinte;
+                    avanca(&it);
+                    free(tmp);
+                    lst->tamanho--;
+                    continue;
+                }
+                else { // lista com um unico item e que será removido
+                    tmp = it;
+                    lst->primeiro = NULL;
+                    lst->ultimo = NULL;
+                    lst->tamanho--;
+                    free(tmp);
+                    break;
+                }
+            }
+        }
+
+        anterior = it;
+        avanca(&it);
+    }
+
+    return 1;
+}
+
 int anexa(char* str, char c) {
     char tmp[2] = {c, '\0'};
 
@@ -70,7 +129,7 @@ int isSimbolo(char c) {
 }
 
 void exibeListaDeToken(ListaToken* tokens) {
-    printf(" -=-=- LISTA DE TOKENS CAPTURADOS -=-=-\n\n");
+    printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
     Token* it = tokens->primeiro;
     while(it) {
         printf("%s\n", it->valor);
