@@ -56,6 +56,7 @@ int setPulsoNulo(Pulso* p);
 int addPulso(Sinal* s, t_valor valor, int tempo);
 
 /** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de memória.
+            Vazia significa: primeiro e ultimo apontam a NULL e num. de elem. é zero.
  */
 Sinais* novaSinais();
 

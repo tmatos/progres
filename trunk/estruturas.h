@@ -37,11 +37,11 @@ typedef struct st_componente {
  */
 typedef struct st_circuito {
     int numEntrada;
-    struct st_sinal *sinaisEntrada;
+    Sinais *sinaisEntrada;
     struct st_componente **listaFiosEntrada;
     struct st_componente **listaFiosSaida;
     int numSaida;
-    struct st_sinal *sinaisSaida;
+    Sinais *sinaisSaida;
 } t_circuito;
 
 /** @brief Inicialização de uma estrutura de circuito

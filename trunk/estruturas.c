@@ -13,8 +13,8 @@ t_circuito* novoCircuito() {
 
     circuito->numEntrada = 0;
     circuito->numSaida = 0;
-    circuito->sinaisEntrada = NULL;
-    circuito->sinaisSaida = NULL;
+    circuito->sinaisEntrada = novaSinais();
+    circuito->sinaisSaida = novaSinais();
     circuito->listaFiosEntrada = NULL;
     circuito->listaFiosSaida = NULL;
 
