@@ -136,62 +136,72 @@ t_circuito* carregaCircuito(FILE *arquivo)
         return NULL;
     }
 
-    // (continuar aqui...)
+    while(1) {
 
-    if(iguais(it->valor, "input")) {
-        avanca(&it);
-
-        virgula = 0; // não esperando por uma virgula inicialmente
-
-        while(1) {
-            if(!it) {
-                if(virgula)
-                    exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
-                else
-                    exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
-
-                return NULL;
-            }
-
-            if(iguais(it->valor, ";"))
-                break;
-
-            if(virgula) {
-                if(iguais(it->valor, ",")) {
-                    virgula = 0;
-                    avanca(&it);
-                    continue; // ainda permite uma virgula a mais...
-                }
-                else {
-                    exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "uma virgula ou ;", it->valor);
-                    return NULL;
-                }
-            }
-
-            if(!identExiste(identificLivre, it->valor)) {
-                exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido", it->linha, it->coluna, NULL, NULL);
-                return NULL;
-            }
-
-            // TODO: atribui como entrada o ident. na estrutura
-
-            removeTokensPorValor(identificLivre, it->valor);
-
-            virgula = 1;
+        if(iguais(it->valor, "input") || iguais(it->valor, "output")) {
+            char tipo[MAX_TOKEN_SIZE]; // usado posteriormente para saber se os ident. serão in ou out
+            strcpy(tipo, it->valor);
 
             avanca(&it);
+
+            virgula = 0; // não esperando por uma virgula inicialmente
+
+            while(1) {
+                if(!it) {
+                    if(virgula)
+                        exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
+                    else
+                        exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
+
+                    return NULL;
+                }
+
+                if(iguais(it->valor, ";"))
+                    break;
+
+                if(virgula) {
+                    if(iguais(it->valor, ",")) {
+                        virgula = 0;
+                        avanca(&it);
+                        continue; // ainda permite uma virgula a mais...
+                    }
+                    else {
+                        exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "uma virgula ou ;", it->valor);
+                        return NULL;
+                    }
+                }
+
+                if(!identExiste(identificLivre, it->valor)) {
+                    exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido", it->linha, it->coluna, NULL, NULL);
+                    return NULL;
+                }
+
+                if(iguais(tipo, "input")) {
+                    circuito->numEntrada++;
+                    // TODO: atribui como entrada o ident. na estrutura
+                }
+                else if (iguais(tipo, "output")) {
+                    circuito->numSaida++;
+                    // TODO: atribui como saída o ident. na estrutura
+                }
+
+                removeTokensPorValor(identificLivre, it->valor);
+
+                virgula = 1;
+
+                avanca(&it);
+            }
         }
-    }
-    else if(iguais(it->valor, "output")) {
+        else if(iguais(it->valor, "wire")) {
 
-    }
-    else if(iguais(it->valor, "wire")) {
-
-    }
-
-    while(it) {
+        }
 
         avanca(&it);
+
+        if(!it) {
+            exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
+            return NULL;
+        }
     }
 
     return NULL;
