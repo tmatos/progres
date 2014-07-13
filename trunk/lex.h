@@ -63,6 +63,10 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
  */
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna);
 
+/** @brief Remove todos os tokens com o valor indicado da lista.
+ */
+int removeTokensPorValor(ListaToken* lst, char* tok);
+
 /** @brief Faz o apend de um char numa string qualquer.
  */
 int anexa(char* str, char c);

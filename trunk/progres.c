@@ -14,6 +14,8 @@
 #include "erros.h"
 #include "lex.h"
 
+#define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
+
 t_circuito* carregaCircuito(FILE *arquivo)
 {
     t_circuito *circuito = novoCircuito();
@@ -103,6 +105,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
             else {
                 insereTokenString(identificadores, it->valor, -1, -1);
+                insereTokenString(identificLivre, it->valor, -1, -1);
                 virgula = 1;
             }
         }
@@ -129,14 +132,55 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'", -1, -1, NULL, NULL);
+        exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
         return NULL;
     }
 
     // (continuar aqui...)
 
     if(iguais(it->valor, "input")) {
+        avanca(&it);
 
+        virgula = 0; // não esperando por uma virgula inicialmente
+
+        while(1) {
+            if(!it) {
+                if(virgula)
+                    exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
+                else
+                    exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
+
+                return NULL;
+            }
+
+            if(iguais(it->valor, ";"))
+                break;
+
+            if(virgula) {
+                if(iguais(it->valor, ",")) {
+                    virgula = 0;
+                    avanca(&it);
+                    continue; // ainda permite uma virgula a mais...
+                }
+                else {
+                    exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "uma virgula ou ;", it->valor);
+                    return NULL;
+                }
+            }
+
+            if(!identExiste(identificLivre, it->valor)) {
+                exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido", it->linha, it->coluna, NULL, NULL);
+                return NULL;
+            }
+
+            // TODO: atribui como entrada o ident. na estrutura
+
+            removeTokensPorValor(identificLivre, it->valor);
+
+            virgula = 1;
+
+            avanca(&it);
+        }
     }
     else if(iguais(it->valor, "output")) {
 
@@ -173,7 +217,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
     while(1) {
         if( isSimbolo( it->valor[0] ) ) {
-            printf("Arquivo de entrada corrompido.\n");
+            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
@@ -185,7 +229,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
         avanca(&it);
 
         if(!it) {
-            printf("Arquivo de entrada corrompido.\n");
+            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
@@ -195,7 +239,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                 avanca(&it);
 
                 if(!it) {
-                    printf("Arquivo de entrada corrompido.\n");
+                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
@@ -214,14 +258,14 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     break;
                 }
                 else {
-                    printf("Arquivo de entrada corrompido.\n");
+                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
                 avanca(&it);
 
                 if(!it) {
-                    printf("Arquivo de entrada corrompido.\n");
+                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
@@ -229,7 +273,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     avanca(&it);
 
                     if(!it) {
-                        printf("Arquivo de entrada corrompido.\n");
+                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
@@ -237,14 +281,14 @@ Sinais* carregaEntradas(FILE *arquivo) {
                         addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
                     }
                     else {
-                        printf("Arquivo de entrada corrompido.\n");
+                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
                     avanca(&it);
 
                     if(!it) {
-                        printf("Arquivo de entrada corrompido.\n");
+                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
@@ -252,7 +296,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                         avanca(&it);
 
                         if(!it) {
-                            printf("Arquivo de entrada corrompido.\n");
+                            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                             return NULL;
                         }
 
@@ -262,18 +306,18 @@ Sinais* carregaEntradas(FILE *arquivo) {
                             break;
                     }
                     else {
-                        printf("Arquivo de entrada corrompido.\n");
+                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
                 }
                 else {
-                    printf("Arquivo de entrada corrompido.\n");
+                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
             }
         }
         else {
-            printf("Arquivo de entrada corrompido.\n");
+            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
