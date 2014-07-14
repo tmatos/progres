@@ -28,3 +28,8 @@ void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encont
 
     printf("\n");
 }
+
+void erroFatalMemoria() {
+    printf("\nERRO FATAL: Sem memoria para alocar.\n");
+    exit(-1);
+}

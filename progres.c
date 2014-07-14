@@ -21,8 +21,13 @@ t_circuito* carregaCircuito(FILE *arquivo)
     t_circuito *circuito = novoCircuito();
 
     ListaToken* tokens = tokeniza(arquivo);
+
     ListaToken* identificadores = novaListaToken(); // lista de todos os identificadores
     ListaToken* identificLivre = novaListaToken(); // lista de ident. de entrada ou saida ainda nao definidos como tal
+
+    ListaToken* listaInput = novaListaToken(); // lista de todos os identificadores das entradas
+    ListaToken* listaOutput = novaListaToken(); // lista de todos os identificadores das saidas
+    ListaToken* listaWire = novaListaToken(); // lista de todos os identificadores de wire
 
     if(!tokens)
         return NULL;
@@ -138,7 +143,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     while(1) {
 
-        if(iguais(it->valor, "input") || iguais(it->valor, "output")) {
+        if(iguais(it->valor, "input") || iguais(it->valor, "output") || iguais(it->valor, "wire")) {
             char tipo[MAX_TOKEN_SIZE]; // usado posteriormente para saber se os ident. serão in ou out
             strcpy(tipo, it->valor);
 
@@ -171,18 +176,42 @@ t_circuito* carregaCircuito(FILE *arquivo)
                     }
                 }
 
-                if(!identExiste(identificLivre, it->valor)) {
+                if(!iguais(tipo, "wire") && !identExiste(identificLivre, it->valor)) {
                     exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido", it->linha, it->coluna, NULL, NULL);
                     return NULL;
                 }
 
                 if(iguais(tipo, "input")) {
+                    insereTokenString(listaInput, it->valor, -1, -1);
                     circuito->numEntrada++;
+
                     // TODO: atribui como entrada o ident. na estrutura
+
                 }
                 else if (iguais(tipo, "output")) {
+                    insereTokenString(listaOutput, it->valor, -1, -1);
                     circuito->numSaida++;
+
                     // TODO: atribui como saída o ident. na estrutura
+                }
+                else if(iguais(tipo, "wire")) {
+
+                    if(isIdentificador(it)) {
+                        if(identExiste(identificadores, it->valor)) {
+                            printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n", it->linha, it->coluna, it->valor);
+                            return NULL;
+                        }
+                        else {
+                            insereTokenString(identificadores, it->valor, -1, -1);
+                            insereTokenString(listaWire, it->valor, -1, -1);
+
+                            // TODO: atribui como wire o ident. na estrutura
+                        }
+                    }
+                    else {
+                        exibeMsgErro("Identificador nao foi encontrado", it->linha, it->coluna, "um identificador", it->valor);
+                        return NULL;
+                    }
                 }
 
                 removeTokensPorValor(identificLivre, it->valor);
@@ -192,14 +221,37 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 avanca(&it);
             }
         }
-        else if(iguais(it->valor, "wire")) {
+        else if(iguais(it->valor, "not")) {
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado '('", -1, -1, NULL, NULL);
+                return NULL;
+            }
+            else if(!iguais(it->valor, "(")) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "(", it->valor);
+                return NULL;
+            }
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado um fio ou saida", -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if(1) { // se it->valor nao esta na lista de saidas ou na lista de wires
+
+            }
+        }
+        else if(iguais(it->valor, "and") || iguais(it->valor, "or")) {
 
         }
 
         avanca(&it);
 
         if(!it) {
-            exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
+            //exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
             return NULL;
         }
     }

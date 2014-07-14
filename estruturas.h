@@ -26,12 +26,12 @@ typedef struct st_componente {
     char nome[16];
     struct st_componente **listaEntrada;
     int numEntrada;
-    Sinal sinalEntrada;
+    Sinal* sinalEntrada;
     struct st_componente **listaSaida;
     int numSaida;
     t_tipo tipo;
-    Sinal saida;
-} * t_componente;
+    Sinal* saida;
+} * Componente;
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'
  */
@@ -50,11 +50,11 @@ t_circuito* novoCircuito();
 
 /** @brief Inicialização de uma estrutura de
  */
-t_componente* novaListaCompon(int tamanho);
+Componente* novaListaCompon(int tamanho);
 
 /** @brief Inicialização de uma estrutura de componente.
  *  @return Uma struct do componente.
  */
-t_componente novoComponente();
+Componente novoComponente();
 
 #endif
