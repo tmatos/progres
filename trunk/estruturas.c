@@ -6,6 +6,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "estruturas.h"
 
 t_circuito* novoCircuito() {
@@ -13,18 +14,30 @@ t_circuito* novoCircuito() {
 
     circuito->numEntrada = 0;
     circuito->numSaida = 0;
-    circuito->sinaisEntrada = novaSinais();
-    circuito->sinaisSaida = novaSinais();
+    circuito->sinaisEntrada = NULL;
+    circuito->sinaisSaida = NULL;
     circuito->listaFiosEntrada = NULL;
     circuito->listaFiosSaida = NULL;
 
     return circuito;
 }
 
-t_componente* novaListaCompon(int tamanho) {
-    return (t_componente*) malloc(sizeof(t_componente) * tamanho);
+Componente* novaListaCompon(int tamanho) {
+    return (Componente*) malloc(sizeof(Componente) * tamanho);
 }
 
-t_componente novoComponente() {
-    return (t_componente) malloc(sizeof(struct st_componente));
+Componente novoComponente(char* nome, t_tipo tipo) {
+    Componente c = (Componente) malloc(sizeof(struct st_componente));
+
+    strcpy(c->nome, nome);
+    c->tipo = tipo;
+
+    c->numEntrada = 0;
+    c->numSaida = 0;
+    c->sinalEntrada = NULL;
+    c->saida = NULL;
+    c->listaEntrada = NULL;
+    c->listaSaida = NULL;
+
+    return c;
 }

@@ -176,6 +176,16 @@ int isPalavra(Token* tk) {
     char* valor = (char*) malloc(sizeof(char) * MAX_TOKEN_SIZE);
     strcpy(valor, tk->valor);
 
+    // em primeiro lugar, as portas
+    if(iguais(valor, "nand")) return 1;
+    if(iguais(valor, "nor")) return 1;
+    if(iguais(valor, "and")) return 1;
+    if(iguais(valor, "or")) return 1;
+    if(iguais(valor, "xor")) return 1;
+    if(iguais(valor, "xnor")) return 1;
+    if(iguais(valor, "not")) return 1;
+    if(iguais(valor, "buf")) return 1;
+
     if(iguais(valor, "module")) return 1;
     if(iguais(valor, "parameter")) return 1;
     if(iguais(valor, "localparam")) return 1;
