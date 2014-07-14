@@ -22,6 +22,24 @@ t_circuito* novoCircuito() {
     return circuito;
 }
 
+int adicionaEntrada(t_circuito* circ, Componente comp) {
+    if(!circ || !comp)
+        return 0;
+
+    //circ->numEntrada++; // tirar isso do chamador antes de descomentar
+
+    if(!circ->listaFiosEntrada) { //TODO: checagens de memoria
+        circ->listaFiosEntrada = (Componente*) malloc(sizeof(Componente));
+        circ->listaFiosEntrada[0] = comp; //(Componente) malloc(sizeof(struct st_componente));
+    }
+    else { //TODO: checagens de memoria
+        circ->listaFiosEntrada = (Componente*) realloc( circ->listaFiosEntrada, sizeof(Componente) * circ->numEntrada );
+        circ->listaFiosEntrada[circ->numEntrada - 1] = comp;
+    }
+
+    return 1;
+}
+
 Componente* novaListaCompon(int tamanho) {
     return (Componente*) malloc(sizeof(Componente) * tamanho);
 }
