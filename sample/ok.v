@@ -9,6 +9,6 @@ output c;
 
 wire tmp;
 
-not(c, a); and(a, x, y);
+not(tmp, a); and(a, x, y);
 
 endmodule

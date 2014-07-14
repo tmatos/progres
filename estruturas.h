@@ -38,8 +38,8 @@ typedef struct st_componente {
 typedef struct st_circuito {
     int numEntrada;
     Sinais *sinaisEntrada;
-    struct st_componente **listaFiosEntrada;
-    struct st_componente **listaFiosSaida;
+    Componente *listaFiosEntrada;
+    Componente *listaFiosSaida;
     int numSaida;
     Sinais *sinaisSaida;
 } t_circuito;
@@ -56,5 +56,7 @@ Componente* novaListaCompon(int tamanho);
  *  @return Uma struct do componente.
  */
 Componente novoComponente();
+
+int adicionaEntrada(t_circuito* circ, Componente comp);
 
 #endif

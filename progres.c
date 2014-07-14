@@ -186,6 +186,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                     circuito->numEntrada++;
 
                     // TODO: atribui como entrada o ident. na estrutura
+                    Componente cp = novoComponente(it->valor, wire);
+                    adicionaEntrada(circuito, cp);
 
                 }
                 else if (iguais(tipo, "output")) {
@@ -240,11 +242,69 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
 
-            if(1) { // se it->valor nao esta na lista de saidas ou na lista de wires
+            if(identExiste(listaWire, it->valor) || identExiste(listaOutput, it->valor)) {
+                //TODO: inserir a porta
+            }
+            else {
+                exibeMsgErro("Fio ou saida nao foi encontrado", it->linha, it->coluna, "ident. para um fio ou saida", it->valor);
+                return NULL;
+            }
 
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if(!iguais(it->valor, ",")) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ",", it->valor);
+                return NULL;
+            }
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperada um identificador", -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if(identExiste(listaWire, it->valor) || identExiste(listaInput, it->valor) || identExiste(listaOutput, it->valor)) {
+                //TODO: inserir a porta
+            }
+            else {
+                exibeMsgErro("Entrada da porta invalida", it->linha, it->coluna, "uma entrada valida (tipos: input, output ou wire)", it->valor);
+                return NULL;
+            }
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado )", -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if(!iguais(it->valor, ")")) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ")", it->valor);
+                return NULL;
+            }
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado ;", -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if(!iguais(it->valor, ";")) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ";", it->valor);
+                return NULL;
             }
         }
         else if(iguais(it->valor, "and") || iguais(it->valor, "or")) {
+
+        }
+        else if(iguais(it->valor, "endmodule")) {
 
         }
 
