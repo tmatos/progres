@@ -56,6 +56,7 @@ const long IDEFrame::ID_MENUITEM2 = wxNewId();
 const long IDEFrame::ID_MENUITEM3 = wxNewId();
 const long IDEFrame::ID_MENUITEM1 = wxNewId();
 const long IDEFrame::idMenuOpen = wxNewId();
+const long IDEFrame::idMenuSave = wxNewId();
 const long IDEFrame::ID_MENUITEM8 = wxNewId();
 const long IDEFrame::idMenuQuit = wxNewId();
 const long IDEFrame::ID_MENUITEM6 = wxNewId();
@@ -107,8 +108,11 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     MenuArquivo->Append(ID_MENUITEM1, _("Novo"), MenuItem2, wxEmptyString);
     MenuItem1 = new wxMenuItem(MenuArquivo, idMenuOpen, _("Abrir\tCtrl-O"), _("Abrir um fonte Verilog"), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem1);
+    MenuItemSave = new wxMenuItem(MenuArquivo, idMenuSave, _("Salvar\tCtrl-S"), _("Salvar o arquivo em edição"), wxITEM_NORMAL);
+    MenuArquivo->Append(MenuItemSave);
     MenuItem4 = new wxMenuItem(MenuArquivo, ID_MENUITEM8, _("Recentes"), wxEmptyString, wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem4);
+    MenuArquivo->AppendSeparator();
     MenuItemSair = new wxMenuItem(MenuArquivo, idMenuQuit, _("Sair\tAlt-F4"), _("Encerrar o aplicativo."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSair);
     MenuBarPrincipal->Append(MenuArquivo, _("&Arquivo"));
@@ -144,6 +148,7 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemNovoCircuitoSelected);
     Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemNovaOndaSelected);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemOpen);
+    Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSave);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnQuit);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSelecionarTudoSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemAnalisarSelected);
@@ -343,4 +348,23 @@ void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)
 {
     IDEConfig* janelaCfg = new IDEConfig(this);
     janelaCfg->Show();
+}
+
+void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
+{
+    wxFileDialog SaveDialog(this, _("Salvar arquivo Verilog"), _(""), _(""), _("Arquivos do Verilog (*.v)|*.v"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+    if(verilogFilePath.IsEmpty())
+    {
+        if(SaveDialog.ShowModal() == wxID_OK)
+        {
+            wxString pathArquivo = SaveDialog.GetPath();
+
+            // TODO
+        }
+    }
+    else
+    {
+        // TODO
+    }
 }

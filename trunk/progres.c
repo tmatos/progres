@@ -305,7 +305,16 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
         }
         else if(iguais(it->valor, "endmodule")) {
+            avanca(&it);
 
+            // não deve haver mais nada além do endmodule
+            if(it) {
+                exibeMsgErro("Token inesperado foi encontrado", it->linha, it->coluna, "nenhum codigo a mais", it->valor);
+                return NULL;
+            }
+            else {
+                return circuito;
+            }
         }
 
         avanca(&it);

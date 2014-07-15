@@ -43,6 +43,7 @@ class IDEFrame: public wxFrame
         void OnListBoxErrosDClick(wxCommandEvent& event);
         void OnMenuItemSelecionarTudoSelected(wxCommandEvent& event);
         void OnMenuItemConfigSelected(wxCommandEvent& event);
+        void OnMenuItemSave(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(IDEFrame)
@@ -54,6 +55,7 @@ class IDEFrame: public wxFrame
         static const long ID_MENUITEM3;
         static const long ID_MENUITEM1;
         static const long idMenuOpen;
+        static const long idMenuSave;
         static const long ID_MENUITEM8;
         static const long idMenuQuit;
         static const long ID_MENUITEM6;
@@ -65,6 +67,7 @@ class IDEFrame: public wxFrame
 
         //(*Declarations(IDEFrame)
         wxMenu* MenuItem2;
+        wxMenuItem* MenuItemSave;
         wxMenuItem* MenuItemNovoCircuito;
         wxTextCtrl* EditBox;
         wxMenu* Menu3;
