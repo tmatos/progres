@@ -60,9 +60,22 @@
 					<help>Abrir um fonte Verilog</help>
 					<handler function="OnMenuItemOpen" entry="EVT_MENU" />
 				</object>
+				<object class="wxMenuItem" name="idMenuSave" variable="MenuItemSave" member="yes">
+					<label>Salvar</label>
+					<accel>Ctrl-S</accel>
+					<help>Salvar o arquivo em edição.</help>
+					<handler function="OnMenuItemSave" entry="EVT_MENU" />
+				</object>
 				<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
 					<label>Recentes</label>
 				</object>
+				<object class="wxMenuItem" name="idMenuClose" variable="MenuItemClose" member="yes">
+					<label>Fechar</label>
+					<accel>Ctrl-W</accel>
+					<help>Fechar o arquivo em edição.</help>
+					<handler function="OnMenuItemCloseSelected" entry="EVT_MENU" />
+				</object>
+				<object class="separator" />
 				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItemSair" member="no">
 					<label>Sair</label>
 					<accel>Alt-F4</accel>

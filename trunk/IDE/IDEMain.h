@@ -30,6 +30,7 @@ class IDEFrame: public wxFrame
 
         void carregaConfigs();
         void CarregarArquivoVerilog(wxString arquivo);
+        void SetTituloJanelaComArquivo(wxString nome);
 
     private:
         //(*Handlers(IDEFrame)
@@ -44,6 +45,7 @@ class IDEFrame: public wxFrame
         void OnMenuItemSelecionarTudoSelected(wxCommandEvent& event);
         void OnMenuItemConfigSelected(wxCommandEvent& event);
         void OnMenuItemSave(wxCommandEvent& event);
+        void OnMenuItemCloseSelected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(IDEFrame)
@@ -57,6 +59,7 @@ class IDEFrame: public wxFrame
         static const long idMenuOpen;
         static const long idMenuSave;
         static const long ID_MENUITEM8;
+        static const long idMenuClose;
         static const long idMenuQuit;
         static const long ID_MENUITEM6;
         static const long ID_MENUITEM4;
@@ -68,6 +71,7 @@ class IDEFrame: public wxFrame
         //(*Declarations(IDEFrame)
         wxMenu* MenuItem2;
         wxMenuItem* MenuItemSave;
+        wxMenuItem* MenuItemClose;
         wxMenuItem* MenuItemNovoCircuito;
         wxTextCtrl* EditBox;
         wxMenu* Menu3;
@@ -95,6 +99,7 @@ class IDEFrame: public wxFrame
 
         wxString defaultWindowTitle;
         long textLenght;
+        bool arquivoNaoSalvo;
 
         DECLARE_EVENT_TABLE()
 };

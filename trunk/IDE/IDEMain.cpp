@@ -58,6 +58,7 @@ const long IDEFrame::ID_MENUITEM1 = wxNewId();
 const long IDEFrame::idMenuOpen = wxNewId();
 const long IDEFrame::idMenuSave = wxNewId();
 const long IDEFrame::ID_MENUITEM8 = wxNewId();
+const long IDEFrame::idMenuClose = wxNewId();
 const long IDEFrame::idMenuQuit = wxNewId();
 const long IDEFrame::ID_MENUITEM6 = wxNewId();
 const long IDEFrame::ID_MENUITEM4 = wxNewId();
@@ -108,10 +109,12 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     MenuArquivo->Append(ID_MENUITEM1, _("Novo"), MenuItem2, wxEmptyString);
     MenuItem1 = new wxMenuItem(MenuArquivo, idMenuOpen, _("Abrir\tCtrl-O"), _("Abrir um fonte Verilog"), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem1);
-    MenuItemSave = new wxMenuItem(MenuArquivo, idMenuSave, _("Salvar\tCtrl-S"), _("Salvar o arquivo em edição"), wxITEM_NORMAL);
+    MenuItemSave = new wxMenuItem(MenuArquivo, idMenuSave, _("Salvar\tCtrl-S"), _("Salvar o arquivo em edição."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSave);
     MenuItem4 = new wxMenuItem(MenuArquivo, ID_MENUITEM8, _("Recentes"), wxEmptyString, wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem4);
+    MenuItemClose = new wxMenuItem(MenuArquivo, idMenuClose, _("Fechar\tCtrl-W"), _("Fechar o arquivo em edição."), wxITEM_NORMAL);
+    MenuArquivo->Append(MenuItemClose);
     MenuArquivo->AppendSeparator();
     MenuItemSair = new wxMenuItem(MenuArquivo, idMenuQuit, _("Sair\tAlt-F4"), _("Encerrar o aplicativo."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSair);
@@ -149,6 +152,7 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemNovaOndaSelected);
     Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemOpen);
     Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSave);
+    Connect(idMenuClose,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemCloseSelected);
     Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnQuit);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSelecionarTudoSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemAnalisarSelected);
@@ -165,6 +169,8 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
         if(!UltimoArquivoVerilog.IsEmpty())
             CarregarArquivoVerilog(UltimoArquivoVerilog);
     }
+
+    arquivoNaoSalvo = false;
 }
 
 IDEFrame::~IDEFrame()
@@ -222,16 +228,29 @@ void IDEFrame::CarregarArquivoVerilog(wxString arquivo)
 
     EditBox->LoadFile(verilogFilePath);
 
-    SetTitle(defaultWindowTitle + _(" - ") + verilogFilePath);
+    SetTituloJanelaComArquivo(verilogFilePath);
 
     textLenght = EditBox->GetNumberOfLines();
     StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
 
     ListBoxErros->Clear();
+
+    arquivoNaoSalvo = false;
+}
+
+void IDEFrame::SetTituloJanelaComArquivo(wxString nome)
+{
+    SetTitle(defaultWindowTitle + _(" - ") + nome);
 }
 
 void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
 {
+    if(arquivoNaoSalvo)
+    {
+        wxMessageBox(_("Salve o arquivo primeiro."), _("Aviso"));
+        return;
+    }
+
     if(verilogFilePath.IsEmpty())
     {
         wxMessageBox(_("Não há arquivo aberto."), _("Erro"));
@@ -306,6 +325,13 @@ void IDEFrame::OnEditBoxText(wxCommandEvent& event)
         textLenght = EditBox->GetNumberOfLines();
         StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
 
+        arquivoNaoSalvo = true;
+
+        if(verilogFilePath.IsEmpty())
+            SetTituloJanelaComArquivo(_("Arquivo não salvo *"));
+        else
+            SetTituloJanelaComArquivo(verilogFilePath + _(" *"));
+
 //        if(event.GetId() != ID_LISTBOXERROS)
 //            EditBox->SetStyle(0, EditBox->GetLastPosition(), wxTextAttr(*wxBLACK, *wxWHITE));
 }
@@ -354,17 +380,54 @@ void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
 {
     wxFileDialog SaveDialog(this, _("Salvar arquivo Verilog"), _(""), _(""), _("Arquivos do Verilog (*.v)|*.v"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
+    wxTextFile arquivo;
+
     if(verilogFilePath.IsEmpty())
     {
         if(SaveDialog.ShowModal() == wxID_OK)
         {
             wxString pathArquivo = SaveDialog.GetPath();
 
-            // TODO
+            if(arquivo.Create(pathArquivo))
+            {
+                arquivo.AddLine(EditBox->GetValue());
+                arquivo.Write();
+                arquivo.Close();
+
+                verilogFilePath = pathArquivo;
+                SetTituloJanelaComArquivo(verilogFilePath);
+                arquivoNaoSalvo = false;
+            }
+            else
+            {
+                wxMessageBox(_("Impossibilitado de salvar o arquivo."), _("Erro"));
+            }
         }
     }
     else
     {
-        // TODO
+        if(arquivo.Open(verilogFilePath))
+        {
+            arquivo.Clear();
+            arquivo.AddLine(EditBox->GetValue());
+            arquivo.Write();
+            arquivo.Close();
+
+            SetTituloJanelaComArquivo(verilogFilePath);
+            arquivoNaoSalvo = false;
+        }
+        else
+        {
+            wxMessageBox(_("Impossibilitado de salvar o arquivo."), _("Erro"));
+        }
     }
+}
+
+void IDEFrame::OnMenuItemCloseSelected(wxCommandEvent& event)
+{
+    ListBoxErros->Clear();
+    EditBox->Clear();
+    verilogFilePath.Clear();
+    arquivoNaoSalvo = false;
+    SetTitle(defaultWindowTitle);
 }
