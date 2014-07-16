@@ -7,7 +7,8 @@
 
 #define LEX_H
 
-#define MAX_TOKEN_SIZE 80
+#define MAX_TOKEN_SIZE 80 // Qtde máxima de caracteres permitidos em um Token
+#define MAX_DIGITOS_NUM 4 // Qtde máxima de digitos num número inteiro a ser reconhecido
 
 /** @brief .
  */
@@ -21,7 +22,7 @@ typedef enum en_grupoToken {
     tokenSimbolo, tokenPalavra, tokenIdent
 } GrupoToken;
 
-/** @brief Tipo basico para o elemento que representa um Token.
+/** @brief Tipo basico para o elemento que representa um token.
  */
 typedef struct st_token {
     char valor[MAX_TOKEN_SIZE];
@@ -123,5 +124,12 @@ ListaToken* tokeniza(FILE *arquivo);
  *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
  */
 int apenasDigitos(char* str);
+
+/** @brief Verifica se uma string contém um número que pode ser convertido.
+            Mais especeificamente, se é um natural menor que 10000.
+ *  @param str Uma string qualquer.
+ *  @return Verdadeiro se pode ser convertido.
+ */
+int isNumNaturalValido(char* str);
 
 #endif

@@ -1,5 +1,5 @@
 
-// Alguma coisa pra teste
+// Alguma coisa pra teste...
 
 module ok(a , b, c);
 
@@ -9,7 +9,7 @@ output c;
 
 wire tmp;
 
-not(tmp, a);
+not #2(tmp, a);
 
 and(a, x, y);
 

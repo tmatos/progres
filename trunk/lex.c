@@ -125,7 +125,7 @@ int anexa(char* str, char c) {
 }
 
 int isSimbolo(char c) {
-    return (c == '(' || c == ')' || c == ',' || c == ';' || c == '{' || c == '}');
+    return (c == '(' || c == ')' || c == ',' || c == ';' || c == '{' || c == '}' || c == '#');
 }
 
 void exibeListaDeToken(ListaToken* tokens) {
@@ -253,7 +253,7 @@ ListaToken* tokeniza(FILE *arquivo) {
         c = fgetc(arquivo);
 
         if(c == EOF) {
-            printf("Final de arquivo alcancado.\n");
+            //printf("Final de arquivo alcancado.\n");
             break;
         }
 
@@ -385,4 +385,14 @@ int apenasDigitos(char* str) {
     }
 
     return ret;
+}
+
+int isNumNaturalValido(char* str) {
+    if(!str)
+        return 0;
+
+    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) ) // importante não ser um valor muito grande, esses numeros
+        return 0;
+
+    return 1;
 }
