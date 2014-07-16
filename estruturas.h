@@ -53,9 +53,9 @@ t_circuito* novoCircuito();
 Componente* novaListaCompon(int tamanho);
 
 /** @brief Inicialização de uma estrutura de componente.
- *  @return Uma struct do componente.
+ *  @return Um tipo Componente que é um ponteiro para a struc.
  */
-Componente novoComponente();
+Componente novoComponente(char* nome, t_operador porta);
 
 int adicionaEntrada(t_circuito* circ, Componente comp);
 

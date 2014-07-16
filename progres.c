@@ -224,13 +224,42 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
         }
         else if(iguais(it->valor, "not")) {
+            Componente portaNot = novoComponente("PortaNot", op_not);
+
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado '('", -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado '( ou #'", -1, -1, NULL, NULL);
                 return NULL;
             }
-            else if(!iguais(it->valor, "(")) {
+
+            if(iguais(it->valor, "#")) {
+                avanca(&it);
+
+                if(!it) {
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperado um numero inteiro nao negativo", -1, -1, NULL, NULL);
+                    return NULL;
+                }
+                else if(!isNumNaturalValido(it->valor)) {
+                    char esperado[100];
+                    sprintf(esperado, "um numero inteiro nao negativo e com ate %d digitos", MAX_DIGITOS_NUM);
+                    exibeMsgErro("Numero valido nao foi encontrado", it->linha, it->coluna, esperado, it->valor);
+                    return NULL;
+                }
+                else {
+                    // Guardar o atraso dessa porta
+                    portaNot->tipo.atraso = atoi(it->valor);
+                }
+
+                avanca(&it);
+
+                if(!it) {
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperado '('", -1, -1, NULL, NULL);
+                    return NULL;
+                }
+            }
+
+            if(!iguais(it->valor, "(")) {
                 exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "(", it->valor);
                 return NULL;
             }
@@ -408,7 +437,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                         return NULL;
                     }
 
-                    if( apenasDigitos(it->valor) && (strlen(it->valor) < 5) ) { // importante não ser um valor muito grande
+                    if(isNumNaturalValido(it->valor)) {
                         addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
                     }
                     else {
@@ -476,6 +505,8 @@ int main(int argc, char* argv[])
         printf("Impossibilitado de abrir o arquivo: %s\n", argv[1]);
         exit(1);
     }
+
+    printf("Abrindo o arquivo de circuito: %s\n", argv[1]);
 
     t_circuito *circuto1 = carregaCircuito(arquivo);
 

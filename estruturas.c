@@ -44,11 +44,12 @@ Componente* novaListaCompon(int tamanho) {
     return (Componente*) malloc(sizeof(Componente) * tamanho);
 }
 
-Componente novoComponente(char* nome, t_tipo tipo) {
+Componente novoComponente(char* nome, t_operador porta) {
     Componente c = (Componente) malloc(sizeof(struct st_componente));
 
     strcpy(c->nome, nome);
-    c->tipo = tipo;
+    c->tipo.operador = porta;
+    c->tipo.atraso = 0; // atraso default é zero
 
     c->numEntrada = 0;
     c->numSaida = 0;
