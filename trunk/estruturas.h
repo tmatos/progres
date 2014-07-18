@@ -11,7 +11,7 @@
 
 /** @brief .
  */
-typedef enum en_operador {op_and, op_or, op_not, op_nand, op_xor, wire} t_operador;
+typedef enum en_operador {op_and, op_or, op_not, op_nand, op_xor, wire, output, input} t_operador;
 
 /** @brief .
  */
@@ -24,24 +24,33 @@ typedef struct st_tipo {
  */
 typedef struct st_componente {
     char nome[16];
-    struct st_componente **listaEntrada;
-    int numEntrada;
-    Sinal* sinalEntrada;
-    struct st_componente **listaSaida;
-    int numSaida;
     t_tipo tipo;
-    Sinal* saida;
+
+    int numEntrada;
+    struct st_componente **listaEntrada;
+    Sinal* sinalEntrada;
+
+    int numSaida;
+    struct st_componente **listaSaida;
+    Sinal* sinalSaida;
 } * Componente;
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'
  */
 typedef struct st_circuito {
     int numEntrada;
-    Sinais *sinaisEntrada;
     Componente *listaFiosEntrada;
-    Componente *listaFiosSaida;
+    Sinais *sinaisEntrada;
+
     int numSaida;
+    Componente *listaFiosSaida;
     Sinais *sinaisSaida;
+
+    int numWires;
+    Componente *listaWires;
+
+    int numPortas;
+    Componente *listaPortas;
 } t_circuito;
 
 /** @brief Inicialização de uma estrutura de circuito
@@ -57,6 +66,28 @@ Componente* novaListaCompon(int tamanho);
  */
 Componente novoComponente(char* nome, t_operador porta);
 
+/** @brief .
+ */
 int adicionaEntrada(t_circuito* circ, Componente comp);
+
+/** @brief .
+ */
+int adicionaSaida(t_circuito* circ, Componente comp);
+
+/** @brief .
+ */
+Componente getComponentePorNome(t_circuito* circ, char* nome);
+
+/** @brief .
+ */
+Componente getWirePorNome(t_circuito* circ, char* nome);
+
+/** @brief .
+ */
+Componente getInputPorNome(t_circuito* circ, char* nome);
+
+/** @brief .
+ */
+Componente getOutputPorNome(t_circuito* circ, char* nome);
 
 #endif

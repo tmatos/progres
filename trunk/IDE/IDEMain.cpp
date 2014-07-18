@@ -9,6 +9,8 @@
 
 #include "IDEMain.h"
 #include "IDEConfig.h"
+#include "inout.h"
+#include "sinais.h"
 #include <wx/msgdlg.h>
 #include <wx/dcclient.h>
 #include <wx/textfile.h>
@@ -171,6 +173,8 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     }
 
     arquivoNaoSalvo = false;
+
+    ondas = NULL;
 }
 
 IDEFrame::~IDEFrame()
@@ -283,6 +287,36 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
     wxClientDC *canvas = new wxClientDC(panel);
     canvas->SetBrush( *wxRED_BRUSH );
     //canvas->DrawRectangle( 15, 15, 50, 70 );
+
+    wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in"), wxFILE_MUST_EXIST);
+    Sinais* ondas = NULL;
+
+    if(EntradaDialog.ShowModal() == wxID_OK)
+        ondas = carregaArquivoSinais( (const char*) EntradaDialog.GetPath().mb_str() );
+
+    if(!ondas)
+        return;
+
+    int i;
+
+    Pulso* it = ondas->lista[0].pulsos; // Aqui, o indice 0 indica qual dos sinas na lista
+    while(it->valor != nulo) {
+        for(i = 0 ; i < it->tempo ; i++) {
+            switch(it->valor) {
+                case um:
+                    //printf("-");
+                break;
+                case zero:
+                    //printf("_");
+                    break;
+                case x:
+                    //printf("x");
+                    break;
+            }
+        }
+
+        it++;
+    }
 
     int n = 5; // num. de tempos
     int un = 20; // qtd de pixels de uma unidadde

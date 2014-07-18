@@ -10,6 +10,8 @@
 #ifndef IDEMAIN_H
 #define IDEMAIN_H
 
+#include "sinais.h"
+
 //(*Headers(IDEFrame)
 #include <wx/notebook.h>
 #include <wx/menu.h>
@@ -100,6 +102,8 @@ class IDEFrame: public wxFrame
         wxString defaultWindowTitle;
         long textLenght;
         bool arquivoNaoSalvo;
+
+        Sinais* ondas;
 
         DECLARE_EVENT_TABLE()
 };
