@@ -67,9 +67,21 @@
 		<Unit filename="IDEConfig.h" />
 		<Unit filename="IDEMain.cpp" />
 		<Unit filename="IDEMain.h" />
+		<Unit filename="inout.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="inout.h" />
+		<Unit filename="lex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lex.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="sinais.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sinais.h" />
 		<Unit filename="wxsmith/IDEConfig.wxs" />
 		<Unit filename="wxsmith/IDEframe.wxs" />
 		<Extensions>
