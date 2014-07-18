@@ -11,6 +11,6 @@ wire tmp;
 
 not #2(tmp, a);
 
-and(a, x, y);
+and(c, tmp, b);
 
 endmodule

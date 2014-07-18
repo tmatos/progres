@@ -6,6 +6,8 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include "erros.h"
 
 void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
     if(linha > 0)
