@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include "erros.h"
 
-void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
+void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
     if(linha > 0)
     {
         printf("%d:", linha);
@@ -29,6 +29,8 @@ void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encont
     }
 
     printf("\n");
+
+    return NULL;
 }
 
 void erroFatalMemoria() {

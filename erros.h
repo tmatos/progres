@@ -14,9 +14,9 @@
  *  @param coluna A coluna onde ocorre o erro no fonte. -1 para omitir.
  *  @param esperado Uma string com o que era esperado. NULL para omitir.
  *  @param encontrado Uma string com o que foi encontrado no lugar. NULL para omitir.
- *  @return Void.
+ *  @return Um NULL, sempre.
  */
-void exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
+void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
 
 /** @brief Exibe uma mensagem de erro por falta de memória e encerra o programa.
  *  @return Void.
