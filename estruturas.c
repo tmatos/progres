@@ -11,23 +11,23 @@
 #include "sinais.h"
 #include "estruturas.h"
 #include "lex.h"
+#include "erros.h"
 
 t_circuito* novoCircuito() {
     t_circuito* circuito = (t_circuito*) malloc(sizeof(t_circuito));
 
-    circuito->numEntrada = 0;
-    circuito->listaFiosEntrada = NULL;
+    if(!circuito)
+        erroFatalMemoria();
+
+    circuito->listaFiosEntrada = novaListaComponente();
     circuito->sinaisEntrada = NULL;
 
-    circuito->numSaida = 0;
-    circuito->listaFiosSaida = NULL;
+    circuito->listaFiosSaida = novaListaComponente();
     circuito->sinaisSaida = NULL;
 
-    circuito->numWires = 0;
-    circuito->listaWires = NULL;
+    circuito->listaWires = novaListaComponente();
 
-    circuito->numPortas = 0;
-    circuito->listaPortas = NULL;
+    circuito->listaPortas = novaListaComponente();
 
     return circuito;
 }
@@ -36,16 +36,7 @@ int adicionaEntrada(t_circuito* circ, Componente comp) {
     if(!circ || !comp)
         return 0;
 
-    circ->numEntrada++;
-
-    if(!circ->listaFiosEntrada) { //TODO: checagens de memoria
-        circ->listaFiosEntrada = (Componente*) malloc(sizeof(Componente));
-        circ->listaFiosEntrada[0] = comp; //(Componente) malloc(sizeof(struct st_componente));
-    }
-    else { //TODO: checagens de memoria
-        circ->listaFiosEntrada = (Componente*) realloc( circ->listaFiosEntrada, sizeof(Componente) * circ->numEntrada );
-        circ->listaFiosEntrada[circ->numEntrada - 1] = comp;
-    }
+    insereComponente(circ->listaFiosEntrada, comp);
 
     return 1;
 }
@@ -54,26 +45,65 @@ int adicionaSaida(t_circuito* circ, Componente comp) {
     if(!circ || !comp)
         return 0;
 
-    circ->numSaida++;
-
-    if(!circ->listaFiosSaida) { //TODO: checagens de memoria
-        circ->listaFiosSaida = (Componente*) malloc(sizeof(Componente));
-        circ->listaFiosSaida[0] = comp; //(Componente) malloc(sizeof(struct st_componente));
-    }
-    else { //TODO: checagens de memoria
-        circ->listaFiosSaida = (Componente*) realloc( circ->listaFiosSaida, sizeof(Componente) * circ->numSaida );
-        circ->listaFiosSaida[circ->numSaida - 1] = comp;
-    }
+    insereComponente(circ->listaFiosSaida, comp);
 
     return 1;
 }
 
-Componente* novaListaCompon(int tamanho) {
-    return (Componente*) malloc(sizeof(Componente) * tamanho);
+ListaComponente* novaListaComponente() {
+    return novaListaComponenteTamanho(0);
+}
+
+ListaComponente* novaListaComponenteTamanho(int tamanho) {
+    ListaComponente* listaCp = (ListaComponente*) malloc(sizeof(ListaComponente));
+
+    if(!listaCp)
+        erroFatalMemoria();
+
+    listaCp->tamanho = tamanho;
+
+    if(tamanho == 0) {
+        listaCp->itens = NULL;
+    }
+    else {
+        listaCp->itens = (Componente*) malloc(sizeof(Componente) * tamanho);
+
+        if(!listaCp->itens)
+            erroFatalMemoria();
+
+        int i;
+
+        for(i=0 ; i<tamanho ; i++)
+            listaCp->itens[i] = NULL;
+    }
+
+    return listaCp;
+}
+
+void insereComponente(ListaComponente* ls, Componente cp) {
+    if(!ls)
+        ls = novaListaComponente();
+
+    if(ls->tamanho == 0) {
+        ls->tamanho++;
+        ls->itens = (Componente*) malloc(sizeof(Componente));
+    }
+    else {
+        ls->tamanho++;
+        ls->itens = (Componente*) realloc( ls->itens, sizeof(Componente) * ls->tamanho );
+    }
+
+    if(!ls->itens)
+        erroFatalMemoria();
+
+    ls->itens[ls->tamanho - 1] = cp;
 }
 
 Componente novoComponente(char* nome, t_operador porta) {
     Componente c = (Componente) malloc(sizeof(struct st_componente));
+
+    if(!c)
+        erroFatalMemoria();
 
     strcpy(c->nome, nome);
     c->tipo.operador = porta;
@@ -90,62 +120,45 @@ Componente novoComponente(char* nome, t_operador porta) {
     return c;
 }
 
-Componente getComponentePorNome(t_circuito* circ, char* nome) {
-    if(!circ || !nome)
+Componente getComponenteItemPorNome(ListaComponente* ls, char* nome) {
+    if(!ls || !nome)
         return NULL;
 
     int i;
 
-    for( i=0 ; i < circ->numPortas ; i++ ) {
-        if( iguais( circ->listaPortas[i]->nome, nome ) ) {
-            return circ->listaPortas[i];
+    for( i=0 ; i < ls->tamanho ; i++ ) {
+        if( iguais( ls->itens[i]->nome, nome ) ) {
+           return ls->itens[i];
         }
     }
 
     return NULL;
+}
+
+Componente getPortaPorNome(t_circuito* circ, char* nome) {
+    if(!circ || !nome)
+        return NULL;
+
+    return getComponenteItemPorNome(circ->listaPortas, nome);
 }
 
 Componente getWirePorNome(t_circuito* circ, char* nome) {
     if(!circ || !nome)
         return NULL;
 
-    int i;
-
-    for( i=0 ; i < circ->numWires ; i++ ) {
-        if( iguais( circ->listaWires[i]->nome, nome ) ) {
-            return circ->listaWires[i];
-        }
-    }
-
-    return NULL;
+    return getComponenteItemPorNome(circ->listaWires, nome);
 }
 
 Componente getInputPorNome(t_circuito* circ, char* nome) {
     if(!circ || !nome)
         return NULL;
 
-    int i;
-
-    for( i=0 ; i < circ->numEntrada ; i++ ) {
-        if( iguais( circ->listaFiosEntrada[i]->nome, nome ) ) {
-            return circ->listaFiosEntrada[i];
-        }
-    }
-
-    return NULL;
+    return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
 }
 
 Componente getOutputPorNome(t_circuito* circ, char* nome) {
     if(!circ || !nome)
         return NULL;
 
-    int i;
-
-    for( i=0 ; i < circ->numSaida ; i++ ) {
-        if( iguais( circ->listaFiosSaida[i]->nome, nome ) ) {
-            return circ->listaFiosSaida[i];
-        }
-    }
-
-    return NULL;
+    return getComponenteItemPorNome(circ->listaFiosSaida, nome);
 }

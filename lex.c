@@ -14,6 +14,10 @@
 
 ListaToken* novaListaToken() {
     ListaToken* l = (ListaToken*) malloc(sizeof(ListaToken));
+
+    if(!l)
+        erroFatalMemoria();
+
     l->primeiro = NULL;
     l->ultimo = NULL;
     l->tamanho = 0;
@@ -29,6 +33,10 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna) {
 
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
     Token* novo = (Token*) malloc(sizeof(Token));
+
+    if(!novo)
+        erroFatalMemoria();
+
     strcpy(novo->valor, tok);
     novo->linha = p_linha;
     novo->coluna = p_coluna;
@@ -174,6 +182,10 @@ int isPalavra(Token* tk) {
         return 0;
 
     char* valor = (char*) malloc(sizeof(char) * MAX_TOKEN_SIZE);
+
+    if(!valor)
+        erroFatalMemoria();
+
     strcpy(valor, tk->valor);
 
     // em primeiro lugar, as portas
@@ -245,6 +257,10 @@ ListaToken* tokeniza(FILE *arquivo) {
     int erro = 0, fim = 0;
 
     char* tok = (char*) malloc(sizeof(char));
+
+    if(!tok)
+        erroFatalMemoria();
+
     strcpy(tok, "");
 
     while(1) {
@@ -367,6 +383,8 @@ ListaToken* tokeniza(FILE *arquivo) {
     //exibeListaDeToken(tokens);
 
     retorno = tokens;
+
+    free(tok);
 
     return retorno;
 }

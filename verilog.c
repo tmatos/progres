@@ -192,7 +192,6 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 }
                 else if (iguais(tipo, "output")) {
                     insereTokenString(listaOutput, it->valor, -1, -1);
-                    circuito->numSaida++;
 
                     // TODO: atribui como saída o ident. na estrutura
                     Componente cpOut = novoComponente(it->valor, output);

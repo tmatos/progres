@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sinais.h"
+#include "erros.h"
 
 int setSinalNome(Sinal* s, char* nome) {
     if(!s || !nome)
@@ -49,6 +50,9 @@ int addPulso(Sinal* s, t_valor valor, int tempo) {
 
     s->pulsos = (Pulso*) realloc( s->pulsos, sizeof(Pulso) * tamanho ); // TODO <---
 
+    if(!s->pulsos)
+        erroFatalMemoria();
+
     // acessando a penúltima posição, lembre q é um vetor!
     s->pulsos[tamanho - 2].valor = valor;
     s->pulsos[tamanho - 2].tempo = tempo;
@@ -66,8 +70,7 @@ Sinais* novaSinais() {
         s->lista = NULL;
     }
     else {
-        printf("Erro de alocacao de memoria.\n");
-        exit(1);
+        erroFatalMemoria();
     }
 
     return s;
@@ -83,9 +86,15 @@ int addSinal(Sinais* s, char* nome) { // perigoso
 
         s->lista = (Sinal*) malloc(sizeof(Sinal));
 
+        if(!s->lista)
+            erroFatalMemoria();
+
         setSinalNome( s->lista + 0, nome);
 
         s->lista[0].pulsos = (Pulso*) malloc(sizeof(Pulso));
+
+        if( !(s->lista[0].pulsos) )
+            erroFatalMemoria();
 
         setPulsoNulo( s->lista[0].pulsos + 0 );
     }
@@ -94,9 +103,15 @@ int addSinal(Sinais* s, char* nome) { // perigoso
 
         s->lista = (Sinal*) realloc( s->lista, sizeof(Sinal) * s->quantidade );
 
+        if(!s->lista)
+            erroFatalMemoria();
+
         setSinalNome( s->lista + (s->quantidade - 1), nome); // aritmetica de ponteiro aqui
 
         s->lista[s->quantidade - 1].pulsos = (Pulso*) malloc(sizeof(Pulso));
+
+        if( !( s->lista[s->quantidade - 1].pulsos ) )
+            erroFatalMemoria();
 
         setPulsoNulo( s->lista[s->quantidade - 1].pulsos + 0 ); // aritmetica de ponteiro aqui tb
     }
