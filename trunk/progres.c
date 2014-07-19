@@ -193,6 +193,9 @@ int main(int argc, char* argv[])
 
         Sinais* entradas = carregaEntradas(wavein);
 
+        if(entradas)
+            free(entradas);
+
         fclose(wavein);
 
         // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
@@ -222,6 +225,8 @@ int main(int argc, char* argv[])
         }*/
         /// DBG
     }
+
+    //system("PAUSE"); /// DBG
 
     return 0;
 }
