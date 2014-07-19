@@ -7,10 +7,13 @@ input a;// sinal de entrada
 input b;
 output c;
 
-wire tmp;
+wire tmp, af, gr;
 
 not #2(tmp, a);
 
-and(c, tmp, b);
+and(c, tmp, af ,);
 
 endmodule
+
+
+

@@ -10,11 +10,11 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "erros.h"
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
 #include "lex.h"
-#include "erros.h"
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
@@ -140,6 +140,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
         return NULL;
     }
 
+    Componente porta = NULL;
+
     while(1) {
 
         if(iguais(it->valor, "input") || iguais(it->valor, "output") || iguais(it->valor, "wire")) {
@@ -223,8 +225,22 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 avanca(&it);
             }
         }
-        else if(iguais(it->valor, "not")) {
-            Componente portaNot = novoComponente("PortaNot", op_not);
+        else if( isPortaLogica(it->valor) ) {
+
+            if(iguais(it->valor, "and"))
+                porta = novoComponente("PortaAND", op_and);
+            else if(iguais(it->valor, "or"))
+                porta = novoComponente("PortaOR", op_and);
+            else if(iguais(it->valor, "xor"))
+                porta = novoComponente("PortaXOR", op_and);
+            else if(iguais(it->valor, "nand"))
+                porta = novoComponente("PortaNAND", op_and);
+            else if(iguais(it->valor, "nor"))
+                porta = novoComponente("PortaNOR", op_and);
+            else if(iguais(it->valor, "xnor"))
+                porta = novoComponente("PortaXNOR", op_and);
+            else if(iguais(it->valor, "not"))
+                porta = novoComponente("PortaNOT", op_and);
 
             avanca(&it);
 
@@ -248,7 +264,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 }
                 else {
                     // Guardar o atraso dessa porta
-                    portaNot->tipo.atraso = atoi(it->valor);
+                    porta->tipo.atraso = atoi(it->valor);
                 }
 
                 avanca(&it);
@@ -291,6 +307,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
 
+            porta_inputs: // Label para a parte do código onde há leitura de entradas da porta lógica
+
             avanca(&it);
 
             if(!it) {
@@ -309,13 +327,28 @@ t_circuito* carregaCircuito(FILE *arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado )", -1, -1, NULL, NULL);
+                if( porta->tipo.operador == op_not )
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperado ')'", -1, -1, NULL, NULL);
+                else
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperado ',' ou ')'", -1, -1, NULL, NULL);
+
                 return NULL;
             }
 
             if(!iguais(it->valor, ")")) {
-                exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ")", it->valor);
-                return NULL;
+                if(porta->tipo.operador == op_not) {
+                    exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ")", it->valor);
+                    return NULL;
+                }
+                else {
+                    if(iguais(it->valor, ",")) {
+                        goto porta_inputs;
+                    }
+                    else {
+                        exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "')' ou ','", it->valor);
+                        return NULL;
+                    }
+                }
             }
 
             avanca(&it);
@@ -329,9 +362,6 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ";", it->valor);
                 return NULL;
             }
-        }
-        else if(iguais(it->valor, "and") || iguais(it->valor, "or")) {
-
         }
         else if(iguais(it->valor, "endmodule")) {
             avanca(&it);
@@ -349,7 +379,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
         avanca(&it);
 
         if(!it) {
-            //exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
+            exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
             return NULL;
         }
     }

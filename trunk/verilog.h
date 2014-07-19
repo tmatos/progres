@@ -3,9 +3,9 @@
  * @brief Rotinas para análise do arquivo Verilog
  */
 
-#ifndef ERROS_H
+#ifndef VERILOG_H
 
-#define ERROS_H
+#define VERILOG_H
 
 #include <stdio.h>
 #include "estruturas.h"
