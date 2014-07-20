@@ -286,6 +286,8 @@ ListaToken* tokeniza(FILE *arquivo) {
         }
 
         if(c == '/') {
+            comentarios: // Label para inicio da parte que trata os comentários
+
             coluna++;
             c = fgetc(arquivo);
 
@@ -295,6 +297,11 @@ ListaToken* tokeniza(FILE *arquivo) {
                 while(c != '\n') {
                     c = fgetc(arquivo);
                     coluna++;
+
+                    if(c == EOF) {
+                        fim = 1;
+                        break;
+                    }
                 }
 
                 coluna = 0;
@@ -302,13 +309,43 @@ ListaToken* tokeniza(FILE *arquivo) {
 
                 continue; // volta pra A
             }
-            /*else if(c == '*') {
+            else if(c == '*') {
                 coluna++;
 
                 c = fgetc(arquivo);
 
-                // TODO: Comentario de multiplas linhas
-            }*/
+                while(1) {
+                    // M
+                    if(c == EOF) {
+                        fim = 1;
+                        break;
+                    }
+
+                    if(c == '\n') {
+                        coluna = 0;
+                        linha++;
+                    }
+                    else
+                        coluna++;
+
+                    if(c == '*') {
+                        c = fgetc(arquivo);
+
+                        if(c == '/') {
+                            coluna++;
+                            break;
+                        }
+                        else
+                            continue; // Volta para M
+                    }
+
+                    c = fgetc(arquivo);
+                }
+
+                if(!fim) {
+                    continue; // Volta para A
+                }
+            }
             else {
                 exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
                 break;
@@ -341,6 +378,10 @@ ListaToken* tokeniza(FILE *arquivo) {
                             insereTokenString(tokens, tok, linha, coluna - strlen(tok));
 
                             break;
+                        }
+                        else if(c == '/') {
+                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            goto comentarios;
                         }
                         else if(isSimbolo(c)) {
                             insereTokenString(tokens, tok, linha, coluna - strlen(tok));
