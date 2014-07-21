@@ -138,11 +138,13 @@ int isSimbolo(char c) {
 
 void exibeListaDeToken(ListaToken* tokens) {
     printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
+
     Token* it = tokens->primeiro;
     while(it) {
         printf("%s\n", it->valor);
         avanca(&it);
     }
+
     printf("\n");
 }
 
@@ -181,41 +183,34 @@ int isPalavra(Token* tk) {
     if(!tk)
         return 0;
 
-    char* valor = (char*) malloc(sizeof(char) * MAX_TOKEN_SIZE);
-
-    if(!valor)
-        erroFatalMemoria();
-
-    strcpy(valor, tk->valor);
-
     // em primeiro lugar, as portas
-    if(iguais(valor, "nand")) return 1;
-    if(iguais(valor, "nor")) return 1;
-    if(iguais(valor, "and")) return 1;
-    if(iguais(valor, "or")) return 1;
-    if(iguais(valor, "xor")) return 1;
-    if(iguais(valor, "xnor")) return 1;
-    if(iguais(valor, "not")) return 1;
-    if(iguais(valor, "buf")) return 1;
+    if(iguais(tk->valor, "nand")) return 1;
+    if(iguais(tk->valor, "nor")) return 1;
+    if(iguais(tk->valor, "and")) return 1;
+    if(iguais(tk->valor, "or")) return 1;
+    if(iguais(tk->valor, "xor")) return 1;
+    if(iguais(tk->valor, "xnor")) return 1;
+    if(iguais(tk->valor, "not")) return 1;
+    if(iguais(tk->valor, "buf")) return 1;
 
-    if(iguais(valor, "module")) return 1;
-    if(iguais(valor, "parameter")) return 1;
-    if(iguais(valor, "localparam")) return 1;
-    if(iguais(valor, "input")) return 1;
-    if(iguais(valor, "output")) return 1;
-    if(iguais(valor, "reg")) return 1;
-    if(iguais(valor, "integer")) return 1;
-    if(iguais(valor, "wire")) return 1;
-    if(iguais(valor, "always")) return 1;
-    if(iguais(valor, "assign")) return 1;
-    if(iguais(valor, "while")) return 1;
-    if(iguais(valor, "begin")) return 1;
-    if(iguais(valor, "if")) return 1;
-    if(iguais(valor, "else")) return 1;
-    if(iguais(valor, "end")) return 1;
-    if(iguais(valor, "case")) return 1;
-    if(iguais(valor, "endcase")) return 1;
-    if(iguais(valor, "endmodule")) return 1;
+    if(iguais(tk->valor, "module")) return 1;
+    if(iguais(tk->valor, "parameter")) return 1;
+    if(iguais(tk->valor, "localparam")) return 1;
+    if(iguais(tk->valor, "input")) return 1;
+    if(iguais(tk->valor, "output")) return 1;
+    if(iguais(tk->valor, "reg")) return 1;
+    if(iguais(tk->valor, "integer")) return 1;
+    if(iguais(tk->valor, "wire")) return 1;
+    if(iguais(tk->valor, "always")) return 1;
+    if(iguais(tk->valor, "assign")) return 1;
+    if(iguais(tk->valor, "while")) return 1;
+    if(iguais(tk->valor, "begin")) return 1;
+    if(iguais(tk->valor, "if")) return 1;
+    if(iguais(tk->valor, "else")) return 1;
+    if(iguais(tk->valor, "end")) return 1;
+    if(iguais(tk->valor, "case")) return 1;
+    if(iguais(tk->valor, "endcase")) return 1;
+    if(iguais(tk->valor, "endmodule")) return 1;
 
     return 0;
 }
@@ -250,8 +245,6 @@ ListaToken* tokeniza(FILE *arquivo) {
     int linha = 1, coluna = 0;
 
     ListaToken* tokens = novaListaToken();
-
-    ListaToken* retorno = NULL;
 
     char c = '\0';
     int erro = 0, fim = 0;
@@ -423,11 +416,9 @@ ListaToken* tokeniza(FILE *arquivo) {
 
     //exibeListaDeToken(tokens);
 
-    retorno = tokens;
-
     free(tok);
 
-    return retorno;
+    return tokens;
 }
 
 int apenasDigitos(char* str) {

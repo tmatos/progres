@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
     t_circuito *circuto1 = carregaCircuito(arquivo);
 
     fclose(arquivo);
+    free(arquivo);
 
     if(circuto1) {
         printf("Circuito carregado com sucesso.\n");
@@ -197,6 +198,7 @@ int main(int argc, char* argv[])
             free(entradas);
 
         fclose(wavein);
+        free(wavein);
 
         // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
         // e com o mesmo formato do arquivo de entrada.
