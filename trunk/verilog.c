@@ -188,7 +188,6 @@ t_circuito* carregaCircuito(FILE *arquivo)
                     // TODO: atribui como entrada o ident. na estrutura
                     Componente cpIn = novoComponente(it->valor, input);
                     adicionaEntrada(circuito, cpIn);
-
                 }
                 else if (iguais(tipo, "output")) {
                     insereTokenString(listaOutput, it->valor, -1, -1);
@@ -209,6 +208,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                             insereTokenString(listaWire, it->valor, -1, -1);
 
                             // TODO: atribui como wire o ident. na estrutura
+                            Componente cpWire = novoComponente(it->valor, wire);
+                            adicionaWire(circuito, cpWire);
                         }
                     }
                     else {
@@ -225,21 +226,22 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
         }
         else if( isPortaLogica(it->valor) ) {
+            porta = NULL;
 
             if(iguais(it->valor, "and"))
                 porta = novoComponente("PortaAND", op_and);
             else if(iguais(it->valor, "or"))
-                porta = novoComponente("PortaOR", op_and);
+                porta = novoComponente("PortaOR", op_or);
             else if(iguais(it->valor, "xor"))
-                porta = novoComponente("PortaXOR", op_and);
+                porta = novoComponente("PortaXOR", op_xor);
             else if(iguais(it->valor, "nand"))
-                porta = novoComponente("PortaNAND", op_and);
+                porta = novoComponente("PortaNAND", op_nand);
             else if(iguais(it->valor, "nor"))
-                porta = novoComponente("PortaNOR", op_and);
+                porta = novoComponente("PortaNOR", op_nor);
             else if(iguais(it->valor, "xnor"))
-                porta = novoComponente("PortaXNOR", op_and);
+                porta = novoComponente("PortaXNOR", op_xnor);
             else if(iguais(it->valor, "not"))
-                porta = novoComponente("PortaNOT", op_and);
+                porta = novoComponente("PortaNOT", op_not);
 
             avanca(&it);
 
@@ -286,8 +288,17 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
 
-            if(identExiste(listaWire, it->valor) || identExiste(listaOutput, it->valor)) {
-                //TODO: inserir a porta
+            if(identExiste(listaWire, it->valor)) {
+                //TODO: inserir na lista de saidas da porta, esta saida
+                Componente out = getComponenteItemPorNome(circuito->listaWires, it->valor);
+                insereComponente(porta->listaSaida, out);
+                insereComponente(out->listaEntrada, porta);
+            }
+            else if(identExiste(listaOutput, it->valor)) {
+                //TODO: inserir na lista de saidas da porta, esta saida
+                Componente out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
+                insereComponente(porta->listaSaida, out);
+                insereComponente(out->listaEntrada, porta);
             }
             else {
                 exibeMsgErro("Fio ou saida nao foi encontrado", it->linha, it->coluna, "ident. para um fio ou saida", it->valor);
@@ -315,8 +326,23 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
 
-            if(identExiste(listaWire, it->valor) || identExiste(listaInput, it->valor) || identExiste(listaOutput, it->valor)) {
-                //TODO: inserir a porta
+            if( identExiste(listaWire, it->valor) ) {
+                //TODO: inserir na lista de entradas da porta, esta entrada
+                Componente in = getComponenteItemPorNome(circuito->listaWires, it->valor);
+                insereComponente(porta->listaEntrada, in);
+                insereComponente(in->listaSaida, porta);
+            }
+            else if( identExiste(listaInput, it->valor) ) {
+                //TODO: inserir na lista de entradas da porta, esta entrada
+                Componente in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
+                insereComponente(porta->listaEntrada, in);
+                insereComponente(in->listaSaida, porta);
+            }
+            else if( identExiste(listaOutput, it->valor) ) {
+                //TODO: inserir na lista de entradas da porta, esta entrada
+                Componente in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
+                insereComponente(porta->listaEntrada, in);
+                insereComponente(in->listaSaida, porta);
             }
             else {
                 exibeMsgErro("Entrada da porta invalida", it->linha, it->coluna, "uma entrada valida (tipos: input, output ou wire)", it->valor);
@@ -371,6 +397,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
             else {
+                // TODO: Liberar a memoria alocada
                 return circuito;
             }
         }
