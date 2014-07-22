@@ -9,14 +9,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
+#include "progres.h"
 #include "erros.h"
 #include "lex.h"
 
 ListaToken* novaListaToken() {
-    ListaToken* l = (ListaToken*) malloc(sizeof(ListaToken));
-
-    if(!l)
-        erroFatalMemoria();
+    ListaToken* l = (ListaToken*) xmalloc(sizeof(ListaToken));
 
     l->primeiro = NULL;
     l->ultimo = NULL;
@@ -32,10 +31,7 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna) {
 }
 
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
-    Token* novo = (Token*) malloc(sizeof(Token));
-
-    if(!novo)
-        erroFatalMemoria();
+    Token* novo = (Token*) xmalloc(sizeof(Token));
 
     strcpy(novo->valor, tok);
     novo->linha = p_linha;
@@ -249,10 +245,7 @@ ListaToken* tokeniza(FILE *arquivo) {
     char c = '\0';
     int erro = 0, fim = 0;
 
-    char* tok = (char*) malloc(sizeof(char));
-
-    if(!tok)
-        erroFatalMemoria();
+    char* tok = (char*) xmalloc(sizeof(char));
 
     strcpy(tok, "");
 

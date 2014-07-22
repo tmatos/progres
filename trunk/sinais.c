@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "progres.h"
 #include "sinais.h"
 #include "erros.h"
 
@@ -48,10 +50,7 @@ int addPulso(Sinal* s, t_valor valor, int tempo) {
 
     tamanho++;
 
-    s->pulsos = (Pulso*) realloc( s->pulsos, sizeof(Pulso) * tamanho ); // TODO <---
-
-    if(!s->pulsos)
-        erroFatalMemoria();
+    s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho ); // TODO <---
 
     // acessando a penúltima posição, lembre q é um vetor!
     s->pulsos[tamanho - 2].valor = valor;
@@ -63,14 +62,11 @@ int addPulso(Sinal* s, t_valor valor, int tempo) {
 }
 
 Sinais* novaSinais() {
-    Sinais* s = (Sinais*) malloc(sizeof(Sinais));
+    Sinais* s = (Sinais*) xmalloc(sizeof(Sinais));
 
     if(s) {
         s->quantidade = 0;
         s->lista = NULL;
-    }
-    else {
-        erroFatalMemoria();
     }
 
     return s;
@@ -84,34 +80,22 @@ int addSinal(Sinais* s, char* nome) { // perigoso
     if(s->quantidade == 0) {
         s->quantidade++;
 
-        s->lista = (Sinal*) malloc(sizeof(Sinal));
-
-        if(!s->lista)
-            erroFatalMemoria();
+        s->lista = (Sinal*) xmalloc(sizeof(Sinal));
 
         setSinalNome( s->lista + 0, nome);
 
-        s->lista[0].pulsos = (Pulso*) malloc(sizeof(Pulso));
-
-        if( !(s->lista[0].pulsos) )
-            erroFatalMemoria();
+        s->lista[0].pulsos = (Pulso*) xmalloc(sizeof(Pulso));
 
         setPulsoNulo( s->lista[0].pulsos + 0 );
     }
     else {
         s->quantidade++;
 
-        s->lista = (Sinal*) realloc( s->lista, sizeof(Sinal) * s->quantidade );
-
-        if(!s->lista)
-            erroFatalMemoria();
+        s->lista = (Sinal*) xrealloc( s->lista, sizeof(Sinal) * s->quantidade );
 
         setSinalNome( s->lista + (s->quantidade - 1), nome); // aritmetica de ponteiro aqui
 
-        s->lista[s->quantidade - 1].pulsos = (Pulso*) malloc(sizeof(Pulso));
-
-        if( !( s->lista[s->quantidade - 1].pulsos ) )
-            erroFatalMemoria();
+        s->lista[s->quantidade - 1].pulsos = (Pulso*) xmalloc(sizeof(Pulso));
 
         setPulsoNulo( s->lista[s->quantidade - 1].pulsos + 0 ); // aritmetica de ponteiro aqui tb
     }

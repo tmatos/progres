@@ -8,16 +8,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "progres.h"
 #include "sinais.h"
 #include "estruturas.h"
 #include "lex.h"
 #include "erros.h"
 
 t_circuito* novoCircuito() {
-    t_circuito* circuito = (t_circuito*) malloc(sizeof(t_circuito));
-
-    if(!circuito)
-        erroFatalMemoria();
+    t_circuito* circuito = (t_circuito*) xmalloc(sizeof(t_circuito));
 
     circuito->listaFiosEntrada = novaListaComponente();
     circuito->sinaisEntrada = NULL;
@@ -55,10 +54,7 @@ ListaComponente* novaListaComponente() {
 }
 
 ListaComponente* novaListaComponenteTamanho(int tamanho) {
-    ListaComponente* listaCp = (ListaComponente*) malloc(sizeof(ListaComponente));
-
-    if(!listaCp)
-        erroFatalMemoria();
+    ListaComponente* listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
 
     listaCp->tamanho = tamanho;
 
@@ -66,10 +62,7 @@ ListaComponente* novaListaComponenteTamanho(int tamanho) {
         listaCp->itens = NULL;
     }
     else {
-        listaCp->itens = (Componente*) malloc(sizeof(Componente) * tamanho);
-
-        if(!listaCp->itens)
-            erroFatalMemoria();
+        listaCp->itens = (Componente*) xmalloc(sizeof(Componente) * tamanho);
 
         int i;
 
@@ -86,24 +79,18 @@ void insereComponente(ListaComponente* ls, Componente cp) {
 
     if(ls->tamanho == 0) {
         ls->tamanho++;
-        ls->itens = (Componente*) malloc(sizeof(Componente));
+        ls->itens = (Componente*) xmalloc(sizeof(Componente));
     }
     else {
         ls->tamanho++;
-        ls->itens = (Componente*) realloc( ls->itens, sizeof(Componente) * ls->tamanho );
+        ls->itens = (Componente*) xrealloc( ls->itens, sizeof(Componente) * ls->tamanho );
     }
-
-    if(!ls->itens)
-        erroFatalMemoria();
 
     ls->itens[ls->tamanho - 1] = cp;
 }
 
 Componente novoComponente(char* nome, t_operador porta) {
-    Componente c = (Componente) malloc(sizeof(struct st_componente));
-
-    if(!c)
-        erroFatalMemoria();
+    Componente c = (Componente) xmalloc(sizeof(struct st_componente));
 
     strcpy(c->nome, nome);
     c->tipo.operador = porta;
