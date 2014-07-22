@@ -245,7 +245,7 @@ ListaToken* tokeniza(FILE *arquivo) {
     char c = '\0';
     int erro = 0, fim = 0;
 
-    char* tok = (char*) xmalloc(sizeof(char));
+    char* tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
     strcpy(tok, "");
 

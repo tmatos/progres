@@ -11,7 +11,19 @@
 
 /** @brief .
  */
-typedef enum en_operador {op_and, op_or, op_not, op_nand, op_xor, wire, output, input} t_operador;
+typedef enum en_operador {
+    op_and,
+    op_or,
+    op_xor,
+    op_nand,
+    op_nor,
+    op_xnor,
+    op_not,
+    op_buf,
+    wire,
+    output,
+    input
+} t_operador;
 
 /** @brief .
  */
@@ -20,28 +32,34 @@ typedef struct st_tipo {
     int atraso;
 } t_tipo;
 
+typedef struct st_componente_list ListaComponente;
+
+typedef struct st_componente * Componente;
+
 /** @brief Estrutura que representa um componente do circuito (uma porta lógica)
  */
-typedef struct st_componente {
+struct st_componente {
     char nome[16];
     t_tipo tipo;
 
-    int numEntrada;
-    struct st_componente **listaEntrada;
+    //int numEntrada;
+    //struct st_componente **listaEntrada;
+    ListaComponente* listaEntrada;
     Sinal* sinalEntrada;
 
-    int numSaida;
-    struct st_componente **listaSaida;
+    //int numSaida;
+    //struct st_componente **listaSaida;
+    ListaComponente* listaSaida;
     Sinal* sinalSaida;
-} * Componente;
+};
 
 /** @brief Estrutura que representa uma lista de componentes.
             Na verdade ela guarda o total e um array de ponteiros para as portas.
  */
-typedef struct st_componente_list {
+struct st_componente_list {
     int tamanho;
     Componente *itens;
-} ListaComponente;
+};
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'
  */
@@ -63,11 +81,19 @@ t_circuito* novoCircuito();
 
 /** @brief .
  */
-int adicionaEntrada(t_circuito* circ, Componente comp);
+void adicionaEntrada(t_circuito* circ, Componente comp);
 
 /** @brief .
  */
-int adicionaSaida(t_circuito* circ, Componente comp);
+void adicionaSaida(t_circuito* circ, Componente comp);
+
+/** @brief .
+ */
+void adicionaWire(t_circuito* circ, Componente comp);
+
+/** @brief .
+ */
+void adicionaPorta(t_circuito* circ, Componente comp);
 
 /** @brief .
  */

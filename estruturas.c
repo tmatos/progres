@@ -31,22 +31,32 @@ t_circuito* novoCircuito() {
     return circuito;
 }
 
-int adicionaEntrada(t_circuito* circ, Componente comp) {
+void adicionaEntrada(t_circuito* circ, Componente comp) {
     if(!circ || !comp)
-        return 0;
+        return;
 
     insereComponente(circ->listaFiosEntrada, comp);
-
-    return 1;
 }
 
-int adicionaSaida(t_circuito* circ, Componente comp) {
+void adicionaSaida(t_circuito* circ, Componente comp) {
     if(!circ || !comp)
-        return 0;
+        return;
 
     insereComponente(circ->listaFiosSaida, comp);
+}
 
-    return 1;
+void adicionaWire(t_circuito* circ, Componente comp) {
+    if(!circ || !comp)
+        return;
+
+    insereComponente(circ->listaWires, comp);
+}
+
+void adicionaPorta(t_circuito* circ, Componente comp) {
+    if(!circ || !comp)
+        return;
+
+    insereComponente(circ->listaPortas, comp);
 }
 
 ListaComponente* novaListaComponente() {
@@ -96,12 +106,14 @@ Componente novoComponente(char* nome, t_operador porta) {
     c->tipo.operador = porta;
     c->tipo.atraso = 0; // atraso default é zero
 
-    c->numEntrada = 0;
-    c->listaEntrada = NULL;
+    //c->numEntrada = 0;
+    //c->listaEntrada = NULL;
+    c->listaEntrada = novaListaComponente();
     c->sinalEntrada = NULL;
 
-    c->numSaida = 0;
-    c->listaSaida = NULL;
+    //c->numSaida = 0;
+    //c->listaSaida = NULL;
+    c->listaSaida = novaListaComponente();
     c->sinalSaida = NULL;
 
     return c;
