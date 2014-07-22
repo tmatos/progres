@@ -17,6 +17,33 @@
 #include "erros.h"
 #include "lex.h"
 
+void* xmalloc(size_t t) {
+    void* p = malloc(t);
+
+    if(!p)
+        erroFatalMemoria();
+
+    return p;
+}
+
+void* xrealloc(void* m, size_t t) {
+    void* p = realloc(m, t);
+
+    if(!p)
+        erroFatalMemoria();
+
+    return p;
+}
+
+void* xcalloc(size_t n, size_t t) {
+    void* p = calloc(n, t);
+
+    if(!p)
+        erroFatalMemoria();
+
+    return p;
+}
+
 Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
     Sinais* entradas = novaSinais();
