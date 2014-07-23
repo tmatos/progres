@@ -15,8 +15,9 @@
 #include "lex.h"
 #include "erros.h"
 
-t_circuito* novoCircuito() {
-    t_circuito* circuito = (t_circuito*) xmalloc(sizeof(t_circuito));
+t_circuito* novoCircuito()
+{
+    t_circuito *circuito = (t_circuito*) xmalloc(sizeof(t_circuito));
 
     circuito->listaFiosEntrada = novaListaComponente();
     circuito->sinaisEntrada = NULL;
@@ -31,41 +32,49 @@ t_circuito* novoCircuito() {
     return circuito;
 }
 
-void adicionaEntrada(t_circuito* circ, Componente comp) {
+void adicionaEntrada(t_circuito* circ, Componente comp)
+{
     if(!circ || !comp)
         return;
 
     insereComponente(circ->listaFiosEntrada, comp);
 }
 
-void adicionaSaida(t_circuito* circ, Componente comp) {
+void adicionaSaida(t_circuito* circ, Componente comp)
+{
     if(!circ || !comp)
         return;
 
     insereComponente(circ->listaFiosSaida, comp);
 }
 
-void adicionaWire(t_circuito* circ, Componente comp) {
+void adicionaWire(t_circuito* circ, Componente comp)
+{
     if(!circ || !comp)
         return;
 
     insereComponente(circ->listaWires, comp);
 }
 
-void adicionaPorta(t_circuito* circ, Componente comp) {
+void adicionaPorta(t_circuito* circ, Componente comp)
+{
     if(!circ || !comp)
         return;
 
     insereComponente(circ->listaPortas, comp);
 }
 
-ListaComponente* novaListaComponente() {
+ListaComponente* novaListaComponente()
+{
     return novaListaComponenteTamanho(0);
 }
 
-ListaComponente* novaListaComponenteTamanho(int tamanho) {
-    ListaComponente* listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
+ListaComponente* novaListaComponenteTamanho(int tamanho)
+{
+    int i;
+    ListaComponente *listaCp;
 
+    listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
     listaCp->tamanho = tamanho;
 
     if(tamanho == 0) {
@@ -74,8 +83,6 @@ ListaComponente* novaListaComponenteTamanho(int tamanho) {
     else {
         listaCp->itens = (Componente*) xmalloc(sizeof(Componente) * tamanho);
 
-        int i;
-
         for(i=0 ; i<tamanho ; i++)
             listaCp->itens[i] = NULL;
     }
@@ -83,7 +90,8 @@ ListaComponente* novaListaComponenteTamanho(int tamanho) {
     return listaCp;
 }
 
-void insereComponente(ListaComponente* ls, Componente cp) {
+void insereComponente(ListaComponente* ls, Componente cp)
+{
     if(!ls)
         ls = novaListaComponente();
 
@@ -106,27 +114,26 @@ Componente novoComponente(char* nome, t_operador porta) {
     c->tipo.operador = porta;
     c->tipo.atraso = 0; // atraso default é zero
 
-    //c->numEntrada = 0;
-    //c->listaEntrada = NULL;
     c->listaEntrada = novaListaComponente();
     c->sinalEntrada = NULL;
 
-    //c->numSaida = 0;
-    //c->listaSaida = NULL;
     c->listaSaida = novaListaComponente();
     c->sinalSaida = NULL;
 
     return c;
 }
 
-Componente getComponenteItemPorNome(ListaComponente* ls, char* nome) {
+Componente getComponenteItemPorNome(ListaComponente* ls, char* nome)
+{
+    int i;
+
     if(!ls || !nome)
         return NULL;
 
-    int i;
-
-    for( i=0 ; i < ls->tamanho ; i++ ) {
-        if( iguais( ls->itens[i]->nome, nome ) ) {
+    for( i=0 ; i < ls->tamanho ; i++ )
+    {
+        if( iguais( ls->itens[i]->nome, nome ) )
+        {
            return ls->itens[i];
         }
     }
@@ -134,28 +141,32 @@ Componente getComponenteItemPorNome(ListaComponente* ls, char* nome) {
     return NULL;
 }
 
-Componente getPortaPorNome(t_circuito* circ, char* nome) {
+Componente getPortaPorNome(t_circuito* circ, char* nome)
+{
     if(!circ || !nome)
         return NULL;
 
     return getComponenteItemPorNome(circ->listaPortas, nome);
 }
 
-Componente getWirePorNome(t_circuito* circ, char* nome) {
+Componente getWirePorNome(t_circuito* circ, char* nome)
+{
     if(!circ || !nome)
         return NULL;
 
     return getComponenteItemPorNome(circ->listaWires, nome);
 }
 
-Componente getInputPorNome(t_circuito* circ, char* nome) {
+Componente getInputPorNome(t_circuito* circ, char* nome)
+{
     if(!circ || !nome)
         return NULL;
 
     return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
 }
 
-Componente getOutputPorNome(t_circuito* circ, char* nome) {
+Componente getOutputPorNome(t_circuito* circ, char* nome)
+{
     if(!circ || !nome)
         return NULL;
 

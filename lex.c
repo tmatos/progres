@@ -14,7 +14,8 @@
 #include "erros.h"
 #include "lex.h"
 
-ListaToken* novaListaToken() {
+ListaToken* novaListaToken()
+{
     ListaToken* l = (ListaToken*) xmalloc(sizeof(ListaToken));
 
     l->primeiro = NULL;
@@ -24,13 +25,15 @@ ListaToken* novaListaToken() {
     return l;
 }
 
-int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna) {
+int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
+{
     char s[2] = {tok, '\0'};
 
     return insereTokenString(lista, s, p_linha, p_coluna);
 }
 
-int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
+int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
+{
     Token* novo = (Token*) xmalloc(sizeof(Token));
 
     strcpy(novo->valor, tok);
@@ -59,20 +62,25 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna) {
     return 1;
 }
 
-int removeTokensPorValor(ListaToken* lst, char* tok) {
+int removeTokensPorValor(ListaToken* lst, char* tok)
+{
+    Token *tmp = NULL;
+    Token *anterior = NULL;
+    Token *it = NULL;
+
     if(!lst || !tok)
         return 0;
 
     if(!lst->primeiro)
         return 1;
 
-    Token* tmp = NULL;
-
-    Token* anterior = NULL;
-    Token* it = lst->primeiro;
-    while(it) {
-        if(iguais(it->valor, tok)) {
-            if(anterior) {
+    it = lst->primeiro;
+    while(it)
+    {
+        if(iguais(it->valor, tok))
+        {
+            if(anterior)
+            {
                 if(it->seguinte) {
                     anterior->seguinte = it->seguinte;
                     tmp = it;
@@ -91,7 +99,8 @@ int removeTokensPorValor(ListaToken* lst, char* tok) {
                     break;
                 }
             }
-            else {
+            else
+            {
                 if(it->seguinte) {
                     tmp = it;
                     lst->primeiro = it->seguinte;
@@ -118,7 +127,8 @@ int removeTokensPorValor(ListaToken* lst, char* tok) {
     return 1;
 }
 
-int anexa(char* str, char c) {
+int anexa(char* str, char c)
+{
     char tmp[2] = {c, '\0'};
 
     strcat(str, tmp);
@@ -128,14 +138,24 @@ int anexa(char* str, char c) {
     return 1;
 }
 
-int isSimbolo(char c) {
-    return (c == '(' || c == ')' || c == ',' || c == ';' || c == '{' || c == '}' || c == '#');
+int isSimbolo(char c)
+{
+    return (c == '(' ||
+            c == ')' ||
+            c == ',' ||
+            c == ';' ||
+            c == '{' ||
+            c == '}' ||
+            c == '#');
 }
 
-void exibeListaDeToken(ListaToken* tokens) {
+void exibeListaDeToken(ListaToken* tokens)
+{
+    Token *it = NULL;
+
     printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
 
-    Token* it = tokens->primeiro;
+    it = tokens->primeiro;
     while(it) {
         printf("%s\n", it->valor);
         avanca(&it);
@@ -144,7 +164,10 @@ void exibeListaDeToken(ListaToken* tokens) {
     printf("\n");
 }
 
-int identExiste(ListaToken* lst, char* str) {
+int identExiste(ListaToken* lst, char* str)
+{
+    Token *it = NULL;
+
     int retorno = 0;
 
     if(!lst || !str)
@@ -153,8 +176,9 @@ int identExiste(ListaToken* lst, char* str) {
     if(!lst->primeiro)
         return retorno;
 
-    Token* it = lst->primeiro;
-    while(it) {
+    it = lst->primeiro;
+    while(it)
+    {
         if(iguais(it->valor, str)) {
             retorno = 1;
             break;
@@ -166,16 +190,19 @@ int identExiste(ListaToken* lst, char* str) {
     return retorno;
 }
 
-int iguais(char* a, char* b) {
+int iguais(char* a, char* b)
+{
     return !strcmp(a, b);
 }
 
-void avanca(Token** t) {
+void avanca(Token** t)
+{
     if(*t)
         *t = (*t)->seguinte;
 }
 
-int isPalavra(Token* tk) {
+int isPalavra(Token* tk)
+{
     if(!tk)
         return 0;
 
@@ -211,7 +238,8 @@ int isPalavra(Token* tk) {
     return 0;
 }
 
-int isIdentificador(Token* tk) {
+int isIdentificador(Token* tk)
+{
     int i = 0;
     int simbol = 0;
 
@@ -237,17 +265,20 @@ int isIdentificador(Token* tk) {
     return 1;
 }
 
-ListaToken* tokeniza(FILE *arquivo) {
-    int linha = 1, coluna = 0;
+ListaToken* tokeniza(FILE *arquivo)
+{
+    int linha = 1; // contador para linha corrente do arquivo
+    int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
+    int erro = 0; // flag de erro, encerra a análise
+    int fim = 0; // flag para indicar o término da análise
 
-    ListaToken* tokens = novaListaToken();
+    char c = '\0'; // usado para leitura de um caraceter
+    char *tok; // usado para a leitura de uma string que representa um token
 
-    char c = '\0';
-    int erro = 0, fim = 0;
+    ListaToken *tokens = novaListaToken();
 
-    char* tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
-    strcpy(tok, "");
+    tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
     while(1) {
         // A
@@ -379,7 +410,15 @@ ListaToken* tokeniza(FILE *arquivo) {
                         else if(isalnum(c)) {
                             coluna++;
                             anexa(tok, c);
-                            // TODO: verificar tamanho maximo de palavra
+
+                            // verificar tamanho máximo de palavra
+                            if( strlen(tok) > MAX_TOKEN_SIZE ) {
+                                exibeMsgErro("Token excede o tamanho maximo permitido", linha, coluna - strlen(tok), NULL, NULL);
+                                erro = 1;
+
+                                break;
+                            }
+
                             continue;
                         }
                         else if(c == EOF) {
@@ -414,28 +453,36 @@ ListaToken* tokeniza(FILE *arquivo) {
     return tokens;
 }
 
-int apenasDigitos(char* str) {
-    int i, ret = 1;
+int apenasDigitos(char* str)
+{
+    int i;
+    int retorno = 1;
 
     if(!str)
         return 0;
 
-    for( i=0 ; i < strlen(str) ; i++ ) {
-        if( !isdigit(str[i]) ) {
-            ret = 0;
+    for( i=0 ; i < strlen(str) ; i++ )
+    {
+        if( !isdigit(str[i]) )
+        {
+            retorno = 0;
             break;
         }
     }
 
-    return ret;
+    return retorno;
 }
 
-int isNumNaturalValido(char* str) {
+int isNumNaturalValido(char* str)
+{
     if(!str)
         return 0;
 
-    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) ) // importante não ser um valor muito grande, esses numeros
+    // importante não ser um valor muito grande, esses numeros
+    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) )
+    {
         return 0;
+    }
 
     return 1;
 }
