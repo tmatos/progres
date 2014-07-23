@@ -179,6 +179,61 @@ Sinais* carregaEntradas(FILE *arquivo) {
     return entradas;
 }
 
+void salvarSinais(Sinais *sinaisSaida, char *pathArquivoSaida)
+{
+    FILE *arqSaida = fopen(pathArquivoSaida, "w");
+
+    if(!arqSaida)
+    {
+        printf("Erro ao tentar abrir arquivo.");
+        return;
+    }
+
+    int si = 0; // indexador dos sinais na lista de sinais de entrada
+    Sinal* itSinais = sinaisSaida->lista;
+
+    while(si < sinaisSaida->quantidade)
+    {
+        fprintf(arqSaida, "%s {", itSinais[si].nome);
+
+        Pulso* it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
+
+        int i = 0;
+
+        while(it->valor != nulo)
+        {
+            if(i > 0)
+                fprintf(arqSaida, ", ");
+
+            switch(it->valor)
+            {
+                case um:
+                    fprintf(arqSaida,"1(%d)", it->tempo);
+                    break;
+                case zero:
+                    fprintf(arqSaida,"0(%d)", it->tempo);
+                    break;
+                case x:
+                    fprintf(arqSaida,"x(%d)", it->tempo);
+                    break;
+                case nulo:
+                    break;
+            }
+
+            it++;
+            i++;
+        }
+
+        fprintf(arqSaida, "}");
+
+        fprintf(arqSaida, "\n");
+
+        si++;
+    }
+
+    fclose(arqSaida);
+}
+
 int main(int argc, char* argv[])
 {
     if(argc < 2) {
@@ -221,13 +276,15 @@ int main(int argc, char* argv[])
         Sinais* entradas = carregaEntradas(wavein);
 
         if(entradas)
+        {
+            // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
+            // e com o mesmo formato do arquivo de entrada.
+            salvarSinais(entradas, "saida.out");
+
             free(entradas);
+        }
 
         fclose(wavein);
-
-        // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
-        // e com o mesmo formato do arquivo de entrada.
-        //salvarSinais(entradas, "saida.out");
 
         /// DBG - O codigo abaixo mostra na tela um array de pulosos, isto e, um sinal
         /*int i;
