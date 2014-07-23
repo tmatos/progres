@@ -46,16 +46,18 @@ void* xcalloc(size_t n, size_t t) {
 
 Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
-    Sinais* entradas = novaSinais();
+    Sinais *entradas = novaSinais();
 
-    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
+    Token *it = NULL;
+
+    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
 
     ListaToken* tokens = tokeniza(arquivo);
 
     if(!tokens)
         return NULL;
 
-    Token* it = tokens->primeiro;
+    it = tokens->primeiro;
 
     if(!it) {
         printf("Arquivo de entrada aparentemente vazio.\n");
@@ -181,52 +183,51 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
 void salvarSinais(Sinais *sinaisSaida, char *pathArquivoSaida)
 {
+    int si; // indexador dos sinais na lista de sinais de entrada
+    Sinal *itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
+    Pulso *it = NULL; // Iterador para os pulsos em um Sinal
+
     FILE *arqSaida = fopen(pathArquivoSaida, "w");
 
     if(!arqSaida)
     {
-        printf("Erro ao tentar abrir arquivo.");
+        printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n", pathArquivoSaida);
         return;
     }
 
-    int si = 0; // indexador dos sinais na lista de sinais de entrada
-    Sinal* itSinais = sinaisSaida->lista;
+    si = 0;
+    itSinais = sinaisSaida->lista;
 
     while(si < sinaisSaida->quantidade)
     {
         fprintf(arqSaida, "%s {", itSinais[si].nome);
 
-        Pulso* it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
-
-        int i = 0;
+        it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
 
         while(it->valor != nulo)
         {
-            if(i > 0)
+            if(it != itSinais[si].pulsos) // Insere virgula apenas se não é a primeira iteração
                 fprintf(arqSaida, ", ");
 
             switch(it->valor)
             {
                 case um:
-                    fprintf(arqSaida,"1(%d)", it->tempo);
+                    fprintf(arqSaida, "1(%d)", it->tempo);
                     break;
                 case zero:
-                    fprintf(arqSaida,"0(%d)", it->tempo);
+                    fprintf(arqSaida, "0(%d)", it->tempo);
                     break;
                 case x:
-                    fprintf(arqSaida,"x(%d)", it->tempo);
+                    fprintf(arqSaida, "x(%d)", it->tempo);
                     break;
                 case nulo:
                     break;
             }
 
             it++;
-            i++;
         }
 
-        fprintf(arqSaida, "}");
-
-        fprintf(arqSaida, "\n");
+        fprintf(arqSaida, "}\n");
 
         si++;
     }
