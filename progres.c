@@ -92,7 +92,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     return NULL;
                 }
 
-                t_valor valorLogico = nulo;
+                ValorLogico valorLogico = nulo;
 
                 if(iguais(it->valor, "0")) {
                     valorLogico = zero;
@@ -181,19 +181,14 @@ Sinais* carregaEntradas(FILE *arquivo) {
     return entradas;
 }
 
-void salvarSinais(Sinais *sinaisSaida, char *pathArquivoSaida)
+void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
 {
     int si; // indexador dos sinais na lista de sinais de entrada
     Sinal *itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
     Pulso *it = NULL; // Iterador para os pulsos em um Sinal
 
-    FILE *arqSaida = fopen(pathArquivoSaida, "w");
-
-    if(!arqSaida)
-    {
-        printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n", pathArquivoSaida);
+    if(!sinaisSaida || !arqSaida)
         return;
-    }
 
     si = 0;
     itSinais = sinaisSaida->lista;
@@ -231,8 +226,6 @@ void salvarSinais(Sinais *sinaisSaida, char *pathArquivoSaida)
 
         si++;
     }
-
-    fclose(arqSaida);
 }
 
 int main(int argc, char* argv[])
@@ -276,16 +269,29 @@ int main(int argc, char* argv[])
 
         Sinais* entradas = carregaEntradas(wavein);
 
+        fclose(wavein);
+
         if(entradas)
         {
-            // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
-            // e com o mesmo formato do arquivo de entrada.
-            salvarSinais(entradas, "saida.out");
+            char pathArquivoSaida[256] = "saida.out";
+
+            FILE *waveout = fopen(pathArquivoSaida, "w");
+
+            if(!waveout)
+            {
+                printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n", pathArquivoSaida);
+            }
+            else
+            {
+                // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
+                // e com o mesmo formato do arquivo de entrada.
+                salvarSinais(entradas, waveout);
+
+                fclose(waveout);
+            }
 
             free(entradas);
         }
-
-        fclose(wavein);
 
         /// DBG - O codigo abaixo mostra na tela um array de pulosos, isto e, um sinal
         /*int i;

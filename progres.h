@@ -19,6 +19,11 @@
  */
 Sinais* carregaEntradas(FILE *arquivo);
 
+/** @brief Salva todos os sinais contidos no conjunto para o arquivo de saida
+            com a formatação padrão.
+ */
+void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida);
+
 /** @brief Wrapper para malloc com verificação de erro
  */
 void* xmalloc(size_t t);
