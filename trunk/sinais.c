@@ -33,7 +33,7 @@ int setPulsoNulo(Pulso* p) {
     return 1;
 }
 
-int addPulso(Sinal* s, t_valor valor, int tempo) {
+int addPulso(Sinal* s, ValorLogico valor, Tempo tempo) {
     if(!s)
         return 0;
 
