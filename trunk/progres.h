@@ -12,6 +12,10 @@
 
 #define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
 
+/** @brief Função que faz a simulação.
+ */
+Sinais* simula(t_circuito* circuto, Sinais* entradas);
+
 /** @brief Cria uma estrutura de dados representando todos os sinas de entrada
             lidos partir do arquivo de entrada correspondente (extensão *.in).
  *  @param arquivo O handler do arquivo de entrada com sinais a ser processado.

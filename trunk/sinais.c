@@ -34,15 +34,18 @@ int setPulsoNulo(Pulso* p) {
 }
 
 int addPulso(Sinal* s, ValorLogico valor, Tempo tempo) {
+    int tamanho;
+    Pulso *it = NULL;
+
     if(!s)
         return 0;
 
     if(!s->pulsos)
         return 0;
 
-    int tamanho = 1;
+    tamanho = 1;
 
-    Pulso* it = s->pulsos;
+    it = s->pulsos;
     while(it->valor != nulo) {
         tamanho++;
         it++;

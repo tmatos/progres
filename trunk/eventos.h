@@ -38,6 +38,7 @@ struct st_evento {
  * @brief .
  */
 struct st_fila_eventos {
+    char nada;
 };
 
 /**

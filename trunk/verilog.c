@@ -18,21 +18,27 @@
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
+    Componente in, out, porta;
+
+    int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
+
     t_circuito *circuito = novoCircuito();
 
-    ListaToken* tokens = tokeniza(arquivo);
+    ListaToken *identificadores = novaListaToken(); // lista de todos os identificadores
+    ListaToken *identificLivre = novaListaToken(); // lista de ident. de entrada ou saida ainda nao definidos como tal
 
-    ListaToken* identificadores = novaListaToken(); // lista de todos os identificadores
-    ListaToken* identificLivre = novaListaToken(); // lista de ident. de entrada ou saida ainda nao definidos como tal
+    ListaToken *listaInput = novaListaToken(); // lista de todos os identificadores das entradas
+    ListaToken *listaOutput = novaListaToken(); // lista de todos os identificadores das saidas
+    ListaToken *listaWire = novaListaToken(); // lista de todos os identificadores de wire
 
-    ListaToken* listaInput = novaListaToken(); // lista de todos os identificadores das entradas
-    ListaToken* listaOutput = novaListaToken(); // lista de todos os identificadores das saidas
-    ListaToken* listaWire = novaListaToken(); // lista de todos os identificadores de wire
+    ListaToken *tokens = tokeniza(arquivo);
+
+    Token *it = NULL;
 
     if(!tokens)
         return NULL;
 
-    Token* it = tokens->primeiro;
+    it = tokens->primeiro;
 
     if(!it)
         return NULL;
@@ -74,7 +80,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     // devemos agora ler os parametros do modulo
 
-    int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
+    virgula = 0; // não esperando por vírgula, por enquanto
 
     while(1) {
         if(!it) {
@@ -140,7 +146,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
         return NULL;
     }
 
-    Componente porta = NULL;
+    porta = NULL;
 
     while(1) {
 
@@ -185,16 +191,14 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 if(iguais(tipo, "input")) {
                     insereTokenString(listaInput, it->valor, -1, -1);
 
-                    // TODO: atribui como entrada o ident. na estrutura
-                    Componente cpIn = novoComponente(it->valor, input);
-                    adicionaEntrada(circuito, cpIn);
+                    // atribui como entrada o ident. na estrutura
+                    adicionaEntrada( circuito, novoComponente(it->valor, input) );
                 }
                 else if (iguais(tipo, "output")) {
                     insereTokenString(listaOutput, it->valor, -1, -1);
 
-                    // TODO: atribui como saída o ident. na estrutura
-                    Componente cpOut = novoComponente(it->valor, output);
-                    adicionaSaida(circuito, cpOut);
+                    // atribui como saída o ident. na estrutura
+                    adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
                 else if(iguais(tipo, "wire")) {
 
@@ -207,9 +211,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                             insereTokenString(identificadores, it->valor, -1, -1);
                             insereTokenString(listaWire, it->valor, -1, -1);
 
-                            // TODO: atribui como wire o ident. na estrutura
-                            Componente cpWire = novoComponente(it->valor, wire);
-                            adicionaWire(circuito, cpWire);
+                            // atribui como wire o ident. na estrutura
+                            adicionaWire(circuito, novoComponente(it->valor, wire));
                         }
                     }
                     else {
@@ -289,14 +292,14 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
 
             if(identExiste(listaWire, it->valor)) {
-                //TODO: inserir na lista de saidas da porta, esta saida
-                Componente out = getComponenteItemPorNome(circuito->listaWires, it->valor);
+                // inserir na lista de saidas da porta, esta saida
+                out = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(porta->listaSaida, out);
                 insereComponente(out->listaEntrada, porta);
             }
             else if(identExiste(listaOutput, it->valor)) {
-                //TODO: inserir na lista de saidas da porta, esta saida
-                Componente out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
+                // inserir na lista de saidas da porta, esta saida
+                out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(porta->listaSaida, out);
                 insereComponente(out->listaEntrada, porta);
             }
@@ -327,20 +330,20 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
 
             if( identExiste(listaWire, it->valor) ) {
-                //TODO: inserir na lista de entradas da porta, esta entrada
-                Componente in = getComponenteItemPorNome(circuito->listaWires, it->valor);
+                // inserir na lista de entradas da porta, esta entrada
+                in = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(porta->listaEntrada, in);
                 insereComponente(in->listaSaida, porta);
             }
             else if( identExiste(listaInput, it->valor) ) {
-                //TODO: inserir na lista de entradas da porta, esta entrada
-                Componente in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
+                // inserir na lista de entradas da porta, esta entrada
+                in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
                 insereComponente(porta->listaEntrada, in);
                 insereComponente(in->listaSaida, porta);
             }
             else if( identExiste(listaOutput, it->valor) ) {
-                //TODO: inserir na lista de entradas da porta, esta entrada
-                Componente in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
+                // inserir na lista de entradas da porta, esta entrada
+                in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(porta->listaEntrada, in);
                 insereComponente(in->listaSaida, porta);
             }

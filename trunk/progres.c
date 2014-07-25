@@ -16,6 +16,7 @@
 #include "sinais.h"
 #include "erros.h"
 #include "lex.h"
+#include "eventos.h"
 
 void* xmalloc(size_t t) {
     void* p = malloc(t);
@@ -46,8 +47,8 @@ void* xcalloc(size_t n, size_t t) {
 
 Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
+    ValorLogico valorLogico;
     Sinais *entradas = novaSinais();
-
     Token *it = NULL;
 
     ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
@@ -92,7 +93,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     return NULL;
                 }
 
-                ValorLogico valorLogico = nulo;
+                valorLogico = nulo;
 
                 if(iguais(it->valor, "0")) {
                     valorLogico = zero;
@@ -230,12 +231,17 @@ void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
 
 Sinais* simula(t_circuito* circuto, Sinais* entradas)
 {
-    if(!circuto || !entradas)
-        return NULL;
+    int i, j, validos;
+
+    Evento *fila = NULL;
+    Pulso *p = NULL;
 
     Sinais* saida = novaSinais();
 
-    int i, j, validos = 0;
+    if(!circuto || !entradas)
+        return NULL;
+
+    validos = 0;
 
     // Validação da correspência das entradas entre os arquivos '.v' e '.in'
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
@@ -256,31 +262,60 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
            circuto->listaFiosEntrada->tamanho,
            entradas->quantidade,
            validos);
+    /// ---
 
+    if(validos < circuto->listaFiosEntrada->tamanho)
+    {
+        printf("O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
+        return NULL;
+    }
 
+    // Inicialização da fila de eventos com os valores das entradas
+    fila = NULL;
+
+    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    {
+        p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
+        while(p->valor != nulo)
+        {
+            insereEvento(&fila, p->tempo, circuto->listaFiosEntrada->itens[i], p->valor);
+            p++;
+        }
+    }
+
+    //
 
     return NULL;
 }
 
 int main(int argc, char* argv[])
 {
+    FILE *arquivoVerilog = NULL;
+    FILE *wavein = NULL;
+    FILE *waveout = NULL;
+
+    Sinais* entradas = NULL;
+    Sinais* saidas = NULL;
+
+    t_circuito *circuto1 = NULL;
+
     if(argc < 2) {
         printf("Uso: progres [arquivo verilog] [arquivo de entradas]\n");
         exit(0);
     }
 
-    FILE *arquivo = fopen(argv[1], "r");
+    arquivoVerilog = fopen(argv[1], "r");
 
-    if(!arquivo) {
+    if(!arquivoVerilog) {
         printf("Impossibilitado de abrir o arquivo: %s\n", argv[1]);
         exit(1);
     }
 
     printf("Abrindo o arquivo de circuito: %s\n", argv[1]);
 
-    t_circuito *circuto1 = carregaCircuito(arquivo);
+    circuto1 = carregaCircuito(arquivoVerilog);
 
-    fclose(arquivo);
+    fclose(arquivoVerilog);
 
     if(circuto1) {
         printf("Circuito carregado com sucesso.\n");
@@ -292,7 +327,7 @@ int main(int argc, char* argv[])
     // parte do arquivo wave_in (meieiro isso aqui...)
     if(argc > 2)
     {
-        FILE *wavein = fopen(argv[2], "r");
+        wavein = fopen(argv[2], "r");
 
         if(!wavein) {
             printf("Impossibilitado de abrir o arquivo de entrada: %s\n", argv[2]);
@@ -301,7 +336,7 @@ int main(int argc, char* argv[])
 
         printf("Abrindo o arquivo de entrada: %s\n", argv[2]);
 
-        Sinais* entradas = carregaEntradas(wavein);
+        entradas = carregaEntradas(wavein);
 
         fclose(wavein);
 
@@ -309,9 +344,9 @@ int main(int argc, char* argv[])
         {
             char pathArquivoSaida[256] = "saida.out";
 
-            FILE *waveout = fopen(pathArquivoSaida, "w");
+            waveout = fopen(pathArquivoSaida, "w");
 
-            Sinais* saidas = simula(circuto1, entradas);
+            saidas = simula(circuto1, entradas);
 
             if(!waveout)
             {
@@ -329,7 +364,7 @@ int main(int argc, char* argv[])
             free(entradas);
         }
 
-        /// DBG - O codigo abaixo mostra na tela um array de pulosos, isto e, um sinal
+        /// DBG - O codigo abaixo 'plota' na tela um array de pulosos, isto e, um sinal
         /*int i;
 
         Pulso* it = entradas->lista[0].pulsos; // Aqui, o indice 0 indica qual dos sinas na lista
