@@ -30,6 +30,7 @@ typedef struct st_evento Evento;
 struct st_evento {
     Tempo quando; // Indica o instante de ocorrência do evento
     Transicao* listaTransicao;
+    Transicao* ultimaTransicao;
     Evento* proximo;
 };
 
@@ -47,7 +48,7 @@ void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor
 /**
  * @brief .
  */
-Transicao getTransicaoEm(Tempo t);
+Transicao* getTransicoesEm(Evento* fila, Tempo t);
 
 /**
  * @brief .
