@@ -240,7 +240,7 @@ int isPalavra(Token* tk)
 
 int isIdentificador(Token* tk)
 {
-    int i = 0;
+    int i;
     int simbol = 0;
 
     if(!tk)
@@ -276,7 +276,6 @@ ListaToken* tokeniza(FILE *arquivo)
     char *tok; // usado para a leitura de uma string que representa um token
 
     ListaToken *tokens = novaListaToken();
-
 
     tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
