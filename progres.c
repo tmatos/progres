@@ -228,6 +228,40 @@ void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
     }
 }
 
+Sinais* simula(t_circuito* circuto, Sinais* entradas)
+{
+    if(!circuto || !entradas)
+        return NULL;
+
+    Sinais* saida = novaSinais();
+
+    int i, j, validos = 0;
+
+    // Validação da correspência das entradas entre os arquivos '.v' e '.in'
+    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    {
+        for( j=0 ; j < entradas->quantidade ; j++ )
+        {
+            if( iguais( circuto->listaFiosEntrada->itens[i]->nome, entradas->lista[j].nome ) )
+            {
+                circuto->listaFiosEntrada->itens[i]->sinalEntrada = &(entradas->lista[j]);
+                validos++;
+                break;
+            }
+        }
+    }
+
+    /// DBG
+    printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n",
+           circuto->listaFiosEntrada->tamanho,
+           entradas->quantidade,
+           validos);
+
+
+
+    return NULL;
+}
+
 int main(int argc, char* argv[])
 {
     if(argc < 2) {
@@ -277,6 +311,8 @@ int main(int argc, char* argv[])
 
             FILE *waveout = fopen(pathArquivoSaida, "w");
 
+            Sinais* saidas = simula(circuto1, entradas);
+
             if(!waveout)
             {
                 printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n", pathArquivoSaida);
@@ -285,7 +321,7 @@ int main(int argc, char* argv[])
             {
                 // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
                 // e com o mesmo formato do arquivo de entrada.
-                salvarSinais(entradas, waveout);
+                salvarSinais(saidas, waveout);
 
                 fclose(waveout);
             }
