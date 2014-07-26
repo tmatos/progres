@@ -232,11 +232,18 @@ void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
 Sinais* simula(t_circuito* circuto, Sinais* entradas)
 {
     int i, j, validos;
+    Tempo t;
+
+    Transicao *listaTr = NULL;
+    Transicao *itTr = NULL;
 
     Evento *fila = NULL;
     Pulso *p = NULL;
 
-    Sinais* saida = novaSinais();
+    ListaComponente *portasAlteradas = NULL;
+    Componente gate = NULL;
+
+    Sinais *saida = novaSinais();
 
     if(!circuto || !entradas)
         return NULL;
@@ -275,15 +282,86 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
+        t = 0;
+
         p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
         while(p->valor != nulo)
         {
-            insereEvento(&fila, p->tempo, circuto->listaFiosEntrada->itens[i], p->valor);
+            insereEvento(&fila, t, circuto->listaFiosEntrada->itens[i], p->valor);
+            t = t + p->tempo;
+
             p++;
         }
+
+        insereEvento(&fila, t, circuto->listaFiosEntrada->itens[i], x); // este sinal fica até infitito
     }
 
     //
+    t = 0;
+
+    while(fila)
+    {
+        portasAlteradas = novaListaComponente();
+
+        t = fila->quando;
+
+        listaTr = popEvento(&fila);
+        itTr = listaTr;
+
+        while(itTr)
+        {
+            for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+            {
+                if( !contemComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] ) ) {
+                    insereComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] );
+                }
+            }
+
+            itTr = itTr->proximo;
+        }
+
+        free(listaTr); // popEvento não liberou a lista de transições, fazemos isso aqui
+        listaTr = NULL;
+
+        for( i=0 ; i < portasAlteradas->tamanho ; i++ )
+        {
+            gate = portasAlteradas->itens[i];
+
+            switch( gate->tipo.operador )
+            {
+            case op_not:
+
+                break;
+            case op_buf:
+
+                break;
+            case op_and:
+
+                break;
+            case op_or:
+
+                break;
+            case op_xor:
+
+                break;
+            case op_nand:
+
+                break;
+            case op_nor:
+
+                break;
+            case op_xnor:
+
+                break;
+            default:
+                break;
+            }
+
+            //portasAlteradas->itens[i]->sinaisEntrada
+        }
+
+
+    }
 
     return NULL;
 }

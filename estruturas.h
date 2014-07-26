@@ -130,6 +130,10 @@ void insereComponente(ListaComponente* ls, Componente cp);
 
 /** @brief .
  */
+int contemComponente(ListaComponente* ls, Componente cp);
+
+/** @brief .
+ */
 Componente getComponenteItemPorNome(ListaComponente* ls, char* nome);
 
 #endif

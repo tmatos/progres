@@ -5,6 +5,8 @@
  Under the terms of the MIT license.
 */
 
+#include <stdlib.h>
+
 #include "eventos.h"
 #include "progres.h"
 #include "estruturas.h"
@@ -108,5 +110,23 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t)
 
 Transicao* popEvento(Evento **fila)
 {
-    return NULL;
+    Transicao *ret = NULL;
+    Evento *dead = NULL;
+
+    if(!fila)
+        return NULL;
+
+    if( !(*fila) )
+        return NULL;
+
+    if( ! (*fila)->listaTransicao )
+        return NULL;
+
+    ret = (*fila)->listaTransicao;
+
+    dead = (*fila);
+    (*fila) = (*fila)->proximo;
+    free(dead);
+
+    return ret;
 }

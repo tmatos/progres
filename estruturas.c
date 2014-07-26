@@ -107,6 +107,23 @@ void insereComponente(ListaComponente* ls, Componente cp)
     ls->itens[ls->tamanho - 1] = cp;
 }
 
+int contemComponente(ListaComponente* ls, Componente cp)
+{
+    int i;
+
+    if(!ls || !cp)
+        return 0;
+
+    for( i=0 ; i < ls->tamanho ; i++ )
+    {
+        if( ls->itens[i] == cp ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 Componente novoComponente(char* nome, t_operador porta) {
     Componente c = (Componente) xmalloc(sizeof(struct st_componente));
 

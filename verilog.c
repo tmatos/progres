@@ -390,6 +390,9 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ";", it->valor);
                 return NULL;
             }
+
+            // finalmente, inserimos a porta na lista de portas do circuito
+            adicionaPorta(circuito, porta);
         }
         else if(iguais(it->valor, "endmodule")) {
             avanca(&it);
