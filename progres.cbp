@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="sample\ok.v sample\abc.in" />
+				<Option parameters="sample\ok.v sample\ok.in sample\ok.out" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -40,6 +40,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="estruturas.h" />
+		<Unit filename="eventos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="eventos.h" />
 		<Unit filename="lex.c">
 			<Option compilerVar="CC" />
 		</Unit>

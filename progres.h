@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include "estruturas.h"
 
+#define MAX_FILE_PATH_SIZE 256
+
 #define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
 
 /** @brief Função que faz a simulação.
