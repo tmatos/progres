@@ -1,3 +1,12 @@
+/***************************************************************
+ * Name:      IDEConfig.cpp
+ * Purpose:   Código para a tela de configurações
+ * Author:    Tiago Matos (2014)
+ * Created:   2014-06-18
+ * Copyright: Tiago Matos (2014)
+ * License:   MIT License
+ **************************************************************/
+
 #include "IDEConfig.h"
 #include "IDEMain.h"
 

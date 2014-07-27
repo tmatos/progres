@@ -5,7 +5,9 @@
 
 #include "sinais.h"
 
-static Sinais* carregaEntradas(FILE *arquivo);
+void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida);
+
+Sinais* carregaEntradas(FILE *arquivo);
 
 extern "C" Sinais* carregaArquivoSinais(const char* path);
 

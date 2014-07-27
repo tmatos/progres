@@ -8,16 +8,18 @@
 
 Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
-    Sinais* entradas = novaSinais();
+    ValorLogico valorLogico;
+    Sinais *entradas = novaSinais();
+    Token *it = NULL;
 
-    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
+    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
 
     ListaToken* tokens = tokeniza(arquivo);
 
     if(!tokens)
         return NULL;
 
-    Token* it = tokens->primeiro;
+    it = tokens->primeiro;
 
     if(!it) {
         printf("Arquivo de entrada aparentemente vazio.\n");
@@ -52,7 +54,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     return NULL;
                 }
 
-                t_valor valorLogico = nulo;
+                valorLogico = nulo;
 
                 if(iguais(it->valor, "0")) {
                     valorLogico = zero;
@@ -61,7 +63,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
                     valorLogico = um;
                 }
                 else if(iguais(it->valor, "x") || iguais(it->valor, "X")) {
-                    valorLogico = x;
+                    valorLogico = xis;
                 }
                 else if(iguais(it->valor, "}")){
                     break;
@@ -139,6 +141,53 @@ Sinais* carregaEntradas(FILE *arquivo) {
     }
 
     return entradas;
+}
+
+void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
+{
+    int si; // indexador dos sinais na lista de sinais de entrada
+    Sinal *itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
+    Pulso *it = NULL; // Iterador para os pulsos em um Sinal
+
+    if(!sinaisSaida || !arqSaida)
+        return;
+
+    si = 0;
+    itSinais = sinaisSaida->lista;
+
+    while(si < sinaisSaida->quantidade)
+    {
+        fprintf(arqSaida, "%s {", itSinais[si].nome);
+
+        it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
+
+        while(it->valor != nulo)
+        {
+            if(it != itSinais[si].pulsos) // Insere virgula apenas se não é a primeira iteração
+                fprintf(arqSaida, ", ");
+
+            switch(it->valor)
+            {
+                case um:
+                    fprintf(arqSaida, "1(%d)", it->tempo);
+                    break;
+                case zero:
+                    fprintf(arqSaida, "0(%d)", it->tempo);
+                    break;
+                case xis:
+                    fprintf(arqSaida, "x(%d)", it->tempo);
+                    break;
+                case nulo:
+                    break;
+            }
+
+            it++;
+        }
+
+        fprintf(arqSaida, "}\n");
+
+        si++;
+    }
 }
 
 Sinais* carregaArquivoSinais(const char* path) {

@@ -1,10 +1,10 @@
 /***************************************************************
  * Name:      IDEMain.cpp
  * Purpose:   Code for Application Frame
- * Author:    Tiago Matos ()
+ * Author:    Tiago Matos (2014)
  * Created:   2014-06-12
- * Copyright: Tiago Matos ()
- * License:
+ * Copyright: Tiago Matos (2014)
+ * License:   MIT License
  **************************************************************/
 
 #include "IDEMain.h"
@@ -280,16 +280,8 @@ void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
 {
-    wxPanel *panel = new wxPanel(bookFontes);
-    bookFontes->AddPage(panel, _("Nova onda"));
-    bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
-
-    wxClientDC *canvas = new wxClientDC(panel);
-    canvas->SetBrush( *wxRED_BRUSH );
-    //canvas->DrawRectangle( 15, 15, 50, 70 );
-
-    wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in"), wxFILE_MUST_EXIST);
     Sinais* ondas = NULL;
+    wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in|Arquivos de saída (*.out)|*.out"), wxFILE_MUST_EXIST);
 
     if(EntradaDialog.ShowModal() == wxID_OK)
         ondas = carregaArquivoSinais( (const char*) EntradaDialog.GetPath().mb_str() );
@@ -297,61 +289,94 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
     if(!ondas)
         return;
 
-    int i;
+    wxPanel *panel = new wxPanel(bookFontes);
 
-    Pulso* it = ondas->lista[0].pulsos; // Aqui, o indice 0 indica qual dos sinas na lista
-    while(it->valor != nulo) {
-        for(i = 0 ; i < it->tempo ; i++) {
-            switch(it->valor) {
-                case um:
-                    //printf("-");
-                break;
-                case zero:
-                    //printf("_");
-                    break;
-                case x:
-                    //printf("x");
-                    break;
-            }
-        }
+    if(bookFontes->GetPageCount() == 2)
+        bookFontes->RemovePage(1);
 
-        it++;
+    bookFontes->AddPage(panel, EntradaDialog.GetFilename());
+
+    bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
+
+    wxClientDC *canvas = new wxClientDC(panel);
+
+
+    int i, j, k;
+
+    const int hzTam = 15; // comprimeto horizontal de uma unidade de tempo
+    const int vrTam = 15; // altura de um pulso entre 0 e 1
+    const int spacmtSinal = 30; // espaçamento vertical entre os sinais
+
+    int x0 = 70, y0 = 30; // início do desenho
+    int x = x0, y = y0;
+
+    int yTexto = y0;
+
+    for(i=0 ; i < ondas->quantidade ; i++)
+    {
+        canvas->DrawText( wxString::FromUTF8(ondas->lista[i].nome), wxPoint(5, yTexto) );
+        yTexto = yTexto + spacmtSinal;
+        //yTexto = y0 + y0 * (i+1);
     }
 
-    int n = 5; // num. de tempos
-    int un = 20; // qtd de pixels de uma unidadde
-    int x0 = 20, y0 = 30; // inicio do desenho
-    int x = x0, y = y0;
-    int vlr = 1; // valor lógico
+    canvas->SetPen(*wxLIGHT_GREY_PEN);
 
-    int tx = x + un; // deslc. de pixel relat. ao tempo q passou
-    y = vlr ? y : y + 15;
-    canvas->DrawLine(x, y, tx, y);
-    x = tx;
+    for(i=0 ; i < ondas->quantidade+1 ; i++)
+    {
+        canvas->DrawLine(    5, y0 + (i * spacmtSinal) - 7,
+                          2000, y0 + (i * spacmtSinal) - 7 );
+    }
 
-    vlr = 0;
-    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+    for(j=0 ; j < 120  ; j++)
+    {
+        canvas->DrawLine( x0 + (j*hzTam), 5,
+                          x0 + (j*hzTam), yTexto+5 );
+    }
 
-    tx = x + un;
-    y = vlr ? y0 : y0 + 15;
-    canvas->DrawLine(x, y, tx, y);
-    x = tx;
+    y = y0;
 
-    vlr = 1;
-    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+    canvas->SetPen(*wxBLACK_PEN);
 
-    tx = x + (un * n);
-    y = vlr ? y0 : y0 + 15;
-    canvas->DrawLine(x, y, tx, y);
-    x = tx;
+    for(i=0 ; i < ondas->quantidade ; i++)
+    {
+        x = x0;
 
-    vlr = 0;
-    canvas->DrawLine(x, y0, x, y0 + 15); // se há mudança de nivel lógico, deve-se ter a linha vert.
+        Pulso* it = ondas->lista[i].pulsos;
 
-    tx = x + un* 234;
-    y = vlr ? y0 : y0 + 15;
-    canvas->DrawLine(x, y, tx, y);
-    x = tx;
+        while(it->valor != nulo)
+        {
+//            for(j = 0 ; j < it->tempo ; j++)
+//            {
+                switch(it->valor)
+                {
+                case um:
+                    canvas->DrawLine(x, y,
+                                     x + (hzTam * it->tempo), y);
+                    break;
+                case zero:
+                    canvas->DrawLine(x, (y + vrTam),
+                                     x + (hzTam * it->tempo), (y + vrTam));
+                    break;
+                case xis:
+                    for(k=0 ; k < it->tempo ; k++)
+                    {
+                        canvas->DrawLine((x + (k*hzTam)), y,
+                                         (x + hzTam + (k*hzTam)), (y + vrTam));
+
+                        canvas->DrawLine((x + (k*hzTam)), (y + vrTam),
+                                         (x + hzTam + (k*hzTam)), y);
+                    }
+                    break;
+                }
+//            }
+
+            x = x + hzTam * it->tempo;
+
+            it++;
+        }
+
+        y = y + spacmtSinal;
+    }
 }
 
 void IDEFrame::OnEditBoxText(wxCommandEvent& event)
