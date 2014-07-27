@@ -132,8 +132,23 @@ int addSinal(Sinais* s, char* nome) { // perigoso
 
 int addSinalPronto(Sinais *ls, Sinal *sinal)
 {
+    Pulso *it = NULL;
+
     if(!sinal)
         return 0;
 
-    // ...
+    if(!ls)
+        ls = novaSinais();
+
+    addSinal(ls, sinal->nome);
+
+    it = sinal->pulsos;
+    while(it->valor != nulo)
+    {
+        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o último)
+        addPulso( ls->lista + (ls->quantidade - 1), it->valor, it->tempo );
+        it++;
+    }
+
+    return 1;
 }
