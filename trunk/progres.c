@@ -49,7 +49,6 @@ Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
     ValorLogico valorLogico;
     Sinais *entradas = novaSinais();
-    Sinais *saidas = novaSinais();
     Token *it = NULL;
 
     ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
@@ -245,7 +244,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
     Componente gate = NULL;
     ValorLogico resultado;
 
-    Sinais *saida = novaSinais();
+    Sinais *saidas = novaSinais();
 
     if(!circuto || !entradas)
         return NULL;
@@ -399,10 +398,13 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             //portasAlteradas->itens[i]->sinaisEntrada
         }
 
-
     }
 
-    return NULL;
+    // copia as saidas da simulação do ciruito para o retorno
+    for(i=0 ; i < circuto->listaFiosSaida->tamanho ; i++)
+        addSinalPronto(saidas, circuto->listaFiosSaida->itens[i]->sinalSaida);
+
+    return saidas;
 }
 
 int main(int argc, char* argv[])
