@@ -67,6 +67,8 @@
 		<Unit filename="IDEConfig.h" />
 		<Unit filename="IDEMain.cpp" />
 		<Unit filename="IDEMain.h" />
+		<Unit filename="SinaisDrawPane.cpp" />
+		<Unit filename="SinaisDrawPane.h" />
 		<Unit filename="inout.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -75,6 +77,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="lex.h" />
+		<Unit filename="memoria.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="memoria.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
