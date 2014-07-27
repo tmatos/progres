@@ -13,6 +13,24 @@
 #include "sinais.h"
 #include "erros.h"
 
+Sinal* novoSinal(char *nome)
+{
+    Sinal *sinal = (Sinal*) xmalloc(sizeof(Sinal));
+
+    if(nome)
+        setSinalNome(sinal, nome);
+    else
+        setSinalNome(sinal, "");
+
+    sinal->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
+
+    setPulsoNulo( sinal->pulsos + 0 );
+
+    sinal->duracaoTotal = 0;
+
+    return sinal;
+}
+
 int setSinalNome(Sinal* s, char* nome) {
     if(!s || !nome)
         return 0;
@@ -33,7 +51,7 @@ int setPulsoNulo(Pulso* p) {
     return 1;
 }
 
-int addPulso(Sinal* s, ValorLogico valor, Tempo tempo) {
+int addPulso(Sinal* s, ValorLogico valor, Tempo duracao) {
     int tamanho;
     Pulso *it = NULL;
 
@@ -53,13 +71,15 @@ int addPulso(Sinal* s, ValorLogico valor, Tempo tempo) {
 
     tamanho++;
 
-    s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho ); // TODO <---
+    s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
 
     // acessando a penúltima posição, lembre q é um vetor!
     s->pulsos[tamanho - 2].valor = valor;
-    s->pulsos[tamanho - 2].tempo = tempo;
+    s->pulsos[tamanho - 2].tempo = duracao;
 
     setPulsoNulo( &(s->pulsos[tamanho - 1]) );
+
+    s->duracaoTotal += duracao;
 
     return 1;
 }
@@ -90,6 +110,8 @@ int addSinal(Sinais* s, char* nome) { // perigoso
         s->lista[0].pulsos = (Pulso*) xmalloc(sizeof(Pulso));
 
         setPulsoNulo( s->lista[0].pulsos + 0 );
+
+        s->lista[0].duracaoTotal = 0;
     }
     else {
         s->quantidade++;
@@ -101,7 +123,17 @@ int addSinal(Sinais* s, char* nome) { // perigoso
         s->lista[s->quantidade - 1].pulsos = (Pulso*) xmalloc(sizeof(Pulso));
 
         setPulsoNulo( s->lista[s->quantidade - 1].pulsos + 0 ); // aritmetica de ponteiro aqui tb
+
+        s->lista[s->quantidade - 1].duracaoTotal = 0;
     }
 
     return 1;
+}
+
+int addSinalPronto(Sinais *ls, Sinal *sinal)
+{
+    if(!sinal)
+        return 0;
+
+    // ...
 }

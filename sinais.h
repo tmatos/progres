@@ -47,6 +47,7 @@ typedef struct st_pulso {
 typedef struct st_sinal {
     char nome[MAX_NOME_SINAL];
     Pulso* pulsos;
+    Tempo duracaoTotal;
 } Sinal;
 
 /** @brief Um conjunto de um ou mais sinais. Podem ser todos de entrada ou todos de saída.
@@ -55,6 +56,10 @@ typedef struct st_sinais {
     int quantidade;
     Sinal* lista;
 } Sinais;
+
+/** @brief Inicializa um sinal vazio com um respectivo nome.
+ */
+Sinal* novoSinal(char *nome);
 
 /** @brief Muda a string contendo o nome do sinal para a indicada.
  */
@@ -68,7 +73,7 @@ int setPulsoNulo(Pulso* p);
             mais um pulso de valor e duração indicados.
             É como se fosse um append, aqui fazemos uso de realloc.
  */
-int addPulso(Sinal* s, ValorLogico valor, Tempo tempo);
+int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
 
 /** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de memória.
             Vazia significa: primeiro e ultimo apontam a NULL e num. de elem. é zero.
@@ -78,5 +83,9 @@ Sinais* novaSinais();
 /** @brief Insere um sinal em branco na estrutura Sinais.
  */
 int addSinal(Sinais* s, char* nome);
+
+/** @brief Copia um sinal para a estrutura Sinais.
+ */
+int addSinalPronto(Sinais *ls, Sinal *sinal);
 
 #endif

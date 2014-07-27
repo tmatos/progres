@@ -137,6 +137,8 @@ Componente novoComponente(char* nome, t_operador porta) {
     c->listaSaida = novaListaComponente();
     c->sinalSaida = NULL;
 
+    c->valorDinamico = x;
+
     return c;
 }
 
