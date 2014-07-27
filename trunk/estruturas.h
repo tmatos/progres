@@ -29,7 +29,7 @@ typedef enum en_operador {
  */
 typedef struct st_tipo {
     t_operador operador;
-    int atraso;
+    Tempo atraso;
 } t_tipo;
 
 typedef struct st_componente_list ListaComponente;
@@ -42,15 +42,13 @@ struct st_componente {
     char nome[16];
     t_tipo tipo;
 
-    //int numEntrada;
-    //struct st_componente **listaEntrada;
     ListaComponente* listaEntrada;
     Sinal* sinalEntrada;
 
-    //int numSaida;
-    //struct st_componente **listaSaida;
     ListaComponente* listaSaida;
     Sinal* sinalSaida;
+
+    ValorLogico valorDinamico; // fio
 };
 
 /** @brief Estrutura que representa uma lista de componentes.

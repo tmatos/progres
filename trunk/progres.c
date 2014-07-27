@@ -49,6 +49,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
     int indice = -1; // indexador do vetor de sinais de entrada
     ValorLogico valorLogico;
     Sinais *entradas = novaSinais();
+    Sinais *saidas = novaSinais();
     Token *it = NULL;
 
     ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
@@ -242,6 +243,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     ListaComponente *portasAlteradas = NULL;
     Componente gate = NULL;
+    ValorLogico resultado;
 
     Sinais *saida = novaSinais();
 
@@ -296,7 +298,21 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         insereEvento(&fila, t, circuto->listaFiosEntrada->itens[i], x); // este sinal fica até infitito
     }
 
-    //
+/*
+    // inicialização dos valores iniciais default das entradas (valor que estava antes de qq sinal)
+    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    {
+        circuto->listaFiosEntrada->itens[i]->valorDinamico = x;
+    }
+
+    // inicialização dos valores iniciais default das saidas (valor que estava antes de qq sinal)
+    for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
+    {
+        circuto->listaFiosSaida->itens[i]->valorDinamico = x;
+    }
+*/
+
+    // aqui ocorre a simulação propriamente dita, usado fila de eventos
     t = 0;
 
     while(fila)
@@ -308,13 +324,27 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         listaTr = popEvento(&fila);
         itTr = listaTr;
 
+        // atualiza valores de fios e faz uma lista das portas alteradas pelas transicoes em listaTr
         while(itTr)
         {
-            for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+            if(itTr->fio->valorDinamico != itTr->novoValor) // apenas se houver mudança de valor no fio
             {
-                if( !contemComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] ) ) {
-                    insereComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] );
+                for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+                {
+                    if( !contemComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] ) ) {
+                        insereComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] );
+                    }
                 }
+
+                if(itTr->fio->tipo.operador == output)
+                {
+                    if( !(itTr->fio->sinalSaida) )
+                        itTr->fio->sinalSaida = novoSinal( itTr->fio->nome );
+
+                    addPulso( itTr->fio->sinalSaida, itTr->fio->valorDinamico, t - itTr->fio->sinalSaida->duracaoTotal );
+                }
+
+                itTr->fio->valorDinamico = itTr->novoValor;
             }
 
             itTr = itTr->proximo;
@@ -330,9 +360,18 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             switch( gate->tipo.operador )
             {
             case op_not:
+                if(gate->listaEntrada->itens[0]->valorDinamico == x)
+                    resultado = x;
+                else if (gate->listaEntrada->itens[0]->valorDinamico == zero)
+                    resultado = um;
+                else if (gate->listaEntrada->itens[0]->valorDinamico == um)
+                    resultado = zero;
+
+                insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], resultado);
 
                 break;
             case op_buf:
+                insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], gate->listaEntrada->itens[0]->valorDinamico);
 
                 break;
             case op_and:
