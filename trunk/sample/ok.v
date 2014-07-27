@@ -1,45 +1,21 @@
 
 // Alguma coisa pra teste...
 
-module ok(a , b,c, x);
+module nao(entra, sai, complex);
 
-input a;// sinal de entrada
-input b, c;
-output x;
+input entra;
+output sai;
+output complex;
 
-wire tmp, af, gr;
+wire fio0, fio1;
 
-not #2(tmp, a);
+not(sai, entra);
 
-and(x, tmp, af);
+not #1(fio0, entra);
 
-/*babahathathatha*/not(tmp, a);/*ji*/
+not(fio1, entra);
 
-/*
-not #2(tmp, a);
-
-not #2(tmp, a);
-
-not #2(tmp, a);
-
-not #2(tmp, a);
-
-not #2(tmp, a);
-
-not #2(tmp, a);
-
-and(c, tmp, af);
-
-and(c, tmp, af);
-and(c, tmp, af);
-and(c, tmp, af);
-and(c, tmp, af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);
-and(c, tmp, af, af, af, af ,af, af, af, af,af);*/
+and #2 (complex, fio1, fio0);
 
 endmodule
 

@@ -95,7 +95,7 @@ Sinais* novaSinais() {
     return s;
 }
 
-int addSinal(Sinais* s, char* nome) { // perigoso
+int addSinal(Sinais* s, char* nome) {
     if(!s) {
         s = novaSinais();
     }

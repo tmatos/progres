@@ -369,28 +369,128 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], resultado);
 
                 break;
+
             case op_buf:
                 insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], gate->listaEntrada->itens[0]->valorDinamico);
 
                 break;
+
             case op_and:
+                resultado = um;
+
+                // computa o valor
+                for(j=0 ; j < gate->listaEntrada->tamanho ; j++)
+                {
+                    if(gate->listaEntrada->itens[j]->valorDinamico == x)
+                    {
+                        resultado = x;
+                        break;
+                    }
+                    else if(gate->listaEntrada->itens[j]->valorDinamico == zero)
+                    {
+                        resultado = zero;
+                    }
+                }
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
+
             case op_or:
+                resultado = zero;
+
+                // computa o valor
+                for(j=0 ; j < gate->listaEntrada->tamanho ; j++)
+                {
+                    if(gate->listaEntrada->itens[j]->valorDinamico == x)
+                    {
+                        resultado = x;
+                        break;
+                    }
+                    else if(gate->listaEntrada->itens[j]->valorDinamico == um)
+                    {
+                        resultado = um;
+                    }
+                }
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
+
             case op_xor:
 
                 break;
+
             case op_nand:
+                resultado = um;
+
+                // computa o valor
+                for(j=0 ; j < gate->listaEntrada->tamanho ; j++)
+                {
+                    if(gate->listaEntrada->itens[j]->valorDinamico == x)
+                    {
+                        resultado = x;
+                        break;
+                    }
+                    else if(gate->listaEntrada->itens[j]->valorDinamico == zero)
+                    {
+                        resultado = zero;
+                    }
+                }
+
+                // fazemos a negação do resultado se este for diferente de x
+                if(resultado != x)
+                    resultado = (resultado == zero ? um : zero);
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
+
             case op_nor:
+                resultado = zero;
+
+                // computa o valor
+                for(j=0 ; j < gate->listaEntrada->tamanho ; j++)
+                {
+                    if(gate->listaEntrada->itens[j]->valorDinamico == x)
+                    {
+                        resultado = x;
+                        break;
+                    }
+                    else if(gate->listaEntrada->itens[j]->valorDinamico == um)
+                    {
+                        resultado = um;
+                    }
+                }
+
+                // fazemos a negação do resultado se este for diferente de x
+                if(resultado != x)
+                    resultado = (resultado == zero ? um : zero);
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
+
             case op_xnor:
 
                 break;
+
             default:
                 break;
             }
@@ -443,7 +543,7 @@ int main(int argc, char* argv[])
         printf("Erro com o fonte.\n");
     }
 
-    // parte do arquivo wave_in (meieiro isso aqui...)
+    // se foi dado um path do arquivo de entrada para simulação, simularemos
     if(argc > 2)
     {
         wavein = fopen(argv[2], "r");
@@ -461,11 +561,26 @@ int main(int argc, char* argv[])
 
         if(entradas)
         {
-            char pathArquivoSaida[256] = "saida.out";
+            char pathArquivoSaida[MAX_FILE_PATH_SIZE] = "";
 
-            waveout = fopen(pathArquivoSaida, "w");
+            if(argc > 3) // se foi passado o argumento do arquivo de saída
+            {
+                strcpy(pathArquivoSaida, argv[3]);
+            }
+            else
+            {
+                strcpy(pathArquivoSaida, argv[2]);
+                strcat(pathArquivoSaida, ".out");
+            }
 
             saidas = simula(circuto1, entradas);
+
+            if(saidas)
+                printf("Simulacao concluida com saidas geradas.\n");
+
+            free(entradas);
+
+            waveout = fopen(pathArquivoSaida, "w");
 
             if(!waveout)
             {
@@ -478,9 +593,15 @@ int main(int argc, char* argv[])
                 salvarSinais(saidas, waveout);
 
                 fclose(waveout);
-            }
 
-            free(entradas);
+                printf("Arquivo de saida salvo em '%s'.\n", pathArquivoSaida);
+
+                free(saidas);
+            }
+        }
+        else
+        {
+            printf("Nao ha entradas para a simulacao do circuito.\n");
         }
 
         /// DBG - O codigo abaixo 'plota' na tela um array de pulosos, isto e, um sinal
