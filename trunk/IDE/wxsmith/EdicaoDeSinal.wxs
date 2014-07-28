@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EdicaoDeSinal">
+		<title>Arquivo de entrada</title>
 		<size>590,366</size>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
@@ -9,16 +10,10 @@
 			<size>576,320</size>
 			<style>wxTE_MULTILINE</style>
 		</object>
-		<object class="wxButton" name="ID_BUTTON1" variable="btnDescartar" member="yes">
-			<label>Descartar</label>
-			<pos>496,336</pos>
-			<size>83,23</size>
-			<handler function="OnbtnDescartarClick" entry="EVT_BUTTON" />
-		</object>
-		<object class="wxButton" name="ID_BUTTON2" variable="btnSalvar" member="yes">
+		<object class="wxButton" name="idBtn_Salvar" variable="btnSalvar" member="yes">
 			<label>Salvar</label>
-			<pos>400,336</pos>
-			<size>83,23</size>
+			<pos>480,336</pos>
+			<size>104,23</size>
 			<handler function="OnbtnSalvarClick" entry="EVT_BUTTON" />
 		</object>
 	</object>

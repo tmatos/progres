@@ -18,24 +18,24 @@ class EdicaoDeSinal: public wxDialog
 
 		//(*Declarations(EdicaoDeSinal)
 		wxTextCtrl* txtWaveIn;
-		wxButton* btnDescartar;
 		wxButton* btnSalvar;
 		//*)
 
-	protected:
+    protected:
 
 		//(*Identifiers(EdicaoDeSinal)
 		static const long ID_TEXTCTRL1;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
+		static const long idBtn_Salvar;
 		//*)
 
-	private:
+    private:
 
 		//(*Handlers(EdicaoDeSinal)
 		void OnbtnDescartarClick(wxCommandEvent& event);
 		void OnbtnSalvarClick(wxCommandEvent& event);
 		//*)
+
+        void OnClose(wxCloseEvent& event);
 
         wxString file;
 

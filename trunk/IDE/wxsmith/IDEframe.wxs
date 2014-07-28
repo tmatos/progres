@@ -22,7 +22,7 @@
 							<style>normal</style>
 							<weight>normal</weight>
 							<underlined>0</underlined>
-							<family>swiss</family>
+							<family>script</family>
 							<face>Courier New</face>
 						</font>
 						<minsize>-1,-1</minsize>
@@ -48,10 +48,6 @@
 					<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItemNovoCircuito" member="yes">
 						<label>Circuto</label>
 						<handler function="OnMenuItemNovoCircuitoSelected" entry="EVT_MENU" />
-					</object>
-					<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItemNovaOnda" member="yes">
-						<label>Onda</label>
-						<handler function="OnMenuItemNovaOndaSelected" entry="EVT_MENU" />
 					</object>
 				</object>
 				<object class="wxMenuItem" name="idMenuOpen" variable="MenuItem1" member="yes">
@@ -93,6 +89,21 @@
 			</object>
 			<object class="wxMenu" variable="Menu3" member="yes">
 				<label>Exibir</label>
+				<object class="wxMenuItem" name="ID_MENUITEM_TESTE" variable="MenuItemTeste" member="yes">
+					<label>Teste</label>
+					<handler function="OnMenuItemTesteSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" variable="Menu4" member="yes">
+				<label>Entradas</label>
+				<object class="wxMenuItem" name="ID_MENUITEM_ENTRADA_NOVO" variable="MenuItem3" member="yes">
+					<label>Novo arquivo de entrada</label>
+					<handler function="OnMenuItemEntradaNovoSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM_ENTRADA_ABRIR" variable="MenuItem5" member="yes">
+					<label>Abrir arquivo de entrada</label>
+					<handler function="OnMenuItemEntradaAbrirSelected" entry="EVT_MENU" />
+				</object>
 			</object>
 			<object class="wxMenu" variable="Menu1" member="yes">
 				<label>Simulação</label>
@@ -123,10 +134,6 @@
 			<fields>3</fields>
 			<widths>-80,-10,-10</widths>
 			<styles>wxSB_NORMAL,wxSB_NORMAL,wxSB_NORMAL</styles>
-		</object>
-		<object class="wxFileDialog" variable="FileDialogFonte" member="yes">
-			<message>Selecionar arquivo</message>
-			<style>wxFD_DEFAULT_STYLE|wxFD_OPEN|wxFD_FILE_MUST_EXIST</style>
 		</object>
 	</object>
 </wxsmith>

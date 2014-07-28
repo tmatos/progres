@@ -18,7 +18,6 @@
 #include <wx/textctrl.h>
 #include <wx/splitter.h>
 #include <wx/listbox.h>
-#include <wx/filedlg.h>
 #include <wx/frame.h>
 #include <wx/statusbr.h>
 //*)
@@ -33,6 +32,7 @@ class IDEFrame: public wxFrame
         void carregaConfigs();
         void CarregarArquivoVerilog(wxString arquivo);
         void SetTituloJanelaComArquivo(wxString nome);
+        void AtualizaTudoParaNovaEntrada(wxString novoPathArquivoWaveIn);
 
     private:
         //(*Handlers(IDEFrame)
@@ -41,13 +41,15 @@ class IDEFrame: public wxFrame
         void OnMenuItemOpen(wxCommandEvent& event);
         void OnMenuItemAnalisarSelected(wxCommandEvent& event);
         void OnMenuItemNovoCircuitoSelected(wxCommandEvent& event);
-        void OnMenuItemNovaOndaSelected(wxCommandEvent& event);
+        void OnMenuItemEntradaAbrirSelected(wxCommandEvent& event);
         void OnEditBoxText(wxCommandEvent& event);
         void OnListBoxErrosDClick(wxCommandEvent& event);
         void OnMenuItemSelecionarTudoSelected(wxCommandEvent& event);
         void OnMenuItemConfigSelected(wxCommandEvent& event);
         void OnMenuItemSave(wxCommandEvent& event);
         void OnMenuItemCloseSelected(wxCommandEvent& event);
+        void OnMenuItemTesteSelected(wxCommandEvent& event);
+        void OnMenuItemEntradaNovoSelected(wxCommandEvent& event);
         //*)
 
         //(*Identifiers(IDEFrame)
@@ -56,7 +58,6 @@ class IDEFrame: public wxFrame
         static const long ID_LISTBOXERROS;
         static const long ID_SPLITTERWINDOW1;
         static const long ID_MENUITEM2;
-        static const long ID_MENUITEM3;
         static const long ID_MENUITEM1;
         static const long idMenuOpen;
         static const long idMenuSave;
@@ -64,6 +65,9 @@ class IDEFrame: public wxFrame
         static const long idMenuClose;
         static const long idMenuQuit;
         static const long ID_MENUITEM6;
+        static const long ID_MENUITEM_TESTE;
+        static const long ID_MENUITEM_ENTRADA_NOVO;
+        static const long ID_MENUITEM_ENTRADA_ABRIR;
         static const long ID_MENUITEM4;
         static const long ID_MENUITEM7;
         static const long idMenuAbout;
@@ -74,23 +78,25 @@ class IDEFrame: public wxFrame
         wxMenu* MenuItem2;
         wxMenuItem* MenuItemSave;
         wxMenuItem* MenuItemClose;
+        wxMenuItem* MenuItem5;
         wxMenuItem* MenuItemNovoCircuito;
         wxTextCtrl* EditBox;
         wxMenu* Menu3;
         wxMenuItem* MenuItem1;
         wxMenuItem* MenuItem4;
         wxMenu* MenuOpcoes;
-        wxMenuItem* MenuItemNovaOnda;
         wxNotebook* bookFontes;
         wxMenu* Menu1;
+        wxMenuItem* MenuItem3;
+        wxMenuItem* MenuItemTeste;
         wxMenuItem* MenuItemConfig;
-        wxFileDialog* FileDialogFonte;
         wxMenuItem* MenuItemAnalisar;
         wxSplitterWindow* SplitterWindow1;
         wxMenu* Menu2;
         wxStatusBar* StatusBarPrincipal;
         wxMenuItem* MenuItemSelecionarTudo;
         wxListBox* ListBoxErros;
+        wxMenu* Menu4;
         //*)
 
         wxString verilogFilePath;

@@ -1,6 +1,7 @@
 
 #include <wx/wx.h>
 #include <wx/sizer.h>
+#include <wx/font.h>
 
 #include "SinaisDrawPane.h"
 #include "EdicaoDeSinal.h"
@@ -43,11 +44,13 @@ END_EVENT_TABLE()
 
 void SinaisDrawPane::mouseDoubleClick(wxMouseEvent& event)
 {
-    if(isInputFile)
+    if(isInputFile && !estaEmEdicao)
     {
         EdicaoDeSinal *editor = new EdicaoDeSinal(this);
 
         editor->setFile(waveFilePath);
+
+        estaEmEdicao = true;
 
         editor->Show();
     }
@@ -57,6 +60,7 @@ SinaisDrawPane::SinaisDrawPane(wxWindow* parent) : wxPanel(parent)
 {
     ondas = NULL;
     bool isInputFile = true;
+    bool estaEmEdicao = false;
 }
 
 void SinaisDrawPane::paintEvent(wxPaintEvent & evt)
@@ -84,7 +88,12 @@ void SinaisDrawPane::setSinais(wxString filePath, bool isInput)
 void SinaisDrawPane::render(wxDC&  canvas)
 {
     if(!ondas)
+    {
+        canvas.SetPen(*wxRED);
+        canvas.DrawText( _("Arquivo vazio ou com formato errado."), wxPoint(30, 30) );
+
         return;
+    }
 
     int i, j, k;
 
@@ -97,6 +106,9 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
     int yTexto = y0;
 
+    // nomes das entradas
+    canvas.SetTextForeground(*wxBLACK);
+
     for(i=0 ; i < ondas->quantidade ; i++)
     {
         canvas.DrawText( wxString::FromUTF8(ondas->lista[i].nome), wxPoint(5, yTexto) );
@@ -105,16 +117,26 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
     canvas.SetPen(*wxLIGHT_GREY_PEN);
 
+    // linhas verticais do grid
     for(i=0 ; i < ondas->quantidade+1 ; i++)
     {
         canvas.DrawLine(    5, y0 + (i * spacmtSinal) - 7,
                           2000, y0 + (i * spacmtSinal) - 7 );
     }
 
+    // linhas horizontais do grid e numeração
+    canvas.SetTextForeground(*wxBLUE);
+
+    wxFont fonte(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+    canvas.SetFont(fonte);
+
     for(j=0 ; j < 120  ; j++)
     {
-        canvas.DrawLine( x0 + (j*hzTam), 5,
-                          x0 + (j*hzTam), yTexto+5 );
+        if(j%5 == 0)
+            canvas.DrawText( wxString::Format(_("%i"), j), wxPoint(x0 + (j*hzTam) + 2, 10 ) );
+
+        canvas.DrawLine( x0 + (j*hzTam), 10,
+                         x0 + (j*hzTam), yTexto+10 );
     }
 
     y = y0;
