@@ -1,6 +1,6 @@
 /**
  * @file progres.h
- * @brief Prototipos do modulo principal do programa.
+ * @brief Protótipos do módulo principal do programa.
  */
 
 #ifndef PROGRES_H
@@ -8,13 +8,15 @@
 #define PROGRES_H
 
 #include <stdio.h>
+
 #include "estruturas.h"
 
-#define MAX_FILE_PATH_SIZE 256
+#define MAX_FILE_PATH_SIZE 4096 /// Tamanho máximo permitido para o argumento de linha comando relat. ao arquivo de entrada
 
-#define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
+#define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n" /// Msg a ser impressa em caso de erros no arquivo de ondas
 
-/** @brief Função que faz a simulação.
+/** @brief Função que faz a simulação do circuito com as entradas especificadas.
+           Em caso de sucesso, retorna as saídas dessa simulação.
  */
 Sinais* simula(t_circuito* circuto, Sinais* entradas);
 

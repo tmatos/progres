@@ -7,8 +7,8 @@
 
 #define LEX_H
 
-#define MAX_TOKEN_SIZE 80 // Qtde máxima de caracteres permitidos em um Token
-#define MAX_DIGITOS_NUM 4 // Qtde máxima de digitos num número inteiro a ser reconhecido
+#define MAX_TOKEN_SIZE 80 /// Qtde máxima de caracteres permitidos em um Token
+#define MAX_DIGITOS_NUM 4 /// Qtde máxima de digitos num número inteiro a ser reconhecido
 
 /** @brief .
  */

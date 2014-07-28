@@ -61,6 +61,8 @@
 		<Linker>
 			<Add option="-mthreads" />
 		</Linker>
+		<Unit filename="EdicaoDeSinal.cpp" />
+		<Unit filename="EdicaoDeSinal.h" />
 		<Unit filename="IDEApp.cpp" />
 		<Unit filename="IDEApp.h" />
 		<Unit filename="IDEConfig.cpp" />
@@ -88,6 +90,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="sinais.h" />
+		<Unit filename="wxsmith/EdicaoDeSinal.wxs" />
 		<Unit filename="wxsmith/IDEConfig.wxs" />
 		<Unit filename="wxsmith/IDEframe.wxs" />
 		<Extensions>
@@ -99,6 +102,7 @@
 				<resources>
 					<wxFrame wxs="wxsmith/IDEframe.wxs" src="IDEMain.cpp" hdr="IDEMain.h" fwddecl="0" i18n="1" name="IDEFrame" language="CPP" />
 					<wxDialog wxs="wxsmith/IDEConfig.wxs" src="IDEConfig.cpp" hdr="IDEConfig.h" fwddecl="0" i18n="1" name="IDEConfig" language="CPP" />
+					<wxDialog wxs="wxsmith/EdicaoDeSinal.wxs" src="EdicaoDeSinal.cpp" hdr="EdicaoDeSinal.h" fwddecl="0" i18n="1" name="EdicaoDeSinal" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

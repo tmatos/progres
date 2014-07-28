@@ -94,6 +94,8 @@ class IDEFrame: public wxFrame
         //*)
 
         wxString verilogFilePath;
+        wxString waveinFilePath;
+        wxString waveoutFilePath;
 
         wxString simuladorExePath;
         bool AbrirUltimoAoIniciar;

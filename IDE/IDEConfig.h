@@ -8,8 +8,9 @@
 #include <wx/filedlg.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include <wx/config.h>
 //*)
+
+#include <wx/config.h>
 
 class IDEConfig: public wxDialog
 {

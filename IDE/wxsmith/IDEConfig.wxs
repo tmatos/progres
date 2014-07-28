@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="IDEConfig">
-		<title>Configura</title>
+		<title>Configurações</title>
 		<size>480,340</size>
 		<id_arg>0</id_arg>
 		<object class="wxButton" name="ID_BUTTON1" variable="btnSalvar" member="yes">

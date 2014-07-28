@@ -9,7 +9,7 @@
 
 #include "sinais.h"
 
-/** @brief .
+/** @brief Enumeração para o definir as classes de componente do circuito de acordo com suas funções.
  */
 typedef enum en_operador {
     op_and,
@@ -25,7 +25,7 @@ typedef enum en_operador {
     input
 } t_operador;
 
-/** @brief .
+/** @brief Estrutura que define a porta. Qual sua função lógica e seu delay.
  */
 typedef struct st_tipo {
     t_operador operador;
@@ -77,35 +77,35 @@ typedef struct st_circuito {
  */
 t_circuito* novoCircuito();
 
-/** @brief .
+/** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
  */
 void adicionaEntrada(t_circuito* circ, Componente comp);
 
-/** @brief .
+/** @brief Adiciona a saída representada por comp à lista de fios de saída do circuito
  */
 void adicionaSaida(t_circuito* circ, Componente comp);
 
-/** @brief .
+/** @brief Adiciona o fio representada por comp à lista de fios (wires) do circuito
  */
 void adicionaWire(t_circuito* circ, Componente comp);
 
-/** @brief .
+/** @brief Adiciona a porta lógica representada por comp à lista de portas do circuito
  */
 void adicionaPorta(t_circuito* circ, Componente comp);
 
-/** @brief .
+/** @brief Retorna a porta que tem o nome indicado, se houver na lista de portas do circuito
  */
 Componente getPortaPorNome(t_circuito* circ, char* nome);
 
-/** @brief .
+/** @brief Retorna o wire que tem o nome indicado, se houver.
  */
 Componente getWirePorNome(t_circuito* circ, char* nome);
 
-/** @brief .
+/** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito
  */
 Componente getInputPorNome(t_circuito* circ, char* nome);
 
-/** @brief .
+/** @brief Retorna a saída que tem o nome indicado, se houver na lista de fios de saída do circuito
  */
 Componente getOutputPorNome(t_circuito* circ, char* nome);
 
@@ -114,23 +114,23 @@ Componente getOutputPorNome(t_circuito* circ, char* nome);
  */
 Componente novoComponente(char* nome, t_operador porta);
 
-/** @brief .
+/** @brief Inicializa a estrutura de lista de componentes vazia
  */
 ListaComponente* novaListaComponente();
 
-/** @brief .
+/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado
  */
 ListaComponente* novaListaComponenteTamanho(int tamanho);
 
-/** @brief .
+/** @brief Insere o componente na lista de componentes
  */
 void insereComponente(ListaComponente* ls, Componente cp);
 
-/** @brief .
+/** @brief Retorna verdadeiro se o componente indicado está contido na lista
  */
 int contemComponente(ListaComponente* ls, Componente cp);
 
-/** @brief .
+/** @brief Retorna o componente da lista indica que possui o referido nome, se houver.
  */
 Componente getComponenteItemPorNome(ListaComponente* ls, char* nome);
 

@@ -7,7 +7,7 @@
 
 #define SINAIS_H
 
-#define MAX_NOME_SINAL 50
+#define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
 /** @brief Valor lógico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
  */

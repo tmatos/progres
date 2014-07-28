@@ -266,7 +266,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
     }
 
     /// DBG
-    printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n",
+    printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
            circuto->listaFiosEntrada->tamanho,
            entradas->quantidade,
            validos);
@@ -297,21 +297,9 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         insereEvento(&fila, t, circuto->listaFiosEntrada->itens[i], x); // este sinal fica até infitito
     }
 
-/*
-    // inicialização dos valores iniciais default das entradas (valor que estava antes de qq sinal)
-    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
-    {
-        circuto->listaFiosEntrada->itens[i]->valorDinamico = x;
-    }
+    // ATENÇÃO: Sabemos que todos os componentes são inicializados com o valorDinamico em xis
 
-    // inicialização dos valores iniciais default das saidas (valor que estava antes de qq sinal)
-    for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
-    {
-        circuto->listaFiosSaida->itens[i]->valorDinamico = x;
-    }
-*/
-
-    // aqui ocorre a simulação propriamente dita, usado fila de eventos
+    // A partir daqui, ocorre a simulação propriamente dita, usado fila de eventos
     t = 0;
 
     while(fila)
@@ -366,12 +354,20 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 else if (gate->listaEntrada->itens[0]->valorDinamico == um)
                     resultado = zero;
 
-                insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], resultado);
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
 
             case op_buf:
-                insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[0], gate->listaEntrada->itens[0]->valorDinamico);
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], gate->listaEntrada->itens[0]->valorDinamico);
+                }
 
                 break;
 
@@ -426,6 +422,28 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_xor:
+                if(gate->listaEntrada->itens[0]->valorDinamico == x || gate->listaEntrada->itens[1]->valorDinamico == x)
+                {
+                    resultado = x;
+                }
+                else
+                {
+                    if ( (gate->listaEntrada->itens[0]->valorDinamico == um && gate->listaEntrada->itens[1]->valorDinamico == zero) ||
+                         (gate->listaEntrada->itens[0]->valorDinamico == zero && gate->listaEntrada->itens[1]->valorDinamico == um) )
+                    {
+                        resultado = um;
+                    }
+                    else
+                    {
+                        resultado = zero;
+                    }
+                }
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
 
@@ -488,14 +506,34 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_xnor:
+                if(gate->listaEntrada->itens[0]->valorDinamico == x || gate->listaEntrada->itens[1]->valorDinamico == x)
+                {
+                    resultado = x;
+                }
+                else
+                {
+                    if ( (gate->listaEntrada->itens[0]->valorDinamico == um && gate->listaEntrada->itens[1]->valorDinamico == um) ||
+                         (gate->listaEntrada->itens[0]->valorDinamico == zero && gate->listaEntrada->itens[1]->valorDinamico == zero) )
+                    {
+                        resultado = um;
+                    }
+                    else
+                    {
+                        resultado = zero;
+                    }
+                }
+
+                // cria eventos relativ. às saidas da porta
+                for(j=0 ; j < gate->listaSaida->tamanho ; j++)
+                {
+                    insereEvento(&fila, t + gate->tipo.atraso, gate->listaSaida->itens[j], resultado);
+                }
 
                 break;
 
             default:
                 break;
             }
-
-            //portasAlteradas->itens[i]->sinaisEntrada
         }
 
     }
@@ -588,8 +626,6 @@ int main(int argc, char* argv[])
             }
             else
             {
-                // Esta função gravará um arquivo de sinais, com os sinas presentes na estrutura indicada
-                // e com o mesmo formato do arquivo de entrada.
                 salvarSinais(saidas, waveout);
 
                 fclose(waveout);
@@ -603,29 +639,6 @@ int main(int argc, char* argv[])
         {
             printf("Nao ha entradas para a simulacao do circuito.\n");
         }
-
-        /// DBG - O codigo abaixo 'plota' na tela um array de pulosos, isto e, um sinal
-        /*int i;
-
-        Pulso* it = entradas->lista[0].pulsos; // Aqui, o indice 0 indica qual dos sinas na lista
-        while(it->valor != nulo) {
-            for(i = 0 ; i < it->tempo ; i++) {
-                switch(it->valor) {
-                    case um:
-                        printf("-");
-                    break;
-                    case zero:
-                        printf("_");
-                        break;
-                    case x:
-                        printf("x");
-                        break;
-                }
-            }
-
-            it++;
-        }*/
-        /// DBG
     }
 
     //system("PAUSE"); /// DBG

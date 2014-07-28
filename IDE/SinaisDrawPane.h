@@ -15,7 +15,10 @@ public:
 
     void render(wxDC& dc);
 
-    void setSinais(Sinais* sinais);
+    void setSinais(Sinais* sinais, bool isInput);
+    bool isInputFile;
+
+    void mouseDoubleClick(wxMouseEvent& event);
 
     // some useful events
     /*

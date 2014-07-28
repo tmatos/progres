@@ -135,7 +135,7 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Menu1->Append(MenuItemAnalisar);
     MenuBarPrincipal->Append(Menu1, _("Simulação"));
     MenuOpcoes = new wxMenu();
-    MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENUITEM7, _("Configura"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENUITEM7, _("Configurações"), wxEmptyString, wxITEM_NORMAL);
     MenuOpcoes->Append(MenuItemConfig);
     MenuBarPrincipal->Append(MenuOpcoes, _("Opções"));
     MenuAjuda = new wxMenu();
@@ -217,7 +217,7 @@ void IDEFrame::OnQuit(wxCommandEvent& event)
 
 void IDEFrame::OnAbout(wxCommandEvent& event)
 {
-    wxString msg = _("Progres Verilog Simulator");
+    wxString msg = _("Progres IDE\n(C) 2014 Tiago Matos\n\ntiagoms88@gmail.com");
     wxMessageBox(msg, _("Progres"));
 }
 
@@ -265,7 +265,11 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
     else
     {
         wxArrayString saida;
+
         wxString comando = simuladorExePath + _(" ") + verilogFilePath;
+
+        if(!waveinFilePath.IsEmpty())
+            comando = comando + _(" ") + waveinFilePath;
 
         wxExecute(comando, saida);
 
@@ -273,12 +277,41 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
 
         for(unsigned int i = 0 ; i < saida.Count() ; i++)
             ListBoxErros->Append(saida[i]);
+
+        if(!waveinFilePath.IsEmpty())
+        {
+            Sinais* ondas_out = NULL;
+
+            waveoutFilePath = waveinFilePath + _(".out");
+
+            ondas_out = carregaArquivoSinais( (const char*) waveoutFilePath.mb_str() );
+
+            if(ondas_out)
+            {
+                SinaisDrawPane *panel = new SinaisDrawPane(bookFontes);
+
+                if(bookFontes->GetPageCount() == 3)
+                {
+                    delete bookFontes->GetPage(2);
+                    bookFontes->RemovePage(2);
+                }
+
+                bookFontes->AddPage(panel, waveoutFilePath);
+                bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
+
+                panel->setSinais(ondas_out, false);
+            }
+            else
+            {
+                wxMessageBox(_("Sem valores de saída para a simulação."), _("Erro"));
+            }
+        }
     }
 }
 
 void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
 {
-    //
+    wxMessageBox(_("Feche o circuito atual para criar um em branco."), _("NÃO IMPLEMENTADO"));
 }
 
 void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
@@ -287,7 +320,11 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
     wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in|Arquivos de saída (*.out)|*.out"), wxFILE_MUST_EXIST);
 
     if(EntradaDialog.ShowModal() == wxID_OK)
+    {
         ondas = carregaArquivoSinais( (const char*) EntradaDialog.GetPath().mb_str() );
+        waveinFilePath = EntradaDialog.GetPath();
+        waveoutFilePath.Clear();
+    }
 
     if(!ondas)
         return;
@@ -295,9 +332,7 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
     SinaisDrawPane *panel = new SinaisDrawPane(bookFontes);
 
     //wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-
     //sizer->Add(panel, 1, wxEXPAND);
-
     //bookFontes->SetSizer(sizer);
     //bookFontes->SetAutoLayout(true);
 
@@ -306,12 +341,19 @@ void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
         delete bookFontes->GetPage(1);
         bookFontes->RemovePage(1);
     }
+    else if(bookFontes->GetPageCount() == 3)
+    {
+        delete bookFontes->GetPage(2);
+        bookFontes->RemovePage(2);
+
+        delete bookFontes->GetPage(1);
+        bookFontes->RemovePage(1);
+    }
 
     bookFontes->AddPage(panel, EntradaDialog.GetFilename());
-
     bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
 
-    panel->setSinais(ondas);
+    panel->setSinais(ondas, true);
 }
 
 void IDEFrame::OnEditBoxText(wxCommandEvent& event)
