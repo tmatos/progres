@@ -105,7 +105,7 @@
 			<object class="wxMenu" variable="MenuOpcoes" member="yes">
 				<label>Opções</label>
 				<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItemConfig" member="yes">
-					<label>Configura</label>
+					<label>Configurações</label>
 					<handler function="OnMenuItemConfigSelected" entry="EVT_MENU" />
 				</object>
 			</object>

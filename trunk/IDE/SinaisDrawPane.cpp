@@ -2,6 +2,7 @@
 #include <wx/sizer.h>
 
 #include "SinaisDrawPane.h"
+#include "EdicaoDeSinal.h"
 #include "sinais.h"
 
 BEGIN_EVENT_TABLE(SinaisDrawPane, wxPanel)
@@ -21,6 +22,9 @@ BEGIN_EVENT_TABLE(SinaisDrawPane, wxPanel)
 // captura os eventos do sistema para redesenho
 EVT_PAINT(SinaisDrawPane::paintEvent)
 
+// clique duplo no gráfico
+EVT_LEFT_DCLICK(SinaisDrawPane::mouseDoubleClick)
+
 END_EVENT_TABLE()
 
 // some useful events
@@ -35,9 +39,22 @@ END_EVENT_TABLE()
  void SinaisDrawPane::keyReleased(wxKeyEvent& event) {}
  */
 
+void SinaisDrawPane::mouseDoubleClick(wxMouseEvent& event)
+{
+    if(isInputFile)
+    {
+        EdicaoDeSinal *editor = new EdicaoDeSinal(this);
+
+        editor->Show();
+
+        //wxMessageBox(_("Edição....."), _("TODO"));
+    }
+}
+
 SinaisDrawPane::SinaisDrawPane(wxWindow* parent) : wxPanel(parent)
 {
     ondas = NULL;
+    bool isInputFile = true;
 }
 
 void SinaisDrawPane::paintEvent(wxPaintEvent & evt)
@@ -52,9 +69,10 @@ void SinaisDrawPane::paintNow()
     render(dc);
 }
 
-void SinaisDrawPane::setSinais(Sinais* sinais)
+void SinaisDrawPane::setSinais(Sinais* sinais, bool isInput)
 {
     ondas = sinais;
+    isInputFile = isInput;
 
     Refresh();
 }
@@ -68,9 +86,9 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
     const int hzTam = 15; // comprimeto horizontal de uma unidade de tempo
     const int vrTam = 15; // altura de um pulso entre 0 e 1
-    const int spacmtSinal = 30; // espa�amento vertical entre os sinais
+    const int spacmtSinal = 30; // espaçamento vertical entre os sinais
 
-    int x0 = 70, y0 = 30; // in�cio do desenho
+    int x0 = 70, y0 = 30; // início do desenho
     int x = x0, y = y0;
 
     int yTexto = y0;

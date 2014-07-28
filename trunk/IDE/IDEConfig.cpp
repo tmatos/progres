@@ -32,7 +32,7 @@ END_EVENT_TABLE()
 IDEConfig::IDEConfig(wxWindow* parent,wxWindowID id)
 {
 	//(*Initialize(IDEConfig)
-	Create(parent, wxID_ANY, _("Configura"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Configurações"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(480,340));
 	btnSalvar = new wxButton(this, ID_BUTTON1, _("Salvar"), wxPoint(304,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	btnCancelar = new wxButton(this, ID_BUTTON2, _("Cancelar"), wxPoint(392,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
@@ -79,9 +79,13 @@ void IDEConfig::OnbtnCancelarClick(wxCommandEvent& event)
 
 void IDEConfig::OnbtnSimuladorPathClick(wxCommandEvent& event)
 {
-    if(fileDiagSimuladorPath->ShowModal() == wxID_OK)
+    wxFileDialog ExeDialog(this, _("Selecionar o executável do simulador"), _(""), _(""),
+                           _("Arquivos executáveis (*.exe)|*.exe|Todos os arquivos (*.*)|*.*"),
+                           wxFILE_MUST_EXIST);
+
+    if(ExeDialog.ShowModal() == wxID_OK)
     {
-        simuladorExePath = fileDiagSimuladorPath->GetPath();
+        simuladorExePath = ExeDialog.GetPath();
         txtSimuladorPath->ChangeValue(simuladorExePath);
     }
 }

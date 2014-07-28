@@ -407,6 +407,10 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return circuito;
             }
         }
+        else {
+            exibeMsgErro("Token inesperado foi encontrado", it->linha, it->coluna, "algum comando", it->valor);
+            return NULL;
+        }
 
         avanca(&it);
 

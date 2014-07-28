@@ -8,6 +8,7 @@
 #define VERILOG_H
 
 #include <stdio.h>
+
 #include "estruturas.h"
 
 /** @brief Cria uma estrutura de dados representando o circuito,
