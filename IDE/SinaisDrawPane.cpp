@@ -1,9 +1,11 @@
+
 #include <wx/wx.h>
 #include <wx/sizer.h>
 
 #include "SinaisDrawPane.h"
 #include "EdicaoDeSinal.h"
 #include "sinais.h"
+#include "inout.h"
 
 BEGIN_EVENT_TABLE(SinaisDrawPane, wxPanel)
 
@@ -45,9 +47,9 @@ void SinaisDrawPane::mouseDoubleClick(wxMouseEvent& event)
     {
         EdicaoDeSinal *editor = new EdicaoDeSinal(this);
 
-        editor->Show();
+        editor->setFile(waveFilePath);
 
-        //wxMessageBox(_("Edição....."), _("TODO"));
+        editor->Show();
     }
 }
 
@@ -69,10 +71,12 @@ void SinaisDrawPane::paintNow()
     render(dc);
 }
 
-void SinaisDrawPane::setSinais(Sinais* sinais, bool isInput)
+void SinaisDrawPane::setSinais(wxString filePath, bool isInput)
 {
-    ondas = sinais;
+    ondas = carregaArquivoSinais( (const char*) filePath.mb_str() );
+
     isInputFile = isInput;
+    waveFilePath = filePath;
 
     Refresh();
 }

@@ -265,12 +265,12 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         }
     }
 
-    /// DBG
+    ///
     printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
            circuto->listaFiosEntrada->tamanho,
            entradas->quantidade,
            validos);
-    /// ---
+    ///
 
     if(validos < circuto->listaFiosEntrada->tamanho)
     {

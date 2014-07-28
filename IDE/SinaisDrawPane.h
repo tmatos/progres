@@ -15,8 +15,9 @@ public:
 
     void render(wxDC& dc);
 
-    void setSinais(Sinais* sinais, bool isInput);
+    void setSinais(wxString filePath, bool isInput);
     bool isInputFile;
+    wxString waveFilePath;
 
     void mouseDoubleClick(wxMouseEvent& event);
 

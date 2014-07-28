@@ -245,6 +245,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 porta = novoComponente("PortaXNOR", op_xnor);
             else if(iguais(it->valor, "not"))
                 porta = novoComponente("PortaNOT", op_not);
+            else if(iguais(it->valor, "buf"))
+                porta = novoComponente("Buffer", op_buf);
 
             avanca(&it);
 
@@ -355,7 +357,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
             avanca(&it);
 
             if(!it) {
-                if( porta->tipo.operador == op_not )
+                if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf )
                     exibeMsgErro("Final do arquivo nao esperado. Era esperado ')'", -1, -1, NULL, NULL);
                 else
                     exibeMsgErro("Final do arquivo nao esperado. Era esperado ',' ou ')'", -1, -1, NULL, NULL);
@@ -364,7 +366,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
             }
 
             if(!iguais(it->valor, ")")) {
-                if(porta->tipo.operador == op_not) {
+                if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf ) {
                     exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, ")", it->valor);
                     return NULL;
                 }
@@ -425,7 +427,8 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
 int isPortaLogica(char* s) {
     if(iguais(s, "and") || iguais(s, "or") || iguais(s, "xor") ||
-       iguais(s, "nand") || iguais(s, "nor") || iguais(s, "xnor") || iguais(s, "not") )
+       iguais(s, "nand") || iguais(s, "nor") || iguais(s, "xnor") ||
+       iguais(s, "not") || iguais(s, "buf") )
         return 1;
     else
         return 0;

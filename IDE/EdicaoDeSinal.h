@@ -9,10 +9,12 @@
 
 class EdicaoDeSinal: public wxDialog
 {
-	public:
+    public:
 
-		EdicaoDeSinal(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
-		virtual ~EdicaoDeSinal();
+        EdicaoDeSinal(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+        virtual ~EdicaoDeSinal();
+
+        void setFile(wxString filePath);
 
 		//(*Declarations(EdicaoDeSinal)
 		wxTextCtrl* txtWaveIn;
@@ -31,7 +33,11 @@ class EdicaoDeSinal: public wxDialog
 	private:
 
 		//(*Handlers(EdicaoDeSinal)
+		void OnbtnDescartarClick(wxCommandEvent& event);
+		void OnbtnSalvarClick(wxCommandEvent& event);
 		//*)
+
+        wxString file;
 
 		DECLARE_EVENT_TABLE()
 };
