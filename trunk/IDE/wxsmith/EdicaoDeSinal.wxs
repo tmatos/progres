@@ -13,11 +13,13 @@
 			<label>Descartar</label>
 			<pos>496,336</pos>
 			<size>83,23</size>
+			<handler function="OnbtnDescartarClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxButton" name="ID_BUTTON2" variable="btnSalvar" member="yes">
 			<label>Salvar</label>
 			<pos>400,336</pos>
 			<size>83,23</size>
+			<handler function="OnbtnSalvarClick" entry="EVT_BUTTON" />
 		</object>
 	</object>
 </wxsmith>

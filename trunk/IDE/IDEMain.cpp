@@ -299,7 +299,7 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
                 bookFontes->AddPage(panel, waveoutFilePath);
                 bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
 
-                panel->setSinais(ondas_out, false);
+                panel->setSinais(waveoutFilePath, false);
             }
             else
             {
@@ -316,44 +316,39 @@ void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemNovaOndaSelected(wxCommandEvent& event)
 {
-    Sinais* ondas = NULL;
     wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in|Arquivos de saída (*.out)|*.out"), wxFILE_MUST_EXIST);
 
     if(EntradaDialog.ShowModal() == wxID_OK)
     {
-        ondas = carregaArquivoSinais( (const char*) EntradaDialog.GetPath().mb_str() );
         waveinFilePath = EntradaDialog.GetPath();
         waveoutFilePath.Clear();
+
+        SinaisDrawPane *panel = new SinaisDrawPane(bookFontes);
+
+        //wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+        //sizer->Add(panel, 1, wxEXPAND);
+        //bookFontes->SetSizer(sizer);
+        //bookFontes->SetAutoLayout(true);
+
+        if(bookFontes->GetPageCount() == 2)
+        {
+            delete bookFontes->GetPage(1);
+            bookFontes->RemovePage(1);
+        }
+        else if(bookFontes->GetPageCount() == 3)
+        {
+            delete bookFontes->GetPage(2);
+            bookFontes->RemovePage(2);
+
+            delete bookFontes->GetPage(1);
+            bookFontes->RemovePage(1);
+        }
+
+        bookFontes->AddPage(panel, EntradaDialog.GetFilename());
+        bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
+
+        panel->setSinais(waveinFilePath, true);
     }
-
-    if(!ondas)
-        return;
-
-    SinaisDrawPane *panel = new SinaisDrawPane(bookFontes);
-
-    //wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    //sizer->Add(panel, 1, wxEXPAND);
-    //bookFontes->SetSizer(sizer);
-    //bookFontes->SetAutoLayout(true);
-
-    if(bookFontes->GetPageCount() == 2)
-    {
-        delete bookFontes->GetPage(1);
-        bookFontes->RemovePage(1);
-    }
-    else if(bookFontes->GetPageCount() == 3)
-    {
-        delete bookFontes->GetPage(2);
-        bookFontes->RemovePage(2);
-
-        delete bookFontes->GetPage(1);
-        bookFontes->RemovePage(1);
-    }
-
-    bookFontes->AddPage(panel, EntradaDialog.GetFilename());
-    bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
-
-    panel->setSinais(ondas, true);
 }
 
 void IDEFrame::OnEditBoxText(wxCommandEvent& event)

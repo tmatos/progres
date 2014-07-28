@@ -1,9 +1,14 @@
-module teste(entra, out);
+// teste simples para as portas
 
-input entra;
-output out;
+module teste(a, b, out, out2);
 
-and #3 (out, entra, entra);
+input a, b;
+output out, out2;
+
+xor #3 (out, a, b);
+
+not #10 (out2, out);
 
 endmodule
+
 
