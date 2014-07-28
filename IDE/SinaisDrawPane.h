@@ -17,6 +17,7 @@ public:
 
     void setSinais(wxString filePath, bool isInput);
     bool isInputFile;
+    bool estaEmEdicao;
     wxString waveFilePath;
 
     void mouseDoubleClick(wxMouseEvent& event);

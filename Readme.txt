@@ -9,11 +9,11 @@ Ou seja, apenas um pequeno subconjuto do Verilog é suportado e principalmente,
 não há suporte à simulação de circuitos sequênciais.
 
 
-------------------------------------------------------------
+----------------------------------------------------------------------------------------
 1. Uso
-------------------------------------------------------------
+----------------------------------------------------------------------------------------
 
-progres fonte.v [entradas.in]
+progres fonte.v [entradas.in] [saidas.out]
 
 Um argumento entre colchetes é opcional.
 
@@ -34,9 +34,9 @@ argumentos do programa ou, se estes foram omitidos, será criado um arquivo com o
 nome do arquivo de entrada porém com a extensão mudada para ".out".
 
 
-------------------------------------------------------------
+----------------------------------------------------------------------------------------
 2. Arquivo de entrada e saída
-------------------------------------------------------------
+----------------------------------------------------------------------------------------
 
 Para a simulação, é necessário que o arquivo de entrada esteja no formato específico de
 nosso programa e que haja uma correspondência entre os sinais de entrada do circuito em
@@ -48,7 +48,8 @@ formato extremamente simples.
 Comentários de uma linha são válidos, tudo que seguir um "//" será ignorado.
 
 Cada sinal inicia com um identificador que o denomina. Em seguida e entre chaves, estará
-uma sequência de pulsos de valor específico ("0", "1" ou "x") com suas determinadas durações.
+uma sequência de pulsos de valor específico ("0", "1" ou "x"), com seus determinados
+tempos de duração. Sendo cada pulso separado por vírgula um do outro.
 
 Exemplo:
 
@@ -74,6 +75,12 @@ unid. tempo: 0123456789
 unid. tempo: 0123456789
 
 
-------------------------------------------------------------
-3. ...
-------------------------------------------------------------
+----------------------------------------------------------------------------------------
+3. Desenvolvedores
+----------------------------------------------------------------------------------------
+
+Tiago Matos
+João Victor
+Luciano Almeida
+
+2014
