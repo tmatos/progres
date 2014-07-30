@@ -34,6 +34,10 @@ class IDEFrame: public wxFrame
         void SetTituloJanelaComArquivo(wxString nome);
         void AtualizaTudoParaNovaEntrada(wxString novoPathArquivoWaveIn);
 
+        void SalvarArquivoAtual();
+        void FecharArquivoAtual();
+        int PerguntaSalvarArquivo();
+
     private:
         //(*Handlers(IDEFrame)
         void OnQuit(wxCommandEvent& event);
