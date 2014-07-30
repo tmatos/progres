@@ -177,6 +177,16 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     defaultWindowTitle = _("Progres IDE");
     SetTitle(defaultWindowTitle);
 
+    // Configuração default para o exec. do simulador
+    wxConfig *config = new wxConfig(_("ProgresIDE"));
+    config->Read(_("SimuladorExePath"), &simuladorExePath);
+    if(simuladorExePath.IsEmpty())
+    {
+        config->Write(_("SimuladorExePath"), _("progres"));
+        simuladorExePath = _("progres");
+    }
+    delete config;
+
     carregaConfigs();
 
     if(AbrirUltimoAoIniciar) {
@@ -247,6 +257,7 @@ void IDEFrame::CarregarArquivoVerilog(wxString arquivo)
     EditBox->LoadFile(verilogFilePath);
 
     SetTituloJanelaComArquivo(verilogFilePath);
+    bookFontes->SetPageText(0, verilogFilePath);
 
     textLenght = EditBox->GetNumberOfLines();
     StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
@@ -320,9 +331,27 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
     }
 }
 
+int IDEFrame::PerguntaSalvarArquivo()
+{
+    return wxMessageBox(_("O arquivo em edição ainda não foi salvo. Deseja salvá-lo?"),
+                        _("Salvar arquivo"),
+                        wxYES_NO | wxCANCEL,
+                        this);
+}
+
 void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
 {
-    wxMessageBox(_("Feche o circuito atual para criar um em branco."), _("NÃO IMPLEMENTADO"));
+    if(arquivoNaoSalvo)
+    {
+        int resp = PerguntaSalvarArquivo();
+
+        if (resp == wxYES)
+            SalvarArquivoAtual();
+        else if (resp == wxCANCEL)
+            return;
+    }
+
+    FecharArquivoAtual();
 }
 
 void IDEFrame::OnMenuItemEntradaNovoSelected(wxCommandEvent& event)
@@ -401,9 +430,15 @@ void IDEFrame::OnEditBoxText(wxCommandEvent& event)
         arquivoNaoSalvo = true;
 
         if(verilogFilePath.IsEmpty())
+        {
             SetTituloJanelaComArquivo(_("Arquivo não salvo *"));
+            bookFontes->SetPageText(0, _("Arquivo não salvo *"));
+        }
         else
+        {
             SetTituloJanelaComArquivo(verilogFilePath + _(" *"));
+            bookFontes->SetPageText(0, verilogFilePath + _(" *"));
+        }
 
 //        if(event.GetId() != ID_LISTBOXERROS)
 //            EditBox->SetStyle(0, EditBox->GetLastPosition(), wxTextAttr(*wxBLACK, *wxWHITE));
@@ -451,6 +486,11 @@ void IDEFrame::OnMenuItemConfigSelected(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
 {
+    SalvarArquivoAtual();
+}
+
+void IDEFrame::SalvarArquivoAtual()
+{
     wxFileDialog SaveDialog(this, _("Salvar arquivo Verilog"), _(""), _(""), _("Arquivos do Verilog (*.v)|*.v"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
     wxTextFile arquivo;
@@ -469,6 +509,7 @@ void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
 
                 verilogFilePath = pathArquivo;
                 SetTituloJanelaComArquivo(verilogFilePath);
+                bookFontes->SetPageText(0, verilogFilePath);
                 arquivoNaoSalvo = false;
             }
             else
@@ -487,6 +528,7 @@ void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
             arquivo.Close();
 
             SetTituloJanelaComArquivo(verilogFilePath);
+            bookFontes->SetPageText(0, verilogFilePath);
             arquivoNaoSalvo = false;
         }
         else
@@ -498,14 +540,29 @@ void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemCloseSelected(wxCommandEvent& event)
 {
+    if(arquivoNaoSalvo)
+    {
+        int resp = PerguntaSalvarArquivo();
+
+        if (resp == wxYES)
+            SalvarArquivoAtual();
+        else if (resp == wxCANCEL)
+            return;
+    }
+
+    FecharArquivoAtual();
+}
+
+void IDEFrame::FecharArquivoAtual()
+{
     ListBoxErros->Clear();
     EditBox->Clear();
     verilogFilePath.Clear();
     arquivoNaoSalvo = false;
     SetTitle(defaultWindowTitle);
+    bookFontes->SetPageText(0, _(""));
 }
 
 void IDEFrame::OnMenuItemTesteSelected(wxCommandEvent& event)
 {
-
 }
