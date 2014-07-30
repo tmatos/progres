@@ -258,6 +258,7 @@ void IDEFrame::CarregarArquivoVerilog(wxString arquivo)
 
     SetTituloJanelaComArquivo(verilogFilePath);
     bookFontes->SetPageText(0, verilogFilePath);
+    bookFontes->ChangeSelection(0);
 
     textLenght = EditBox->GetNumberOfLines();
     StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
@@ -352,6 +353,8 @@ void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
     }
 
     FecharArquivoAtual();
+
+    bookFontes->ChangeSelection(0);
 }
 
 void IDEFrame::OnMenuItemEntradaNovoSelected(wxCommandEvent& event)
