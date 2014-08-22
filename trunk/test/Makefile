@@ -1,4 +1,6 @@
 # Progres
+# Testes unitarios de algumas partes.
+# Utilizando CppUnit.
 
 CC = g++
 CPPC = g++ 
@@ -34,3 +36,4 @@ progres: $(OBJ) $(OBJTEST)
 
 clean:
 	rm -f ./*.o
+	rm -f ./obj/*.o
