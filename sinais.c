@@ -12,6 +12,7 @@
 #include "progres.h"
 #include "sinais.h"
 #include "erros.h"
+#include "mem.h"
 
 Sinal* novoSinal(char *nome)
 {

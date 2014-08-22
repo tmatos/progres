@@ -56,4 +56,4 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t);
  */
 Transicao* popEvento(Evento **fila);
 
-#endif
+#endif // EVENTOS_H

@@ -24,4 +24,4 @@ t_circuito* carregaCircuito(FILE* arquivo);
  */
 int isPortaLogica(char* s);
 
-#endif
+#endif // VERILOG_H

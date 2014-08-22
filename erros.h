@@ -23,4 +23,4 @@ void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encon
  */
 void erroFatalMemoria();
 
-#endif
+#endif // ERROS_H
