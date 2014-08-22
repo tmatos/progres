@@ -134,4 +134,4 @@ int contemComponente(ListaComponente* ls, Componente cp);
  */
 Componente getComponenteItemPorNome(ListaComponente* ls, char* nome);
 
-#endif
+#endif // ESTRUTURAS_H

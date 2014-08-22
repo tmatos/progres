@@ -11,6 +11,7 @@
 #include "progres.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "mem.h"
 
 void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor)
 {

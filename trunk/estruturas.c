@@ -14,6 +14,7 @@
 #include "estruturas.h"
 #include "lex.h"
 #include "erros.h"
+#include "mem.h"
 
 t_circuito* novoCircuito()
 {

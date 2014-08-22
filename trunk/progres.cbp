@@ -44,14 +44,26 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="eventos.h" />
+		<Unit filename="inout.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="inout.h" />
 		<Unit filename="lex.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="lex.h" />
+		<Unit filename="mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mem.h" />
 		<Unit filename="progres.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="progres.h" />
+		<Unit filename="simula.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="simula.h" />
 		<Unit filename="sinais.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -13,6 +13,7 @@
 #include "progres.h"
 #include "erros.h"
 #include "lex.h"
+#include "mem.h"
 
 ListaToken* novaListaToken()
 {
