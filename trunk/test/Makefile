@@ -17,10 +17,10 @@ $(OBJTEST): $(SRCSTEST)
 	$(CPPC) -c -o $@ $< $(LIBS)
 
 
-_DEPS = sinais.h progres.h erros.h estruturas.h lex.h eventos.h verilog.h
+_DEPS = sinais.h erros.h estruturas.h lex.h eventos.h verilog.h inout.h mem.h simula.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = sinais.o progres.o erros.o estruturas.o lex.o eventos.o verilog.o
+_OBJ = sinais.o erros.o estruturas.o lex.o eventos.o verilog.o inout.o mem.o simula.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
