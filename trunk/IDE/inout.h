@@ -11,4 +11,4 @@ Sinais* carregaEntradas(FILE *arquivo);
 
 extern "C" Sinais* carregaArquivoSinais(const char* path);
 
-#endif
+#endif // INOUT_H

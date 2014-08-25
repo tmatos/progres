@@ -1,6 +1,5 @@
 
 #ifndef SINAISDRAWPANE_H
-
 #define SINAISDRAWPANE_H
 
 #include "sinais.h"
@@ -22,7 +21,7 @@ public:
 
     void mouseDoubleClick(wxMouseEvent& event);
 
-    // some useful events
+    // eventos que podem ser uteis
     /*
      void mouseMoved(wxMouseEvent& event);
      void mouseDown(wxMouseEvent& event);

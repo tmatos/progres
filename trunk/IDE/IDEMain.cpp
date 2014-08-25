@@ -190,8 +190,10 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     carregaConfigs();
 
     if(AbrirUltimoAoIniciar) {
-        if(!UltimoArquivoVerilog.IsEmpty())
-            CarregarArquivoVerilog(UltimoArquivoVerilog);
+        if(!UltimoArquivoVerilog.IsEmpty()) {
+            if(wxFile::Exists(UltimoArquivoVerilog))
+                CarregarArquivoVerilog(UltimoArquivoVerilog);
+        }
     }
 
     arquivoNaoSalvo = false;
