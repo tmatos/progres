@@ -88,4 +88,4 @@ int addSinal(Sinais* s, char* nome);
  */
 int addSinalPronto(Sinais *ls, Sinal *sinal);
 
-#endif
+#endif // SINAIS_H

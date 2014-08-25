@@ -132,4 +132,4 @@ int apenasDigitos(char* str);
  */
 int isNumNaturalValido(char* str);
 
-#endif
+#endif // LEX_H

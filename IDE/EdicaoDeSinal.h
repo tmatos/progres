@@ -1,3 +1,4 @@
+
 #ifndef EDICAODESINAL_H
 #define EDICAODESINAL_H
 
@@ -16,30 +17,30 @@ class EdicaoDeSinal: public wxDialog
 
         void setFile(wxString filePath);
 
-		//(*Declarations(EdicaoDeSinal)
-		wxTextCtrl* txtWaveIn;
-		wxButton* btnSalvar;
-		//*)
+        //(*Declarations(EdicaoDeSinal)
+        wxTextCtrl* txtWaveIn;
+        wxButton* btnSalvar;
+        //*)
 
     protected:
 
-		//(*Identifiers(EdicaoDeSinal)
-		static const long ID_TEXTCTRL1;
-		static const long idBtn_Salvar;
-		//*)
+        //(*Identifiers(EdicaoDeSinal)
+        static const long ID_TEXTCTRL1;
+        static const long idBtn_Salvar;
+        //*)
 
     private:
 
-		//(*Handlers(EdicaoDeSinal)
-		void OnbtnDescartarClick(wxCommandEvent& event);
-		void OnbtnSalvarClick(wxCommandEvent& event);
-		//*)
+        //(*Handlers(EdicaoDeSinal)
+        void OnbtnDescartarClick(wxCommandEvent& event);
+        void OnbtnSalvarClick(wxCommandEvent& event);
+        //*)
 
         void OnClose(wxCloseEvent& event);
 
         wxString file;
 
-		DECLARE_EVENT_TABLE()
+        DECLARE_EVENT_TABLE()
 };
 
-#endif
+#endif // EDICAODESINAL_H

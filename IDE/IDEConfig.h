@@ -1,3 +1,4 @@
+
 #ifndef IDECONFIG_H
 #define IDECONFIG_H
 
@@ -56,4 +57,4 @@ class IDEConfig: public wxDialog
         DECLARE_EVENT_TABLE()
 };
 
-#endif
+#endif // IDECONFIG_H
