@@ -184,6 +184,9 @@ void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
                 case x:
                     fprintf(arqSaida, "x(%d)", it->tempo);
                     break;
+                case z:
+                    fprintf(arqSaida, "z(%d)", it->tempo);
+                    break;
                 case nulo:
                     break;
             }

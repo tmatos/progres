@@ -15,19 +15,31 @@ typedef enum en_valor {
     zero = 0,
     um = 1,
     x,
+    z,
     nulo
 } ValorLogico;
 
 /** @brief Unidades de tempo disponíveis para a duração de um pulso.
-        Na ordem, segundo, milisegundo, microsegundo, nanosegundo e picosegundo.
+        Na ordem, segundo, milisegundo, microsegundo, nanosegundo, picosegundo e fentosegundo.
         O valor numérico é equivalente ao valor absoluto do módulo do expoente.
 */
 typedef enum en_un_tempo {
     UN_S = 0,
+    UN_100MS = 1,
+    UN_10MS = 2,
     UN_MS = 3,
+    UN_100US = 4,
+    UN_10US = 5,
     UN_US = 6,
+    UN_100NS = 7,
+    UN_10NS = 8,
     UN_NS = 9,
-    UN_PS = 12
+    UN_100PS = 10,
+    UN_10PS = 11,
+    UN_PS = 12,
+    UN_100FS = 13,
+    UN_10FS = 14,
+    UN_FS = 15
 } UnidTempo;
 
 /** @brief O tipo das variáveis usadas na representação do tempo.

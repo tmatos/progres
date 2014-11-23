@@ -145,9 +145,28 @@ int isSimbolo(char c)
             c == ')' ||
             c == ',' ||
             c == ';' ||
+            c == ':' ||
             c == '{' ||
             c == '}' ||
-            c == '#');
+            c == '[' ||
+            c == ']' ||
+            c == '?' ||
+            c == '=' ||
+            c == '<' ||
+            c == '>' ||
+            c == '~' ||
+            c == '&' ||
+            c == '|' ||
+            c == '!' ||
+            c == '+' ||
+            c == '-' ||
+            c == '*' ||
+            c == '/' ||
+            c == '#' ||
+            c == '@' ||
+            c == '$' ||
+            c == '"' ||
+            c == '\'');
 }
 
 void exibeListaDeToken(ListaToken* tokens)
@@ -451,12 +470,46 @@ ListaToken* tokeniza(FILE *arquivo)
                 break;
             }
         }
+        else if(c == '"') {
+            coluna++;
+
+            anexa(tok, c);
+
+            c = fgetc(arquivo);
+
+            while(1) {
+                // S
+                if(c == EOF) {
+                    insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                    fim = 1;
+                    break;
+                }
+
+                if(c == '\n') {
+                    coluna = 0;
+                    linha++;
+                }
+                else
+                    coluna++;
+
+                anexa(tok, c);
+
+                if(c == '"') {
+                    insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                    break;
+                }
+
+                c = fgetc(arquivo);
+            }
+
+            continue; // Volta para A
+        }
         else {
             // B
             if(isSimbolo(c)) {
                 coluna++;
                 insereToken(tokens, c, linha, coluna);
-                continue;
+                continue; // Volta para A
             }
             else {
                 if(isalnum(c)) {
@@ -464,6 +517,7 @@ ListaToken* tokeniza(FILE *arquivo)
                     anexa(tok, c);
 
                     while(1) {
+                        // P
                         c = fgetc(arquivo);
 
                         if(isspace(c)) {
@@ -502,7 +556,7 @@ ListaToken* tokeniza(FILE *arquivo)
                                 break;
                             }
 
-                            continue;
+                            continue; // Vai para P
                         }
                         else if(c == EOF) {
                             insereTokenString(tokens, tok, linha, coluna - strlen(tok));

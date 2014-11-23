@@ -399,7 +399,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
         else if(iguais(it->valor, "endmodule")) {
             avanca(&it);
 
-            // não deve haver mais nada além do endmodule
+            // nao deve haver mais nada alem do endmodule
             if(it) {
                 exibeMsgErro("Token inesperado foi encontrado", it->linha, it->coluna, "nenhum codigo a mais", it->valor);
                 return NULL;
@@ -408,6 +408,10 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 // TODO: Liberar a memoria alocada
                 return circuito;
             }
+        }
+        else if(iguais(it->valor, "initial")) {
+            exibeMsgErro("Lamentamos mas o initial ainda nao foi implementado", it->linha, it->coluna, "algum comando", it->valor);
+            return NULL;
         }
         else {
             exibeMsgErro("Token inesperado foi encontrado", it->linha, it->coluna, "algum comando", it->valor);
