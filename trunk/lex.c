@@ -383,14 +383,13 @@ ListaToken* tokeniza(FILE *arquivo)
     tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
     while(1) {
-        // A
+        A: // Label para parte A do automato
+
         strcpy(tok, "");
         c = fgetc(arquivo);
 
-        if(c == EOF) {
-            //printf("Final de arquivo alcancado.\n");
-            break;
-        }
+        if(c == EOF)
+            goto encerrar;
 
         if(isspace(c)) {
             if(c == '\n') {
@@ -401,11 +400,11 @@ ListaToken* tokeniza(FILE *arquivo)
                 coluna++;
             }
 
-            continue; // Volta para A
+            goto A;
         }
 
         if(c == '/') {
-            comentarios: // Label para inicio da parte que trata os comentários
+            comentarios: // Label para inicio da parte que trata os comentarios
 
             coluna++;
             c = fgetc(arquivo);
@@ -417,16 +416,14 @@ ListaToken* tokeniza(FILE *arquivo)
                     c = fgetc(arquivo);
                     coluna++;
 
-                    if(c == EOF) {
-                        fim = 1;
-                        break;
-                    }
+                    if(c == EOF)
+                        goto encerrar;
                 }
 
                 coluna = 0;
                 linha++;
 
-                continue; // volta pra A
+                goto A;
             }
             else if(c == '*') {
                 coluna++;
@@ -434,11 +431,10 @@ ListaToken* tokeniza(FILE *arquivo)
                 c = fgetc(arquivo);
 
                 while(1) {
-                    // M
-                    if(c == EOF) {
-                        fim = 1;
-                        break;
-                    }
+                    M: //Label para a parte de comentario de multiplas linhas
+
+                    if(c == EOF)
+                        goto encerrar;
 
                     if(c == '\n') {
                         coluna = 0;
@@ -455,15 +451,13 @@ ListaToken* tokeniza(FILE *arquivo)
                             break;
                         }
                         else
-                            continue; // Volta para M
+                            goto M;
                     }
 
                     c = fgetc(arquivo);
                 }
 
-                if(!fim) {
-                    continue; // Volta para A
-                }
+                goto A;
             }
             else {
                 exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
@@ -481,8 +475,7 @@ ListaToken* tokeniza(FILE *arquivo)
                 // S
                 if(c == EOF) {
                     insereTokenString(tokens, tok, linha, coluna - strlen(tok));
-                    fim = 1;
-                    break;
+                    goto encerrar;
                 }
 
                 if(c == '\n') {
@@ -502,14 +495,15 @@ ListaToken* tokeniza(FILE *arquivo)
                 c = fgetc(arquivo);
             }
 
-            continue; // Volta para A
+            goto A;
         }
         else {
-            // B
+            // B: a parte B do automato
+
             if(isSimbolo(c)) {
                 coluna++;
                 insereToken(tokens, c, linha, coluna);
-                continue; // Volta para A
+                goto A;
             }
             else {
                 if(isalnum(c)) {
@@ -517,7 +511,8 @@ ListaToken* tokeniza(FILE *arquivo)
                     anexa(tok, c);
 
                     while(1) {
-                        // P
+                        P: // Label para parte P do automato
+
                         c = fgetc(arquivo);
 
                         if(isspace(c)) {
@@ -551,23 +546,18 @@ ListaToken* tokeniza(FILE *arquivo)
                             // verificar tamanho máximo de palavra
                             if( strlen(tok) > MAX_TOKEN_SIZE ) {
                                 exibeMsgErro("Token excede o tamanho maximo permitido", linha, coluna - strlen(tok), NULL, NULL);
-                                erro = 1;
-
-                                break;
+                                goto encerrar;
                             }
 
-                            continue; // Vai para P
+                            goto P;
                         }
                         else if(c == EOF) {
                             insereTokenString(tokens, tok, linha, coluna - strlen(tok));
-                            fim = 1;
-                            break;
+                            goto encerrar;
                         }
                         else {
                             exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
-                            erro = 1; //variavel local recebera indicativo de erro
-
-                            break;
+                            goto encerrar;
                         }
                     }
                 }
@@ -579,8 +569,11 @@ ListaToken* tokeniza(FILE *arquivo)
         }
 
         if(erro || fim)
-            break;
+        {
+            encerrar: // Label para o encerramento
 
+            break;
+        }
     }
 
     //exibeListaDeToken(tokens);
