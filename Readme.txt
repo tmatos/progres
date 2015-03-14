@@ -1,5 +1,5 @@
 
-Progres - Copyright (c) 2014 João Victor, Luciano Almeida e Tiago Matos
+Progres - Copyright (c) 2014, 2015 Tiago Matos Santos
 
 Simulador em construção como requisito para aprovação na disciplina ENGG52
 da graduação em Engenharia de Computação na UFBA.
@@ -76,11 +76,11 @@ unid. tempo: 0123456789
 
 
 ----------------------------------------------------------------------------------------
-3. Desenvolvedores
+3. Contato
 ----------------------------------------------------------------------------------------
 
-Tiago Matos
-João Victor
-Luciano Almeida
+Tiago Matos Santos - tiagoms88@gmail.com
 
-2014
+
+
+2015

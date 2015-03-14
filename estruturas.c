@@ -1,6 +1,6 @@
 /*
  Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, Tiago Matos, Joao Victor, Luciano Almeida
+ (C) 2014, 2015 Tiago Matos Santos
 
  Under the terms of the MIT license.
 */
