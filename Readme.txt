@@ -1,12 +1,12 @@
 
 Progres - Copyright (c) 2014, 2015 Tiago Matos Santos
 
-Simulador em construção como requisito para aprovação na disciplina ENGG52
-da graduação em Engenharia de Computação na UFBA.
+Simulador em construÃ§Ã£o como requisito para aprovaÃ§Ã£o na disciplina ENGG52
+da graduaÃ§Ã£o em Engenharia de ComputaÃ§Ã£o na UFBA.
 
-Ele provê a simulação de circuitos combinacionais escritos em Verilog estrutural.
-Ou seja, apenas um pequeno subconjuto do Verilog é suportado e principalmente,
-não há suporte à simulação de circuitos sequênciais.
+Ele provÃª a simulaÃ§Ã£o de circuitos combinacionais escritos em Verilog estrutural.
+Ou seja, apenas um pequeno subconjuto do Verilog Ã© suportado e principalmente,
+nÃ£o hÃ¡ suporte Ã  simulaÃ§Ã£o de circuitos sequÃªnciais.
 
 
 ----------------------------------------------------------------------------------------
@@ -15,45 +15,45 @@ não há suporte à simulação de circuitos sequênciais.
 
 progres fonte.v [entradas.in] [saidas.out]
 
-Um argumento entre colchetes é opcional.
+Um argumento entre colchetes Ã© opcional.
 
-Faz a análise do código fonte em Verilog. Na ocorrência do primeiro erro sintático neste
-fonte, o programa é interrompido e é informada uma mensagem de erro indicando linha e
-coluna onde está o erro mais uma descrição do problema.
+Faz a anÃ¡lise do cÃ³digo fonte em Verilog. Na ocorrÃªncia do primeiro erro sintÃ¡tico neste
+fonte, o programa Ã© interrompido e Ã© informada uma mensagem de erro indicando linha e
+coluna onde estÃ¡ o erro mais uma descriÃ§Ã£o do problema.
 
 Exemplo: "5:13 erro: Simbolo esperado nao foi encontrado..."
 
-Nos diz que na linha 5 e coluna 13, um simbolo esperado não foi encontrado, o resto da
-mensagem pode ser algo específico a cada erro que surja.
+Nos diz que na linha 5 e coluna 13, um simbolo esperado nÃ£o foi encontrado, o resto da
+mensagem pode ser algo especÃ­fico a cada erro que surja.
 
-Caso o arquivo fonte esteja correto e tenha sido fornecido um arquivo de entrada válido,
-o programa tentará simular o circuito para essa entrada e gerar a saída correspondente.
+Caso o arquivo fonte esteja correto e tenha sido fornecido um arquivo de entrada vÃ¡lido,
+o programa tentarÃ¡ simular o circuito para essa entrada e gerar a saÃ­da correspondente.
 
-Se houve sucesso na simulação, um arquivo de saída será criado conforme especificado nos
-argumentos do programa ou, se estes foram omitidos, será criado um arquivo com o mesmo 
-nome do arquivo de entrada porém com a extensão mudada para ".out".
+Se houve sucesso na simulaÃ§Ã£o, um arquivo de saÃ­da serÃ¡ criado conforme especificado nos
+argumentos do programa ou, se estes foram omitidos, serÃ¡ criado um arquivo com o mesmo 
+nome do arquivo de entrada porÃ©m com a extensÃ£o mudada para ".out".
 
 
 ----------------------------------------------------------------------------------------
-2. Arquivo de entrada e saída
+2. Arquivo de entrada e saÃ­da
 ----------------------------------------------------------------------------------------
 
-Para a simulação, é necessário que o arquivo de entrada esteja no formato específico de
-nosso programa e que haja uma correspondência entre os sinais de entrada do circuito em
+Para a simulaÃ§Ã£o, Ã© necessÃ¡rio que o arquivo de entrada esteja no formato especÃ­fico de
+nosso programa e que haja uma correspondÃªncia entre os sinais de entrada do circuito em
 Verilog e do arquivo "*.in".
 
-Os arquivos de entrada, "*.in", e de saída, "*.out", são arquivos de texto que seguem um
+Os arquivos de entrada, "*.in", e de saÃ­da, "*.out", sÃ£o arquivos de texto que seguem um
 formato extremamente simples.
 
-Comentários de uma linha são válidos, tudo que seguir um "//" será ignorado.
+ComentÃ¡rios de uma linha sÃ£o vÃ¡lidos, tudo que seguir um "//" serÃ¡ ignorado.
 
-Cada sinal inicia com um identificador que o denomina. Em seguida e entre chaves, estará
-uma sequência de pulsos de valor específico ("0", "1" ou "x"), com seus determinados
-tempos de duração. Sendo cada pulso separado por vírgula um do outro.
+Cada sinal inicia com um identificador que o denomina. Em seguida e entre chaves, estarÃ¡
+uma sequÃªncia de pulsos de valor especÃ­fico ("0", "1" ou "x"), com seus determinados
+tempos de duraÃ§Ã£o. Sendo cada pulso separado por vÃ­rgula um do outro.
 
 Exemplo:
 
-// Esta entrada contém dois sinas.
+// Esta entrada contÃ©m dois sinas.
 
 primeiro
 {
@@ -65,7 +65,7 @@ segundo { 0(2),1(1),x(3),0(1) }
 // Final do arquivo de entrada.
 
 
-Neste arquivo temos as representações dos sinas:
+Neste arquivo temos as representaÃ§Ãµes dos sinas:
 
                     ___
    primeiro: XX_____
@@ -79,7 +79,7 @@ unid. tempo: 0123456789
 3. Contato
 ----------------------------------------------------------------------------------------
 
-Tiago Matos Santos - tiagoms88@gmail.com
+Tiago Matos Santos - tiagoms88 AT gmail DOT com
 
 
 
