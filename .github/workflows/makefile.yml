@@ -7,12 +7,21 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-
     - name: Build target
       run: make
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install cppunit 
+      run: apt-get install -yyq libcppunit-dev
+    - name: Run tests
+      run: |
+        cd test
+        make tests
