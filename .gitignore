@@ -1,4 +1,6 @@
 sample/*.out
 obj/
 progres
+test/*.o
+test/progrestest
 
