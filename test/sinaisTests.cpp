@@ -1,5 +1,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
+#include <cppunit/TextOutputter.h>
 #include <cstring>
 
 #include "../sinais.h"
@@ -119,7 +120,9 @@ public:
 int main(int argc, char **argv)
 {
   CppUnit::TextUi::TestRunner runner;
+  CppUnit::TextOutputter textOut( &runner.result(), std::cout );
   runner.addTest( Testes_sinais::suite() );
   runner.run();
+  textOut.printStatistics();
   return 0;
 }
