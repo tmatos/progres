@@ -3,4 +3,4 @@ obj/
 progres
 test/*.o
 test/progrestest
-
+generated-docs/
