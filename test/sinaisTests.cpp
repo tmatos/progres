@@ -5,8 +5,8 @@
 
 #include "../sinais.h"
 
-class Testes_sinais : public CppUnit::TestFixture  {
-
+class Testes_sinais : public CppUnit::TestFixture
+{
   CPPUNIT_TEST_SUITE( Testes_sinais );
   CPPUNIT_TEST( test_novoSinal );
   CPPUNIT_TEST( test_setSinalNome );
@@ -26,7 +26,7 @@ public:
     CPPUNIT_ASSERT( !strcmp( (char*)"teste", (char*)sinal->nome ) );
     CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal->duracaoTotal );
   }
-  
+
   void test_setSinalNome()
   {
     Sinal *sinal = novoSinal( (char*)"teste" );
@@ -34,7 +34,7 @@ public:
     
     CPPUNIT_ASSERT( !strcmp( (char*)"123", (char*)sinal->nome ) );
   }
-  
+
   void test_addPulso()
   {
     Sinal *sinal = novoSinal( (char*)"teste" );
@@ -82,7 +82,7 @@ public:
     
     Sinal *sinal_0 = novoSinal( (char*)"sinal_teste_0" );
     addPulso(sinal_0, um, (Tempo)255);   // 0
-    addPulso(sinal_0, zero, (Tempo)250); // 1 
+    addPulso(sinal_0, zero, (Tempo)250); // 1
     addPulso(sinal_0, um, (Tempo)10);    // 2
     
     addSinalPronto(sinais, sinal_0);
@@ -100,7 +100,7 @@ public:
     Sinal *sinal_1 = novoSinal( (char*)"sinal_teste_1" );
     addPulso(sinal_1, um, (Tempo)1010); // 0
     addPulso(sinal_1, um, (Tempo)200);  // 1
-    addPulso(sinal_1, zero, (Tempo)5);    // 2
+    addPulso(sinal_1, zero, (Tempo)5);  // 2
     
     addSinalPronto(sinais, sinal_1);
     
@@ -114,7 +114,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( sinais->lista[1].pulsos[2].valor, zero );
     CPPUNIT_ASSERT_EQUAL( sinais->lista[1].pulsos[2].tempo, (Tempo)(5) );
   }
-  
+
 };
 
 int main(int argc, char **argv)
@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   CppUnit::TextUi::TestRunner runner;
   CppUnit::TextOutputter textOut( &runner.result(), std::cout );
   runner.addTest( Testes_sinais::suite() );
-  runner.run();
+  int returnVal = runner.run() ? 0 : 1;
   textOut.printStatistics();
-  return 0;
+  return returnVal;
 }
