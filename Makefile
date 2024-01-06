@@ -16,6 +16,9 @@ OBJ = $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
 
 default: makedir all
 
+debug: CFLAGS += -gdwarf-4 -g3
+debug: default
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
