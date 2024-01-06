@@ -1,15 +1,15 @@
 # Progres
-# Testes unitarios de algumas partes.
-# Utilizando CppUnit.
+# Testes unitarios utilizando CppUnit
+# Sumario de cobertura com `lcov`
 
 CC = g++
 CPPC = g++ 
 
 SRCDIR = ..
 IDIR = ..
-ODIR = obj
+ODIR = .
 
-CFLAGS = -I$(IDIR)
+CFLAGS = -I$(IDIR) --coverage -g -O0
 
 LIBS = -lcppunit
 
@@ -17,6 +17,8 @@ SRCSTEST = sinaisTests.cpp
 OBJTEST = sinaisTests.o
 
 TARGET = progrestest
+
+COV_FILE = cov.txt
 
 default: tests
 
@@ -38,13 +40,18 @@ $(TARGET): $(OBJ) $(OBJTEST)
 tests: makedir $(TARGET)
 	./$(TARGET)
 
+coverage: tests
+	lcov -q -d . -c -o $(COV_FILE) && lcov --summary $(COV_FILE)
+
 .PHONY: makedir
 makedir:
 	mkdir -p $(ODIR)
 
 .PHONY: clean
 clean:
-	rm -rf $(ODIR)
+	if [ $(ODIR) != . ]; then rm -rf $(ODIR); fi
 	rm -f ./*.o
+	rm -f ./*.gcno
+	rm -f ./*.gcda
+	rm -f $(COV_FILE)
 	rm $(TARGET)
-

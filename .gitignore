@@ -3,4 +3,7 @@ obj/
 progres
 test/*.o
 test/progrestest
+test/cov.txt
+*.gcno
+*.gcda
 generated-docs/
