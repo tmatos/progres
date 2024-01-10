@@ -1,5 +1,7 @@
 # Progres
 
+[![Build Status](https://github.com/tmatos/progres/actions/workflows/makefile.yml/badge.svg)](https://github.com/tmatos/progres/actions)
+
 Simulador orientado a eventos para um subset da linguagem Verilog.
 
 No momento, provê a simulação de circuitos combinacionais escritos em Verilog estrutural.
