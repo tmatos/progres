@@ -14,7 +14,7 @@ CFLAGS = -I$(IDIR) --coverage -g -O0
 LIBS = -lcppunit
 
 TARGET = progrestest
-COV_FILE = cov.txt
+COV_FILE = coverage.txt
 
 default: tests
 
