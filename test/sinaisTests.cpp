@@ -117,12 +117,3 @@ public:
 
 };
 
-int main(int argc, char **argv)
-{
-  CppUnit::TextUi::TestRunner runner;
-  CppUnit::TextOutputter textOut( &runner.result(), std::cout );
-  runner.addTest( Testes_sinais::suite() );
-  int returnVal = runner.run() ? 0 : 1;
-  textOut.printStatistics();
-  return returnVal;
-}

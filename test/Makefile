@@ -8,21 +8,22 @@ CPPC = g++
 SRCDIR = ..
 IDIR = ..
 ODIR = .
+TDIR = .
 
 CFLAGS = -I$(IDIR) --coverage -g -O0
-
 LIBS = -lcppunit
 
-SRCSTEST = sinaisTests.cpp
-OBJTEST = sinaisTests.o
-
 TARGET = progrestest
-
 COV_FILE = cov.txt
 
 default: tests
 
-$(OBJTEST): $(SRCSTEST)
+_SRCSTEST = sinaisTests.cpp lexTests.cpp main.cpp
+SRCTEST = $(patsubst %,$(TDIR)/%,$(_SRCTEST))
+_OBJTEST = sinaisTests.o lexTests.o main.o
+OBJTEST = $(patsubst %,$(TDIR)/%,$(_OBJTEST))
+
+$(TDIR)/%.o: $(TDIR)/%.cpp
 	$(CPPC) -c -o $@ $< $(LIBS)
 
 _DEPS = sinais.h erros.h estruturas.h lex.h eventos.h verilog.h inout.h mem.h simula.h
@@ -54,4 +55,4 @@ clean:
 	rm -f ./*.gcno
 	rm -f ./*.gcda
 	rm -f $(COV_FILE)
-	rm $(TARGET)
+	rm -f $(TARGET)
