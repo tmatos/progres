@@ -19,11 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Install cppunit 
+    - name: Install cppunit and lcov
       run: |
         sudo apt-get update
         sudo apt-get install -y libcppunit-dev
+        sudo apt-get install -y lcov
     - name: Run tests
       run: |
         cd test
-        make tests
+        make coverage
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
