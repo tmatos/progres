@@ -18,21 +18,16 @@ COV_FILE = coverage.txt
 
 default: tests
 
-_SRCSTEST = estruturasTests.cpp sinaisTests.cpp lexTests.cpp eventosTests.cpp main.cpp
-SRCTEST = $(patsubst %,$(TDIR)/%,$(_SRCTEST))
 _OBJTEST = estruturasTests.o sinaisTests.o lexTests.o eventosTests.o main.o
 OBJTEST = $(patsubst %,$(TDIR)/%,$(_OBJTEST))
 
 $(TDIR)/%.o: $(TDIR)/%.cpp
 	$(CPPC) -c -o $@ $< $(LIBS)
 
-_DEPS = sinais.h erros.h estruturas.h lex.h eventos.h verilog.h inout.h mem.h simula.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
-
 _OBJ = sinais.o erros.o estruturas.o lex.o eventos.o verilog.o inout.o mem.o simula.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-$(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
+$(ODIR)/%.o: $(SRCDIR)/%.c $(IDIR)/%.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJ) $(OBJTEST)
