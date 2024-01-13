@@ -18,9 +18,9 @@ COV_FILE = coverage.txt
 
 default: tests
 
-_SRCSTEST = sinaisTests.cpp lexTests.cpp main.cpp
+_SRCSTEST = estruturasTests.cpp sinaisTests.cpp lexTests.cpp eventosTests.cpp main.cpp
 SRCTEST = $(patsubst %,$(TDIR)/%,$(_SRCTEST))
-_OBJTEST = sinaisTests.o lexTests.o main.o
+_OBJTEST = estruturasTests.o sinaisTests.o lexTests.o eventosTests.o main.o
 OBJTEST = $(patsubst %,$(TDIR)/%,$(_OBJTEST))
 
 $(TDIR)/%.o: $(TDIR)/%.cpp
