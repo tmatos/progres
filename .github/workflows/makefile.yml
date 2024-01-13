@@ -32,6 +32,6 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         directory: test
-        file: test/coverage.txt
+        file: coverage.txt
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
