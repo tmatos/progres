@@ -1,6 +1,7 @@
 # Progres
 
 [![Build Status](https://github.com/tmatos/progres/actions/workflows/makefile.yml/badge.svg)](https://github.com/tmatos/progres/actions)
+[![codecov](https://codecov.io/gh/tmatos/progres/graph/badge.svg?token=XCUNGD1HQD)](https://codecov.io/gh/tmatos/progres)
 
 Simulador orientado a eventos para um subset da linguagem Verilog.
 
