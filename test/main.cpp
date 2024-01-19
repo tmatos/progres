@@ -7,6 +7,7 @@
 #include "sinaisTests.cpp"
 #include "lexTests.cpp"
 #include "eventosTests.cpp"
+#include "simulaTests.cpp"
 
 int main(int argc, char **argv)
 {
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
   runner.addTest( Testes_sinais::suite() );
   runner.addTest( Testes_lex::suite() );
   runner.addTest( Testes_eventos::suite() );
+  runner.addTest( Testes_simula::suite() );
   int returnVal = runner.run() ? 0 : 1;
   textOut.printStatistics();
   return returnVal;
