@@ -11,14 +11,26 @@
 class Testes_simula : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_simula );
+  CPPUNIT_TEST( test_simula_CircuitoNull );
   CPPUNIT_TEST( test_simula_CircuitoVazio );
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
+  void test_simula_CircuitoNull()
+  {
+    t_circuito *circ = NULL;
+    Sinais *inputs = NULL;
+    Sinais *outputs = NULL;
+
+    outputs = simula(circ, inputs);
+
+    CPPUNIT_ASSERT_EQUAL( (Sinais*)NULL, outputs );
+  }
+
   void test_simula_CircuitoVazio()
   {
-    t_circuito* circ = novoCircuito();
+    t_circuito *circ = novoCircuito();
     Sinais *inputs = novaSinais();
     Sinais *outputs = NULL;
 
