@@ -18,7 +18,9 @@
 
 t_circuito* carregaCircuito(FILE *arquivo)
 {
-    Componente in, out, porta;
+    Componente in;
+    Componente out;
+    Componente porta;
 
     int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
 
@@ -35,16 +37,17 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     Token *it = NULL;
 
-    if(!tokens)
+    if(!tokens) {
         return NULL;
+    }
 
     it = tokens->primeiro;
 
-    if(!it)
+    if(!it) {
         return NULL;
+    }
 
-    if(!iguais(it->valor, "module"))
-    {
+    if(!iguais(it->valor, "module")) {
         exibeMsgErro("Palavra-chave nao encontrada onde esperado", it->linha, it->coluna, "module", it->valor);
         return NULL;
     }
@@ -82,18 +85,22 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     virgula = 0; // não esperando por vírgula, por enquanto
 
-    while(1) {
+    while(1)
+    {
         if(!it) {
-            if(virgula)
+            if(virgula) {
                 exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
-            else
+            }
+            else {
                 exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido ou ')'", -1, -1, NULL, NULL);
+            }
 
             return NULL;
         }
 
-        if(iguais(it->valor, ")"))
+        if(iguais(it->valor, ")")) {
             break;
+        }
 
         if(virgula) {
             if(iguais(it->valor, ",")) {
@@ -148,9 +155,12 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     porta = NULL;
 
-    while(1) {
-
-        if(iguais(it->valor, "input") || iguais(it->valor, "output") || iguais(it->valor, "wire")) {
+    while(1)
+    {
+        if( iguais(it->valor, "input")
+            || iguais(it->valor, "output")
+            || iguais(it->valor, "wire") )
+        {
             char tipo[MAX_TOKEN_SIZE]; // usado posteriormente para saber se os ident. serão in ou out
             strcpy(tipo, it->valor);
 
@@ -158,18 +168,21 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
             virgula = 0; // não esperando por uma virgula inicialmente
 
-            while(1) {
+            while(1)
+            {
                 if(!it) {
-                    if(virgula)
+                    if(virgula) {
                         exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
-                    else
+                    } else {
                         exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
+                    }
 
                     return NULL;
                 }
 
-                if(iguais(it->valor, ";"))
+                if(iguais(it->valor, ";")) {
                     break;
+                }
 
                 if(virgula) {
                     if(iguais(it->valor, ",")) {
@@ -183,7 +196,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
                     }
                 }
 
-                if(!iguais(tipo, "wire") && !identExiste(identificLivre, it->valor)) {
+                if( !iguais(tipo, "wire") && !identExiste(identificLivre, it->valor) ) {
                     exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido", it->linha, it->coluna, NULL, NULL);
                     return NULL;
                 }
@@ -429,11 +442,21 @@ t_circuito* carregaCircuito(FILE *arquivo)
     return NULL;
 }
 
-int isPortaLogica(char* s) {
-    if(iguais(s, "and") || iguais(s, "or") || iguais(s, "xor") ||
-       iguais(s, "nand") || iguais(s, "nor") || iguais(s, "xnor") ||
-       iguais(s, "not") || iguais(s, "buf") )
+int isPortaLogica(char* s)
+{
+    if( iguais(s, "and")
+        || iguais(s, "or")
+        || iguais(s, "xor")
+        || iguais(s, "nand")
+        || iguais(s, "nor")
+        || iguais(s, "xnor")
+        || iguais(s, "not")
+        || iguais(s, "buf") )
+    {
         return 1;
+    }
     else
+    {
         return 0;
+    }
 }
