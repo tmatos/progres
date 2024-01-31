@@ -10,6 +10,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE( Testes_verilog );
   CPPUNIT_TEST( test_isPortaLogica );
   CPPUNIT_TEST( test_test_carregaCircuito_fileEmpty );
+  CPPUNIT_TEST( test_test_carregaCircuito_fileTop_module );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -42,6 +43,18 @@ public:
     circuit = carregaCircuito(arquivoVerilogVazio);
 
     CPPUNIT_ASSERT( ! circuit );
+  }
+
+  void test_test_carregaCircuito_fileTop_module()
+  {
+    t_circuito *circuit = NULL;
+    FILE *arquivoVerilogTop = fopen("./verilog_sample_src/top.v", "r");
+
+    CPPUNIT_ASSERT( arquivoVerilogTop );
+
+    circuit = carregaCircuito(arquivoVerilogTop);
+
+    CPPUNIT_ASSERT( circuit );
   }
 
 };
