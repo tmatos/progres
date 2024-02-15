@@ -20,6 +20,7 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_isNumNaturalValido );
   CPPUNIT_TEST( test_tokeniza_top_v );
   CPPUNIT_TEST( test_tokeniza_tudo_v );
+  CPPUNIT_TEST( test_tokeniza_multiline_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -252,7 +253,19 @@ public:
     helper_test_tokeniza("./verilog_sample_src/tudo.v", tokens_esperados);
   }
 
-  void helper_test_tokeniza(const char* file_path, const std::list<std::string>& tokens_esperados)
+  void test_tokeniza_multiline_v()
+  {
+    std::list<std::string> tokens_esperados = {
+      "module", "multiline", "(", ")", ";",
+      "wire", "w", ";",
+      "endmodule" };
+    
+    ListaToken* lt = helper_test_tokeniza("./verilog_sample_src/multiline.v", tokens_esperados);
+
+    exibeListaDeToken(lt);
+  }
+
+  ListaToken* helper_test_tokeniza(const char* file_path, const std::list<std::string>& tokens_esperados)
   {
     FILE* arquivo = fopen(file_path, "r");
 
@@ -273,8 +286,11 @@ public:
     }
 
     CPPUNIT_ASSERT_EQUAL(tokens->ultimo->seguinte, it);
-
     CPPUNIT_ASSERT(!it);
+
+    fclose(arquivo);
+
+    return tokens;
   }
 
 };
