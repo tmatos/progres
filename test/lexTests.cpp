@@ -2,6 +2,8 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TextOutputter.h>
 #include <cstring>
+#include <list>
+#include <string>
 
 #include "../lex.h"
 
@@ -218,122 +220,49 @@ public:
 
   void test_tokeniza_top_v()
   {
-    FILE* arquivo = fopen("./verilog_sample_src/top.v", "r");
-
-    ListaToken* tokens = tokeniza(arquivo);
-
-    CPPUNIT_ASSERT_EQUAL(6, tokens->tamanho); // total = #(tokens) + 1
-
-    Token* it = tokens->primeiro;
-    CPPUNIT_ASSERT( !strcmp("module", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("top", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("(", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(")", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("endmodule", it->valor) );
+    std::list<std::string> tokens_esperados = {
+      "module", "top", "(", ")", ";",
+      "endmodule" };
+    
+    helper_test_tokeniza("./verilog_sample_src/top.v", tokens_esperados);
   }
 
   void test_tokeniza_tudo_v()
   {
-    FILE* arquivo = fopen("./verilog_sample_src/tudo.v", "r");
+    std::list<std::string> tokens_esperados = {
+      "module", "modTudo", "(", "a0", ",", "b0", ",", "x0", ",", "y0", ")", ";",
+      "input", "a0", ",", "b0", ";",
+      "output", "x0", ",", "y0", ";",
+      "not", "(", "y0", ",", "b0", ")", ";",
+      "xor", "(", "x0", ",", "a0", ",", "b0", ")", ";",
+      "endmodule" };
+
+    helper_test_tokeniza("./verilog_sample_src/tudo.v", tokens_esperados);
+  }
+
+  void helper_test_tokeniza(const char* file_path, const std::list<std::string>& tokens_esperados)
+  {
+    FILE* arquivo = fopen(file_path, "r");
+
+    CPPUNIT_ASSERT(arquivo);
 
     ListaToken* tokens = tokeniza(arquivo);
 
-    CPPUNIT_ASSERT_EQUAL(39, tokens->tamanho); // total = #(tokens) + 1
+    CPPUNIT_ASSERT(tokens);
+
+    CPPUNIT_ASSERT_EQUAL( (size_t)tokens_esperados.size(), (size_t)tokens->tamanho );
 
     Token* it = tokens->primeiro;
-    CPPUNIT_ASSERT( !strcmp("module", it->valor) );
 
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("modTudo", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("(", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("a0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("b0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("x0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("y0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(")", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
+    for ( auto s : tokens_esperados ) {
+      CPPUNIT_ASSERT(it);
+      CPPUNIT_ASSERT( !strcmp(s.c_str(), it->valor) );
+      it = it->seguinte;
+    }
 
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("input", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("a0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("b0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
+    CPPUNIT_ASSERT_EQUAL(tokens->ultimo->seguinte, it);
 
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("output", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("x0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("y0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("not", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("(", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("y0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("b0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(")", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
-
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("xor", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("(", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("x0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("a0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(",", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("b0", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(")", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp(";", it->valor) );
-    it = it->seguinte;
-    CPPUNIT_ASSERT( !strcmp("endmodule", it->valor) );
+    CPPUNIT_ASSERT(!it);
   }
 
 };
