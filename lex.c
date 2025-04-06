@@ -15,6 +15,31 @@
 #include "lex.h"
 #include "mem.h"
 
+char arrayPalavrasReservadas[][15] = {
+    "always",
+    "and",
+    "assign",
+    "attribute",
+    "begin",
+    "buf",
+    "bufif0",
+    "bufif1",
+    "case",
+    "casex",
+    "casez",
+    "cmos",
+    "deassign",
+    "default",
+    "defparam",
+    "disable",
+    "edge",
+    "else",
+    "end",
+    "endattribute",
+    "endcase",
+    "endfunction",
+};
+
 ListaToken* novaListaToken()
 {
     ListaToken* l = (ListaToken*) xmalloc(sizeof(ListaToken));
