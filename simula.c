@@ -45,7 +45,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     validos = 0;
 
-    // Valida��o da corresp�ncia das entradas entre os arquivos '.v' e '.in'
+    // Validacao da correspencia das entradas entre os arquivos '.v' e '.in'
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
         for( j=0 ; j < entradas->quantidade ; j++ )
@@ -72,7 +72,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         return NULL;
     }
 
-    // Inicializa��o da fila de eventos com os valores das entradas
+    // Inicializacao da fila de eventos com os valores das entradas
     fila = NULL;
 
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
@@ -94,12 +94,12 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         insereEvento(&fila,
                      t,
                      circuto->listaFiosEntrada->itens[i],
-                     x); // este sinal fica at� infitito
+                     x); // este sinal fica ate infitito
     }
 
-    // ATEN��O: Sabemos que todos os componentes s�o inicializados com o valorDinamico em xis
+    // ATENCAO: Sabemos que todos os componentes sao inicializados com o valorDinamico em xis
 
-    // A partir daqui, ocorre a simula��o propriamente dita, usado fila de eventos
+    // A partir daqui, ocorre a simulacao propriamente dita, usado fila de eventos
     t = 0;
 
     while(fila)
@@ -114,7 +114,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         // atualiza valores de fios e faz uma lista das portas alteradas pelas transicoes em listaTr
         while(itTr)
         {
-            if( itTr->fio->valorDinamico != itTr->novoValor ) // apenas se houver mudan�a de valor no fio
+            if( itTr->fio->valorDinamico != itTr->novoValor ) // apenas se houver mudanca de valor no fio
             {
                 for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
                 {
@@ -141,7 +141,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             itTr = itTr->proximo;
         }
 
-        free(listaTr); // popEvento n�o liberou a lista de transi��es, fazemos isso aqui
+        free(listaTr); // popEvento nao liberou a lista de transicoes, fazemos isso aqui
         listaTr = NULL;
 
         for( i=0 ; i < portasAlteradas->tamanho ; i++ )
@@ -155,7 +155,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeNotGate(valor_not_in);
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -167,7 +167,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_buf:
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -180,7 +180,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             case op_and:
                 resultado = computeAndGate(gate->listaEntrada);
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -194,7 +194,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             case op_or:
                 resultado = computeOrGate(gate->listaEntrada);
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -211,7 +211,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b);
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -244,7 +244,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -277,7 +277,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -294,7 +294,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
 
-                // cria eventos relativos �s saidas da porta
+                // cria eventos relativos as saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -311,7 +311,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         }
     }
 
-    // copia as saidas da simula��o do ciruito para o retorno da funcao
+    // copia as saidas da simulacao do ciruito para o retorno da funcao
     for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
     {
         addSinalPronto(saidas,

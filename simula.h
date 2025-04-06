@@ -1,6 +1,6 @@
 /**
  * @file simula.h
- * @brief Protótipo da função principal da simulação.
+ * @brief ProtÃ³tipos da funÃ§Ã£o principal da simulaÃ§Ã£o.
  */
 
 #ifndef SIMULA_H
@@ -9,28 +9,28 @@
 
 #include "estruturas.h"
 
-/** @brief Função que faz a simulação do circuito com as entradas especificadas.
-           Em caso de sucesso, retorna as saídas dessa simulação.
+/** @brief FunÃ§Ã£o que faz a simulaÃ§Ã£o do circuito com as entradas especificadas.
+           Em caso de sucesso, retorna as saÃ­das dessa simulaÃ§Ã£o.
  */
 Sinais* simula(t_circuito* circuto, Sinais* entradas);
 
-/** @brief Simulação da avaliação da porta not
+/** @brief SimulaÃ§Ã£o da avaliaÃ§Ã£o da porta 'not'
  */
 ValorLogico computeNotGate(ValorLogico input);
 
-/** @brief Simulação da avaliação da porta xor
+/** @brief SimulaÃ§Ã£o da avaliaÃ§Ã£o da porta 'xor'
  */
 ValorLogico computeXorGate(ValorLogico a, ValorLogico b);
 
-/** @brief Simulação da avaliação da porta xnor
+/** @brief SimulaÃ§Ã£o da avaliaÃ§Ã£o da porta 'xnor'
  */
 ValorLogico computeXnorGate(ValorLogico a, ValorLogico b);
 
-/** @brief Simulação da avaliação da porta 'or' sobre todas as n entradas
+/** @brief SimulaÃ§Ã£o da avaliaÃ§Ã£o da porta 'or' sobre todas as n entradas
  */
 ValorLogico computeOrGate(ListaComponente* inputs);
 
-/** @brief Simulação da avaliação da porta 'and' sobre todas as n entradas
+/** @brief SimulaÃ§Ã£o da avaliaÃ§Ã£o da porta 'and' sobre todas as n entradas
  */
 ValorLogico computeAndGate(ListaComponente* inputs);
 
