@@ -10,6 +10,7 @@
 #include "simulaTests.cpp"
 #include "verilogTests.cpp"
 #include "inoutTests.cpp"
+#include "errosTests.cpp"
 
 int main(int argc, char **argv)
 {
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
   runner.addTest( Testes_simula::suite() );
   runner.addTest( Testes_verilog::suite() );
   runner.addTest( Testes_inout::suite() );
+  runner.addTest( Testes_erros::suite() );
   int returnVal = runner.run() ? 0 : 1;
   textOut.printStatistics();
   return returnVal;
