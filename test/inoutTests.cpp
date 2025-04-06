@@ -12,6 +12,7 @@ class Testes_inout : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaEntradas_emptyFile );
   CPPUNIT_TEST( test_carregaEntradas_oneInputFile );
   CPPUNIT_TEST( test_carregaEntradas_twoInputFile );
+  CPPUNIT_TEST( test_carregaEntradas_file_notgates_in );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -56,6 +57,26 @@ public:
     CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].duracaoTotal );
+  }
+
+  void test_carregaEntradas_file_notgates_in()
+  {
+    FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
+
+    CPPUNIT_ASSERT( f_notgates_in );
+
+    Sinais* inputs = carregaEntradas(f_notgates_in);
+    
+    CPPUNIT_ASSERT( inputs );
+    CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
+    CPPUNIT_ASSERT( inputs->lista );
+    CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
+    CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].duracaoTotal );
+
+    CPPUNIT_ASSERT_EQUAL( x, inputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( x, inputs->lista[1].pulsos[0].valor );
   }
 
 };
