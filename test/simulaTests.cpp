@@ -6,6 +6,8 @@
 #include "../estruturas.h"
 #include "../sinais.h"
 #include "../eventos.h"
+#include "../verilog.h"
+#include "../inout.h"
 #include "../simula.h"
 
 class Testes_simula : public CppUnit::TestFixture
@@ -14,6 +16,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_CircuitoNull );
   CPPUNIT_TEST( test_simula_CircuitoVazio );
   CPPUNIT_TEST( test_simula_CircuitoUmaEntrada );
+  CPPUNIT_TEST( test_simula_samplefile_andgates_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -76,6 +79,50 @@ public:
     outputs = simula(circ, inputs);
 
     CPPUNIT_ASSERT(outputs);
+  }
+
+  void test_simula_samplefile_andgates_v()
+  {
+    t_circuito* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* outputs = NULL;
+    FILE* f_andgates_v = fopen("./verilog_sample_src/andgates.v", "r");
+    FILE* f_andgates_in = fopen("./inout_sample_files/andgates.in", "r");
+
+    CPPUNIT_ASSERT( f_andgates_v );
+    CPPUNIT_ASSERT( f_andgates_in );
+
+    circuit = carregaCircuito(f_andgates_v);
+
+    CPPUNIT_ASSERT( circuit );
+
+    inputs = carregaEntradas(f_andgates_in);
+
+    CPPUNIT_ASSERT( inputs );
+
+    outputs = simula(circuit, inputs);
+
+    CPPUNIT_ASSERT( outputs );
+
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
+
+    CPPUNIT_ASSERT( outputs->lista );
+
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
+
+    CPPUNIT_ASSERT( outputs->lista[0].pulsos );
+
+    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
+
+    CPPUNIT_ASSERT_EQUAL( x, outputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( zero, outputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[1].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( um, outputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
+    
   }
 
 };
