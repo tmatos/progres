@@ -35,6 +35,14 @@ ValorLogico computeOrGate(ListaComponente* inputs);
  */
 ValorLogico computeAndGate(ListaComponente* inputs);
 
+/** @brief Simulação da avaliação da porta 'nor' sobre todas as n entradas
+ */
+ValorLogico computeNorGate(ListaComponente* inputs);
+
+/** @brief Simulação da avaliação da porta 'nand' sobre todas as n entradas
+ */
+ValorLogico computeNandGate(ListaComponente* inputs);
+
 /** @brief Cria novos eventos na fila de acordo com a saidas (result) computadas
  *         para a porta lógica (gate), no tempo t indicado. 
  */

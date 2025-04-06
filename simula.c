@@ -32,8 +32,6 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
     ValorLogico valor_not_in;
     ValorLogico valor_xor_in_a;
     ValorLogico valor_xor_in_b;
-    ValorLogico valor_nand_in_j;
-    ValorLogico valor_nor_in_j;
     ValorLogico valor_xnor_in_a;
     ValorLogico valor_xnor_in_b;
 
@@ -179,55 +177,13 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_nand:
-                resultado = um;
-
-                // computa o valor da operacao nand sobre todas as entradas (em duas etapas)
-                for( j=0 ; j < gate->listaEntrada->tamanho ; j++ )
-                {
-                    valor_nand_in_j = gate->listaEntrada->itens[j]->valorDinamico;
-
-                    if(valor_nand_in_j == x || valor_nand_in_j == z) {
-                        resultado = valor_nand_in_j;
-                        break;
-                    }
-                    else if(valor_nand_in_j == zero) {
-                        resultado = zero;
-                    }
-                }
-
-                // fazemos a negativa do resultado se este for diferente de x e z (segunda etapa)
-                if( (resultado != x) && (resultado != z) ) {
-                    resultado = (resultado == zero) ? um : zero;
-                }
-
+                resultado = computeNandGate(gate->listaEntrada);
                 createEventsFromOutputs(&fila, t, gate, resultado);
-
                 break;
 
             case op_nor:
-                resultado = zero;
-
-                // computa o valor da operacao nor sobre todas as entradas (em duas etapas)
-                for( j=0 ; j < gate->listaEntrada->tamanho ; j++ )
-                {
-                    valor_nor_in_j = gate->listaEntrada->itens[j]->valorDinamico;
-
-                    if(valor_nor_in_j == x || valor_nor_in_j == z) {
-                        resultado = valor_nor_in_j;
-                        break;
-                    }
-                    else if(valor_nor_in_j == um) {
-                        resultado = um;
-                    }
-                }
-
-                // fazemos a negativa do resultado se este for diferente de x e z (segunda etapa)
-                if( (resultado != x) && (resultado != z) ) {
-                    resultado = (resultado == zero) ? um : zero;
-                }
-
+                resultado = computeNorGate(gate->listaEntrada);
                 createEventsFromOutputs(&fila, t, gate, resultado);
-
                 break;
 
             case op_xnor:
@@ -310,7 +266,7 @@ ValorLogico computeOrGate(ListaComponente* inputs)
             out = input_at_j;
             break;
         }
-        
+
         if(input_at_j == um) {
             out = um;
             break;
@@ -340,6 +296,30 @@ ValorLogico computeAndGate(ListaComponente* inputs)
             out = zero;
             break;
         }
+    }
+
+    return out;
+}
+
+ValorLogico computeNorGate(ListaComponente* inputs)
+{
+    ValorLogico out = computeOrGate(inputs);
+
+    // fazemos a negativa do resultado se este for diferente de x e z
+    if( (out != x) && (out != z) ) {
+        out = (out == zero) ? um : zero;
+    }
+
+    return out;
+}
+
+ValorLogico computeNandGate(ListaComponente* inputs)
+{
+    ValorLogico out = computeAndGate(inputs);
+
+    // fazemos a negativa do resultado se este for diferente de x e z
+    if( (out != x) && (out != z) ) {
+        out = (out == zero) ? um : zero;
     }
 
     return out;
