@@ -7,3 +7,5 @@ test/coverage.txt
 *.gcno
 *.gcda
 generated-docs/
+.vscode/settings.json
+IDE/IDE.layout
