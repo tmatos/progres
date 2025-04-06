@@ -168,6 +168,12 @@ public:
 
     strcpy(tk.valor, "wire");
     CPPUNIT_ASSERT( isPalavra(&tk) );
+
+    strcpy(tk.valor, "always");
+    CPPUNIT_ASSERT( isPalavra(&tk) );
+
+    strcpy(tk.valor, "xor");
+    CPPUNIT_ASSERT( isPalavra(&tk) );
   }
 
   void test_apenasDigitos_outro()
