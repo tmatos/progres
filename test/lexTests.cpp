@@ -151,6 +151,7 @@ public:
     strcpy(tk.valor, "reset");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
+    CPPUNIT_ASSERT( ! isIdentificador((Token*)NULL) );
   }
 
   void test_isPalavra()
@@ -174,6 +175,8 @@ public:
 
     strcpy(tk.valor, "xor");
     CPPUNIT_ASSERT( isPalavra(&tk) );
+
+    CPPUNIT_ASSERT( ! isPalavra((Token*)NULL) );
   }
 
   void test_apenasDigitos_outro()
@@ -223,6 +226,8 @@ public:
 
     strcpy(str, "a");
     CPPUNIT_ASSERT( ! isNumNaturalValido(str) );
+
+    CPPUNIT_ASSERT( ! isNumNaturalValido((char*)NULL) );
   }
 
   void test_tokeniza_top_v()
