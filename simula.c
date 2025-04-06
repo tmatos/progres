@@ -154,18 +154,8 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             {
             case op_not:
                 valor_not_in = gate->listaEntrada->itens[0]->valorDinamico;
-                if(valor_not_in == x) {
-                    resultado = x;
-                }
-                else if (valor_not_in == zero) {
-                    resultado = um;
-                }
-                else if (valor_not_in == um) {
-                    resultado = zero;
-                }
-                else {
-                    resultado = z;
-                }
+                
+                resultado = computeNotGate(valor_not_in);
 
                 // cria eventos relativos às saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
@@ -389,4 +379,19 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
     }
 
     return saidas;
+}
+
+ValorLogico computeNotGate(ValorLogico input)
+{
+    if(input == x)
+        return x;
+    
+    if(input == zero)
+        return um;
+    
+    if(input == um) {
+        return zero;
+    }
+    
+    return z;
 }

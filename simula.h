@@ -14,4 +14,8 @@
  */
 Sinais* simula(t_circuito* circuto, Sinais* entradas);
 
+/** @brief Simulação da avaliaçã da porta not
+ */
+ValorLogico computeNotGate(ValorLogico input);
+
 #endif // SIMULA_H
