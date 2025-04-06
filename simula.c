@@ -152,74 +152,30 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             {
             case op_not:
                 valor_not_in = gate->listaEntrada->itens[0]->valorDinamico;
-
                 resultado = computeNotGate(valor_not_in);
-
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
-
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             case op_buf:
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 gate->listaEntrada->itens[0]->valorDinamico);
-                }
+                resultado = gate->listaEntrada->itens[0]->valorDinamico;
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             case op_and:
                 resultado = computeAndGate(gate->listaEntrada);
-
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
-
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             case op_or:
                 resultado = computeOrGate(gate->listaEntrada);
-
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
-
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             case op_xor:
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-
                 resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b);
-
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
-
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             case op_nand:
@@ -244,14 +200,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
+                createEventsFromOutputs(&fila, t, gate, resultado);
 
                 break;
 
@@ -277,32 +226,15 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
+                createEventsFromOutputs(&fila, t, gate, resultado);
 
                 break;
 
             case op_xnor:
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-
                 resultado = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
-
-                // cria eventos relativos as saidas da porta
-                for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
-                {
-                    insereEvento(&fila,
-                                 t + gate->tipo.atraso,
-                                 gate->listaSaida->itens[j],
-                                 resultado);
-                }
-
+                createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
             default:
@@ -411,4 +343,18 @@ ValorLogico computeAndGate(ListaComponente* inputs)
     }
 
     return out;
+}
+
+void createEventsFromOutputs(Evento** fila, Tempo t, Componente gate, ValorLogico result)
+{
+    int j;
+
+    // cria eventos relativos as saidas da porta
+    for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
+    {
+        insereEvento(fila,
+                     t + gate->tipo.atraso,
+                     gate->listaSaida->itens[j],
+                     result);
+    }
 }
