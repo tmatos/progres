@@ -154,7 +154,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             {
             case op_not:
                 valor_not_in = gate->listaEntrada->itens[0]->valorDinamico;
-                
+
                 resultado = computeNotGate(valor_not_in);
 
                 // cria eventos relativos às saidas da porta
@@ -239,22 +239,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
 
-                if(valor_xor_in_a == x || valor_xor_in_b == x) {
-                    resultado = x;
-                }
-                else if(valor_xor_in_a == z || valor_xor_in_b == z) {
-                    resultado = z;
-                }
-                else {
-                    if( (valor_xor_in_a == um && valor_xor_in_b == zero) ||
-                        (valor_xor_in_a == zero && valor_xor_in_b == um) )
-                    {
-                        resultado = um;
-                    }
-                    else {
-                        resultado = zero;
-                    }
-                }
+                resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b)
 
                 // cria eventos relativos às saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
@@ -337,22 +322,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
 
-                if(valor_xnor_in_a == x || valor_xnor_in_b == x) {
-                    resultado = x;
-                }
-                else if(valor_xnor_in_a == z || valor_xnor_in_b == z) {
-                    resultado = z;
-                }
-                else {
-                    if( (valor_xnor_in_a == um && valor_xnor_in_b == um) ||
-                        (valor_xnor_in_a == zero && valor_xnor_in_b == zero) )
-                    {
-                        resultado = um;
-                    }
-                    else {
-                        resultado = zero;
-                    }
-                }
+                resultado = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
 
                 // cria eventos relativos às saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
@@ -389,9 +359,36 @@ ValorLogico computeNotGate(ValorLogico input)
     if(input == zero)
         return um;
     
-    if(input == um) {
+    if(input == um)
         return zero;
-    }
     
     return z;
+}
+
+ValorLogico computeXorGate(ValorLogico a, ValorLogico b)
+{
+    if(a == x || b == x)
+        return x;
+
+    if(a == z || b == z)
+        return z;
+
+    if( (a == um && b == zero) || (a == zero && b == um) )
+        return um;
+
+    return zero;
+}
+
+ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
+{
+    if(a == x || b == x)
+        return x;
+
+    if(a == z || b == z)
+        return z;
+
+    if( (a == um && b == um) || (a == zero && b == zero) )
+        return um;
+
+    return zero;
 }

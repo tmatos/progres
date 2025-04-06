@@ -14,8 +14,16 @@
  */
 Sinais* simula(t_circuito* circuto, Sinais* entradas);
 
-/** @brief Simulação da avaliaçã da porta not
+/** @brief Simulação da avaliação da porta not
  */
 ValorLogico computeNotGate(ValorLogico input);
+
+/** @brief Simulação da avaliação da porta xor
+ */
+ValorLogico computeXorGate(ValorLogico a, ValorLogico b)
+
+/** @brief Simulação da avaliação da porta xnor
+ */
+ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
 
 #endif // SIMULA_H
