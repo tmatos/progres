@@ -26,4 +26,12 @@ ValorLogico computeXorGate(ValorLogico a, ValorLogico b);
  */
 ValorLogico computeXnorGate(ValorLogico a, ValorLogico b);
 
+/** @brief Simulação da avaliação da porta 'or' sobre todas as n entradas
+ */
+ValorLogico computeOrGate(ListaComponente* inputs);
+
+/** @brief Simulação da avaliação da porta 'and' sobre todas as n entradas
+ */
+ValorLogico computeAndGate(ListaComponente* inputs);
+
 #endif // SIMULA_H

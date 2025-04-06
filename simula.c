@@ -30,8 +30,6 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     ValorLogico resultado;
     ValorLogico valor_not_in;
-    ValorLogico valor_and_in_j;
-    ValorLogico valor_or_in_j;
     ValorLogico valor_xor_in_a;
     ValorLogico valor_xor_in_b;
     ValorLogico valor_nand_in_j;
@@ -47,7 +45,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     validos = 0;
 
-    // Validação da correspência das entradas entre os arquivos '.v' e '.in'
+    // Validaï¿½ï¿½o da correspï¿½ncia das entradas entre os arquivos '.v' e '.in'
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
         for( j=0 ; j < entradas->quantidade ; j++ )
@@ -74,7 +72,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         return NULL;
     }
 
-    // Inicialização da fila de eventos com os valores das entradas
+    // Inicializaï¿½ï¿½o da fila de eventos com os valores das entradas
     fila = NULL;
 
     for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
@@ -96,12 +94,12 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         insereEvento(&fila,
                      t,
                      circuto->listaFiosEntrada->itens[i],
-                     x); // este sinal fica até infitito
+                     x); // este sinal fica atï¿½ infitito
     }
 
-    // ATENÇÃO: Sabemos que todos os componentes são inicializados com o valorDinamico em xis
+    // ATENï¿½ï¿½O: Sabemos que todos os componentes sï¿½o inicializados com o valorDinamico em xis
 
-    // A partir daqui, ocorre a simulação propriamente dita, usado fila de eventos
+    // A partir daqui, ocorre a simulaï¿½ï¿½o propriamente dita, usado fila de eventos
     t = 0;
 
     while(fila)
@@ -116,7 +114,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         // atualiza valores de fios e faz uma lista das portas alteradas pelas transicoes em listaTr
         while(itTr)
         {
-            if( itTr->fio->valorDinamico != itTr->novoValor ) // apenas se houver mudança de valor no fio
+            if( itTr->fio->valorDinamico != itTr->novoValor ) // apenas se houver mudanï¿½a de valor no fio
             {
                 for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
                 {
@@ -143,7 +141,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             itTr = itTr->proximo;
         }
 
-        free(listaTr); // popEvento não liberou a lista de transições, fazemos isso aqui
+        free(listaTr); // popEvento nï¿½o liberou a lista de transiï¿½ï¿½es, fazemos isso aqui
         listaTr = NULL;
 
         for( i=0 ; i < portasAlteradas->tamanho ; i++ )
@@ -157,7 +155,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeNotGate(valor_not_in);
 
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -169,7 +167,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_buf:
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -180,23 +178,9 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_and:
-                resultado = um;
+                resultado = computeAndGate(gate->listaEntrada);
 
-                // computa o valor da operacao and sobre todas as entradas
-                for( j=0 ; j < gate->listaEntrada->tamanho ; j++ )
-                {
-                    valor_and_in_j = gate->listaEntrada->itens[j]->valorDinamico;
-
-                    if(valor_and_in_j == x || valor_and_in_j == z) {
-                        resultado = valor_and_in_j;
-                        break;
-                    }
-                    else if(valor_and_in_j == zero) {
-                        resultado = zero;
-                    }
-                }
-
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -208,23 +192,9 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
 
             case op_or:
-                resultado = zero;
+                resultado = computeOrGate(gate->listaEntrada);
 
-                // computa o valor da operacao or sobre todas as entradas
-                for( j=0 ; j < gate->listaEntrada->tamanho ; j++ )
-                {
-                    valor_or_in_j = gate->listaEntrada->itens[j]->valorDinamico;
-
-                    if(valor_or_in_j == x || valor_or_in_j == z) {
-                        resultado = valor_or_in_j;
-                        break;
-                    }
-                    else if(valor_or_in_j == um) {
-                        resultado = um;
-                    }
-                }
-
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -241,7 +211,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b);
 
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -274,7 +244,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -307,7 +277,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                     resultado = (resultado == zero) ? um : zero;
                 }
 
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -324,7 +294,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
                 resultado = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
 
-                // cria eventos relativos às saidas da porta
+                // cria eventos relativos ï¿½s saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
                 {
                     insereEvento(&fila,
@@ -341,7 +311,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         }
     }
 
-    // copia as saidas da simulação do ciruito para o retorno da funcao
+    // copia as saidas da simulaï¿½ï¿½o do ciruito para o retorno da funcao
     for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
     {
         addSinalPronto(saidas,
@@ -391,4 +361,54 @@ ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
         return um;
 
     return zero;
+}
+
+ValorLogico computeOrGate(ListaComponente* inputs)
+{
+    int j;
+    ValorLogico input_at_j;
+    ValorLogico out = zero;
+    
+    // computa o valor da operacao or sobre todas as entradas
+    for( j=0 ; j < inputs->tamanho ; j++ )
+    {
+        input_at_j = inputs->itens[j]->valorDinamico;
+
+        if(input_at_j == x || input_at_j == z) {
+            out = input_at_j;
+            break;
+        }
+        
+        if(input_at_j == um) {
+            out = um;
+            break;
+        }
+    }
+
+    return out;
+}
+
+ValorLogico computeAndGate(ListaComponente* inputs)
+{
+    int j;
+    ValorLogico input_at_j;
+    ValorLogico out = um;
+
+    // computa o valor da operacao and sobre todas as entradas
+    for( j=0 ; j < inputs->tamanho ; j++ )
+    {
+        input_at_j = inputs->itens[j]->valorDinamico;
+
+        if(input_at_j == x || input_at_j == z) {
+            out = input_at_j;
+            break;
+        }
+
+        if(input_at_j == zero) {
+            out = zero;
+            break;
+        }
+    }
+
+    return out;
 }
