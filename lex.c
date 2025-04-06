@@ -357,11 +357,12 @@ int isIdentificador(Token* tk)
     if(!tk)
         return 0;
 
-    if(!isalpha(tk->valor[0])) // se nao comeca com letra, nao eh identificador valido
+    // se nao comeca com letra ou underscore, nao eh identificador valido
+    if( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
         return 0;
 
     for(i = 1 ; i < strlen(tk->valor) ; i++) {
-        if(!isalnum(tk->valor[i])) {
+        if( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
             simbol = 1;
             break;
         }
@@ -514,7 +515,7 @@ ListaToken* tokeniza(FILE *arquivo)
                 goto A;
             }
             else {
-                if(isalnum(c)) {
+                if(isalnum(c) || c == '_') {
                     coluna++;
                     anexa(tok, c);
 
@@ -547,7 +548,7 @@ ListaToken* tokeniza(FILE *arquivo)
 
                             break;
                         }
-                        else if(isalnum(c)) {
+                        else if(isalnum(c) || c == '_') {
                             coluna++;
                             anexa(tok, c);
 

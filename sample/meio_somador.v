@@ -1,7 +1,7 @@
 
 // meio somador (soma dois bits)
 
-module meioSomador(a, b, s, c);
+module meio_somador(a, b, s, c);
 
 input a, b; // bits a somar
 output s; // soma

@@ -66,7 +66,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
     if( validos < circuto->listaFiosEntrada->tamanho )
     {
-        printf("O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
+        printf("AVISO: O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
         return NULL;
     }
 
