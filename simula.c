@@ -239,7 +239,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
 
-                resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b)
+                resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b);
 
                 // cria eventos relativos às saidas da porta
                 for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
