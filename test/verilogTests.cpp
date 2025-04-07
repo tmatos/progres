@@ -91,7 +91,25 @@ public:
       "./verilog_sample_src/badverilog_18.v",
       "./verilog_sample_src/badverilog_19.v",
       "./verilog_sample_src/badverilog_20.v",
-      "./verilog_sample_src/badverilog_21.v"
+      "./verilog_sample_src/badverilog_21.v",
+      "./verilog_sample_src/badverilog_22.v",
+      "./verilog_sample_src/badverilog_23.v",
+      "./verilog_sample_src/badverilog_24.v",
+      "./verilog_sample_src/badverilog_25.v",
+      "./verilog_sample_src/badverilog_26.v",
+      "./verilog_sample_src/badverilog_27.v",
+      "./verilog_sample_src/badverilog_28.v",
+      "./verilog_sample_src/badverilog_29.v",
+      "./verilog_sample_src/badverilog_30.v",
+      "./verilog_sample_src/badverilog_31.v",
+      "./verilog_sample_src/badverilog_32.v",
+      "./verilog_sample_src/badverilog_33.v",
+      "./verilog_sample_src/badverilog_34.v",
+      "./verilog_sample_src/badverilog_35.v",
+      "./verilog_sample_src/badverilog_36.v",
+      "./verilog_sample_src/badverilog_37.v",
+      "./verilog_sample_src/badverilog_38.v",
+      "./verilog_sample_src/badverilog_39.v"
     };
 
     t_circuito* circuit = NULL;
