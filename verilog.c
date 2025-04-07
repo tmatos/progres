@@ -55,7 +55,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador", -1, -1, NULL, NULL);
+        exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador", -1, -1, NULL, NULL);
         return NULL;
     }
     else if(!isIdentificador(it)) {
@@ -70,11 +70,11 @@ t_circuito* carregaCircuito(FILE *arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo não esperado. Era esperado '('", -1, -1, NULL, NULL);
+        exibeMsgErro("Final do arquivo nao esperado. Era esperado '('", -1, -1, NULL, NULL);
         return NULL;
     }
     else if(!iguais(it->valor, "(")) {
-        // se it->valor não é '(', pare
+        // se it->valor nao eh '(', pare
         exibeMsgErro("Simbolo esperado nao foi encontrado", it->linha, it->coluna, "(", it->valor);
         return NULL;
     }
@@ -83,16 +83,16 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
     // devemos agora ler os parametros do modulo
 
-    virgula = 0; // não esperando por vírgula, por enquanto
+    virgula = 0; // nao esperando por virgula, por enquanto
 
     while(1)
     {
         if(!it) {
             if(virgula) {
-                exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
             }
             else {
-                exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido ou ')'", -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido ou ')'", -1, -1, NULL, NULL);
             }
 
             return NULL;
@@ -161,20 +161,20 @@ t_circuito* carregaCircuito(FILE *arquivo)
             || iguais(it->valor, "output")
             || iguais(it->valor, "wire") )
         {
-            char tipo[MAX_TOKEN_SIZE]; // usado posteriormente para saber se os ident. serão in ou out
+            char tipo[MAX_TOKEN_SIZE]; // usado posteriormente para saber se os ident. serao in ou out
             strcpy(tipo, it->valor);
 
             avanca(&it);
 
-            virgula = 0; // não esperando por uma virgula inicialmente
+            virgula = 0; // nao esperando por uma virgula inicialmente
 
             while(1)
             {
                 if(!it) {
                     if(virgula) {
-                        exibeMsgErro("Final do arquivo não esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
+                        exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula", -1, -1, NULL, NULL);
                     } else {
-                        exibeMsgErro("Final do arquivo não esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
+                        exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido", -1, -1, NULL, NULL);
                     }
 
                     return NULL;
@@ -210,7 +210,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 else if (iguais(tipo, "output")) {
                     insereTokenString(listaOutput, it->valor, -1, -1);
 
-                    // atribui como saída o ident. na estrutura
+                    // atribui como saida o ident. na estrutura
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
                 else if(iguais(tipo, "wire")) {
@@ -335,7 +335,7 @@ t_circuito* carregaCircuito(FILE *arquivo)
                 return NULL;
             }
 
-            porta_inputs: // Label para a parte do código onde há leitura de entradas da porta lógica
+            porta_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
 
             avanca(&it);
 
@@ -444,19 +444,13 @@ t_circuito* carregaCircuito(FILE *arquivo)
 
 int isPortaLogica(char* s)
 {
-    if( iguais(s, "and")
-        || iguais(s, "or")
-        || iguais(s, "xor")
-        || iguais(s, "nand")
-        || iguais(s, "nor")
-        || iguais(s, "xnor")
-        || iguais(s, "not")
-        || iguais(s, "buf") )
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+    return ( iguais(s, "and")
+            || iguais(s, "or")
+            || iguais(s, "xor")
+            || iguais(s, "nand")
+            || iguais(s, "nor")
+            || iguais(s, "xnor")
+            || iguais(s, "not")
+            || iguais(s, "buf")
+    );
 }
