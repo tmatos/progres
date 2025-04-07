@@ -1,4 +1,6 @@
 
 module nome( a, b, c);
 
-input 
+input a;
+
+and
