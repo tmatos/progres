@@ -13,9 +13,11 @@
 #include "sinais.h"
 #include "mem.h"
 
-void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor)
+void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor)
 {
-    Evento *evt;
+    Evento* evt = NULL;
+    Evento* ant = NULL; // evento anterior
+    Evento* it = NULL; // iterador para eventos
 
     if(!comp)
         return;
@@ -35,8 +37,8 @@ void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor
     }
     else
     {
-        Evento *ant = NULL; // evento anterior
-        Evento *it = *fila; // iterador de evento
+        ant = NULL; // evento anterior
+        it = *fila; // iterador de evento
         while( it && (it->quando < t) ) {
             ant = it;
             it = it->proximo;
@@ -55,7 +57,7 @@ void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor
             evt->proximo = it;
             ant->proximo = evt;
         }
-        else if(t == it->quando) // um evento no instante existe, adicionar à lista de transições
+        else if(t == it->quando) // um evento no instante existe, adicionar a lista de transicoes
         {
             it->ultimaTransicao->proximo = (Transicao*) xmalloc(sizeof(Transicao));
             it->ultimaTransicao = it->ultimaTransicao->proximo;
@@ -65,7 +67,7 @@ void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor
         }
         else if(t < it->quando)
         {
-            if(ant == NULL) // inserir evento no início da fila
+            if(ant == NULL) // inserir evento no inicio da fila
             {
                 evt = (Evento*) xmalloc(sizeof(Evento));
                 evt->quando = t;
@@ -98,7 +100,7 @@ void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor
 
 Transicao* getTransicoesEm(Evento* fila, Tempo t)
 {
-    Evento *it = fila; // iterador de evento
+    Evento* it = fila; // iterador de evento
     while( (it->quando < t) && it ) {
         it = it->proximo;
     }
@@ -109,10 +111,10 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t)
         return NULL;
 }
 
-Transicao* popEvento(Evento **fila)
+Transicao* popEvento(Evento** fila)
 {
-    Transicao *ret = NULL;
-    Evento *dead = NULL;
+    Transicao* ret = NULL;
+    Evento* dead = NULL;
 
     if(!fila)
         return NULL;
