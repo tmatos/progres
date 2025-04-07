@@ -13,9 +13,16 @@ class Testes_inout : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaEntradas_oneInputFile );
   CPPUNIT_TEST( test_carregaEntradas_twoInputFile );
   CPPUNIT_TEST( test_carregaEntradas_file_notgates_in );
-  CPPUNIT_TEST( test_carregaEntradas_file_badinput_0_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_0_in );  
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_1_in );
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_2_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_3_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_4_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_5_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_6_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_7_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_8_in );
+  CPPUNIT_TEST( test_carregaEntradas_file_badinput_9_in );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -101,6 +108,62 @@ public:
   void test_carregaEntradas_file_badinput_2_in()
   {
     FILE* fp = fopen("./inout_sample_files/badinput_2.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_3_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_3.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_4_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_4.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_5_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_5.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_6_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_6.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_7_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_7.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_8_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_8.in", "r");
+    CPPUNIT_ASSERT( fp );
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( !inputs );
+  }
+
+  void test_carregaEntradas_file_badinput_9_in()
+  {
+    FILE* fp = fopen("./inout_sample_files/badinput_9.in", "r");
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
