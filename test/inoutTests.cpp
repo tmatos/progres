@@ -23,29 +23,29 @@ class Testes_inout : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_7_in );
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_8_in );
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_9_in );
+  CPPUNIT_TEST( test_salvarSinais );
   CPPUNIT_TEST_SUITE_END();
 
 public:
   void test_carregaEntradas_emptyFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/empty.in", "r");
-
     CPPUNIT_ASSERT( file_inputs );
 
     Sinais* inputs = carregaEntradas(file_inputs);
-
     CPPUNIT_ASSERT( !inputs );
+    fclose(file_inputs);
   }
 
   void test_carregaEntradas_oneInputFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/one.in", "r");
-
     CPPUNIT_ASSERT( file_inputs );
 
     Sinais* inputs = carregaEntradas(file_inputs);
-
     CPPUNIT_ASSERT( inputs );
+    fclose(file_inputs);
+
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
     CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
@@ -55,14 +55,14 @@ public:
   void test_carregaEntradas_twoInputFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/two.in", "r");
-
     CPPUNIT_ASSERT( file_inputs );
 
     Sinais* inputs = carregaEntradas(file_inputs);
-
     CPPUNIT_ASSERT( inputs );
     CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
+    fclose(file_inputs);
+
     CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
     CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
@@ -72,14 +72,14 @@ public:
   void test_carregaEntradas_file_notgates_in()
   {
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
-
     CPPUNIT_ASSERT( f_notgates_in );
 
     Sinais* inputs = carregaEntradas(f_notgates_in);
-    
     CPPUNIT_ASSERT( inputs );
     CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
+    fclose(f_notgates_in);
+
     CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
     CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
@@ -95,6 +95,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_1_in()
@@ -103,6 +104,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_2_in()
@@ -111,6 +113,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_3_in()
@@ -119,6 +122,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_4_in()
@@ -127,6 +131,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_5_in()
@@ -135,6 +140,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_6_in()
@@ -143,6 +149,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_7_in()
@@ -151,6 +158,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_8_in()
@@ -159,6 +167,7 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
   }
 
   void test_carregaEntradas_file_badinput_9_in()
@@ -167,6 +176,49 @@ public:
     CPPUNIT_ASSERT( fp );
     Sinais* inputs = carregaEntradas(fp);
     CPPUNIT_ASSERT( !inputs );
+    fclose(fp);
+  }
+
+  void test_salvarSinais()
+  {
+    FILE* fp = fopen("./inout_sample_files/allpulses.in", "r");
+    CPPUNIT_ASSERT( fp );
+
+    Sinais* inputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( inputs );
+    fclose(fp);
+
+    FILE* fp_out = fopen("./inout_sample_files/allpulses.in.out", "w");
+    CPPUNIT_ASSERT( fp_out );
+
+    salvarSinais(inputs, fp_out);
+    fclose(fp_out);
+
+    fp = fopen("./inout_sample_files/allpulses.in.out", "r");
+    CPPUNIT_ASSERT( fp );
+
+    Sinais* outputs = carregaEntradas(fp);
+    CPPUNIT_ASSERT( outputs );
+    fclose(fp);
+
+    // verificando se o sinal original e o que foi salvo sao iguais
+
+    CPPUNIT_ASSERT_EQUAL( inputs->quantidade, outputs->quantidade );
+
+    for ( int i = 0; i < inputs->quantidade; ++i ) {
+      CPPUNIT_ASSERT( !strcmp(inputs->lista[i].nome, outputs->lista[i].nome) );
+      CPPUNIT_ASSERT_EQUAL( inputs->lista[i].duracaoTotal, outputs->lista[i].duracaoTotal );
+      
+      for ( int j = 0; j < 3; ++j )
+      {
+        CPPUNIT_ASSERT_EQUAL( inputs->lista[i].pulsos[j].tempo,
+                              outputs->lista[i].pulsos[j].tempo );
+        CPPUNIT_ASSERT_EQUAL( inputs->lista[i].pulsos[j].valor,
+                              outputs->lista[i].pulsos[j].valor );
+      }
+    }
+
+    remove("./inout_sample_files/allpulses.in.out");
   }
 
 };
