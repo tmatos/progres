@@ -18,14 +18,14 @@
 
 int main(int argc, char* argv[])
 {
-    FILE *arquivoVerilog = NULL;
-    FILE *wavein = NULL;
-    FILE *waveout = NULL;
+    FILE* arquivoVerilog = NULL;
+    FILE* wavein = NULL;
+    FILE* waveout = NULL;
 
     Sinais* entradas = NULL;
     Sinais* saidas = NULL;
 
-    t_circuito *circuto1 = NULL;
+    t_circuito* circuto1 = NULL;
 
     if(argc < 2) {
         printf("Uso: progres [arquivo verilog] [arquivo de entradas]\n");
@@ -49,12 +49,11 @@ int main(int argc, char* argv[])
         printf("Circuito carregado com sucesso.\n");
     }
     else {
-        printf("Erro com o fonte.\n");
+        printf("Erro com o codigo fonte do cicuito.\n");
     }
 
-    // se foi dado um path do arquivo de entrada para simulação, simularemos
-    if(argc > 2)
-    {
+    // se foi fornecido um path do arquivo de entrada para simulacao, simularemos
+    if(argc > 2) {
         wavein = fopen(argv[2], "r");
 
         if(!wavein) {
@@ -68,16 +67,13 @@ int main(int argc, char* argv[])
 
         fclose(wavein);
 
-        if(entradas)
-        {
+        if(entradas) {
             char pathArquivoSaida[MAX_FILE_PATH_SIZE] = "";
 
-            if(argc > 3) // se foi passado o argumento do arquivo de saída
-            {
+            if(argc > 3) { // se foi passado o argumento do arquivo de saida
                 strcpy(pathArquivoSaida, argv[3]);
             }
-            else
-            {
+            else {
                 strcpy(pathArquivoSaida, argv[2]);
                 strcat(pathArquivoSaida, ".out");
             }
@@ -91,23 +87,17 @@ int main(int argc, char* argv[])
 
             waveout = fopen(pathArquivoSaida, "w");
 
-            if(!waveout)
-            {
+            if(!waveout) {
                 printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n", pathArquivoSaida);
             }
-            else
-            {
+            else {
                 salvarSinais(saidas, waveout);
-
                 fclose(waveout);
-
                 printf("Arquivo de saida salvo em '%s'.\n", pathArquivoSaida);
-
                 free(saidas);
             }
         }
-        else
-        {
+        else {
             printf("Nao ha entradas para a simulacao do circuito.\n");
         }
     }
