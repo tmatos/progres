@@ -79,7 +79,13 @@ public:
       "./verilog_sample_src/badverilog_06.v",
       "./verilog_sample_src/badverilog_07.v",
       "./verilog_sample_src/badverilog_08.v",
-      "./verilog_sample_src/badverilog_09.v"
+      "./verilog_sample_src/badverilog_09.v",
+      "./verilog_sample_src/badverilog_10.v",
+      "./verilog_sample_src/badverilog_11.v",
+      "./verilog_sample_src/badverilog_12.v",
+      "./verilog_sample_src/badverilog_13.v",
+      "./verilog_sample_src/badverilog_14.v",
+      "./verilog_sample_src/badverilog_15.v"
     };
 
     t_circuito* circuit = NULL;
