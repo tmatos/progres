@@ -67,9 +67,9 @@ public:
     CPPUNIT_ASSERT(inputs);
 
     addSinal( inputs, str_nome_entrada_1 );
-    addPulso( &(inputs->lista[0]), um, (Tempo)20 );    // 0
-    addPulso( &(inputs->lista[0]), zero, (Tempo)50 );  // 1
-    addPulso( &(inputs->lista[0]), um, (Tempo)105 );   // 2
+    addPulso( &(inputs->lista[0]), VAL_1, (Tempo)20 );    // 0
+    addPulso( &(inputs->lista[0]), VAL_0, (Tempo)50 );  // 1
+    addPulso( &(inputs->lista[0]), VAL_1, (Tempo)105 );   // 2
 
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
@@ -114,13 +114,13 @@ public:
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, outputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, outputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, outputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
   }
 
@@ -150,13 +150,13 @@ public:
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, outputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, outputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, outputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
   }
 
@@ -186,13 +186,13 @@ public:
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, outputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, outputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, outputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
   }
 
@@ -222,13 +222,13 @@ public:
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, outputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, outputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, outputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
   }
 
@@ -261,16 +261,16 @@ public:
     CPPUNIT_ASSERT( s.pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[2].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
 
     s = outputs->lista[1];
@@ -279,16 +279,16 @@ public:
     CPPUNIT_ASSERT( s.pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[2].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
   }
 
@@ -321,16 +321,16 @@ public:
     CPPUNIT_ASSERT( s.pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)38, s.duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)13, s.pulsos[3].tempo );
   }
   
@@ -363,16 +363,16 @@ public:
     CPPUNIT_ASSERT( s.pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, s.duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
   }
 
@@ -405,16 +405,16 @@ public:
     CPPUNIT_ASSERT( s.pulsos );
     CPPUNIT_ASSERT_EQUAL( (Tempo)25, s.duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[1].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( zero, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
 
-    CPPUNIT_ASSERT_EQUAL( um, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
   }
 

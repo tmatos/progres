@@ -65,16 +65,16 @@ Sinais* carregaEntradas(FILE* arquivo)
             if(!it)
                 return erroFatalArquivoCorrompido();
 
-            valorLogico = nulo;
+            valorLogico = VAL_BLANK;
 
             if( iguais(it->valor, "0") ) {
-                valorLogico = zero;
+                valorLogico = VAL_0;
             }
             else if( iguais(it->valor, "1") ) {
-                valorLogico = um;
+                valorLogico = VAL_1;
             }
             else if( iguais(it->valor, "x") || iguais(it->valor, "X") ) {
-                valorLogico = x;
+                valorLogico = VAL_X;
             }
             else if( iguais(it->valor, "}") ) {
                 break;
@@ -150,7 +150,7 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
 
         it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
 
-        while( it->valor != nulo )
+        while( it->valor != VAL_BLANK )
         {
             // Insere virgula apenas se nao eh a primeira iteracao
             if( it != itSinais[si].pulsos )
@@ -158,19 +158,19 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
 
             switch(it->valor)
             {
-                case um:
+                case VAL_1:
                     fprintf(arqSaida, "1(%d)", it->tempo);
                     break;
-                case zero:
+                case VAL_0:
                     fprintf(arqSaida, "0(%d)", it->tempo);
                     break;
-                case x:
+                case VAL_X:
                     fprintf(arqSaida, "x(%d)", it->tempo);
                     break;
-                case z:
+                case VAL_Z:
                     fprintf(arqSaida, "z(%d)", it->tempo);
                     break;
-                case nulo:
+                case VAL_BLANK:
                     break;
             }
 

@@ -22,7 +22,7 @@ public:
 
     Tempo t = (Tempo)5000;
     Componente c0 = novoComponente( (char*)"entrada_componente_0", input );
-    ValorLogico v = um;
+    ValorLogico v = VAL_1;
 
     insereEvento( &fila, t, c0, v );
   
@@ -35,7 +35,7 @@ public:
     CPPUNIT_ASSERT(!fila->proximo);
 
     t = 11000;
-    v = zero;
+    v = VAL_0;
     Componente c1 = novoComponente( (char*)"entrada_componente_1", input );
 
     insereEvento( &fila, t, c1, v );
@@ -67,7 +67,7 @@ public:
 
     Tempo t = (Tempo)5000;
     Componente c0 = novoComponente( (char*)"wire_component_0", wire );
-    ValorLogico v = um;
+    ValorLogico v = VAL_1;
 
     insereEvento( &fila, t, c0, v );
     CPPUNIT_ASSERT(fila);
@@ -82,12 +82,12 @@ public:
     CPPUNIT_ASSERT( ! getTransicoesEm(fila, (Tempo)15000 ) );
 
     Componente c1 = novoComponente( (char*)"wire_component_1", wire );
-    insereEvento( &fila, (Tempo)7000, c1, zero );
+    insereEvento( &fila, (Tempo)7000, c1, VAL_0 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
 
     Componente c2 = novoComponente( (char*)"wire_component_2", wire );
-    insereEvento( &fila, (Tempo)5550, c2, um );
+    insereEvento( &fila, (Tempo)5550, c2, VAL_1 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
     CPPUNIT_ASSERT(fila->proximo->proximo);

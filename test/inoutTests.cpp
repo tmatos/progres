@@ -85,8 +85,8 @@ public:
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].duracaoTotal );
 
-    CPPUNIT_ASSERT_EQUAL( x, inputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( x, inputs->lista[1].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[0].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[1].pulsos[0].valor );
   }
 
   void test_carregaEntradas_file_badinput_0_in()

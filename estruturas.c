@@ -130,7 +130,7 @@ Componente novoComponente(char* nome, t_operador porta) {
 
     strcpy(c->nome, nome);
     c->tipo.operador = porta;
-    c->tipo.atraso = 0; // atraso default é zero
+    c->tipo.atraso = 0; // atraso default ï¿½ zero
 
     c->listaEntrada = novaListaComponente();
     c->sinalEntrada = NULL;
@@ -138,7 +138,7 @@ Componente novoComponente(char* nome, t_operador porta) {
     c->listaSaida = novaListaComponente();
     c->sinalSaida = NULL;
 
-    c->valorDinamico = x;
+    c->valorDinamico = VAL_X;
 
     return c;
 }

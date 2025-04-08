@@ -78,7 +78,7 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         t = 0;
 
         p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
-        while(p->valor != nulo)
+        while(p->valor != VAL_BLANK)
         {
             insereEvento(&fila,
                          t,
@@ -92,10 +92,10 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
         insereEvento(&fila,
                      t,
                      circuto->listaFiosEntrada->itens[i],
-                     x); // este sinal fica ate infitito
+                     VAL_X); // este sinal fica ate infitito
     }
 
-    // ATENCAO: Sabemos que todos os componentes sao inicializados com o valorDinamico em xis
+    // ATENCAO: Sabemos que todos os componentes sao inicializados com o valorDinamico em X
 
     // A partir daqui, ocorre a simulacao propriamente dita, usado fila de eventos
     t = 0;
@@ -211,64 +211,64 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
 
 ValorLogico computeNotGate(ValorLogico input)
 {
-    if(input == x)
-        return x;
+    if(input == VAL_X)
+        return VAL_X;
     
-    if(input == zero)
-        return um;
+    if(input == VAL_0)
+        return VAL_1;
     
-    if(input == um)
-        return zero;
+    if(input == VAL_1)
+        return VAL_0;
     
-    return z;
+    return VAL_Z;
 }
 
 ValorLogico computeXorGate(ValorLogico a, ValorLogico b)
 {
-    if(a == x || b == x)
-        return x;
+    if(a == VAL_X || b == VAL_X)
+        return VAL_X;
 
-    if(a == z || b == z)
-        return z;
+    if(a == VAL_Z || b == VAL_Z)
+        return VAL_Z;
 
-    if( (a == um && b == zero) || (a == zero && b == um) )
-        return um;
+    if( (a == VAL_1 && b == VAL_0) || (a == VAL_0 && b == VAL_1) )
+        return VAL_1;
 
-    return zero;
+    return VAL_0;
 }
 
 ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
 {
-    if(a == x || b == x)
-        return x;
+    if(a == VAL_X || b == VAL_X)
+        return VAL_X;
 
-    if(a == z || b == z)
-        return z;
+    if(a == VAL_Z || b == VAL_Z)
+        return VAL_Z;
 
-    if( (a == um && b == um) || (a == zero && b == zero) )
-        return um;
+    if( (a == VAL_1 && b == VAL_1) || (a == VAL_0 && b == VAL_0) )
+        return VAL_1;
 
-    return zero;
+    return VAL_0;
 }
 
 ValorLogico computeOrGate(ListaComponente* inputs)
 {
     int j;
     ValorLogico input_at_j;
-    ValorLogico out = zero;
+    ValorLogico out = VAL_0;
     
     // computa o valor da operacao or sobre todas as entradas
     for( j=0 ; j < inputs->tamanho ; j++ )
     {
         input_at_j = inputs->itens[j]->valorDinamico;
 
-        if(input_at_j == x || input_at_j == z) {
+        if(input_at_j == VAL_X || input_at_j == VAL_Z) {
             out = input_at_j;
             break;
         }
 
-        if(input_at_j == um) {
-            out = um;
+        if(input_at_j == VAL_1) {
+            out = VAL_1;
             break;
         }
     }
@@ -280,20 +280,20 @@ ValorLogico computeAndGate(ListaComponente* inputs)
 {
     int j;
     ValorLogico input_at_j;
-    ValorLogico out = um;
+    ValorLogico out = VAL_1;
 
     // computa o valor da operacao and sobre todas as entradas
     for( j=0 ; j < inputs->tamanho ; j++ )
     {
         input_at_j = inputs->itens[j]->valorDinamico;
 
-        if(input_at_j == x || input_at_j == z) {
+        if(input_at_j == VAL_X || input_at_j == VAL_Z) {
             out = input_at_j;
             break;
         }
 
-        if(input_at_j == zero) {
-            out = zero;
+        if(input_at_j == VAL_0) {
+            out = VAL_0;
             break;
         }
     }
@@ -305,9 +305,9 @@ ValorLogico computeNorGate(ListaComponente* inputs)
 {
     ValorLogico out = computeOrGate(inputs);
 
-    // fazemos a negativa do resultado se este for diferente de x e z
-    if( (out != x) && (out != z) ) {
-        out = (out == zero) ? um : zero;
+    // fazemos a negativa do resultado se este for diferente de X e Z
+    if( (out != VAL_X) && (out != VAL_Z) ) {
+        out = (out == VAL_0) ? VAL_1 : VAL_0;
     }
 
     return out;
@@ -317,9 +317,9 @@ ValorLogico computeNandGate(ListaComponente* inputs)
 {
     ValorLogico out = computeAndGate(inputs);
 
-    // fazemos a negativa do resultado se este for diferente de x e z
-    if( (out != x) && (out != z) ) {
-        out = (out == zero) ? um : zero;
+    // fazemos a negativa do resultado se este for diferente de X e Z
+    if( (out != VAL_X) && (out != VAL_Z) ) {
+        out = (out == VAL_0) ? VAL_1 : VAL_0;
     }
 
     return out;

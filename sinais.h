@@ -11,12 +11,12 @@
 
 /** @brief Valor lógico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
  */
-typedef enum en_valor {
-    zero = 0,
-    um = 1,
-    x,
-    z,
-    nulo
+typedef enum en_logic_value {
+    VAL_0 = 0,
+    VAL_1 = 1,
+    VAL_X = 2,
+    VAL_Z = 3,
+    VAL_BLANK
 } ValorLogico;
 
 /** @brief Unidades de tempo disponíveis para a duração de um pulso.
