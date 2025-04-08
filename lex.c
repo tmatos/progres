@@ -184,6 +184,32 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
         tc = KW_MODULE;
     else if( iguais(tok, "endmodule") )
         tc = KW_ENDMODULE;
+    else if( iguais(tok, "initial") )
+        tc = KW_INITIAL;
+    else if( iguais(tok, "begin") )
+        tc = KW_BEGIN;
+    else if( iguais(tok, "end") )
+        tc = KW_END;
+    else if( iguais(tok, ",") )
+        tc = SYM_COMMA;
+    else if( iguais(tok, ":") )
+        tc = SYM_COLON;
+    else if( iguais(tok, ";") )
+        tc = SYM_SEMICOLON;
+    else if( iguais(tok, "(") )
+        tc = SYM_OPEN_BRACKET;
+    else if( iguais(tok, ")") )
+        tc = SYM_CLOSE_BRACKET;
+    else if( iguais(tok, "[") )
+        tc = SYM_OPEN_SQUAREBRACKET;
+    else if( iguais(tok, "]") )
+        tc = SYM_CLOSE_SQUAREBRACKET;
+    else if( iguais(tok, "{") )
+        tc = SYM_OPEN_BRACE;
+    else if( iguais(tok, "}") )
+        tc = SYM_CLOSE_BRACE;
+    else if( iguais(tok, "#") )
+        tc = SYM_HASHTAG;
 
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 
