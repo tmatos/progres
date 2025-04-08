@@ -178,6 +178,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
     porta = NULL;
 
+    // process body of the module until it ends
     while(1)
     {
         if( it->classe == KW_INPUT
@@ -270,6 +271,10 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
                 avanca(&it);
             }
+        }
+        else if( it->classe == KW_REG ) {
+            exibeMsgErro("Registradores ainda nao sao suportados", -1, -1, NULL, NULL);
+            return NULL;
         }
         else if( isPortaLogica(it->valor) ) {
             porta = NULL;

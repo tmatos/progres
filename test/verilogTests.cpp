@@ -14,6 +14,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_fileEmpty );
   CPPUNIT_TEST( test_carregaCircuito_fileTop_module );
   CPPUNIT_TEST( test_carregaCircuito_fileTudo_module );
+  CPPUNIT_TEST( test_carregaCircuito_reg_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
   CPPUNIT_TEST_SUITE_END();
 
@@ -65,6 +66,16 @@ public:
     circuit = carregaCircuito(arquivo);
     CPPUNIT_ASSERT( circuit );
     fclose(arquivo);
+  }
+
+  void test_carregaCircuito_reg_v()
+  {
+    t_circuito* circuit = NULL;
+    FILE* file = fopen("./verilog_sample_src/reg.v", "r");
+    CPPUNIT_ASSERT( file );
+    circuit = carregaCircuito(file);
+    CPPUNIT_ASSERT( !circuit ); // reg is not supported yet
+    fclose(file);
   }
 
   void test_carregaCircuito_badverilog_XX_v()
