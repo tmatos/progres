@@ -282,7 +282,7 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
                     lst->tamanho--;
                     continue;
                 }
-                else { // lista com um unico item e que ser� removido
+                else { // lista com um unico item e que sera removido
                     tmp = it;
                     lst->primeiro = NULL;
                     lst->ultimo = NULL;
@@ -343,7 +343,7 @@ int isSimbolo(char c)
 
 void exibeListaDeToken(ListaToken* tokens)
 {
-    Token *it = NULL;
+    Token* it = NULL;
 
     printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
 
@@ -358,7 +358,7 @@ void exibeListaDeToken(ListaToken* tokens)
 
 int identExiste(ListaToken* lst, char* str)
 {
-    Token *it = NULL;
+    Token* it = NULL;
 
     int retorno = 0;
 
@@ -437,17 +437,17 @@ int isIdentificador(Token* tk)
     return 1;
 }
 
-ListaToken* tokeniza(FILE *arquivo)
+ListaToken* tokeniza(FILE* arquivo)
 {
     int linha = 1; // contador para linha corrente do arquivo
     int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
-    int erro = 0; // flag de erro, encerra a an�lise
-    int fim = 0; // flag para indicar o t�rmino da an�lise
+    int erro = 0; // flag de erro, encerra a analise
+    int fim = 0; // flag para indicar o termino da analise
 
     char c = '\0'; // usado para leitura de um caraceter
-    char *tok; // usado para a leitura de uma string que representa um token
+    char* tok; // usado para a leitura de uma string que representa um token
 
-    ListaToken *tokens = novaListaToken();
+    ListaToken* tokens = novaListaToken();
 
     tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
@@ -500,7 +500,7 @@ ListaToken* tokeniza(FILE *arquivo)
                 c = fgetc(arquivo);
 
                 while(1) {
-                    M: //Label para a parte de comentario de multiplas linhas
+                    M: // Label para a parte de comentario de multiplas linhas
 
                     if(c == EOF)
                         goto encerrar;
@@ -541,7 +541,7 @@ ListaToken* tokeniza(FILE *arquivo)
             c = fgetc(arquivo);
 
             while(1) {
-                // S
+                // S: captura de strings literais
                 if(c == EOF) {
                     insereTokenString(tokens, tok, linha, coluna - strlen(tok));
                     goto encerrar;
@@ -612,9 +612,10 @@ ListaToken* tokeniza(FILE *arquivo)
                             coluna++;
                             anexa(tok, c);
 
-                            // verificar tamanho m�ximo de palavra
+                            // verificar tamanho maximo de palavra
                             if( strlen(tok) > MAX_TOKEN_SIZE ) {
-                                exibeMsgErro("Token excede o tamanho maximo permitido", linha, coluna - strlen(tok), NULL, NULL);
+                                exibeMsgErro("Token excede o tamanho maximo permitido",
+                                             linha, coluna - strlen(tok), NULL, NULL);
                                 goto encerrar;
                             }
 
@@ -662,8 +663,7 @@ int apenasDigitos(char* str)
 
     for( i=0 ; i < strlen(str) ; i++ )
     {
-        if( !isdigit(str[i]) )
-        {
+        if( !isdigit(str[i]) ) {
             retorno = 0;
             break;
         }
@@ -677,9 +677,8 @@ int isNumNaturalValido(char* str)
     if(!str)
         return 0;
 
-    // importante n�o ser um valor muito grande, esses numeros
-    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) )
-    {
+    // importante nao ser um valor muito grande, esses numeros
+    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) ) {
         return 0;
     }
 
