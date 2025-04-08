@@ -21,6 +21,7 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_tokeniza_top_v );
   CPPUNIT_TEST( test_tokeniza_tudo_v );
   CPPUNIT_TEST( test_tokeniza_multiline_v );
+  CPPUNIT_TEST( test_tokeniza_strings_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -28,7 +29,6 @@ public:
   void test_novaListaToken()
   {
     ListaToken* l = novaListaToken();
-
     CPPUNIT_ASSERT(l);
     CPPUNIT_ASSERT( ! l->primeiro );
     CPPUNIT_ASSERT( ! l->ultimo );
@@ -76,10 +76,7 @@ public:
     int n = 26;
     char simbolos[n] = "(),;:{}[]?=<>~&|!+-*/#@$\"\'";
 
-    int i = 0;
-
-    for( i=0 ; i<n ; i++ )
-    {
+    for( int i=0 ; i<n ; i++ ) {
       CPPUNIT_ASSERT( isSimbolo(simbolos[i]) );
     }
 
@@ -276,14 +273,25 @@ public:
     exibeListaDeToken(lt);
   }
 
+  void test_tokeniza_strings_v()
+  {
+    std::list<std::string> tokens_esperados = {
+      "module", "strings", "(", ")", ";",
+      "reg", "[", "255", ":", "0", "]", "str1", ";",
+      "initial", "begin",
+      "str1", "=", "\"Hello\n world\"", ";",
+      "end",
+      "endmodule" };
+
+    helper_test_tokeniza("./verilog_sample_src/strings.v", tokens_esperados);
+  }
+
   ListaToken* helper_test_tokeniza(const char* file_path, const std::list<std::string>& tokens_esperados)
   {
     FILE* arquivo = fopen(file_path, "r");
-
     CPPUNIT_ASSERT(arquivo);
 
     ListaToken* tokens = tokeniza(arquivo);
-
     CPPUNIT_ASSERT(tokens);
 
     CPPUNIT_ASSERT_EQUAL( (size_t)tokens_esperados.size(), (size_t)tokens->tamanho );
