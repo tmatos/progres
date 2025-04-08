@@ -147,27 +147,61 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
 
 int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
 {
-    Token* novo = (Token*) xmalloc(sizeof(Token));
+    Token* newtok = (Token*) xmalloc(sizeof(Token));
 
-    strcpy(novo->valor, tok);
-    novo->linha = p_linha;
-    novo->coluna = p_coluna;
-    novo->seguinte = NULL;
+    strcpy(newtok->valor, tok);
+    newtok->linha = p_linha;
+    newtok->coluna = p_coluna;
+    newtok->seguinte = NULL;
 
-    // TODO: Preencher o tipo
+    TokenClass tc = _UNKNOWN;
+
+    if( iguais(tok, "and") )
+        tc = KW_AND;
+    else if( iguais(tok, "or") )
+        tc = KW_OR;
+    else if( iguais(tok, "not") )
+        tc = KW_NOT;
+    else if( iguais(tok, "buf") )
+        tc = KW_BUF;
+    else if( iguais(tok, "nand") )
+        tc = KW_NAND;
+    else if( iguais(tok, "nor") )
+        tc = KW_NOR;
+    else if( iguais(tok, "xor") )
+        tc = KW_XOR;
+    else if( iguais(tok, "xnor") )
+        tc = KW_XNOR;
+    else if( iguais(tok, "input") )
+        tc = KW_INPUT;
+    else if( iguais(tok, "output") )
+        tc = KW_OUTPUT;
+    else if( iguais(tok, "wire") )
+        tc = KW_WIRE;
+    else if( iguais(tok, "reg") )
+        tc = KW_REG;
+    else if( iguais(tok, "module") )
+        tc = KW_MODULE;
+    else if( iguais(tok, "endmodule") )
+        tc = KW_ENDMODULE;
+
+    // TODO: Preencher classe do token para todas elas, nao apenas estas acima
+
+    newtok->classe = tc;
+
     // TODO: Checagens...
 
     if(lista->tamanho == 0) {
-        lista->primeiro = novo;
-        lista->ultimo = novo;
+        lista->primeiro = newtok;
+        lista->ultimo = newtok;
     }
     else if(lista->tamanho == 1) {
-        lista->primeiro->seguinte = novo;
-        lista->ultimo = novo;
+        lista->primeiro->seguinte = newtok;
+        lista->ultimo = newtok;
     }
     else {
-        lista->ultimo->seguinte = novo;
-        lista->ultimo = novo;
+        lista->ultimo->seguinte = newtok;
+        lista->ultimo = newtok;
     }
 
     lista->tamanho++;
@@ -222,7 +256,7 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
                     lst->tamanho--;
                     continue;
                 }
-                else { // lista com um unico item e que será removido
+                else { // lista com um unico item e que serï¿½ removido
                     tmp = it;
                     lst->primeiro = NULL;
                     lst->ultimo = NULL;
@@ -381,8 +415,8 @@ ListaToken* tokeniza(FILE *arquivo)
 {
     int linha = 1; // contador para linha corrente do arquivo
     int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
-    int erro = 0; // flag de erro, encerra a análise
-    int fim = 0; // flag para indicar o término da análise
+    int erro = 0; // flag de erro, encerra a anï¿½lise
+    int fim = 0; // flag para indicar o tï¿½rmino da anï¿½lise
 
     char c = '\0'; // usado para leitura de um caraceter
     char *tok; // usado para a leitura de uma string que representa um token
@@ -552,7 +586,7 @@ ListaToken* tokeniza(FILE *arquivo)
                             coluna++;
                             anexa(tok, c);
 
-                            // verificar tamanho máximo de palavra
+                            // verificar tamanho mï¿½ximo de palavra
                             if( strlen(tok) > MAX_TOKEN_SIZE ) {
                                 exibeMsgErro("Token excede o tamanho maximo permitido", linha, coluna - strlen(tok), NULL, NULL);
                                 goto encerrar;
@@ -617,7 +651,7 @@ int isNumNaturalValido(char* str)
     if(!str)
         return 0;
 
-    // importante não ser um valor muito grande, esses numeros
+    // importante nï¿½o ser um valor muito grande, esses numeros
     if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) )
     {
         return 0;
