@@ -101,7 +101,8 @@ void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor
 Transicao* getTransicoesEm(Evento* fila, Tempo t)
 {
     Evento* it = fila; // iterador de evento
-    while( (it->quando < t) && it ) {
+    
+    while( it && (it->quando < t)  ) {
         it = it->proximo;
     }
 
