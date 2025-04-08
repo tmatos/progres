@@ -1,6 +1,6 @@
 /**
  * @file estruturas.h
- * @brief Prototipos das estruturas de dados chave do simulador.
+ * @brief Prot√≥tipos das estruturas de dados chave do simulador.
  */
 
 #ifndef ESTRUTURAS_H
@@ -9,7 +9,7 @@
 
 #include "sinais.h"
 
-/** @brief EnumeraÁ„o para o definir as classes de componente do circuito de acordo com suas funÁıes.
+/** @brief Enumera√ß√£o para o definir as classes de componente do circuito de acordo com suas fun√ß√µes.
  */
 typedef enum en_operador {
     op_and,
@@ -25,7 +25,7 @@ typedef enum en_operador {
     input
 } t_operador;
 
-/** @brief Estrutura que define a porta. Qual sua funÁ„o lÛgica e seu delay.
+/** @brief Estrutura que define a porta. Qual sua fun√ß√£o l√≥gica e seu delay.
  */
 typedef struct st_tipo {
     t_operador operador;
@@ -36,7 +36,7 @@ typedef struct st_componente_list ListaComponente;
 
 typedef struct st_componente * Componente;
 
-/** @brief Estrutura que representa um componente do circuito (uma porta lÛgica)
+/** @brief Estrutura que representa um componente do circuito (uma porta l√≥gica)
  */
 struct st_componente {
     char nome[16];
@@ -52,86 +52,86 @@ struct st_componente {
 };
 
 /** @brief Estrutura que representa uma lista de componentes.
-            Na verdade ela guarda o total e um array de ponteiros para as portas.
+           Na verdade ela guarda o total e um array de ponteiros para as portas.
  */
 struct st_componente_list {
     int tamanho;
-    Componente *itens;
+    Componente* itens;
 };
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'
  */
 typedef struct st_circuito {
-    ListaComponente *listaFiosEntrada;
-    Sinais *sinaisEntrada;
+    ListaComponente* listaFiosEntrada;
+    Sinais* sinaisEntrada;
 
-    ListaComponente *listaFiosSaida;
-    Sinais *sinaisSaida;
+    ListaComponente* listaFiosSaida;
+    Sinais* sinaisSaida;
 
-    ListaComponente *listaWires;
+    ListaComponente* listaWires;
 
-    ListaComponente *listaPortas;
+    ListaComponente* listaPortas;
 } t_circuito;
 
-/** @brief InicializaÁ„o de uma estrutura de circuito
+/** @brief Inicializa√ß√£o de uma estrutura de circuito
  */
 t_circuito* novoCircuito();
 
-/** @brief Adiciona a entrada representada por comp ‡ lista de fios de entrada do circuito
+/** @brief Adiciona a entrada representada por comp √† lista de fios de entrada do circuito
  */
 void adicionaEntrada(t_circuito* circ, Componente comp);
 
-/** @brief Adiciona a saÌda representada por comp ‡ lista de fios de saÌda do circuito
+/** @brief Adiciona a sa√≠da representada por comp √† lista de fios de sa√≠da do circuito
  */
 void adicionaSaida(t_circuito* circ, Componente comp);
 
-/** @brief Adiciona o fio representada por comp ‡ lista de fios (wires) do circuito
+/** @brief Adiciona o fio representada por comp √† lista de fios (wires) do circuito
  */
 void adicionaWire(t_circuito* circ, Componente comp);
 
-/** @brief Adiciona a porta lÛgica representada por comp ‡ lista de portas do circuito
+/** @brief Adiciona a porta l√≥gica representada por comp √† lista de portas do circuito
  */
 void adicionaPorta(t_circuito* circ, Componente comp);
 
 /** @brief Retorna a porta que tem o nome indicado, se houver na lista de portas do circuito
  */
-Componente getPortaPorNome(t_circuito* circ, char* nome);
+Componente getPortaPorNome(t_circuito* circ, const char* nome);
 
 /** @brief Retorna o wire que tem o nome indicado, se houver.
  */
-Componente getWirePorNome(t_circuito* circ, char* nome);
+Componente getWirePorNome(t_circuito* circ, const char* nome);
 
 /** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito
  */
-Componente getInputPorNome(t_circuito* circ, char* nome);
+Componente getInputPorNome(t_circuito* circ, const char* nome);
 
-/** @brief Retorna a saÌda que tem o nome indicado, se houver na lista de fios de saÌda do circuito
+/** @brief Retorna a sa√≠da que tem o nome indicado, se houver na lista de fios de sa√≠da do circuito
  */
-Componente getOutputPorNome(t_circuito* circ, char* nome);
+Componente getOutputPorNome(t_circuito* circ, const char* nome);
 
-/** @brief InicializaÁ„o de uma estrutura de componente.
- *  @return Um tipo Componente que È um ponteiro para a struc.
+/** @brief Inicializa√ß√£o de uma estrutura de componente.
+ *  @return Um tipo Componente que √© um ponteiro para a struc.
  */
-Componente novoComponente(char* nome, t_operador porta);
+Componente novoComponente(const char* nome, t_operador porta);
 
-/** @brief Inicializa a estrutura de lista de componentes vazia
+/** @brief Inicializa a estrutura de lista de componentes vazia.
  */
 ListaComponente* novaListaComponente();
 
-/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado
+/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado.
  */
 ListaComponente* novaListaComponenteTamanho(int tamanho);
 
-/** @brief Insere o componente na lista de componentes
+/** @brief Insere o componente na lista de componentes.
  */
 void insereComponente(ListaComponente* ls, Componente cp);
 
-/** @brief Retorna verdadeiro se o componente indicado est· contido na lista
+/** @brief Retorna verdadeiro se o componente indicado est√° contido na lista.
  */
 int contemComponente(ListaComponente* ls, Componente cp);
 
 /** @brief Retorna o componente da lista indica que possui o referido nome, se houver.
  */
-Componente getComponenteItemPorNome(ListaComponente* ls, char* nome);
+Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome);
 
 #endif // ESTRUTURAS_H

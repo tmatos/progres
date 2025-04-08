@@ -125,7 +125,7 @@ int contemComponente(ListaComponente* ls, Componente cp)
     return 0;
 }
 
-Componente novoComponente(char* nome, t_operador porta) {
+Componente novoComponente(const char* nome, t_operador porta) {
     Componente c = (Componente) xmalloc(sizeof(struct st_componente));
 
     strcpy(c->nome, nome);
@@ -143,7 +143,7 @@ Componente novoComponente(char* nome, t_operador porta) {
     return c;
 }
 
-Componente getComponenteItemPorNome(ListaComponente* ls, char* nome)
+Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
 {
     int i;
 
@@ -161,7 +161,7 @@ Componente getComponenteItemPorNome(ListaComponente* ls, char* nome)
     return NULL;
 }
 
-Componente getPortaPorNome(t_circuito* circ, char* nome)
+Componente getPortaPorNome(t_circuito* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -169,7 +169,7 @@ Componente getPortaPorNome(t_circuito* circ, char* nome)
     return getComponenteItemPorNome(circ->listaPortas, nome);
 }
 
-Componente getWirePorNome(t_circuito* circ, char* nome)
+Componente getWirePorNome(t_circuito* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -177,7 +177,7 @@ Componente getWirePorNome(t_circuito* circ, char* nome)
     return getComponenteItemPorNome(circ->listaWires, nome);
 }
 
-Componente getInputPorNome(t_circuito* circ, char* nome)
+Componente getInputPorNome(t_circuito* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -185,7 +185,7 @@ Componente getInputPorNome(t_circuito* circ, char* nome)
     return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
 }
 
-Componente getOutputPorNome(t_circuito* circ, char* nome)
+Componente getOutputPorNome(t_circuito* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
