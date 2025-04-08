@@ -82,90 +82,91 @@ t_circuito* carregaCircuito(FILE* arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo nao esperado. Era esperado '('",
+        exibeMsgErro("Final do arquivo nao esperado. Era esperado '(' ou ';'",
                      -1, -1, NULL, NULL);
         return NULL;
     }
-    else if( it->classe != SYM_OPEN_BRACKET ) {
-        // se it->valor nao eh '(', pare
+    else if( it->classe != SYM_OPEN_BRACKET && it->classe != SYM_SEMICOLON) {
+        // se it->valor nao eh '(' ou ';', pare
         exibeMsgErro("Simbolo esperado nao foi encontrado",
-                     it->linha, it->coluna, "(", it->valor);
+                     it->linha, it->coluna, "( ou ;", it->valor);
         return NULL;
     }
 
-    avanca(&it);
+    if( it->classe == SYM_OPEN_BRACKET ) {
+        // devemos agora ler os parametros do modulo
+        avanca(&it);
 
-    // devemos agora ler os parametros do modulo
+        virgula = 0; // nao esperando por virgula, por enquanto
 
-    virgula = 0; // nao esperando por virgula, por enquanto
+        while(1)
+        {
+            if(!it) {
+                if(virgula) {
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula",
+                                -1, -1, NULL, NULL);
+                }
+                else {
+                    exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido ou ')'",
+                                -1, -1, NULL, NULL);
+                }
 
-    while(1)
-    {
-        if(!it) {
+                return NULL;
+            }
+
+            if( it->classe == SYM_CLOSE_BRACKET ) {
+                // it->valor eh ')'
+                break;
+            }
+
             if(virgula) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula",
-                             -1, -1, NULL, NULL);
+                if( it->classe == SYM_COMMA ) {
+                    virgula = 0;
+                    avanca(&it);
+                    continue;
+                    // TODO: bug de virgula a mais...
+                }
+                else {
+                    exibeMsgErro("Simbolo esperado nao foi encontrado",
+                                it->linha, it->coluna, "uma virgula ou )", it->valor);
+                    return NULL;
+                }
+            }
+
+            if( isIdentificador(it) ) {
+                if( identExiste(identificadores, it->valor) ) {
+                    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
+                        it->linha, it->coluna, it->valor);
+                    return NULL;
+                }
+                else {
+                    insereTokenString(identificadores, it->valor, -1, -1);
+                    insereTokenString(identificLivre, it->valor, -1, -1);
+                    virgula = 1;
+                }
             }
             else {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido ou ')'",
-                             -1, -1, NULL, NULL);
-            }
-
-            return NULL;
-        }
-
-        if( it->classe == SYM_CLOSE_BRACKET ) {
-            // it->valor eh ')'
-            break;
-        }
-
-        if(virgula) {
-            if( it->classe == SYM_COMMA ) {
-                virgula = 0;
-                avanca(&it);
-                continue;
-                // TODO: bug de virgula a mais...
-            }
-            else {
-                exibeMsgErro("Simbolo esperado nao foi encontrado",
-                             it->linha, it->coluna, "uma virgula ou )", it->valor);
+                exibeMsgErro("Identificador nao foi encontrado",
+                            it->linha, it->coluna, "um identificador", it->valor);
                 return NULL;
             }
-        }
 
-        if( isIdentificador(it) ) {
-            if( identExiste(identificadores, it->valor) ) {
-                printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-                       it->linha, it->coluna, it->valor);
-                return NULL;
-            }
-            else {
-                insereTokenString(identificadores, it->valor, -1, -1);
-                insereTokenString(identificLivre, it->valor, -1, -1);
-                virgula = 1;
-            }
-        }
-        else {
-            exibeMsgErro("Identificador nao foi encontrado",
-                         it->linha, it->coluna, "um identificador", it->valor);
-            return NULL;
+            avanca(&it);
         }
 
         avanca(&it);
-    }
 
-    avanca(&it);
+        if(!it) {
+            exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
+                        -1, -1, NULL, NULL);
+            return NULL;
+        }
 
-    if(!it) {
-        exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
-                     -1, -1, NULL, NULL);
-        return NULL;
-    }
-
-    if( it->classe != SYM_SEMICOLON ) {
-        exibeMsgErro("Simbolo esperado nao foi encontrado",
-                     it->linha, it->coluna, ";", it->valor);
-        return NULL;
+        if( it->classe != SYM_SEMICOLON ) {
+            exibeMsgErro("Simbolo esperado nao foi encontrado",
+                        it->linha, it->coluna, ";", it->valor);
+            return NULL;
+        }
     }
 
     avanca(&it);
