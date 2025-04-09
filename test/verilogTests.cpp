@@ -132,7 +132,12 @@ public:
       "./verilog_sample_src/badverilog_39.v",
       "./verilog_sample_src/badverilog_40.v",
       "./verilog_sample_src/badverilog_41.v",
-      "./verilog_sample_src/badverilog_42.v"
+      "./verilog_sample_src/badverilog_42.v",
+      "./verilog_sample_src/badverilog_43.v",
+      "./verilog_sample_src/badverilog_44.v",
+      "./verilog_sample_src/badverilog_45.v",
+      "./verilog_sample_src/badverilog_46.v",
+      "./verilog_sample_src/badverilog_47.v"
     };
 
     t_circuito* circuit = NULL;
