@@ -134,7 +134,7 @@ void exibeListaDeToken(ListaToken* tokens);
 
 /** @brief Retorna verdadeiro se duas strings são iguais.
  */
-int iguais(char* a, char* b);
+int iguais(const char* a, const char* b);
 
 /** @brief Avanca o iterador de token para o próximo da lista.
  *  @param t Um ponteiro para um ponteiro de um Token.
@@ -159,7 +159,7 @@ int isIdentificador(Token* tk);
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se str é o valor de algum Token em lst, falso caso contrário.
  */
-int identExiste(ListaToken* lst, char* str);
+int identExiste(ListaToken* lst, const char* str);
 
 /** @brief Cria uma lista de Tokens que tem significado para o processamento
             sintatico, a partir do arquivo com o codigo fonte em Verilog.
@@ -172,13 +172,13 @@ ListaToken* tokeniza(FILE *arquivo);
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
  */
-int apenasDigitos(char* str);
+int apenasDigitos(const char* str);
 
 /** @brief Verifica se uma string contém um número que pode ser convertido.
             Mais especeificamente, se é um natural menor que 10000.
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se pode ser convertido.
  */
-int isNumNaturalValido(char* str);
+int isNumNaturalValido(const char* str);
 
 #endif // LEX_H

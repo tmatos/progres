@@ -356,7 +356,7 @@ void exibeListaDeToken(ListaToken* tokens)
     printf("\n");
 }
 
-int identExiste(ListaToken* lst, char* str)
+int identExiste(ListaToken* lst, const char* str)
 {
     Token* it = NULL;
 
@@ -382,7 +382,7 @@ int identExiste(ListaToken* lst, char* str)
     return retorno;
 }
 
-int iguais(char* a, char* b)
+int iguais(const char* a, const char* b)
 {
     return !strcmp(a, b);
 }
@@ -653,7 +653,7 @@ ListaToken* tokeniza(FILE* arquivo)
     return tokens;
 }
 
-int apenasDigitos(char* str)
+int apenasDigitos(const char* str)
 {
     int i;
     int retorno = 1;
@@ -672,7 +672,7 @@ int apenasDigitos(char* str)
     return retorno;
 }
 
-int isNumNaturalValido(char* str)
+int isNumNaturalValido(const char* str)
 {
     if(!str)
         return 0;

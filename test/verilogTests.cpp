@@ -74,7 +74,13 @@ public:
     FILE* file = fopen("./verilog_sample_src/reg.v", "r");
     CPPUNIT_ASSERT( file );
     circuit = carregaCircuito(file);
-    CPPUNIT_ASSERT( !circuit ); // reg is not supported yet
+    CPPUNIT_ASSERT( circuit );
+    CPPUNIT_ASSERT( circuit->listaReg.total == 5 );
+    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[0]->name, "ra") );
+    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[1]->name, "rb") );
+    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[2]->name, "rc") );
+    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[3]->name, "rd") );
+    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[4]->name, "r_flag") );
     fclose(file);
   }
 
@@ -126,7 +132,12 @@ public:
       "./verilog_sample_src/badverilog_39.v",
       "./verilog_sample_src/badverilog_40.v",
       "./verilog_sample_src/badverilog_41.v",
-      "./verilog_sample_src/badverilog_42.v"
+      "./verilog_sample_src/badverilog_42.v",
+      "./verilog_sample_src/badverilog_43.v",
+      "./verilog_sample_src/badverilog_44.v",
+      "./verilog_sample_src/badverilog_45.v",
+      "./verilog_sample_src/badverilog_46.v",
+      "./verilog_sample_src/badverilog_47.v"
     };
 
     t_circuito* circuit = NULL;
