@@ -59,7 +59,22 @@ struct st_componente_list {
     Componente* itens;
 };
 
-/** @brief Estrutura que representa um circuito, mais especificamente um 'module'
+/** @brief Representação de um registrador.
+ */
+typedef struct st_reg {
+    char name[32];
+    unsigned int size; // size in bits
+    unsigned int value; // stored binary value
+} Register;
+
+/** @brief Estrutura para a lista de registradores de um module.
+ */
+typedef struct st_list_reg {
+    int total;
+    Register** itens;
+} ListaReg;
+
+/** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
  */
 typedef struct st_circuito {
     ListaComponente* listaFiosEntrada;
@@ -71,11 +86,18 @@ typedef struct st_circuito {
     ListaComponente* listaWires;
 
     ListaComponente* listaPortas;
+
+    ListaReg listaReg;
 } t_circuito;
 
-/** @brief Inicialização de uma estrutura de circuito
+/** @brief Inicialização de uma estrutura de circuito.
  */
 t_circuito* novoCircuito();
+
+/** @brief Inserir um registrador novo no circuito.
+ *         `size`é o tamanho em bits.
+ */
+void addRegister(t_circuito* circ, const char* name, unsigned int size);
 
 /** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
  */

@@ -273,8 +273,43 @@ t_circuito* carregaCircuito(FILE* arquivo)
             }
         }
         else if( it->classe == KW_REG ) {
-            exibeMsgErro("Registradores ainda nao sao suportados", -1, -1, NULL, NULL);
-            return NULL;
+            avanca(&it);
+
+            if(!it) {
+               exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
+               return NULL;
+            }
+
+            if( !isIdentificador(it) ) {
+                exibeMsgErro("Identificador nao foi encontrado",
+                             it->linha, it->coluna, "um identificador", it->valor);
+                return NULL;
+            }
+
+            // verificar se pode utilizar este identificador
+            if( identExiste(identificadores, it->valor) ) {
+                    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
+                           it->linha, it->coluna, it->valor);
+                    return NULL;
+            }
+            
+            // adicionar na lista de identificadores usados
+            insereTokenString(identificadores, it->valor, -1, -1);
+
+            addRegister(circuito, it->valor, 1);
+
+            avanca(&it);
+
+            if(!it) {
+               exibeMsgErro("Final do arquivo nao esperado", -1, -1, NULL, NULL);
+               return NULL;
+            }
+
+            if(it->classe != SYM_SEMICOLON) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado",
+                             it->linha, it->coluna, ";", it->valor);
+                return NULL;
+            }
         }
         else if( isPortaLogica(it->valor) ) {
             porta = NULL;

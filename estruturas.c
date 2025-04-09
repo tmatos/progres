@@ -30,6 +30,9 @@ t_circuito* novoCircuito()
 
     circuito->listaPortas = novaListaComponente();
 
+    circuito->listaReg.total = 0;
+    circuito->listaReg.itens = NULL;
+
     return circuito;
 }
 
@@ -106,6 +109,27 @@ void insereComponente(ListaComponente* ls, Componente cp)
     }
 
     ls->itens[ls->tamanho - 1] = cp;
+}
+
+void addRegister(t_circuito* circ, const char* name, unsigned int size)
+{
+    Register* reg = (Register*) xmalloc(sizeof(Register));
+
+    strcpy(reg->name, name);
+    reg->size = size;
+    reg->value = (unsigned int) VAL_0;
+
+    if(circ->listaReg.total == 0) {
+        circ->listaReg.total++;
+        circ->listaReg.itens = (Register**) xmalloc(sizeof(Register*));
+    }
+    else {
+        circ->listaReg.total++;
+        circ->listaReg.itens = (Register**) xrealloc(circ->listaReg.itens,
+                                                     sizeof(Register*) * circ->listaReg.total);
+    }
+
+    circ->listaReg.itens[circ->listaReg.total - 1] = reg;
 }
 
 int contemComponente(ListaComponente* ls, Componente cp)
