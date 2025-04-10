@@ -139,7 +139,15 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
             itTr = itTr->proximo;
         }
 
-        free(listaTr); // popEvento nao liberou a lista de transicoes, fazemos isso aqui
+        // TODO: extrair esse codigo de liberacao de mem para funcao
+        // popEvento() nao liberou mem da lista de transicoes, fazemos isso aqui
+        Transicao* pt = listaTr;
+        Transicao* pta;
+        while (pt) {
+            pta = pt;
+            pt = pt->proximo;
+            free(pta);
+        }
         listaTr = NULL;
 
         for( i=0 ; i < portasAlteradas->tamanho ; i++ )
