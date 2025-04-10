@@ -205,6 +205,12 @@ Sinais* simula(t_circuito* circuto, Sinais* entradas)
                 break;
             }
         }
+
+        // free mem
+        if(portasAlteradas->tamanho != 0)
+            free(portasAlteradas->itens);
+        free(portasAlteradas);
+        portasAlteradas = NULL;
     }
 
     // copia as saidas da simulacao do ciruito para o retorno da funcao
