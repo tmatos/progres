@@ -132,6 +132,21 @@ void addRegister(t_circuito* circ, const char* name, unsigned int size)
     circ->listaReg.itens[circ->listaReg.total - 1] = reg;
 }
 
+void addParam(t_circuito* circ, Param* param)
+{
+    if(circ->listaParam.total == 0) {
+        circ->listaParam.total++;
+        circ->listaParam.itens = (Param**) xmalloc(sizeof(Param*));
+    }
+    else {
+        circ->listaParam.total++;
+        circ->listaParam.itens = (Param**) xrealloc(circ->listaParam.itens,
+                                                     sizeof(Param*) * circ->listaParam.total);
+    }
+
+    circ->listaParam.itens[circ->listaParam.total - 1] = param;
+}
+
 int contemComponente(ListaComponente* ls, Componente cp)
 {
     int i;

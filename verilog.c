@@ -10,6 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "mem.h"
 #include "erros.h"
 #include "verilog.h"
 #include "estruturas.h"
@@ -39,6 +40,9 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
     // lista de todos os identificadores de wire
     ListaToken* listaWire = novaListaToken();
+
+    // list for params
+    ListaToken* list_param = novaListaToken();
 
     ListaToken* tokens = tokeniza(arquivo);
 
@@ -434,7 +438,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperada um identificador",
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador",
                              -1, -1, NULL, NULL);
                 return NULL;
             }
@@ -533,6 +537,88 @@ t_circuito* carregaCircuito(FILE* arquivo)
             exibeMsgErro("Lamentamos mas o initial ainda nao foi implementado",
                          it->linha, it->coluna, "algum comando", it->valor);
             return NULL;
+        }
+        else if( it->classe == KW_LOCALPARAM ) {
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador",
+                             -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if( !isIdentificador(it) ) {
+                exibeMsgErro("Token inesperado foi encontrado",
+                             it->linha, it->coluna, "um identificador", it->valor);
+                return NULL;
+            }
+    
+            if( identExiste(identificadores, it->valor) ) {
+                printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
+                       it->linha, it->coluna, it->valor);
+                return NULL;
+            }
+
+            if( strlen(it->valor) > MAX_PARAM_NAME_SIZE ) {
+                printf("%d:%d: erro: O identificador '%s' excede o tamanho maximo de %d para parametros.\n",
+                       it->linha, it->coluna, it->valor, MAX_PARAM_NAME_SIZE);
+                return NULL;
+            }
+
+            insereTokenString(identificadores, it->valor, -1, -1);
+            insereTokenString(list_param, it->valor, -1, -1);
+
+            Param* param = (Param*) xmalloc(sizeof(Param));
+            param->is_local = 1;
+            strcpy( param->name, it->valor );
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado: '='",
+                             -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if( it->classe != SYM_EQ ) {
+                exibeMsgErro("Token inesperado foi encontrado",
+                             it->linha, it->coluna, "=", it->valor);
+                return NULL;
+            }
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado: um numero literal",
+                             -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            // TODO: implement for all number types and notations
+            if( !isNumNaturalValido(it->valor) ) {
+                exibeMsgErro("Token inesperado foi encontrado",
+                             it->linha, it->coluna, "um numero", it->valor);
+                return NULL;
+            }
+
+            param->value = atoi(it->valor);
+
+            avanca(&it);
+
+            if(!it) {
+                exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
+                             -1, -1, NULL, NULL);
+                return NULL;
+            }
+
+            if( it->classe != SYM_SEMICOLON ) {
+                exibeMsgErro("Simbolo esperado nao foi encontrado",
+                             it->linha, it->coluna, ";", it->valor);
+                return NULL;
+            }
+
+            // include the param in the circuit struct
+            addParam(circuito, param);
         }
         else {
             exibeMsgErro("Token inesperado foi encontrado",

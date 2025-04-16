@@ -32,6 +32,23 @@ typedef struct st_tipo {
     Tempo atraso;
 } t_tipo;
 
+#define MAX_PARAM_NAME_SIZE 64
+
+/** @brief Estrutura para parametros.
+ */
+typedef struct st_param {
+    char name[MAX_PARAM_NAME_SIZE];
+    int value;
+    int is_local;
+} Param;
+
+/** @brief Estrutura para a lista de parametros de um module.
+ */
+typedef struct st_list_param {
+    int total;
+    Param** itens;
+} ListaParam;
+
 typedef struct st_componente_list ListaComponente;
 
 typedef struct st_componente * Componente;
@@ -88,6 +105,8 @@ typedef struct st_circuito {
     ListaComponente* listaPortas;
 
     ListaReg listaReg;
+
+    ListaParam listaParam;
 } t_circuito;
 
 /** @brief Inicialização de uma estrutura de circuito.
@@ -98,6 +117,10 @@ t_circuito* novoCircuito();
  *         `size`é o tamanho em bits.
  */
 void addRegister(t_circuito* circ, const char* name, unsigned int size);
+
+/** @brief Inserir um parametro novo no circuito.
+ */
+void addParam(t_circuito* circ, Param* param);
 
 /** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
  */

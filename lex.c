@@ -15,7 +15,7 @@
 #include "lex.h"
 #include "mem.h"
 
-#define NUM_RESERV_KEYWORDS 107
+#define NUM_RESERV_KEYWORDS 108
 
 char arrayPalavrasReservadas[][NUM_RESERV_KEYWORDS] = {
     "always",
@@ -63,6 +63,7 @@ char arrayPalavrasReservadas[][NUM_RESERV_KEYWORDS] = {
     "medium",
     "module",
     "large",
+    "localparam",
     "macromodule",
     "nand",
     "negedge",
@@ -190,6 +191,14 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
         tc = KW_BEGIN;
     else if( iguais(tok, "end") )
         tc = KW_END;
+    else if( iguais(tok, "parameter") )
+        tc = KW_PARAMETER;
+    else if( iguais(tok, "defparam") )
+        tc = KW_DEFPARAM;
+    else if( iguais(tok, "localparam") )
+        tc = KW_LOCALPARAM;
+    else if( iguais(tok, "=") )
+        tc = SYM_EQ;
     else if( iguais(tok, ",") )
         tc = SYM_COMMA;
     else if( iguais(tok, ":") )

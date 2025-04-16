@@ -38,6 +38,8 @@ typedef enum en_token_class {
     KW_OR,
     KW_OUTPUT,
     KW_PARAMETER,
+    KW_LOCALPARAM,
+    KW_DEFPARAM,
     KW_REAL,
     KW_REALTIME,
     KW_REG,
