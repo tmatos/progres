@@ -10,23 +10,27 @@
 
 #include "erros.h"
 
-void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
-    if(linha > 0)
-    {
+
+void* show_error_lexical(char *msg, int lin, int col)
+{
+    return exibeMsgErro(msg, lin, col, NULL, NULL);
+}
+
+
+void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado)
+{
+    if(linha > 0) {
         printf("%d:", linha);
 
         if(coluna > 0)
             printf("%d:", coluna);
     }
 
-    if(msg)
-    {
+    if(msg) {
         printf(" erro: %s.", msg);
 
         if(esperado)
-        {
             printf(" Esperava-se '%s', mas foi encontrado '%s'.", esperado, encontrado);
-        }
     }
 
     printf("\n");

@@ -560,7 +560,7 @@ ListaToken* tokeniza(FILE* arquivo)
                 goto A;
             }
             else {
-                exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
+                show_error_lexical("Simbolo nao esperado", linha, coluna);
                 break;
             }
         }
@@ -645,8 +645,9 @@ ListaToken* tokeniza(FILE* arquivo)
 
                             // verificar tamanho maximo de palavra
                             if( strlen(tok) > MAX_TOKEN_SIZE ) {
-                                exibeMsgErro("Token excede o tamanho maximo permitido",
-                                             linha, coluna - strlen(tok), NULL, NULL);
+                                show_error_lexical("Token excede o tamanho maximo permitido",
+                                                   linha,
+                                                   coluna - strlen(tok) );
                                 goto encerrar;
                             }
 
@@ -657,13 +658,13 @@ ListaToken* tokeniza(FILE* arquivo)
                             goto encerrar;
                         }
                         else {
-                            exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                            show_error_lexical("Caractere nao permitido", linha, coluna);
                             goto encerrar;
                         }
                     }
                 }
                 else {
-                    exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                    show_error_lexical("Caractere nao permitido", linha, coluna);
                     break;
                 }
             }
