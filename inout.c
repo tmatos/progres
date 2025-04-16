@@ -39,10 +39,13 @@ Sinais* carregaEntradas(FILE* arquivo)
         return NULL;
     }
 
+    // loop para o conjunto de sinais
     while(1)
     {
         if( isSimbolo( it->valor[0] ) )
             return erroFatalArquivoCorrompido();
+
+        // TODO: check signal name duplication errors
 
         insereTokenString(nomesUsados, it->valor, it->linha, it->coluna);
 
@@ -128,6 +131,9 @@ Sinais* carregaEntradas(FILE* arquivo)
             break;
         }
     }
+
+    delete_lista_token(nomesUsados);
+    delete_lista_token(tokens);
 
     return entradas;
 }
