@@ -16,7 +16,6 @@ void* show_error_lexical(char *msg, int lin, int col)
     return exibeMsgErro(msg, lin, col, NULL, NULL);
 }
 
-
 void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado)
 {
     if(linha > 0) {
@@ -26,11 +25,20 @@ void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encon
             printf("%d:", coluna);
     }
 
-    if(msg) {
-        printf(" erro: %s.", msg);
+    if(!msg) {
+        printf("Erro desconhecido.\n");
+        return NULL;
+    }
 
-        if(esperado)
-            printf(" Esperava-se '%s', mas foi encontrado '%s'.", esperado, encontrado);
+    printf(" erro: %s.", msg);
+
+    if(esperado) {
+        printf(" Esperava-se: '%s'", esperado);
+
+        if(encontrado)
+            printf(", mas foi encontrado: '%s'", encontrado);
+
+        printf(".");
     }
 
     printf("\n");
