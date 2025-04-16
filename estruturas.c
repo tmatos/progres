@@ -33,6 +33,9 @@ t_circuito* novoCircuito()
     circuito->listaReg.total = 0;
     circuito->listaReg.itens = NULL;
 
+    circuito->listaParam.total = 0;
+    circuito->listaParam.itens = NULL;
+
     return circuito;
 }
 
@@ -169,7 +172,7 @@ Componente novoComponente(const char* nome, t_operador porta) {
 
     strcpy(c->nome, nome);
     c->tipo.operador = porta;
-    c->tipo.atraso = 0; // atraso default � zero
+    c->tipo.atraso = 0; // atraso default eh zero
 
     c->listaEntrada = novaListaComponente();
     c->sinalEntrada = NULL;
