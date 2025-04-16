@@ -22,8 +22,8 @@ int main(int argc, char* argv[])
     FILE* f_wave_in = NULL;
     FILE* f_wave_out = NULL;
 
-    Sinais* entradas = NULL;
-    Sinais* saidas = NULL;
+    Sinais* sinais_entradas = NULL;
+    Sinais* sinais_saidas = NULL;
     t_circuito* circuto1 = NULL;
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
@@ -70,11 +70,11 @@ int main(int argc, char* argv[])
 
     printf("Abrindo o arquivo de entrada: %s\n", argv[2]);
 
-    entradas = carregaEntradas(f_wave_in);
+    sinais_entradas = carregaEntradas(f_wave_in);
 
     fclose(f_wave_in);
 
-    if(!entradas) {
+    if(!sinais_entradas) {
         printf("Nao ha entradas para a simulacao do circuito.\n");
         exit(1);
     }
@@ -89,13 +89,15 @@ int main(int argc, char* argv[])
         strcat(str_wave_out_filepath, ".out");
     }
 
-    saidas = simula(circuto1, entradas);
+    sinais_saidas = simula(circuto1, sinais_entradas);
 
-    if(saidas) {
+    if(sinais_saidas) {
         printf("Simulacao concluida com saidas geradas.\n");
     }
 
-    free(entradas);
+    if(sinais_entradas->lista)
+        free(sinais_entradas->lista);
+    free(sinais_entradas);
 
     f_wave_out = fopen(str_wave_out_filepath, "w");
 
@@ -105,10 +107,13 @@ int main(int argc, char* argv[])
         exit(1);
     }
     
-    salvarSinais(saidas, f_wave_out);
+    salvarSinais(sinais_saidas, f_wave_out);
     fclose(f_wave_out);
     printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
-    free(saidas);
+
+    if(sinais_saidas->lista)
+        free(sinais_saidas->lista);
+    free(sinais_saidas);
 
     return 0;
 }
