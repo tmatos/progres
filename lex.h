@@ -95,6 +95,10 @@ typedef struct st_listaToken {
  */
 ListaToken* novaListaToken();
 
+/** @brief Delete the list and its contents from memory.
+ */
+void delete_lista_token(ListaToken* list);
+
 /** @brief Insere na lista um novo token a partir de um caractere,
             deve-se especificar a posicao do mesmo no arquivo.
  *  @param lista Onde sera inserido o token.

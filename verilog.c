@@ -529,7 +529,14 @@ t_circuito* carregaCircuito(FILE* arquivo)
                 return NULL;
             }
             else {
-                // TODO: Liberar a memoria alocada
+                // Liberar a memoria alocada no inicio da funcao
+                delete_lista_token(identificadores);
+                delete_lista_token(identificLivre);
+                delete_lista_token(listaInput);
+                delete_lista_token(listaOutput);
+                delete_lista_token(listaWire);
+                delete_lista_token(list_param);
+                delete_lista_token(tokens);
                 return circuito;
             }
         }

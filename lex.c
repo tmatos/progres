@@ -139,6 +139,28 @@ ListaToken* novaListaToken()
     return l;
 }
 
+void delete_lista_token(ListaToken* list)
+{
+    if(!list)
+        return;
+
+    if(list->tamanho == 0) {
+        free(list);
+        return;
+    }
+
+    Token* an;
+    Token* it = list->primeiro;
+
+    while(it) {
+        an = it;
+        it = it->seguinte;
+        free(an);
+    }
+
+    free(list);
+}
+
 int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
 {
     char s[2] = {tok, '\0'};
