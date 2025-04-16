@@ -7,6 +7,11 @@
 
 #define ERROS_H
 
+#define MSG_ERROR_LEX_UNEXPECTED_SYMBOL "Simbolo nao esperado"
+#define MSG_ERROR_LEX_INVALID_CHAR "Caractere nao permitido"
+#define MSG_ERROR_LEX_TOKEN_SIZE_MAXED "Token excede o tamanho maximo permitido"
+
+
 /** @brief Exibe uma mensagem de erro relativa a analise lexica do arquivo fonte em questao.
  *  @param msg O texto da mensagem de erro a ser exibida.
  *  @param lin A linha onde ocorre o erro no fonte. -1 para omitir.
