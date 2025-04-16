@@ -14,6 +14,6 @@ void* xcalloc(size_t n, size_t t);
 
 void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
 
-void erroFatalMemoria();
+void fatal_error_no_memory();
 
 #endif // MEMORIA_H

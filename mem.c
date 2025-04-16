@@ -13,7 +13,7 @@ void* xmalloc(size_t t) {
     void* p = malloc(t);
 
     if(!p)
-        erroFatalMemoria();
+        fatal_error_no_memory();
 
     return p;
 }
@@ -22,7 +22,7 @@ void* xrealloc(void* m, size_t t) {
     void* p = realloc(m, t);
 
     if(!p)
-        erroFatalMemoria();
+        fatal_error_no_memory();
 
     return p;
 }
@@ -31,7 +31,7 @@ void* xcalloc(size_t n, size_t t) {
     void* p = calloc(n, t);
 
     if(!p)
-        erroFatalMemoria();
+        fatal_error_no_memory();
 
     return p;
 }

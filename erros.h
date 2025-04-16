@@ -18,9 +18,9 @@
  */
 void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
 
-/** @brief Exibe uma mensagem de erro por falta de memória e encerra o programa.
+/** @brief Exibe uma mensagem de erro por falta de memoria e encerra o programa.
  *  @return Void.
  */
-void erroFatalMemoria();
+void fatal_error_no_memory();
 
 #endif // ERROS_H

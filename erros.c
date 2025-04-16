@@ -34,7 +34,7 @@ void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encon
     return NULL;
 }
 
-void erroFatalMemoria() {
+void fatal_error_no_memory() {
     printf("\nERRO FATAL: Sem memoria para alocar.\n");
     exit(-1);
 }
