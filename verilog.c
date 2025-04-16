@@ -69,8 +69,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador",
-                     -1, -1, NULL, NULL);
+        exibeMsgErro("Final do arquivo nao esperado",
+                     -1, -1, "um identificador", NULL);
         return NULL;
     }
     else if( !isIdentificador(it) ) {
@@ -86,14 +86,14 @@ t_circuito* carregaCircuito(FILE* arquivo)
     avanca(&it);
 
     if(!it) {
-        exibeMsgErro("Final do arquivo nao esperado. Era esperado '(' ou ';'",
-                     -1, -1, NULL, NULL);
+        exibeMsgErro("Final do arquivo nao esperado",
+                     -1, -1, "(' ou ';", NULL);
         return NULL;
     }
     else if( it->classe != SYM_OPEN_BRACKET && it->classe != SYM_SEMICOLON) {
         // se it->valor nao eh '(' ou ';', pare
         exibeMsgErro("Simbolo esperado nao foi encontrado",
-                     it->linha, it->coluna, "( ou ;", it->valor);
+                     it->linha, it->coluna, "(' ou ';", it->valor);
         return NULL;
     }
 
@@ -107,12 +107,12 @@ t_circuito* carregaCircuito(FILE* arquivo)
         {
             if(!it) {
                 if(virgula) {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula",
-                                -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                -1, -1, ",", NULL);
                 }
                 else {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido ou ')'",
-                                -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                -1, -1, "identificador valido ou )", NULL);
                 }
 
                 return NULL;
@@ -132,7 +132,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
                 }
                 else {
                     exibeMsgErro("Simbolo esperado nao foi encontrado",
-                                it->linha, it->coluna, "uma virgula ou )", it->valor);
+                                it->linha, it->coluna, ",' ou ')", it->valor);
                     return NULL;
                 }
             }
@@ -161,8 +161,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
         avanca(&it);
 
         if(!it) {
-            exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
-                        -1, -1, NULL, NULL);
+            exibeMsgErro("Final do arquivo nao esperado", -1, -1, ";", NULL);
             return NULL;
         }
 
@@ -201,11 +200,11 @@ t_circuito* carregaCircuito(FILE* arquivo)
             {
                 if(!it) {
                     if(virgula) {
-                        exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula",
-                                     -1, -1, NULL, NULL);
+                        exibeMsgErro("Final do arquivo nao esperado",
+                                     -1, -1, ",", NULL);
                     } else {
-                        exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador valido",
-                                     -1, -1, NULL, NULL);
+                        exibeMsgErro("Final do arquivo nao esperado",
+                                     -1, -1, "identificador valido", NULL);
                     }
 
                     return NULL;
@@ -223,14 +222,15 @@ t_circuito* carregaCircuito(FILE* arquivo)
                     }
                     else {
                         exibeMsgErro("Simbolo esperado nao foi encontrado",
-                                     it->linha, it->coluna, "uma virgula ou ;", it->valor);
+                                     it->linha, it->coluna, ",' ou ';", it->valor);
                         return NULL;
                     }
                 }
 
                 if( !iguais(tipo, "wire") && !identExiste(identificLivre, it->valor) ) {
-                    exibeMsgErro("Identificador invalido. Era esperado um identificador valido e que ainda possa ser atribuido",
-                                 it->linha, it->coluna, NULL, NULL);
+                    exibeMsgErro("Identificador invalido",
+                                 it->linha, it->coluna,
+                                 "identificador valido e que ainda possa ser atribuido", NULL);
                     return NULL;
                 }
 
@@ -350,8 +350,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado '( ou #'",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "(' ou '#", NULL);
                 return NULL;
             }
 
@@ -359,8 +359,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
                 avanca(&it);
 
                 if(!it) {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperado um numero inteiro nao negativo",
-                                 -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                 -1, -1, "um numero inteiro nao negativo", NULL);
                     return NULL;
                 }
                 else if( !isNumNaturalValido(it->valor) ) {
@@ -380,8 +380,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
                 avanca(&it);
 
                 if(!it) {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperado '('",
-                                 -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                 -1, -1, "(", NULL);
                     return NULL;
                 }
             }
@@ -395,8 +395,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado um fio ou saida",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "identificador para wire ou output", NULL);
                 return NULL;
             }
 
@@ -415,15 +415,15 @@ t_circuito* carregaCircuito(FILE* arquivo)
             else {
                 exibeMsgErro("Fio ou saida nao foi encontrado",
                              it->linha, it->coluna,
-                             "ident. para um fio ou saida", it->valor);
+                             "identificador para wire ou output", it->valor);
                 return NULL;
             }
 
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperada uma virgula",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, ",", NULL);
                 return NULL;
             }
 
@@ -438,8 +438,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "um identificador", NULL);
                 return NULL;
             }
 
@@ -473,12 +473,12 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                 if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf ) {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperado ')'",
-                                 -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                 -1, -1, ")", NULL);
                 }
                 else {
-                    exibeMsgErro("Final do arquivo nao esperado. Era esperado ',' ou ')'",
-                                 -1, -1, NULL, NULL);
+                    exibeMsgErro("Final do arquivo nao esperado",
+                                 -1, -1, ",' ou ')", NULL);
                 }
 
                 return NULL;
@@ -496,7 +496,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
                     }
                     else {
                         exibeMsgErro("Simbolo esperado nao foi encontrado",
-                                     it->linha, it->coluna, "')' ou ','", it->valor);
+                                     it->linha, it->coluna, ")' ou ',", it->valor);
                         return NULL;
                     }
                 }
@@ -505,8 +505,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, ";", NULL);
                 return NULL;
             }
 
@@ -549,8 +549,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado um identificador",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "um identificador", NULL);
                 return NULL;
             }
 
@@ -582,8 +582,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado: '='",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "=", NULL);
                 return NULL;
             }
 
@@ -596,8 +596,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado: um numero literal",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, "um numero literal", NULL);
                 return NULL;
             }
 
@@ -613,8 +613,8 @@ t_circuito* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                exibeMsgErro("Final do arquivo nao esperado. Era esperado ';'",
-                             -1, -1, NULL, NULL);
+                exibeMsgErro("Final do arquivo nao esperado",
+                             -1, -1, ";", NULL);
                 return NULL;
             }
 
