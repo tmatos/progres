@@ -108,7 +108,7 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
                     lst->tamanho--;
                     continue;
                 }
-                else { // lista com um unico item e que será removido
+                else { // lista com um unico item e que sera removido
                     tmp = it;
                     lst->primeiro = NULL;
                     lst->ultimo = NULL;
@@ -268,8 +268,8 @@ ListaToken* tokeniza(FILE *arquivo)
 {
     int linha = 1; // contador para linha corrente do arquivo
     int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
-    int erro = 0; // flag de erro, encerra a análise
-    int fim = 0; // flag para indicar o término da análise
+    int erro = 0; // flag de erro, encerra a analise
+    int fim = 0; // flag para indicar o termino da analise
 
     char c = '\0'; // usado para leitura de um caraceter
     char *tok; // usado para a leitura de uma string que representa um token
@@ -301,7 +301,7 @@ ListaToken* tokeniza(FILE *arquivo)
         }
 
         if(c == '/') {
-            comentarios: // Label para inicio da parte que trata os comentários
+            comentarios: // Label para inicio da parte que trata os comentarios
 
             coluna++;
             c = fgetc(arquivo);
@@ -362,7 +362,7 @@ ListaToken* tokeniza(FILE *arquivo)
                 }
             }
             else {
-                exibeMsgErro("Simbolo nao esperado", linha, coluna, NULL, NULL);
+                show_error_msg("Simbolo nao esperado", linha, coluna, NULL, NULL);
                 break;
             }
         }
@@ -409,9 +409,10 @@ ListaToken* tokeniza(FILE *arquivo)
                             coluna++;
                             anexa(tok, c);
 
-                            // verificar tamanho máximo de palavra
+                            // verificar tamanho maximo de palavra
                             if( strlen(tok) > MAX_TOKEN_SIZE ) {
-                                exibeMsgErro("Token excede o tamanho maximo permitido", linha, coluna - strlen(tok), NULL, NULL);
+                                show_error_msg("Token excede o tamanho maximo permitido",
+                                               linha, coluna - strlen(tok), NULL, NULL);
                                 erro = 1;
 
                                 break;
@@ -425,7 +426,7 @@ ListaToken* tokeniza(FILE *arquivo)
                             break;
                         }
                         else {
-                            exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                            show_error_msg("Caractere nao permitido", linha, coluna, NULL, NULL);
                             erro = 1; //variavel local recebera indicativo de erro
 
                             break;
@@ -433,7 +434,7 @@ ListaToken* tokeniza(FILE *arquivo)
                     }
                 }
                 else {
-                    exibeMsgErro("Caractere nao permitido", linha, coluna, NULL, NULL);
+                    show_error_msg("Caractere nao permitido", linha, coluna, NULL, NULL);
                     break;
                 }
             }
@@ -476,7 +477,7 @@ int isNumNaturalValido(char* str)
     if(!str)
         return 0;
 
-    // importante não ser um valor muito grande, esses numeros
+    // importante nao ser um valor muito grande, esses numeros
     if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) )
     {
         return 0;

@@ -29,7 +29,7 @@ void *show_error_lexical(char *msg, int lin, int col);
  *  @param encontrado Uma string com o que foi encontrado no lugar. NULL para omitir.
  *  @return Um NULL, sempre.
  */
-void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
+void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *encontrado);
 
 /** @brief Exibe uma mensagem de erro por falta de memoria e encerra o programa.
  *  @return Void.

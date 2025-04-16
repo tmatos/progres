@@ -12,7 +12,7 @@ void* xrealloc(void* m, size_t t);
 
 void* xcalloc(size_t n, size_t t);
 
-void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado);
+void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *encontrado);
 
 void fatal_error_no_memory();
 

@@ -31,7 +31,7 @@ void* xcalloc(size_t n, size_t t) {
     return p;
 }
 
-void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
+void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
 //    if(linha > 0)
 //    {
 //        printf("%d:", linha);

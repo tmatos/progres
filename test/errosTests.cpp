@@ -8,12 +8,12 @@
 class Testes_erros : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_erros );
-  CPPUNIT_TEST( test_exibeMsgErro );
+  CPPUNIT_TEST( test_show_error_msg );
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void test_exibeMsgErro()
+  void test_show_error_msg()
   {
     char msg[] = "mensagem";
     int linha = 1;
@@ -21,8 +21,8 @@ public:
     char esperado[] = "wire";
     char encontrado[] = "qwire";
     
-    // exibeMsgErro returna sempre um NULL
-    CPPUNIT_ASSERT( ! exibeMsgErro(msg, linha, coluna, esperado, encontrado) );
+    // show_error_msg(...) returna sempre um NULL
+    CPPUNIT_ASSERT( ! show_error_msg(msg, linha, coluna, esperado, encontrado) );
   }
 
 };

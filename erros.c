@@ -13,10 +13,10 @@
 
 void* show_error_lexical(char *msg, int lin, int col)
 {
-    return exibeMsgErro(msg, lin, col, NULL, NULL);
+    return show_error_msg(msg, lin, col, NULL, NULL);
 }
 
-void* exibeMsgErro(char* msg, int linha, int coluna, char* esperado, char *encontrado)
+void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *encontrado)
 {
     if(linha > 0) {
         printf("%d:", linha);
