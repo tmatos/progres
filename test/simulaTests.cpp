@@ -30,7 +30,7 @@ public:
 
   void test_simula_CircuitoNull()
   {
-    t_circuito *circ = NULL;
+    Module *circ = NULL;
     Sinais *inputs = NULL;
     Sinais *outputs = NULL;
 
@@ -41,7 +41,7 @@ public:
 
   void test_simula_CircuitoVazio()
   {
-    t_circuito *circ = novoCircuito();
+    Module *circ = novoCircuito();
     Sinais *inputs = novaSinais();
     Sinais *outputs = NULL;
 
@@ -57,7 +57,7 @@ public:
 
   void test_simula_CircuitoUmaEntrada()
   {
-    t_circuito *circ = novoCircuito();
+    Module *circ = novoCircuito();
     Sinais *inputs = novaSinais();
     Sinais *outputs = NULL;
 
@@ -90,7 +90,7 @@ public:
 
   void test_simula_samplefile_andgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     FILE* f_andgates_v = fopen("./verilog_sample_src/andgates.v", "r");
@@ -126,7 +126,7 @@ public:
 
   void test_simula_samplefile_orgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     FILE* f_orgates_v = fopen("./verilog_sample_src/orgates.v", "r");
@@ -162,7 +162,7 @@ public:
 
   void test_simula_samplefile_nandgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     FILE* f_nandgates_v = fopen("./verilog_sample_src/nandgates.v", "r");
@@ -198,7 +198,7 @@ public:
 
   void test_simula_samplefile_norgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     FILE* f_norgates_v = fopen("./verilog_sample_src/norgates.v", "r");
@@ -234,7 +234,7 @@ public:
 
   void test_simula_samplefile_notgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
@@ -294,7 +294,7 @@ public:
 
   void test_simula_samplefile_bufgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
@@ -336,7 +336,7 @@ public:
   
   void test_simula_samplefile_xorgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
@@ -378,7 +378,7 @@ public:
 
   void test_simula_samplefile_xnorgates_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;

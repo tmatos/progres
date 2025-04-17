@@ -14,7 +14,7 @@
 #include "lex.h"
 #include "eventos.h"
 
-Sinais* simula(t_circuito* circuto, Sinais* entradas)
+Sinais* simula(Module* circuto, Sinais* entradas)
 {
     int i, j, validos;
     Tempo t;

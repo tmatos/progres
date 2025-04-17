@@ -16,9 +16,9 @@
 #include "erros.h"
 #include "mem.h"
 
-t_circuito* novoCircuito()
+Module* novoCircuito()
 {
-    t_circuito *circuito = (t_circuito*) xmalloc(sizeof(t_circuito));
+    Module *circuito = (Module*) xmalloc(sizeof(Module));
 
     circuito->listaFiosEntrada = novaListaComponente();
     circuito->sinaisEntrada = NULL;
@@ -39,7 +39,7 @@ t_circuito* novoCircuito()
     return circuito;
 }
 
-void adicionaEntrada(t_circuito* circ, Componente comp)
+void adicionaEntrada(Module* circ, Componente comp)
 {
     if(!circ || !comp)
         return;
@@ -47,7 +47,7 @@ void adicionaEntrada(t_circuito* circ, Componente comp)
     insereComponente(circ->listaFiosEntrada, comp);
 }
 
-void adicionaSaida(t_circuito* circ, Componente comp)
+void adicionaSaida(Module* circ, Componente comp)
 {
     if(!circ || !comp)
         return;
@@ -55,7 +55,7 @@ void adicionaSaida(t_circuito* circ, Componente comp)
     insereComponente(circ->listaFiosSaida, comp);
 }
 
-void adicionaWire(t_circuito* circ, Componente comp)
+void adicionaWire(Module* circ, Componente comp)
 {
     if(!circ || !comp)
         return;
@@ -63,7 +63,7 @@ void adicionaWire(t_circuito* circ, Componente comp)
     insereComponente(circ->listaWires, comp);
 }
 
-void adicionaPorta(t_circuito* circ, Componente comp)
+void adicionaPorta(Module* circ, Componente comp)
 {
     if(!circ || !comp)
         return;
@@ -114,7 +114,7 @@ void insereComponente(ListaComponente* ls, Componente cp)
     ls->itens[ls->tamanho - 1] = cp;
 }
 
-void addRegister(t_circuito* circ, const char* name, unsigned int size)
+void addRegister(Module* circ, const char* name, unsigned int size)
 {
     Register* reg = (Register*) xmalloc(sizeof(Register));
 
@@ -135,7 +135,7 @@ void addRegister(t_circuito* circ, const char* name, unsigned int size)
     circ->listaReg.itens[circ->listaReg.total - 1] = reg;
 }
 
-void addParam(t_circuito* circ, Param* param)
+void addParam(Module* circ, Param* param)
 {
     if(circ->listaParam.total == 0) {
         circ->listaParam.total++;
@@ -203,7 +203,7 @@ Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
     return NULL;
 }
 
-Componente getPortaPorNome(t_circuito* circ, const char* nome)
+Componente getPortaPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -211,7 +211,7 @@ Componente getPortaPorNome(t_circuito* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaPortas, nome);
 }
 
-Componente getWirePorNome(t_circuito* circ, const char* nome)
+Componente getWirePorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -219,7 +219,7 @@ Componente getWirePorNome(t_circuito* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaWires, nome);
 }
 
-Componente getInputPorNome(t_circuito* circ, const char* nome)
+Componente getInputPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -227,7 +227,7 @@ Componente getInputPorNome(t_circuito* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
 }
 
-Componente getOutputPorNome(t_circuito* circ, const char* nome)
+Componente getOutputPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;

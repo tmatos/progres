@@ -17,12 +17,12 @@
 #include "sinais.h"
 #include "lex.h"
 
-t_circuito* carregaCircuito(FILE* arquivo)
+Module* carregaCircuito(FILE* arquivo)
 {
     Componente in;
     Componente out;
     Componente porta;
-    t_circuito* circuito = NULL;
+    Module* circuito = NULL;
 
     int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
 

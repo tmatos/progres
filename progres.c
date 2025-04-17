@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
-    t_circuito* circuto1 = NULL;
+    Module* circuto1 = NULL;
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 

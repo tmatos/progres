@@ -93,7 +93,7 @@ typedef struct st_list_reg {
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
  */
-typedef struct st_circuito {
+typedef struct st_module {
     ListaComponente* listaFiosEntrada;
     Sinais* sinaisEntrada;
 
@@ -107,52 +107,52 @@ typedef struct st_circuito {
     ListaReg listaReg;
 
     ListaParam listaParam;
-} t_circuito;
+} Module;
 
 /** @brief Inicialização de uma estrutura de circuito.
  */
-t_circuito* novoCircuito();
+Module* novoCircuito();
 
 /** @brief Inserir um registrador novo no circuito.
  *         `size`é o tamanho em bits.
  */
-void addRegister(t_circuito* circ, const char* name, unsigned int size);
+void addRegister(Module* circ, const char* name, unsigned int size);
 
 /** @brief Inserir um parametro novo no circuito.
  */
-void addParam(t_circuito* circ, Param* param);
+void addParam(Module* circ, Param* param);
 
 /** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
  */
-void adicionaEntrada(t_circuito* circ, Componente comp);
+void adicionaEntrada(Module* circ, Componente comp);
 
 /** @brief Adiciona a saída representada por comp à lista de fios de saída do circuito
  */
-void adicionaSaida(t_circuito* circ, Componente comp);
+void adicionaSaida(Module* circ, Componente comp);
 
 /** @brief Adiciona o fio representada por comp à lista de fios (wires) do circuito
  */
-void adicionaWire(t_circuito* circ, Componente comp);
+void adicionaWire(Module* circ, Componente comp);
 
 /** @brief Adiciona a porta lógica representada por comp à lista de portas do circuito
  */
-void adicionaPorta(t_circuito* circ, Componente comp);
+void adicionaPorta(Module* circ, Componente comp);
 
 /** @brief Retorna a porta que tem o nome indicado, se houver na lista de portas do circuito
  */
-Componente getPortaPorNome(t_circuito* circ, const char* nome);
+Componente getPortaPorNome(Module* circ, const char* nome);
 
 /** @brief Retorna o wire que tem o nome indicado, se houver.
  */
-Componente getWirePorNome(t_circuito* circ, const char* nome);
+Componente getWirePorNome(Module* circ, const char* nome);
 
 /** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito
  */
-Componente getInputPorNome(t_circuito* circ, const char* nome);
+Componente getInputPorNome(Module* circ, const char* nome);
 
 /** @brief Retorna a saída que tem o nome indicado, se houver na lista de fios de saída do circuito
  */
-Componente getOutputPorNome(t_circuito* circ, const char* nome);
+Componente getOutputPorNome(Module* circ, const char* nome);
 
 /** @brief Inicialização de uma estrutura de componente.
  *  @return Um tipo Componente que é um ponteiro para a struc.

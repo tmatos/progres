@@ -49,7 +49,7 @@ public:
 
   void test_novoCircuito()
   {
-    t_circuito* circ = novoCircuito();
+    Module* circ = novoCircuito();
     CPPUNIT_ASSERT(circ);
 
     CPPUNIT_ASSERT(circ->listaFiosEntrada);
@@ -97,7 +97,7 @@ public:
   void test_getXPorNome()
   {
     char* null_name = NULL;
-    t_circuito* circ = novoCircuito();
+    Module* circ = novoCircuito();
     CPPUNIT_ASSERT(circ);    
 
     CPPUNIT_ASSERT( !getPortaPorNome(circ, null_name) );

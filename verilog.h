@@ -1,6 +1,6 @@
 /**
  * @file verilog.h
- * @brief Rotinas para análise do arquivo Verilog
+ * @brief Rotinas para anï¿½lise do arquivo Verilog
  */
 
 #ifndef VERILOG_H
@@ -16,9 +16,9 @@
  *  @param arquivo O handler do arquivo a ser processado.
  *  @return A estrutura de dados do circuito.
  */
-t_circuito* carregaCircuito(FILE* arquivo);
+Module* carregaCircuito(FILE* arquivo);
 
-/** @brief Retorna verdadeiro se uma string representa uma porta lógica em Verilog.
+/** @brief Retorna verdadeiro se uma string representa uma porta lï¿½gica em Verilog.
  *  @param s Uma string qualquer.
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.
  */

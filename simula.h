@@ -13,7 +13,7 @@
 /** @brief Função que faz a simulação do circuito com as entradas especificadas.
            Em caso de sucesso, retorna as saídas dessa simulação.
  */
-Sinais* simula(t_circuito* circuto, Sinais* entradas);
+Sinais* simula(Module* circuto, Sinais* entradas);
 
 /** @brief Simulação da avaliação da porta 'not'
  */

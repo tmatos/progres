@@ -42,7 +42,7 @@ public:
 
   void test_carregaCircuito_fileEmpty()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* arquivoVerilogVazio = fopen("./verilog_sample_src/empty.v", "r");
     CPPUNIT_ASSERT( arquivoVerilogVazio );
     circuit = carregaCircuito(arquivoVerilogVazio);
@@ -52,7 +52,7 @@ public:
 
   void test_carregaCircuito_fileTop_module()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* arquivoVerilogTop = fopen("./verilog_sample_src/top.v", "r");
     CPPUNIT_ASSERT( arquivoVerilogTop );
     circuit = carregaCircuito(arquivoVerilogTop);
@@ -62,7 +62,7 @@ public:
 
   void test_carregaCircuito_fileTudo_module()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* arquivo = fopen("./verilog_sample_src/tudo.v", "r");
     CPPUNIT_ASSERT( arquivo );
     circuit = carregaCircuito(arquivo);
@@ -72,7 +72,7 @@ public:
 
   void test_carregaCircuito_reg_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* file = fopen("./verilog_sample_src/reg.v", "r");
     CPPUNIT_ASSERT( file );
     circuit = carregaCircuito(file);
@@ -88,7 +88,7 @@ public:
 
   void test_carregaCircuito_localparam_test_v()
   {
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* file = fopen("./verilog_sample_src/localparam_test.v", "r");
     CPPUNIT_ASSERT( file );
     circuit = carregaCircuito(file);
@@ -170,7 +170,7 @@ public:
       "./verilog_sample_src/badverilog_59.v"
     };
 
-    t_circuito* circuit = NULL;
+    Module* circuit = NULL;
     FILE* fp = NULL;
 
     for ( std::string path : list_bad_files )
