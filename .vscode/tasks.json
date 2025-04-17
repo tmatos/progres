@@ -5,14 +5,14 @@
             "label": "run make release",
             "command": "make",
             "args": [],
-            "problemMatcher": [],
+            "problemMatcher": []
         },
         {
             "type": "shell",
             "label": "run make debug",
             "command": "make debug",
             "args": [],
-            "problemMatcher": [],
+            "problemMatcher": []
         }
     ],
     "version": "2.0.0"
