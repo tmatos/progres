@@ -248,7 +248,7 @@ int isIdentificador(Token* tk)
     if(!isalpha(tk->valor[0])) // se nao comeca com letra, nao eh identificador valido
         return 0;
 
-    for(i = 1 ; i < strlen(tk->valor) ; i++) {
+    for(i = 1 ; i < len(tk->valor) ; i++) {
         if(!isalnum(tk->valor[i])) {
             simbol = 1;
             break;
@@ -390,16 +390,16 @@ ListaToken* tokeniza(FILE *arquivo)
                                 coluna++;
                             }
 
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            insereTokenString(tokens, tok, linha, coluna - len(tok));
 
                             break;
                         }
                         else if(c == '/') {
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            insereTokenString(tokens, tok, linha, coluna - len(tok));
                             goto comentarios;
                         }
                         else if(isSimbolo(c)) {
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            insereTokenString(tokens, tok, linha, coluna - len(tok));
                             coluna++;
                             insereToken(tokens, c, linha, coluna);
 
@@ -410,9 +410,9 @@ ListaToken* tokeniza(FILE *arquivo)
                             anexa(tok, c);
 
                             // verificar tamanho maximo de palavra
-                            if( strlen(tok) > MAX_TOKEN_SIZE ) {
+                            if( len(tok) > MAX_TOKEN_SIZE ) {
                                 show_error_msg("Token excede o tamanho maximo permitido",
-                                               linha, coluna - strlen(tok), NULL, NULL);
+                                               linha, coluna - len(tok), NULL, NULL);
                                 erro = 1;
 
                                 break;
@@ -421,7 +421,7 @@ ListaToken* tokeniza(FILE *arquivo)
                             continue;
                         }
                         else if(c == EOF) {
-                            insereTokenString(tokens, tok, linha, coluna - strlen(tok));
+                            insereTokenString(tokens, tok, linha, coluna - len(tok));
                             fim = 1;
                             break;
                         }
@@ -460,7 +460,7 @@ int apenasDigitos(char* str)
     if(!str)
         return 0;
 
-    for( i=0 ; i < strlen(str) ; i++ )
+    for( i=0 ; i < len(str) ; i++ )
     {
         if( !isdigit(str[i]) )
         {
@@ -478,10 +478,16 @@ int isNumNaturalValido(char* str)
         return 0;
 
     // importante nao ser um valor muito grande, esses numeros
-    if( !apenasDigitos(str) || !(strlen(str) <= MAX_DIGITOS_NUM) )
+    if( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) )
     {
         return 0;
     }
 
     return 1;
+}
+
+unsigned long len(const char *str)
+{
+    // TODO: restrict to a maximum lenght
+    return strlen(str);
 }

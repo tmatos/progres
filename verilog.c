@@ -558,7 +558,7 @@ Module* carregaCircuito(FILE* arquivo)
                 return NULL;
             }
 
-            if( strlen(it->valor) > MAX_PARAM_NAME_SIZE ) {
+            if( len(it->valor) > MAX_PARAM_NAME_SIZE ) {
                 printf("%d:%d: erro: O identificador '%s' excede o tamanho maximo de %d para parametros.\n",
                        it->linha, it->coluna, it->valor, MAX_PARAM_NAME_SIZE);
                 return NULL;

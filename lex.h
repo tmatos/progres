@@ -187,4 +187,10 @@ int apenasDigitos(const char* str);
  */
 int isNumNaturalValido(const char* str);
 
+/** @brief Wrapper to strlen()
+ *  @param str A null terminated C string
+ *  @return Lenght of str
+ */
+unsigned long len(const char* str);
+
 #endif // LEX_H
