@@ -22,6 +22,7 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_tokeniza_tudo_v );
   CPPUNIT_TEST( test_tokeniza_multiline_v );
   CPPUNIT_TEST( test_tokeniza_strings_v );
+  CPPUNIT_TEST( test_tokeniza_bad_lexical_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -310,6 +311,15 @@ public:
     fclose(arquivo);
 
     return tokens;
+  }
+
+  void test_tokeniza_bad_lexical_v()
+  {
+    FILE* f_bad_lexical = fopen("./verilog_sample_src/bad_lexical.v", "r");
+    CPPUNIT_ASSERT(f_bad_lexical);
+
+    ListaToken* tokens = tokeniza(f_bad_lexical);
+    CPPUNIT_ASSERT_EQUAL( 21, tokens->tamanho );
   }
 
 };
