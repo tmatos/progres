@@ -688,20 +688,17 @@ ListaToken* tokeniza(FILE* arquivo)
 int apenasDigitos(const char* str)
 {
     int i;
-    int retorno = 1;
 
     if(!str)
         return 0;
 
     for( i=0 ; i < len(str) ; i++ )
     {
-        if( !isdigit(str[i]) ) {
-            retorno = 0;
-            break;
-        }
+        if( !isdigit(str[i]) )
+            return 0;
     }
 
-    return retorno;
+    return 1;
 }
 
 int isNumNaturalValido(const char* str)
@@ -717,7 +714,7 @@ int isNumNaturalValido(const char* str)
     return 1;
 }
 
-unsigned long len(const char *str)
+size_t len(const char* str)
 {
     // TODO: restrict to a maximum length
     return strlen(str);

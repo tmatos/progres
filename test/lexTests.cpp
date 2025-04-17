@@ -202,28 +202,24 @@ public:
 
   void test_isNumNaturalValido()
   {
-    char str[50];
+    std::list<std::string> valid_nums = {
+      "0", "00", "000", "0000",
+      "01", "001", "0001", "0009",
+      "1", "9", "20", "123", "1000",
+      "09", "99", "999", "9090", "9999"
+    };
 
-    copy(str, "0");
-    CPPUNIT_ASSERT( isNumNaturalValido(str) );
+    for ( std::string s : valid_nums ) {
+      CPPUNIT_ASSERT( isNumNaturalValido(s.c_str()) );
+    }
 
-    copy(str, "1");
-    CPPUNIT_ASSERT( isNumNaturalValido(str) );
+    std::list<std::string> invalid_nums = {
+      "-1", "a", "a1a", "1a1", "1aaaa", "0000a", "99999999999"
+    };
 
-    copy(str, "20");
-    CPPUNIT_ASSERT( isNumNaturalValido(str) );
-
-    copy(str, "123");
-    CPPUNIT_ASSERT( isNumNaturalValido(str) );
-
-    copy(str, "5050");
-    CPPUNIT_ASSERT( isNumNaturalValido(str) );
-
-    copy(str, "-1");
-    CPPUNIT_ASSERT( ! isNumNaturalValido(str) );
-
-    copy(str, "a");
-    CPPUNIT_ASSERT( ! isNumNaturalValido(str) );
+    for ( std::string s : invalid_nums ) {
+      CPPUNIT_ASSERT( ! isNumNaturalValido(s.c_str()) );
+    }
 
     CPPUNIT_ASSERT( ! isNumNaturalValido((char*)NULL) );
   }
