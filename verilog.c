@@ -567,7 +567,7 @@ Module* carregaCircuito(FILE* arquivo)
             insereTokenString(identificadores, it->valor, -1, -1);
             insereTokenString(list_param, it->valor, -1, -1);
 
-            Param* param = (Param*) xmalloc(sizeof(Param));
+            Param* param = (Param*) xcalloc(1, sizeof(Param));
             param->is_local = 1;
             strcpy( param->name, it->valor );
 
