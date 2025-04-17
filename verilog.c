@@ -188,7 +188,7 @@ Module* carregaCircuito(FILE* arquivo)
         {
             // usado posteriormente para saber se os identificadores serao in ou out
             char tipo[MAX_TOKEN_SIZE];
-            strcpy(tipo, it->valor);
+            copy(tipo, it->valor);
 
             avanca(&it);
 
@@ -569,7 +569,7 @@ Module* carregaCircuito(FILE* arquivo)
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
             param->is_local = 1;
-            strcpy( param->name, it->valor );
+            copy( param->name, it->valor );
 
             avanca(&it);
 

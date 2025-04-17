@@ -172,7 +172,7 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
 {
     Token* newtok = (Token*) xmalloc(sizeof(Token));
 
-    strcpy(newtok->valor, tok);
+    copy(newtok->valor, tok);
     newtok->linha = p_linha;
     newtok->coluna = p_coluna;
     newtok->seguinte = NULL;
@@ -485,7 +485,7 @@ ListaToken* tokeniza(FILE* arquivo)
     while(1) {
         A: // Label para parte A do automato
 
-        strcpy(tok, "");
+        copy(tok, "");
         c = fgetc(arquivo);
 
         if(c == EOF)
@@ -719,6 +719,12 @@ int isNumNaturalValido(const char* str)
 
 unsigned long len(const char *str)
 {
-    // TODO: restrict to a maximum lenght
+    // TODO: restrict to a maximum length
     return strlen(str);
+}
+
+char* copy(char* dest, const char* src)
+{
+    // TODO: restrict to a maximum length
+    return strcpy(dest, src);
 }

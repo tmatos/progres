@@ -95,58 +95,58 @@ public:
     tk.coluna = 1;
     tk.seguinte = NULL;
 
-    strcpy(tk.valor, "module");
+    copy(tk.valor, "module");
     CPPUNIT_ASSERT( !isIdentificador(&tk) );
 
-    strcpy(tk.valor, "wire");
+    copy(tk.valor, "wire");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "reg");
+    copy(tk.valor, "reg");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "input");
+    copy(tk.valor, "input");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "output");
+    copy(tk.valor, "output");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "123");
+    copy(tk.valor, "123");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "123abc");
+    copy(tk.valor, "123abc");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "+");
+    copy(tk.valor, "+");
     CPPUNIT_ASSERT( ! isIdentificador(&tk) );
 
-    strcpy(tk.valor, "a");
+    copy(tk.valor, "a");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "b");
+    copy(tk.valor, "b");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "x");
+    copy(tk.valor, "x");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "y");
+    copy(tk.valor, "y");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "clk");
+    copy(tk.valor, "clk");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "clock");
+    copy(tk.valor, "clock");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "CLK");
+    copy(tk.valor, "CLK");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "clr");
+    copy(tk.valor, "clr");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "CLR");
+    copy(tk.valor, "CLR");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
-    strcpy(tk.valor, "reset");
+    copy(tk.valor, "reset");
     CPPUNIT_ASSERT( isIdentificador(&tk) );
 
     CPPUNIT_ASSERT( ! isIdentificador((Token*)NULL) );
@@ -159,19 +159,19 @@ public:
     tk.coluna = 5;
     tk.seguinte = NULL;
 
-    strcpy(tk.valor, "aaa");
+    copy(tk.valor, "aaa");
     CPPUNIT_ASSERT( ! isPalavra(&tk) );
 
-    strcpy(tk.valor, "123");
+    copy(tk.valor, "123");
     CPPUNIT_ASSERT( ! isPalavra(&tk) );
 
-    strcpy(tk.valor, "wire");
+    copy(tk.valor, "wire");
     CPPUNIT_ASSERT( isPalavra(&tk) );
 
-    strcpy(tk.valor, "always");
+    copy(tk.valor, "always");
     CPPUNIT_ASSERT( isPalavra(&tk) );
 
-    strcpy(tk.valor, "xor");
+    copy(tk.valor, "xor");
     CPPUNIT_ASSERT( isPalavra(&tk) );
 
     CPPUNIT_ASSERT( ! isPalavra((Token*)NULL) );
@@ -181,22 +181,22 @@ public:
   {
     char str[50];
 
-    strcpy(str, "1234567890");
+    copy(str, "1234567890");
     CPPUNIT_ASSERT( apenasDigitos(str) );
 
-    strcpy(str, "0000000000");
+    copy(str, "0000000000");
     CPPUNIT_ASSERT( apenasDigitos(str) );
 
-    strcpy(str, "1");
+    copy(str, "1");
     CPPUNIT_ASSERT( apenasDigitos(str) );
 
-    strcpy(str, "A");
+    copy(str, "A");
     CPPUNIT_ASSERT( ! apenasDigitos(str) );
 
-    strcpy(str, "555555x555555");
+    copy(str, "555555x555555");
     CPPUNIT_ASSERT( ! apenasDigitos(str) );
 
-    strcpy(str, "999999999999m");
+    copy(str, "999999999999m");
     CPPUNIT_ASSERT( ! apenasDigitos(str) );
   }
 
@@ -204,25 +204,25 @@ public:
   {
     char str[50];
 
-    strcpy(str, "0");
+    copy(str, "0");
     CPPUNIT_ASSERT( isNumNaturalValido(str) );
 
-    strcpy(str, "1");
+    copy(str, "1");
     CPPUNIT_ASSERT( isNumNaturalValido(str) );
 
-    strcpy(str, "20");
+    copy(str, "20");
     CPPUNIT_ASSERT( isNumNaturalValido(str) );
 
-    strcpy(str, "123");
+    copy(str, "123");
     CPPUNIT_ASSERT( isNumNaturalValido(str) );
 
-    strcpy(str, "5050");
+    copy(str, "5050");
     CPPUNIT_ASSERT( isNumNaturalValido(str) );
 
-    strcpy(str, "-1");
+    copy(str, "-1");
     CPPUNIT_ASSERT( ! isNumNaturalValido(str) );
 
-    strcpy(str, "a");
+    copy(str, "a");
     CPPUNIT_ASSERT( ! isNumNaturalValido(str) );
 
     CPPUNIT_ASSERT( ! isNumNaturalValido((char*)NULL) );

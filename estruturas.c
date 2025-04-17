@@ -118,7 +118,7 @@ void addRegister(Module* circ, const char* name, unsigned int size)
 {
     Register* reg = (Register*) xmalloc(sizeof(Register));
 
-    strcpy(reg->name, name);
+    copy(reg->name, name);
     reg->size = size;
     reg->value = (unsigned int) VAL_0;
 
@@ -170,7 +170,7 @@ int contemComponente(ListaComponente* ls, Componente cp)
 Componente novoComponente(const char* nome, t_operador porta) {
     Componente c = (Componente) xmalloc(sizeof(struct st_componente));
 
-    strcpy(c->nome, nome);
+    copy(c->nome, nome);
     c->tipo.operador = porta;
     c->tipo.atraso = 0; // atraso default eh zero
 
