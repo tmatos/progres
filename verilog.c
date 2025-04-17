@@ -138,8 +138,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
             if( isIdentificador(it) ) {
                 if( identExiste(identificadores, it->valor) ) {
-                    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-                        it->linha, it->coluna, it->valor);
+                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     return NULL;
                 }
                 else {
@@ -250,8 +249,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
                     if( isIdentificador(it) ) {
                         if( identExiste(identificadores, it->valor) ) {
-                            printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-                                   it->linha, it->coluna, it->valor);
+                            show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                             return NULL;
                         }
                         else {
@@ -292,8 +290,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
 
             // verificar se pode utilizar este identificador
             if( identExiste(identificadores, it->valor) ) {
-                    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-                           it->linha, it->coluna, it->valor);
+                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     return NULL;
             }
             
@@ -557,8 +554,7 @@ t_circuito* carregaCircuito(FILE* arquivo)
             }
     
             if( identExiste(identificadores, it->valor) ) {
-                printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-                       it->linha, it->coluna, it->valor);
+                show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                 return NULL;
             }
 

@@ -10,6 +10,13 @@
 
 #include "erros.h"
 
+void* show_error_identifier_duplicate(const char* tok, int lin, int col)
+{
+    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
+           lin, col, tok);
+    
+    return NULL;
+}
 
 void* show_error_lexical(char *msg, int lin, int col)
 {
