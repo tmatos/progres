@@ -48,22 +48,20 @@ Module* carregaCircuito(FILE* arquivo)
 
     Token* it = NULL;
 
-    if(!tokens) {
-        return NULL;
-    }
+    if(!tokens)
+        goto bad_return;
 
     it = tokens->primeiro;
 
-    if(!it) {
-        return NULL;
-    }
+    if(!it)
+        goto bad_return;
 
     circuito = novoCircuito();
 
     if( it->classe != KW_MODULE ) {
         show_error_msg("Palavra-chave nao encontrada onde esperada",
                        it->linha, it->coluna, "module", it->valor);
-        return NULL;
+        goto bad_return;
     }
 
     avanca(&it);
@@ -71,12 +69,12 @@ Module* carregaCircuito(FILE* arquivo)
     if(!it) {
         show_error_msg("Final do arquivo nao esperado",
                        -1, -1, "um identificador", NULL);
-        return NULL;
+        goto bad_return;
     }
     else if( !isIdentificador(it) ) {
         show_error_msg("Identificador nao encontrado",
                        it->linha, it->coluna, "identificador valido", it->valor);
-        return NULL;
+        goto bad_return;
     }
     else {
         // senao, adicione-o a lista de identificadores
@@ -87,13 +85,13 @@ Module* carregaCircuito(FILE* arquivo)
 
     if(!it) {
         show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou ';", NULL);
-        return NULL;
+        goto bad_return;
     }
     else if( it->classe != SYM_OPEN_BRACKET && it->classe != SYM_SEMICOLON) {
         // se it->valor nao eh '(' ou ';', pare
         show_error_msg("Simbolo esperado nao foi encontrado",
                      it->linha, it->coluna, "(' ou ';", it->valor);
-        return NULL;
+        goto bad_return;
     }
 
     if( it->classe == SYM_OPEN_BRACKET ) {
@@ -114,7 +112,7 @@ Module* carregaCircuito(FILE* arquivo)
                                    -1, -1, "identificador valido ou )", NULL);
                 }
 
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe == SYM_CLOSE_BRACKET ) {
@@ -132,14 +130,14 @@ Module* carregaCircuito(FILE* arquivo)
                 else {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ",' ou ')", it->valor);
-                    return NULL;
+                    goto bad_return;
                 }
             }
 
             if( isIdentificador(it) ) {
                 if( identExiste(identificadores, it->valor) ) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                    return NULL;
+                    goto bad_return;
                 }
                 else {
                     insereTokenString(identificadores, it->valor, -1, -1);
@@ -150,7 +148,7 @@ Module* carregaCircuito(FILE* arquivo)
             else {
                 show_error_msg("Identificador nao foi encontrado",
                                it->linha, it->coluna, "um identificador", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             avanca(&it);
@@ -160,13 +158,13 @@ Module* carregaCircuito(FILE* arquivo)
 
         if(!it) {
             show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
-            return NULL;
+            goto bad_return;
         }
 
         if( it->classe != SYM_SEMICOLON ) {
             show_error_msg("Simbolo esperado nao foi encontrado",
                            it->linha, it->coluna, ";", it->valor);
-            return NULL;
+            goto bad_return;
         }
     }
 
@@ -174,7 +172,7 @@ Module* carregaCircuito(FILE* arquivo)
 
     if(!it) {
         show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-        return NULL;
+        goto bad_return;
     }
 
     porta = NULL;
@@ -205,7 +203,7 @@ Module* carregaCircuito(FILE* arquivo)
                                        -1, -1, "identificador valido", NULL);
                     }
 
-                    return NULL;
+                    goto bad_return;
                 }
 
                 if( it->classe == SYM_SEMICOLON ) {
@@ -221,7 +219,7 @@ Module* carregaCircuito(FILE* arquivo)
                     else {
                         show_error_msg("Simbolo esperado nao foi encontrado",
                                        it->linha, it->coluna, ",' ou ';", it->valor);
-                        return NULL;
+                        goto bad_return;
                     }
                 }
 
@@ -230,7 +228,7 @@ Module* carregaCircuito(FILE* arquivo)
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
                                    NULL);
-                    return NULL;
+                    goto bad_return;
                 }
 
                 if( iguais(tipo, "input") ) {
@@ -250,7 +248,7 @@ Module* carregaCircuito(FILE* arquivo)
                     if( isIdentificador(it) ) {
                         if( identExiste(identificadores, it->valor) ) {
                             show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                            return NULL;
+                            goto bad_return;
                         }
                         else {
                             insereTokenString(identificadores, it->valor, -1, -1);
@@ -263,7 +261,7 @@ Module* carregaCircuito(FILE* arquivo)
                     else {
                         show_error_msg("Identificador nao foi encontrado",
                                        it->linha, it->coluna, "um identificador", it->valor);
-                        return NULL;
+                        goto bad_return;
                     }
                 }
 
@@ -279,19 +277,19 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-               return NULL;
+               goto bad_return;
             }
 
             if( !isIdentificador(it) ) {
                 show_error_msg("Identificador nao foi encontrado",
                              it->linha, it->coluna, "um identificador", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             // verificar se pode utilizar este identificador
             if( identExiste(identificadores, it->valor) ) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                    return NULL;
+                    goto bad_return;
             }
             
             // adicionar na lista de identificadores usados
@@ -303,13 +301,13 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-               return NULL;
+               goto bad_return;
             }
 
             if(it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ";", it->valor);
-                return NULL;
+                goto bad_return;
             }
         }
         else if( isPortaLogica(it->valor) ) {
@@ -348,7 +346,7 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou '#", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe == SYM_HASHTAG ) {
@@ -357,7 +355,7 @@ Module* carregaCircuito(FILE* arquivo)
                 if(!it) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, "um numero inteiro nao negativo", NULL);
-                    return NULL;
+                    goto bad_return;
                 }
                 else if( !isNumNaturalValido(it->valor) ) {
                     char esperado[100];
@@ -366,7 +364,7 @@ Module* carregaCircuito(FILE* arquivo)
                             MAX_DIGITOS_NUM);
                     show_error_msg("Numero valido nao foi encontrado",
                                    it->linha, it->coluna, esperado, it->valor);
-                    return NULL;
+                    goto bad_return;
                 }
                 else {
                     // Guardar o atraso dessa porta
@@ -377,14 +375,14 @@ Module* carregaCircuito(FILE* arquivo)
 
                 if(!it) {
                     show_error_msg("Final do arquivo nao esperado", -1, -1, "(", NULL);
-                    return NULL;
+                    goto bad_return;
                 }
             }
 
             if( it->classe != SYM_OPEN_BRACKET ) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, "(", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             avanca(&it);
@@ -392,7 +390,7 @@ Module* carregaCircuito(FILE* arquivo)
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "identificador para wire ou output", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( identExiste(listaWire, it->valor) ) {
@@ -411,20 +409,20 @@ Module* carregaCircuito(FILE* arquivo)
                 show_error_msg("Fio ou saida nao foi encontrado",
                                it->linha, it->coluna,
                                "identificador para wire ou output", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             avanca(&it);
 
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ",", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe != SYM_COMMA ) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ",", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             porta_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
@@ -434,7 +432,7 @@ Module* carregaCircuito(FILE* arquivo)
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "um identificador", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( identExiste(listaWire, it->valor) ) {
@@ -460,7 +458,7 @@ Module* carregaCircuito(FILE* arquivo)
                                it->linha, it->coluna,
                                "uma entrada valida (tipos: input, output ou wire)",
                                it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             avanca(&it);
@@ -475,14 +473,14 @@ Module* carregaCircuito(FILE* arquivo)
                                    -1, -1, ",' ou ')", NULL);
                 }
 
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe != SYM_CLOSE_BRACKET ) {
                 if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
-                    return NULL;
+                    goto bad_return;
                 }
                 else {
                     if( it->classe == SYM_COMMA ) {
@@ -491,7 +489,7 @@ Module* carregaCircuito(FILE* arquivo)
                     else {
                         show_error_msg("Simbolo esperado nao foi encontrado",
                                        it->linha, it->coluna, ")' ou ',", it->valor);
-                        return NULL;
+                        goto bad_return;
                     }
                 }
             }
@@ -500,13 +498,13 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe != SYM_SEMICOLON ) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ";", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             // finalmente, inserimos a porta na lista de portas do circuito
@@ -519,7 +517,7 @@ Module* carregaCircuito(FILE* arquivo)
             if(it) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "nenhum codigo a mais", it->valor);
-                return NULL;
+                goto bad_return;
             }
             else {
                 // Liberar a memoria alocada no inicio da funcao
@@ -536,7 +534,7 @@ Module* carregaCircuito(FILE* arquivo)
         else if( it->classe == KW_INITIAL ) {
             show_error_msg("Lamentamos mas o initial ainda nao foi implementado",
                            it->linha, it->coluna, "algum comando", it->valor);
-            return NULL;
+            goto bad_return;
         }
         else if( it->classe == KW_LOCALPARAM ) {
             avanca(&it);
@@ -544,24 +542,24 @@ Module* carregaCircuito(FILE* arquivo)
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "um identificador", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( !isIdentificador(it) ) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "um identificador", it->valor);
-                return NULL;
+                goto bad_return;
             }
     
             if( identExiste(identificadores, it->valor) ) {
                 show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                return NULL;
+                goto bad_return;
             }
 
             if( len(it->valor) > MAX_PARAM_NAME_SIZE ) {
                 printf("%d:%d: erro: O identificador '%s' excede o tamanho maximo de %d para parametros.\n",
                        it->linha, it->coluna, it->valor, MAX_PARAM_NAME_SIZE);
-                return NULL;
+                goto bad_return;
             }
 
             insereTokenString(identificadores, it->valor, -1, -1);
@@ -575,13 +573,13 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, "=", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe != SYM_EQ ) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "=", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             avanca(&it);
@@ -589,14 +587,14 @@ Module* carregaCircuito(FILE* arquivo)
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "um numero literal", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             // TODO: implement for all number types and notations
             if( !isNumNaturalValido(it->valor) ) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "um numero", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             param->value = atoi(it->valor);
@@ -605,13 +603,13 @@ Module* carregaCircuito(FILE* arquivo)
 
             if(!it) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
-                return NULL;
+                goto bad_return;
             }
 
             if( it->classe != SYM_SEMICOLON ) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ";", it->valor);
-                return NULL;
+                goto bad_return;
             }
 
             // include the param in the circuit struct
@@ -620,16 +618,26 @@ Module* carregaCircuito(FILE* arquivo)
         else {
             show_error_msg("Token inesperado foi encontrado",
                            it->linha, it->coluna, "algum comando", it->valor);
-            return NULL;
+            goto bad_return;
         }
 
         avanca(&it);
 
         if(!it) {
             show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-            return NULL;
+            goto bad_return;
         }
     }
+
+bad_return:
+    // free mem allocated in the head of this func
+    delete_lista_token(identificadores);
+    delete_lista_token(identificLivre);
+    delete_lista_token(listaInput);
+    delete_lista_token(listaOutput);
+    delete_lista_token(listaWire);
+    delete_lista_token(list_param);
+    delete_lista_token(tokens);
 
     return NULL;
 }
