@@ -170,10 +170,8 @@ Module* carregaCircuito(FILE* arquivo)
 
     avanca(&it);
 
-    if(!it) {
-        show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-        goto bad_return;
-    }
+    if(!it)
+        goto bad_return_unexpected_eof;
 
     porta = NULL;
 
@@ -275,10 +273,8 @@ Module* carregaCircuito(FILE* arquivo)
         else if( it->classe == KW_REG ) {
             avanca(&it);
 
-            if(!it) {
-               show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-               goto bad_return;
-            }
+            if(!it)
+               goto bad_return_unexpected_eof;
 
             if( !isIdentificador(it) ) {
                 show_error_msg("Identificador nao foi encontrado",
@@ -299,10 +295,8 @@ Module* carregaCircuito(FILE* arquivo)
 
             avanca(&it);
 
-            if(!it) {
-               show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-               goto bad_return;
-            }
+            if(!it)
+               goto bad_return_unexpected_eof;
 
             if(it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
@@ -623,11 +617,13 @@ Module* carregaCircuito(FILE* arquivo)
 
         avanca(&it);
 
-        if(!it) {
-            show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
-            goto bad_return;
-        }
+        if(!it)
+            goto bad_return_unexpected_eof;
+            
     }
+
+bad_return_unexpected_eof:
+    show_error_msg("Final do arquivo nao esperado", -1, -1, NULL, NULL);
 
 bad_return:
     // free mem allocated in the head of this func
