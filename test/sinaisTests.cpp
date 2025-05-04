@@ -10,6 +10,7 @@ class Testes_sinais : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE( Testes_sinais );
   CPPUNIT_TEST( test_novoSinal );
   CPPUNIT_TEST( test_setSinalNome );
+  CPPUNIT_TEST( test_setPulsoNulo );
   CPPUNIT_TEST( test_addPulso );
   CPPUNIT_TEST( test_novaSinais );
   CPPUNIT_TEST( test_addSinal );
@@ -20,30 +21,69 @@ public:
 
   void test_novoSinal()
   {
-    Sinal *sinal = novoSinal( (char*)"teste" );
+    Sinal *sinal_unnamed = novoSinal(NULL);
     
-    CPPUNIT_ASSERT( sinal );
-    CPPUNIT_ASSERT( !strcmp( (char*)"teste", (char*)sinal->nome ) );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal->duracaoTotal );
+    CPPUNIT_ASSERT( sinal_unnamed );
+    CPPUNIT_ASSERT( !strcmp( (char*)"", (char*)sinal_unnamed->nome ) );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_unnamed->duracaoTotal );
+
+    Sinal *sinal_teste = novoSinal( (char*)"teste" );
+    
+    CPPUNIT_ASSERT( sinal_teste );
+    CPPUNIT_ASSERT( !strcmp( (char*)"teste", (char*)sinal_teste->nome ) );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_teste->duracaoTotal );
   }
 
   void test_setSinalNome()
   {
     Sinal *sinal = novoSinal( (char*)"teste" );
-    setSinalNome(sinal, (char*)"123" );
+
+    int ret = setSinalNome(sinal, (char*)"123" );
     
+    CPPUNIT_ASSERT(ret);
     CPPUNIT_ASSERT( !strcmp( (char*)"123", (char*)sinal->nome ) );
+
+    ret = setSinalNome(NULL, NULL);
+
+    CPPUNIT_ASSERT(!ret);
+    CPPUNIT_ASSERT( !strcmp( (char*)"123", (char*)sinal->nome ) );
+  }
+
+  void test_setPulsoNulo()
+  {
+    Pulso p;
+
+    int ret = setPulsoNulo(&p);
+    CPPUNIT_ASSERT(ret);
+    CPPUNIT_ASSERT_EQUAL( VAL_BLANK, p.valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, p.tempo );
+    CPPUNIT_ASSERT_EQUAL( UN_S, p.unidade );
+
+    ret = setPulsoNulo(NULL);
+    CPPUNIT_ASSERT(!ret);
   }
 
   void test_addPulso()
   {
     Sinal *sinal = novoSinal( (char*)"teste" );
+
+    CPPUNIT_ASSERT(sinal);
     
-    addPulso(sinal, VAL_0, (Tempo)5);
+    int ret = addPulso(sinal, VAL_0, (Tempo)5);
+    CPPUNIT_ASSERT(ret);
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, sinal->duracaoTotal );
     
-    addPulso(sinal, VAL_0, (Tempo)30000);
+    ret = addPulso(sinal, VAL_0, (Tempo)30000);
+    CPPUNIT_ASSERT(ret);
     CPPUNIT_ASSERT_EQUAL( (Tempo)30005, sinal->duracaoTotal );
+
+    ret = addPulso(NULL, VAL_0, (Tempo)30);
+    CPPUNIT_ASSERT(!ret);
+
+    free(sinal->pulsos);
+    sinal->pulsos = NULL;
+    ret = addPulso(sinal, VAL_0, (Tempo)30);
+    CPPUNIT_ASSERT(!ret);
   }
 
   void test_novaSinais()
