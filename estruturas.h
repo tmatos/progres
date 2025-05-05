@@ -25,7 +25,7 @@ typedef enum en_operador {
     input
 } t_operador;
 
-/** @brief Estrutura que define a porta. Qual sua função lógica e seu delay.
+/** @brief Estrutura que define a porta. Qual sua função logica e seu delay.
  */
 typedef struct st_tipo {
     t_operador operador;
@@ -53,10 +53,12 @@ typedef struct st_componente_list ListaComponente;
 
 typedef struct st_componente * Componente;
 
+#define MAX_COMPONENTE_NAME_SIZE 32
+
 /** @brief Estrutura que representa um componente do circuito (uma porta lógica)
  */
 struct st_componente {
-    char nome[16];
+    char nome[MAX_COMPONENTE_NAME_SIZE];
     t_tipo tipo;
 
     ListaComponente* listaEntrada;
@@ -76,10 +78,12 @@ struct st_componente_list {
     Componente* itens;
 };
 
+#define MAX_REGISTER_NAME_SIZE 32
+
 /** @brief Representação de um registrador.
  */
 typedef struct st_reg {
-    char name[32];
+    char name[MAX_REGISTER_NAME_SIZE];
     unsigned int size; // size in bits
     unsigned int value; // stored binary value
 } Register;
