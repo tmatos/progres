@@ -80,6 +80,7 @@ typedef struct st_token {
     int linha;
     int coluna;
     TokenClass classe;
+    struct st_token* anterior;
     struct st_token* seguinte;
 } Token;
 
@@ -117,11 +118,11 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
  *  @return Verdadeiro caso sucesso, falso caso falhe.
  */
-int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna);
+int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna);
 
 /** @brief Remove todos os tokens com o valor indicado da lista.
  */
-int removeTokensPorValor(ListaToken* lst, char* tok);
+int removeTokensPorValor(ListaToken* lst, const char* tok);
 
 /** @brief Faz o apend de um char numa string qualquer.
  */

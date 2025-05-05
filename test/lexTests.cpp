@@ -13,6 +13,8 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_iguais );
   CPPUNIT_TEST( test_apenasDigitos );
   CPPUNIT_TEST( test_novaListaToken );
+  CPPUNIT_TEST( test_insereTokenString );
+  CPPUNIT_TEST( test_removeTokensPorValor );
   CPPUNIT_TEST( test_isSimbolo );
   CPPUNIT_TEST( test_isIdentificador );
   CPPUNIT_TEST( test_isPalavra );
@@ -33,7 +35,86 @@ public:
     CPPUNIT_ASSERT(l);
     CPPUNIT_ASSERT( ! l->primeiro );
     CPPUNIT_ASSERT( ! l->ultimo );
-    CPPUNIT_ASSERT_EQUAL( l->tamanho, 0 );
+    CPPUNIT_ASSERT_EQUAL( 0, l->tamanho );
+  }  
+
+  void test_insereTokenString()
+  {
+    ListaToken* l = novaListaToken();
+
+    std::string token0("my_token");
+    std::string token1("<=");
+    
+    insereTokenString(l, token0.c_str(), 3000, 200);
+    
+    CPPUNIT_ASSERT(l);
+    CPPUNIT_ASSERT( l->primeiro );
+    CPPUNIT_ASSERT( l->ultimo );
+    CPPUNIT_ASSERT( l->primeiro == l->ultimo );
+    CPPUNIT_ASSERT( ! l->primeiro->seguinte );
+    CPPUNIT_ASSERT( ! l->primeiro->anterior );
+    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
+    CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
+    CPPUNIT_ASSERT( !strcmp(token0.c_str(), l->primeiro->valor) );
+    
+    insereTokenString(l, token1.c_str(), 3000, 210);
+    
+    CPPUNIT_ASSERT(l);
+    CPPUNIT_ASSERT( l->primeiro );
+    CPPUNIT_ASSERT( l->ultimo );
+    CPPUNIT_ASSERT( l->primeiro != l->ultimo );
+    CPPUNIT_ASSERT_EQUAL( 2, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
+    CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
+    CPPUNIT_ASSERT( !strcmp(token0.c_str(), l->primeiro->valor) );
+    CPPUNIT_ASSERT_EQUAL( 3000, l->ultimo->linha );
+    CPPUNIT_ASSERT_EQUAL( 210, l->ultimo->coluna );
+    CPPUNIT_ASSERT( !strcmp(token1.c_str(), l->ultimo->valor) );
+    CPPUNIT_ASSERT( ! l->primeiro->anterior );
+    CPPUNIT_ASSERT( ! l->ultimo->seguinte );
+    CPPUNIT_ASSERT( l->primeiro->seguinte == l->ultimo );
+    CPPUNIT_ASSERT( l->primeiro == l->ultimo->anterior );
+  }
+
+  void test_removeTokensPorValor()
+  {
+    ListaToken* l = novaListaToken();
+
+    std::string token0("none");
+    std::string token1("<=");
+    std::string token2("wire");
+    std::string token3("#");
+    std::string tokenZ("zzzzz");
+    
+    insereTokenString(l, token0.c_str(), 500, 210);
+    CPPUNIT_ASSERT(l);
+    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+    
+    removeTokensPorValor(l, tokenZ.c_str()); // nao sera encontrado
+    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+
+    removeTokensPorValor(l, token0.c_str());
+    CPPUNIT_ASSERT_EQUAL( 0, l->tamanho );
+    CPPUNIT_ASSERT( ! l->primeiro );
+    CPPUNIT_ASSERT( ! l->ultimo );
+
+    insereTokenString(l, token0.c_str(), 10, 1);
+    insereTokenString(l, token1.c_str(), 20, 1);
+    insereTokenString(l, token2.c_str(), 50, 1);
+    insereTokenString(l, token3.c_str(), 500, 1);
+    CPPUNIT_ASSERT_EQUAL( 4, l->tamanho );
+
+    removeTokensPorValor(l, token0.c_str());
+    CPPUNIT_ASSERT_EQUAL( 3, l->tamanho );
+
+    removeTokensPorValor(l, token2.c_str());
+    CPPUNIT_ASSERT_EQUAL( 2, l->tamanho );
+    CPPUNIT_ASSERT( l->primeiro != l->ultimo );
+
+    removeTokensPorValor(l, token3.c_str());
+    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+    CPPUNIT_ASSERT( l->primeiro == l->ultimo );
   }
 
   void test_iguais()

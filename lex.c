@@ -168,13 +168,14 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
     return insereTokenString(lista, s, p_linha, p_coluna);
 }
 
-int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
+int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna)
 {
     Token* newtok = (Token*) xmalloc(sizeof(Token));
 
     copy(newtok->valor, tok);
     newtok->linha = p_linha;
     newtok->coluna = p_coluna;
+    newtok->anterior = NULL;
     newtok->seguinte = NULL;
 
     TokenClass tc = _UNKNOWN;
@@ -252,12 +253,9 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
         lista->primeiro = newtok;
         lista->ultimo = newtok;
     }
-    else if(lista->tamanho == 1) {
-        lista->primeiro->seguinte = newtok;
-        lista->ultimo = newtok;
-    }
     else {
         lista->ultimo->seguinte = newtok;
+        newtok->anterior = lista->ultimo;
         lista->ultimo = newtok;
     }
 
@@ -266,7 +264,7 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
     return 1;
 }
 
-int removeTokensPorValor(ListaToken* lst, char* tok)
+int removeTokensPorValor(ListaToken* lst, const char* tok)
 {
     Token *tmp = NULL;
     Token *anterior = NULL;
@@ -283,18 +281,17 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
     {
         if(iguais(it->valor, tok))
         {
-            if(anterior)
-            {
+            if(anterior) {
                 if(it->seguinte) {
                     anterior->seguinte = it->seguinte;
+                    it->seguinte->anterior = anterior;
                     tmp = it;
-                    anterior = it;
                     avanca(&it);
                     free(tmp);
                     lst->tamanho--;
                     continue;
                 }
-                else { // caso em que removemos do final da lista
+                else { // caso em que removemos item no final da lista
                     tmp = it;
                     anterior->seguinte = NULL;
                     lst->ultimo = anterior;
@@ -303,12 +300,12 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
                     break;
                 }
             }
-            else
-            {
-                if(it->seguinte) {
+            else {
+                if(it->seguinte) { // primeiro da lista eh removido e ha outros itens
                     tmp = it;
                     lst->primeiro = it->seguinte;
                     avanca(&it);
+                    it->anterior = NULL;
                     free(tmp);
                     lst->tamanho--;
                     continue;
@@ -317,7 +314,7 @@ int removeTokensPorValor(ListaToken* lst, char* tok)
                     tmp = it;
                     lst->primeiro = NULL;
                     lst->ultimo = NULL;
-                    lst->tamanho--;
+                    lst->tamanho = 0;
                     free(tmp);
                     break;
                 }
