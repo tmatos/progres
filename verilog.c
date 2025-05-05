@@ -278,14 +278,14 @@ Module* carregaCircuito(FILE* arquivo)
 
             if( !isIdentificador(it) ) {
                 show_error_msg("Identificador nao foi encontrado",
-                             it->linha, it->coluna, "um identificador", it->valor);
+                               it->linha, it->coluna, "um identificador", it->valor);
                 goto bad_return;
             }
 
             // verificar se pode utilizar este identificador
             if( identExiste(identificadores, it->valor) ) {
-                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                    goto bad_return;
+                show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                goto bad_return;
             }
             
             // adicionar na lista de identificadores usados
@@ -339,7 +339,26 @@ Module* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou '#", NULL);
+                show_error_msg("Final do arquivo nao esperado", -1, -1,
+                               "(', identificador ou '#", NULL);
+                goto bad_return;
+            }
+
+            if( isIdentificador(it) ) {  
+                if( identExiste(identificadores, it->valor) ) {
+                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                    goto bad_return;
+                }
+
+                insereTokenString(identificadores, it->valor, -1, -1);
+                copy(porta->nome, it->valor);
+
+                avanca(&it);
+            }
+
+            if(!it) {
+                show_error_msg("Final do arquivo nao esperado", -1, -1,
+                               "(' ou '#", NULL);
                 goto bad_return;
             }
 
