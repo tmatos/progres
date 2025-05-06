@@ -18,6 +18,7 @@
 
 int main(int argc, char* argv[])
 {
+    int i;
     FILE* f_verilog_source = NULL;
     FILE* f_wave_in = NULL;
     FILE* f_wave_out = NULL;
@@ -95,9 +96,16 @@ int main(int argc, char* argv[])
         printf("Simulacao concluida com saidas geradas.\n");
     }
 
-    if(sinais_entradas->lista)
-        free(sinais_entradas->lista);
-    free(sinais_entradas);
+    // free mem (inputs)
+    if(sinais_entradas) {
+        for( i=0 ; i < sinais_entradas->quantidade ; i++ )
+            free(sinais_entradas->lista[i].pulsos);
+        
+        if(sinais_entradas->lista)
+            free(sinais_entradas->lista);
+
+        free(sinais_entradas);
+    }
 
     f_wave_out = fopen(str_wave_out_filepath, "w");
 
@@ -111,9 +119,43 @@ int main(int argc, char* argv[])
     fclose(f_wave_out);
     printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
 
-    if(sinais_saidas->lista)
-        free(sinais_saidas->lista);
-    free(sinais_saidas);
+    // free mem (outputs)
+    if(sinais_saidas) {
+        for( i=0 ; i < sinais_saidas->quantidade ; i++ )
+            free(sinais_saidas->lista[i].pulsos);
+        
+        if(sinais_saidas->lista)
+            free(sinais_saidas->lista);
+
+        free(sinais_saidas);
+    }
+
+    // free mem (circuit)
+    if(circuto1) {
+        if(circuto1->listaFiosEntrada->itens)
+            free(circuto1->listaFiosEntrada->itens);
+        free(circuto1->listaFiosEntrada);
+
+        if(circuto1->listaFiosSaida->itens)
+            free(circuto1->listaFiosSaida->itens);
+        free(circuto1->listaFiosSaida);
+
+        if(circuto1->listaPortas->itens)
+            free(circuto1->listaPortas->itens);
+        free(circuto1->listaPortas);
+
+        if(circuto1->listaWires->itens)
+            free(circuto1->listaWires->itens);
+        free(circuto1->listaWires);
+
+        if(circuto1->listaParam.itens)
+            free(circuto1->listaParam.itens);
+
+        if(circuto1->listaReg.itens)
+            free(circuto1->listaReg.itens);
+        
+        free(circuto1);
+    }
 
     return 0;
 }
