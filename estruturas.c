@@ -150,6 +150,24 @@ void addParam(Module* circ, Param* param)
     circ->listaParam.itens[circ->listaParam.total - 1] = param;
 }
 
+Param* get_param_by_name(ListaParam list, const char* name)
+{
+    int i;
+    Param* r = NULL;
+
+    if(!name)
+        return r;
+    
+    for ( i = 0 ; i < list.total ; i++ ) {
+        if( iguais(list.itens[i]->name, name) ) {
+            r = list.itens[i];
+            break;
+        }
+    }
+    
+    return r;
+}
+
 int contemComponente(ListaComponente* ls, Componente cp)
 {
     int i;

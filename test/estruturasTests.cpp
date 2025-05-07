@@ -3,6 +3,7 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
+#include "../lex.h"
 #include "../sinais.h"
 #include "../estruturas.h"
 
@@ -15,6 +16,7 @@ class Testes_estruturas : public CppUnit::TestFixture
   CPPUNIT_TEST( test_novoCircuito );
   CPPUNIT_TEST( test_insereComponente );
   CPPUNIT_TEST( test_getXPorNome );
+  CPPUNIT_TEST( test_get_param_by_name );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -128,6 +130,35 @@ public:
     CPPUNIT_ASSERT( !getWirePorNome(circ, str_in) );
     CPPUNIT_ASSERT( !getInputPorNome(circ, str_out) );
     CPPUNIT_ASSERT( !getOutputPorNome(circ, str_in) );
+  }
+
+  void test_get_param_by_name()
+  {
+    char str_param_name[] = "ALGUM_NOME_001";
+    int N = 255;
+
+    Module* circ = novoCircuito();
+    CPPUNIT_ASSERT(circ);
+
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, str_param_name) );
+
+    Param p;
+    p.is_local = 0;
+    p.value = N;
+    copy(p.name, str_param_name);
+
+    addParam(circ, &p);
+
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, NULL) );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "") );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "algum") );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "ALGUM") );
+
+    Param* r = get_param_by_name(circ->listaParam, str_param_name);
+
+    CPPUNIT_ASSERT( r );
+    CPPUNIT_ASSERT( !strcmp(str_param_name, r->name) );
+    CPPUNIT_ASSERT_EQUAL( N, r->value );
   }
 
 };

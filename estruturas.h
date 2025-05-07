@@ -126,6 +126,14 @@ void addRegister(Module* circ, const char* name, unsigned int size);
  */
 void addParam(Module* circ, Param* param);
 
+/** @brief Obter um Param de uma lista usando o nome como chave.
+ *  @param list Uma struct 'ListaParam'.
+ *  @param name String com o nome dado ao param. 
+ *  @return Um ponteiro para a struct 'Param' correspondente, caso encontrado.
+ *          NULL, caso nao seja encontrada uma correspondencia.
+ */
+Param* get_param_by_name(ListaParam list, const char* name);
+
 /** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
  */
 void adicionaEntrada(Module* circ, Componente comp);
