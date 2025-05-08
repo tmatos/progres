@@ -122,6 +122,14 @@ Module* novoCircuito();
  */
 void addRegister(Module* circ, const char* name, unsigned int size);
 
+/** @brief Obter um Register de uma lista usando o nome como chave.
+ *  @param list Uma struct 'ListaReg'.
+ *  @param name String com o nome dado ao registrador. 
+ *  @return Um ponteiro para a struct 'Register' correspondente, caso encontrado.
+ *          NULL, caso nao seja encontrada uma correspondencia.
+ */
+Register* get_reg_by_name(ListaReg list, const char* name);
+
 /** @brief Inserir um parametro novo no circuito.
  */
 void addParam(Module* circ, Param* param);

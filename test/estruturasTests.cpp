@@ -17,6 +17,7 @@ class Testes_estruturas : public CppUnit::TestFixture
   CPPUNIT_TEST( test_insereComponente );
   CPPUNIT_TEST( test_getXPorNome );
   CPPUNIT_TEST( test_get_param_by_name );
+  CPPUNIT_TEST( test_get_reg_by_name );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -159,6 +160,28 @@ public:
     CPPUNIT_ASSERT( r );
     CPPUNIT_ASSERT( !strcmp(str_param_name, r->name) );
     CPPUNIT_ASSERT_EQUAL( N, r->value );
+  }
+
+  void test_get_reg_by_name()
+  {
+    char str_reg_name[] = "register_ALGUM_NOME_001";
+
+    Module* circ = novoCircuito();
+    CPPUNIT_ASSERT(circ);
+
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, str_reg_name) );
+
+    addRegister(circ, str_reg_name, 32);
+
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, NULL) );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "") );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "algum") );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "ALGUM") );
+
+    Register* r = get_reg_by_name(circ->listaReg, str_reg_name);
+
+    CPPUNIT_ASSERT( r );
+    CPPUNIT_ASSERT( !strcmp(str_reg_name, r->name) );
   }
 
 };

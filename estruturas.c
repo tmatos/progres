@@ -135,6 +135,22 @@ void addRegister(Module* circ, const char* name, unsigned int size)
     circ->listaReg.itens[circ->listaReg.total - 1] = reg;
 }
 
+Register* get_reg_by_name(ListaReg list, const char* name)
+{
+    int i;
+
+    if(!name)
+        return NULL;
+    
+    for ( i = 0 ; i < list.total ; i++ ) {
+        if( iguais(list.itens[i]->name, name) ) {
+            return list.itens[i];
+        }
+    }
+    
+    return NULL;
+}
+
 void addParam(Module* circ, Param* param)
 {
     if(circ->listaParam.total == 0) {
@@ -153,19 +169,17 @@ void addParam(Module* circ, Param* param)
 Param* get_param_by_name(ListaParam list, const char* name)
 {
     int i;
-    Param* r = NULL;
 
     if(!name)
-        return r;
+        return NULL;
     
     for ( i = 0 ; i < list.total ; i++ ) {
         if( iguais(list.itens[i]->name, name) ) {
-            r = list.itens[i];
-            break;
+            return list.itens[i];
         }
     }
     
-    return r;
+    return NULL;
 }
 
 int contemComponente(ListaComponente* ls, Componente cp)
@@ -175,8 +189,7 @@ int contemComponente(ListaComponente* ls, Componente cp)
     if(!ls || !cp)
         return 0;
 
-    for( i=0 ; i < ls->tamanho ; i++ )
-    {
+    for( i=0 ; i < ls->tamanho ; i++ ) {
         if( ls->itens[i] == cp ) {
             return 1;
         }
@@ -185,7 +198,8 @@ int contemComponente(ListaComponente* ls, Componente cp)
     return 0;
 }
 
-Componente novoComponente(const char* nome, t_operador porta) {
+Componente novoComponente(const char* nome, t_operador porta)
+{
     Componente c = (Componente) xmalloc(sizeof(struct st_componente));
 
     copy(c->nome, nome);
@@ -210,10 +224,8 @@ Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
     if(!ls || !nome)
         return NULL;
 
-    for( i=0 ; i < ls->tamanho ; i++ )
-    {
-        if( iguais( ls->itens[i]->nome, nome ) )
-        {
+    for( i=0 ; i < ls->tamanho ; i++ ) {
+        if( iguais(ls->itens[i]->nome, nome) ) {
            return ls->itens[i];
         }
     }

@@ -18,6 +18,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_reg_v );
   CPPUNIT_TEST( test_carregaCircuito_localparam_test_v );
   CPPUNIT_TEST( test_carregaCircuito_named_gates_test_v );
+  CPPUNIT_TEST( test_carregaCircuito_initial_single_test_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
   CPPUNIT_TEST_SUITE_END();
 
@@ -113,6 +114,22 @@ public:
     fclose(file);
   }
 
+  void test_carregaCircuito_initial_single_test_v()
+  {
+    Module* circuit = NULL;
+    FILE* file = fopen("./verilog_sample_src/initial_single_test.v", "r");
+    CPPUNIT_ASSERT( file );
+    circuit = carregaCircuito(file);
+    CPPUNIT_ASSERT( circuit );
+    CPPUNIT_ASSERT_EQUAL( 1, circuit->listaParam.total );
+    CPPUNIT_ASSERT_EQUAL( 0, circuit->listaParam.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( 2, circuit->listaReg.total );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)0, circuit->listaReg.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)1, circuit->listaReg.itens[1]->value );
+    free(circuit);
+    fclose(file);
+  }
+
   void test_carregaCircuito_badverilog_XX_v()
   {
     std::list<std::string> list_bad_files = {
@@ -181,7 +198,16 @@ public:
       "./verilog_sample_src/badverilog_58.v",
       "./verilog_sample_src/badverilog_59.v",
       "./verilog_sample_src/badverilog_60.v",
-      "./verilog_sample_src/badverilog_61.v"
+      "./verilog_sample_src/badverilog_61.v",
+      "./verilog_sample_src/badverilog_62.v",
+      "./verilog_sample_src/badverilog_63.v",
+      "./verilog_sample_src/badverilog_64.v",
+      "./verilog_sample_src/badverilog_65.v",
+      "./verilog_sample_src/badverilog_66.v",
+      "./verilog_sample_src/badverilog_67.v",
+      "./verilog_sample_src/badverilog_68.v",
+      "./verilog_sample_src/badverilog_69.v",
+      "./verilog_sample_src/badverilog_70.v"
     };
 
     Module* circuit = NULL;

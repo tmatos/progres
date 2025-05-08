@@ -545,9 +545,65 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            show_error_msg("Lamentamos mas o initial ainda nao foi implementado",
-                           it->linha, it->coluna, "algum comando", it->valor);
-            goto bad_return;
+            avanca(&it);
+            if(!it)
+                goto bad_return_unexpected_eof;
+
+            // treat a single statement attrib
+            if( identExiste(identificadores, it->valor) ){
+                // waiting for a reg, for now
+                Register* left_reg = NULL;
+                left_reg = get_reg_by_name(circuito->listaReg, it->valor);
+
+                if(!left_reg) {
+                    show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
+                                   it->linha, it->coluna, "um registrador", it->valor);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if(!it)
+                    goto bad_return_unexpected_eof;
+                
+                if(it->classe != SYM_EQ) {
+                    show_error_msg("Token inesperado foi encontrado",
+                                   it->linha, it->coluna, "=", it->valor);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if(!it)
+                    goto bad_return_unexpected_eof;
+
+                // agora ele espera um literal ou parametro
+                if(isNumNaturalValido(it->valor)) {
+                    left_reg->value = atoi(it->valor);
+                }
+                else if (identExiste(list_param, it->valor)) {
+                    Param* p = get_param_by_name(circuito->listaParam, it->valor);
+                    left_reg->value = p->value;
+                }
+                else {
+                    show_error_msg("Token inesperado foi encontrado",
+                                   it->linha, it->coluna, "um numero ou parametro", it->valor);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if(!it)
+                    goto bad_return_unexpected_eof;
+        
+                if(it->classe != SYM_SEMICOLON) {
+                    show_error_msg("Token inesperado foi encontrado",
+                                   it->linha, it->coluna, ";", it->valor);
+                    goto bad_return;
+                }
+            }
+            else {
+                show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
+                               it->linha, it->coluna, "apenas uma atribuicao", it->valor);
+                goto bad_return;
+            }
         }
         else if( it->classe == KW_LOCALPARAM ) {
             avanca(&it);

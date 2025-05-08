@@ -9,3 +9,4 @@ test/coverage.txt
 generated-docs/
 .vscode/settings.json
 IDE/IDE.layout
+benchmarks/
