@@ -196,6 +196,7 @@ public:
       "./verilog_sample_src/badverilog_56.v",
       "./verilog_sample_src/badverilog_57.v",
       "./verilog_sample_src/badverilog_58.v",
+      "./verilog_sample_src/badverilog_58a.v",
       "./verilog_sample_src/badverilog_59.v",
       "./verilog_sample_src/badverilog_60.v",
       "./verilog_sample_src/badverilog_61.v",
