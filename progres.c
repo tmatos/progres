@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,14 +29,21 @@ int main(int argc, char* argv[])
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 
-    if(argc < 2) {
-        printf("Uso: progres [arquivo verilog] [arquivo de entradas]\n");
+    if (argc < 2 || !strcmp(argv[1], "-h")) {
+        printf(_HELP_STRING_BRIEF);
+        exit(0);
+    }
+
+    if (!strcmp(argv[1], "-v")) {
+        printf("Progres Verilog Simulator - version %s\n"
+               "(C) 2014-2025 Tiago Matos (tmatos.net)\n",
+               _PROGRES_VERSION);
         exit(0);
     }
 
     f_verilog_source = fopen(argv[1], "r");
 
-    if(!f_verilog_source) {
+    if (!f_verilog_source) {
         printf("Impossibilitado de abrir o arquivo: %s\n", argv[1]);
         exit(1);
     }
@@ -47,7 +54,7 @@ int main(int argc, char* argv[])
 
     fclose(f_verilog_source);
 
-    if(circuto1) {
+    if (circuto1) {
         printf("Circuito carregado com sucesso.\n");
     }
     else {
@@ -56,7 +63,7 @@ int main(int argc, char* argv[])
     }
 
     // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
-    if(argc == 2) {
+    if (argc == 2) {
         printf("Para haver simulacao, um arquivo de entrada deve ser fornecido.\n");
         exit(0);
     }
@@ -64,7 +71,7 @@ int main(int argc, char* argv[])
     // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
     f_wave_in = fopen(argv[2], "r");
 
-    if(!f_wave_in) {
+    if (!f_wave_in) {
         printf("Impossibilitado de abrir o arquivo de entrada: %s\n", argv[2]);
         exit(1);
     }
@@ -75,13 +82,13 @@ int main(int argc, char* argv[])
 
     fclose(f_wave_in);
 
-    if(!sinais_entradas) {
+    if (!sinais_entradas) {
         printf("Nao ha entradas para a simulacao do circuito.\n");
         exit(1);
     }
 
     // se foi fornecido o argumento com path para arquivo de saida
-    if(argc > 3) {
+    if (argc > 3) {
         strcpy(str_wave_out_filepath, argv[3]);
     }
     else {
@@ -92,16 +99,16 @@ int main(int argc, char* argv[])
 
     sinais_saidas = simula(circuto1, sinais_entradas);
 
-    if(sinais_saidas) {
+    if (sinais_saidas) {
         printf("Simulacao concluida com saidas geradas.\n");
     }
 
     // free mem (inputs)
-    if(sinais_entradas) {
-        for( i=0 ; i < sinais_entradas->quantidade ; i++ )
+    if (sinais_entradas) {
+        for ( i=0 ; i < sinais_entradas->quantidade ; i++ )
             free(sinais_entradas->lista[i].pulsos);
         
-        if(sinais_entradas->lista)
+        if (sinais_entradas->lista)
             free(sinais_entradas->lista);
 
         free(sinais_entradas);
@@ -109,7 +116,7 @@ int main(int argc, char* argv[])
 
     f_wave_out = fopen(str_wave_out_filepath, "w");
 
-    if(!f_wave_out) {
+    if (!f_wave_out) {
         printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n",
                str_wave_out_filepath);
         exit(1);
@@ -120,38 +127,38 @@ int main(int argc, char* argv[])
     printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
 
     // free mem (outputs)
-    if(sinais_saidas) {
-        for( i=0 ; i < sinais_saidas->quantidade ; i++ )
+    if (sinais_saidas) {
+        for ( i=0 ; i < sinais_saidas->quantidade ; i++ )
             free(sinais_saidas->lista[i].pulsos);
         
-        if(sinais_saidas->lista)
+        if (sinais_saidas->lista)
             free(sinais_saidas->lista);
 
         free(sinais_saidas);
     }
 
     // free mem (circuit)
-    if(circuto1) {
-        if(circuto1->listaFiosEntrada->itens)
+    if (circuto1) {
+        if (circuto1->listaFiosEntrada->itens)
             free(circuto1->listaFiosEntrada->itens);
         free(circuto1->listaFiosEntrada);
 
-        if(circuto1->listaFiosSaida->itens)
+        if (circuto1->listaFiosSaida->itens)
             free(circuto1->listaFiosSaida->itens);
         free(circuto1->listaFiosSaida);
 
-        if(circuto1->listaPortas->itens)
+        if (circuto1->listaPortas->itens)
             free(circuto1->listaPortas->itens);
         free(circuto1->listaPortas);
 
-        if(circuto1->listaWires->itens)
+        if (circuto1->listaWires->itens)
             free(circuto1->listaWires->itens);
         free(circuto1->listaWires);
 
-        if(circuto1->listaParam.itens)
+        if (circuto1->listaParam.itens)
             free(circuto1->listaParam.itens);
 
-        if(circuto1->listaReg.itens)
+        if (circuto1->listaReg.itens)
             free(circuto1->listaReg.itens);
         
         free(circuto1);
