@@ -204,6 +204,8 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
         tc = KW_WIRE;
     else if( iguais(tok, "reg") )
         tc = KW_REG;
+    else if( iguais(tok, "signed") )
+        tc = KW_SIGNED;
     else if( iguais(tok, "module") )
         tc = KW_MODULE;
     else if( iguais(tok, "endmodule") )

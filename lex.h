@@ -43,6 +43,7 @@ typedef enum en_token_class {
     KW_REAL,
     KW_REALTIME,
     KW_REG,
+    KW_SIGNED,
     KW_TIME,
     KW_TRI,
     KW_WIRE,

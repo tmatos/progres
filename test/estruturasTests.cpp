@@ -171,7 +171,7 @@ public:
 
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, str_reg_name) );
 
-    addRegister(circ, str_reg_name, 32);
+    addRegister(circ, str_reg_name, 32, 0);
 
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, NULL) );
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "") );

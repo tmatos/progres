@@ -26,4 +26,6 @@ localparam EXTRA_FLAGS_END = 23;
 
 reg [EXTRA_FLAGS_END:EXTRA_FLAGS_START] r_extra_flag;
 
+reg signed [63:0] number_signed;
+
 endmodule

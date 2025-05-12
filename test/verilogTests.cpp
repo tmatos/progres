@@ -76,18 +76,19 @@ public:
 
   void test_carregaCircuito_reg_v()
   {
-    std::vector<std::tuple<std::string, int>> regs_info {
-      {"bit_is_on", 1},
-      {"bit_is_ok", 1},
-      {"silly_bit", 1},
-      {"ra", 16},
-      {"rb", 16},
-      {"ral", 8},
-      {"rah", 8},
-      {"rax", 32},
-      {"rbx", 32},
-      {"r_flag", 20},
-      {"r_extra_flag", 3}
+    std::vector<std::tuple<std::string, int, int>> regs_info {
+      {"bit_is_on", 1, 0},
+      {"bit_is_ok", 1, 0},
+      {"silly_bit", 1, 0},
+      {"ra", 16, 0},
+      {"rb", 16, 0},
+      {"ral", 8, 0},
+      {"rah", 8, 0},
+      {"rax", 32, 0},
+      {"rbx", 32, 0},
+      {"r_flag", 20, 0},
+      {"r_extra_flag", 3, 0},
+      {"number_signed", 64, 1}
     };
 
     Module* circuit = NULL;
@@ -95,13 +96,15 @@ public:
     CPPUNIT_ASSERT( file );
     circuit = carregaCircuito(file);
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT( circuit->listaReg.total == 11 );
+    CPPUNIT_ASSERT( circuit->listaReg.total == 12 );
 
     for ( int i=0 ; i < circuit->listaReg.total ; i++ ) {
       std::string name = std::get<0>(regs_info[i]);
       unsigned size = std::get<1>(regs_info[i]);
+      int is_signed = std::get<2>(regs_info[i]);
       CPPUNIT_ASSERT( !strcmp(name.c_str(), circuit->listaReg.itens[i]->name) );
-      CPPUNIT_ASSERT_EQUAL( size, circuit->listaReg.itens[i]->size );  
+      CPPUNIT_ASSERT_EQUAL( size, circuit->listaReg.itens[i]->size );
+      CPPUNIT_ASSERT_EQUAL( is_signed, circuit->listaReg.itens[i]->is_signed );
     }
 
     fclose(file);
@@ -229,6 +232,7 @@ public:
       "./verilog_sample_src/badverilog_69.v",
       "./verilog_sample_src/badverilog_70.v",
       "./verilog_sample_src/badverilog_71.v",
+      "./verilog_sample_src/badverilog_71a.v",
       "./verilog_sample_src/badverilog_72.v",
       "./verilog_sample_src/badverilog_73.v",
       "./verilog_sample_src/badverilog_74.v",

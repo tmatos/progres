@@ -275,6 +275,16 @@ Module* carregaCircuito(FILE* arquivo)
             if(!it)
                goto bad_return_unexpected_eof;
 
+            int is_signed = 0;
+
+            if(it->classe == KW_SIGNED) {
+                is_signed = 1;
+                
+                avanca(&it);
+                if(!it)
+                    goto bad_return_unexpected_eof;
+            }
+
             // range specification
             int range_msb = 0;
             int range_lsb = 0;
@@ -360,7 +370,7 @@ Module* carregaCircuito(FILE* arquivo)
             // adicionar na lista de identificadores usados
             insereTokenString(identificadores, it->valor, -1, -1);
 
-            addRegister(circuito, it->valor, (range_msb - range_lsb + 1));
+            addRegister(circuito, it->valor, (range_msb - range_lsb + 1), is_signed);
 
             avanca(&it);
             if(!it)

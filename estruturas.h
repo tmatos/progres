@@ -85,6 +85,7 @@ struct st_componente_list {
 typedef struct st_reg {
     char name[MAX_REGISTER_NAME_SIZE];
     unsigned int size; // size in bits
+    int is_signed; // true if reg signed
     unsigned int value; // stored binary value // TODO: change this type
 } Register;
 
@@ -118,9 +119,13 @@ typedef struct st_module {
 Module* novoCircuito();
 
 /** @brief Inserir um registrador novo no circuito.
- *         `size`é o tamanho em bits.
+ *  @param circ Ponteiro para o circuito.
+ *  @param name Nome dado ao registrador.
+ *  @param size Comprimento, em quantidade de bits.
+ *  @param is_signed Verdadeiro caso seja com sinal.
+ *  @return void
  */
-void addRegister(Module* circ, const char* name, unsigned int size);
+void addRegister(Module* circ, const char* name, unsigned int size, int is_signed);
 
 /** @brief Obter um Register de uma lista usando o nome como chave.
  *  @param list Uma struct 'ListaReg'.

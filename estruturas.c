@@ -114,12 +114,13 @@ void insereComponente(ListaComponente* ls, Componente cp)
     ls->itens[ls->tamanho - 1] = cp;
 }
 
-void addRegister(Module* circ, const char* name, unsigned int size)
+void addRegister(Module* circ, const char* name, unsigned int size, int is_signed)
 {
     Register* reg = (Register*) xmalloc(sizeof(Register));
 
     copy(reg->name, name);
     reg->size = size;
+    reg->is_signed = is_signed;
     reg->value = (unsigned int) VAL_0;
 
     if(circ->listaReg.total == 0) {
