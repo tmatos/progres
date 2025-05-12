@@ -4,15 +4,20 @@ module initial_single_sample(x, y);
 input x;
 output y;
 
-reg ax;
-reg bx;
+reg is_on;
 
-localparam P = 0;
+reg [15:0] ax;
+reg [15:0] bx;
+
+localparam MAX = 65535;
 
 initial
-	ax = P;
+	is_on = 1;
 
 initial
-	bx = 1;
+	ax = 12345;
+
+initial
+	bx = MAX;
 
 endmodule

@@ -272,9 +272,78 @@ Module* carregaCircuito(FILE* arquivo)
         }
         else if( it->classe == KW_REG ) {
             avanca(&it);
-
             if(!it)
                goto bad_return_unexpected_eof;
+
+            // range specification
+            int range_msb = 0;
+            int range_lsb = 0;
+
+            // optional range specification
+            // range ::= [ msb_constant_expression : lsb_constant_expression ]
+            // TODO: calculate the expressions  
+            if (it->classe == SYM_OPEN_SQUAREBRACKET) {
+                avanca(&it);
+                if (!it)
+                   goto bad_return_unexpected_eof;
+
+                if (isNumNaturalValido(it->valor)) {
+                    range_msb = atoi(it->valor);
+                }
+                else if (identExiste(list_param, it->valor)) {
+                    range_msb = get_param_by_name(circuito->listaParam, it->valor)->value;
+                }
+                else {
+                    show_error_msg("Numero para bit mais significativo nao foi encontrado",
+                                   it->linha, it->coluna, "algum numero", it->valor);
+                    goto bad_return;
+                }
+                    
+                avanca(&it);
+                if (!it)
+                   goto bad_return_unexpected_eof;
+
+                if (it->classe != SYM_COLON) {
+                    show_error_msg("Simbolo inesperado",
+                                   it->linha, it->coluna, ":", it->valor);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if (!it)
+                   goto bad_return_unexpected_eof;
+
+                if (isNumNaturalValido(it->valor)) {
+                    range_lsb = atoi(it->valor);
+                }
+                else if (identExiste(list_param, it->valor)) {
+                    range_lsb = get_param_by_name(circuito->listaParam, it->valor)->value;
+                }
+                else {
+                    show_error_msg("Numero para bit menos significativo nao foi encontrado",
+                                   it->linha, it->coluna, "algum numero", it->valor);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if (!it)
+                   goto bad_return_unexpected_eof;
+
+                if (it->classe != SYM_CLOSE_SQUAREBRACKET) {
+                    show_error_msg("Simbolo inesperado", it->linha, it->coluna, "]", it->valor);
+                    goto bad_return;
+                }
+
+                if ( range_msb < range_lsb ) {
+                    show_error_msg("Range invalido",
+                                   it->anterior->linha, it->anterior->coluna, NULL, NULL);
+                    goto bad_return;
+                }
+
+                avanca(&it);
+                if (!it)
+                   goto bad_return_unexpected_eof;
+            }
 
             if( !isIdentificador(it) ) {
                 show_error_msg("Identificador nao foi encontrado",
@@ -291,10 +360,9 @@ Module* carregaCircuito(FILE* arquivo)
             // adicionar na lista de identificadores usados
             insereTokenString(identificadores, it->valor, -1, -1);
 
-            addRegister(circuito, it->valor, 1);
+            addRegister(circuito, it->valor, (range_msb - range_lsb + 1));
 
             avanca(&it);
-
             if(!it)
                goto bad_return_unexpected_eof;
 

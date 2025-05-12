@@ -85,7 +85,7 @@ struct st_componente_list {
 typedef struct st_reg {
     char name[MAX_REGISTER_NAME_SIZE];
     unsigned int size; // size in bits
-    unsigned int value; // stored binary value
+    unsigned int value; // stored binary value // TODO: change this type
 } Register;
 
 /** @brief Estrutura para a lista de registradores de um module.

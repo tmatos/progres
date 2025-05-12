@@ -5,6 +5,8 @@
 #include <cstring>
 #include <list>
 #include <string>
+#include <vector>
+#include <tuple>
 
 #include "../verilog.h"
 
@@ -74,17 +76,34 @@ public:
 
   void test_carregaCircuito_reg_v()
   {
+    std::vector<std::tuple<std::string, int>> regs_info {
+      {"bit_is_on", 1},
+      {"bit_is_ok", 1},
+      {"silly_bit", 1},
+      {"ra", 16},
+      {"rb", 16},
+      {"ral", 8},
+      {"rah", 8},
+      {"rax", 32},
+      {"rbx", 32},
+      {"r_flag", 20},
+      {"r_extra_flag", 3}
+    };
+
     Module* circuit = NULL;
     FILE* file = fopen("./verilog_sample_src/reg.v", "r");
     CPPUNIT_ASSERT( file );
     circuit = carregaCircuito(file);
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT( circuit->listaReg.total == 5 );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[0]->name, "ra") );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[1]->name, "rb") );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[2]->name, "rc") );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[3]->name, "rd") );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaReg.itens[4]->name, "r_flag") );
+    CPPUNIT_ASSERT( circuit->listaReg.total == 11 );
+
+    for ( int i=0 ; i < circuit->listaReg.total ; i++ ) {
+      std::string name = std::get<0>(regs_info[i]);
+      unsigned size = std::get<1>(regs_info[i]);
+      CPPUNIT_ASSERT( !strcmp(name.c_str(), circuit->listaReg.itens[i]->name) );
+      CPPUNIT_ASSERT_EQUAL( size, circuit->listaReg.itens[i]->size );  
+    }
+
     fclose(file);
   }
 
@@ -208,7 +227,19 @@ public:
       "./verilog_sample_src/badverilog_67.v",
       "./verilog_sample_src/badverilog_68.v",
       "./verilog_sample_src/badverilog_69.v",
-      "./verilog_sample_src/badverilog_70.v"
+      "./verilog_sample_src/badverilog_70.v",
+      "./verilog_sample_src/badverilog_71.v",
+      "./verilog_sample_src/badverilog_72.v",
+      "./verilog_sample_src/badverilog_73.v",
+      "./verilog_sample_src/badverilog_74.v",
+      "./verilog_sample_src/badverilog_75.v",
+      "./verilog_sample_src/badverilog_76.v",
+      "./verilog_sample_src/badverilog_77.v",
+      "./verilog_sample_src/badverilog_78.v",
+      "./verilog_sample_src/badverilog_79.v",
+      "./verilog_sample_src/badverilog_80.v",
+      "./verilog_sample_src/badverilog_81.v",
+      "./verilog_sample_src/badverilog_82.v"
     };
 
     Module* circuit = NULL;
