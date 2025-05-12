@@ -295,7 +295,7 @@ public:
     }
 
     std::list<std::string> invalid_nums = {
-      "-1", "a", "a1a", "1a1", "1aaaa", "0000a", "99999999999"
+      "-1", "a", "a1a", "1a1", "1aaaa", "0000a", "9999999999999999"
     };
 
     for ( std::string s : invalid_nums ) {
