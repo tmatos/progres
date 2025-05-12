@@ -613,64 +613,18 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            avanca(&it);
-            if(!it)
+            VerilogError err = load_initial_block(&it, identificadores, list_param, circuito);
+            switch (err)
+            {
+            case ERROR_VERILOG_BAD_EOF:
                 goto bad_return_unexpected_eof;
-
-            // treat a single statement attrib
-            if( identExiste(identificadores, it->valor) ){
-                // waiting for a reg, for now
-                Register* left_reg = NULL;
-                left_reg = get_reg_by_name(circuito->listaReg, it->valor);
-
-                if(!left_reg) {
-                    show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
-                                   it->linha, it->coluna, "um registrador", it->valor);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if(!it)
-                    goto bad_return_unexpected_eof;
-                
-                if(it->classe != SYM_EQ) {
-                    show_error_msg("Token inesperado foi encontrado",
-                                   it->linha, it->coluna, "=", it->valor);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if(!it)
-                    goto bad_return_unexpected_eof;
-
-                // agora ele espera um literal ou parametro
-                if(isNumNaturalValido(it->valor)) {
-                    left_reg->value = atoi(it->valor);
-                }
-                else if (identExiste(list_param, it->valor)) {
-                    Param* p = get_param_by_name(circuito->listaParam, it->valor);
-                    left_reg->value = p->value;
-                }
-                else {
-                    show_error_msg("Token inesperado foi encontrado",
-                                   it->linha, it->coluna, "um numero ou parametro", it->valor);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if(!it)
-                    goto bad_return_unexpected_eof;
-        
-                if(it->classe != SYM_SEMICOLON) {
-                    show_error_msg("Token inesperado foi encontrado",
-                                   it->linha, it->coluna, ";", it->valor);
-                    goto bad_return;
-                }
-            }
-            else {
-                show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
-                               it->linha, it->coluna, "apenas uma atribuicao", it->valor);
+                break;
+            case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
+                break;
+            default:
+                // no error
+                break;
             }
         }
         else if( it->classe == KW_LOCALPARAM ) {
@@ -759,7 +713,6 @@ Module* carregaCircuito(FILE* arquivo)
         }
 
         avanca(&it);
-
         if(!it)
             goto bad_return_unexpected_eof;
             
@@ -792,4 +745,78 @@ int isPortaLogica(char* s)
             || iguais(s, "not")
             || iguais(s, "buf")
     );
+}
+
+VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
+{
+    Token* t = *it;
+    Register* left_reg = NULL;
+
+    avanca(&t);
+    if (!t)
+        goto load_initial_block_bad_eof;
+
+    // treat a single statement attrib, for now
+
+    if (!identExiste(identifiers, t->valor)) {
+        show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
+                       t->linha, t->coluna, "apenas uma atribuicao", t->valor);
+        goto load_initial_block_bad_token;
+    }
+
+    // waiting for a reg, for now
+    left_reg = get_reg_by_name(module->listaReg, t->valor);
+
+    if (!left_reg) {
+        show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
+                        t->linha, t->coluna, "um registrador", t->valor);
+        goto load_initial_block_bad_token;
+    }
+
+    avanca(&t);
+    if (!t)
+        goto load_initial_block_bad_eof;
+    
+    if (t->classe != SYM_EQ) {
+        show_error_msg("Token inesperado foi encontrado", t->linha, t->coluna, "=", t->valor);
+        goto load_initial_block_bad_token;
+    }
+
+    avanca(&t);
+    if (!t)
+        goto load_initial_block_bad_eof;
+
+    // agora ele espera um literal ou parametro
+    if (isNumNaturalValido(t->valor)) {
+        left_reg->value = atoi(t->valor);
+    }
+    else if (identExiste(list_param, t->valor)) {
+        Param* p = get_param_by_name(module->listaParam, t->valor);
+        left_reg->value = p->value;
+    }
+    else {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "um numero ou parametro", t->valor);
+        goto load_initial_block_bad_token;
+    }
+
+    avanca(&t);
+    if (!t)
+        goto load_initial_block_bad_eof;
+
+    if (t->classe != SYM_SEMICOLON) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, ";", t->valor);
+        goto load_initial_block_bad_token;
+    }
+
+load_initial_block_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_initial_block_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_initial_block_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
 }
