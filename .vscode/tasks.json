@@ -13,6 +13,17 @@
             "command": "make debug",
             "args": [],
             "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "run make coverage",
+            "command": "cd test && make clean && make coverage",
+            "args": [],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ],
     "version": "2.0.0"
