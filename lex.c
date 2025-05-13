@@ -244,6 +244,24 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
         tc = SYM_CLOSE_BRACE;
     else if( iguais(tok, "#") )
         tc = SYM_HASHTAG;
+    else if( iguais(tok, "+") )
+        tc = SYM_PLUS;
+    else if( iguais(tok, "-") )
+        tc = SYM_MINUS;
+    else if( iguais(tok, "*") )
+        tc = SYM_ASTERISK;
+    else if( iguais(tok, "/") )
+        tc = SYM_SLASH;
+    else if( iguais(tok, "%") )
+        tc = SYM_PERCENT;
+    else if( iguais(tok, "~") )
+        tc = SYM_TILDE;
+    else if( iguais(tok, "&") )
+        tc = SYM_AMPERSAND;
+    else if( iguais(tok, "|") )
+        tc = SYM_PIPE;
+    else if( iguais(tok, "^") )
+        tc = SYM_CIRCUMFLEX;
 
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 
