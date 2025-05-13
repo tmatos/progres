@@ -576,6 +576,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
                 goto A;
             }
+            // TODO: recognize SYM_SLASH
             else {
                 show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_SYMBOL, linha, coluna);
                 break;
@@ -614,84 +615,79 @@ ListaToken* tokeniza(FILE* arquivo)
 
             goto A;
         }
-        else {
-            // B: a parte B do automato
 
-            if(isSimbolo(c)) {
-                coluna++;
-                insereToken(tokens, c, linha, coluna);
-                goto A;
-            }
-            else {
-                if(isalnum(c) || c == '_') {
+        // B: a parte B do automato
+
+        if(isSimbolo(c)) {
+            // TODO: capture symbols larger than 1 char
+            coluna++;
+            insereToken(tokens, c, linha, coluna);
+            goto A;
+        }
+
+        if ( !isalnum(c) && c != '_' ) {
+            show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
+            goto encerrar;;
+        }
+
+        if (isalnum(c) || c == '_') {
+            coluna++;
+            anexa(tok, c);
+
+            while (1) {
+                P: // Label para parte P do automato
+
+                c = fgetc(arquivo);
+
+                if (isspace(c)) {
+                    if(c == '\n') {
+                        coluna = 0;
+                        linha++;
+                    }
+                    else {
+                        coluna++;
+                    }
+                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    break;
+                }
+                else if (c == '/') {
+                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    goto comentarios;
+                }
+                else if (isSimbolo(c)) {
+                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    coluna++;
+                    insereToken(tokens, c, linha, coluna);
+                    break;
+                }
+                else if(isalnum(c) || c == '_') {
                     coluna++;
                     anexa(tok, c);
 
-                    while(1) {
-                        P: // Label para parte P do automato
-
-                        c = fgetc(arquivo);
-
-                        if(isspace(c)) {
-                            if(c == '\n') {
-                                coluna = 0;
-                                linha++;
-                            }
-                            else {
-                                coluna++;
-                            }
-
-                            insereTokenString(tokens, tok, linha, coluna - len(tok));
-
-                            break;
-                        }
-                        else if(c == '/') {
-                            insereTokenString(tokens, tok, linha, coluna - len(tok));
-                            goto comentarios;
-                        }
-                        else if(isSimbolo(c)) {
-                            insereTokenString(tokens, tok, linha, coluna - len(tok));
-                            coluna++;
-                            insereToken(tokens, c, linha, coluna);
-
-                            break;
-                        }
-                        else if(isalnum(c) || c == '_') {
-                            coluna++;
-                            anexa(tok, c);
-
-                            // verificar tamanho maximo de palavra
-                            if( len(tok) > MAX_TOKEN_SIZE ) {
-                                show_error_lexical(MSG_ERROR_LEX_TOKEN_SIZE_MAXED,
-                                                   linha,
-                                                   coluna - len(tok) );
-                                goto encerrar;
-                            }
-
-                            goto P;
-                        }
-                        else if(c == EOF) {
-                            insereTokenString(tokens, tok, linha, coluna - len(tok));
-                            goto encerrar;
-                        }
-                        else {
-                            show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
-                            goto encerrar;
-                        }
+                    // verificar tamanho maximo de palavra
+                    if( len(tok) > MAX_TOKEN_SIZE ) {
+                        show_error_lexical(MSG_ERROR_LEX_TOKEN_SIZE_MAXED,
+                                           linha,
+                                           coluna - len(tok) );
+                        goto encerrar;
                     }
+
+                    goto P;
+                }
+                else if(c == EOF) {
+                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    goto encerrar;
                 }
                 else {
                     show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
-                    break;
+                    goto encerrar;
                 }
             }
         }
 
-        if(erro || fim)
-        {
+        if (erro || fim) {
             encerrar: // Label para o encerramento
-
-            break;
+                break;
         }
     }
 
