@@ -144,7 +144,7 @@ Module* carregaCircuito(FILE* arquivo)
 {
     Componente in;
     Componente out;
-    Componente porta;
+    Componente gate;
     Module* circuito = NULL;
 
     int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
@@ -186,7 +186,7 @@ Module* carregaCircuito(FILE* arquivo)
     if(!it)
         goto bad_return_unexpected_eof;
 
-    porta = NULL;
+    gate = NULL;
 
     circuito = novoCircuito();
 
@@ -398,33 +398,33 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if( isPortaLogica(it->valor) ) {
-            porta = NULL;
+            gate = NULL;
             
             switch (it->classe)
             {
             case KW_AND:
-                porta = novoComponente("PortaAND", op_and);
+                gate = novoComponente("PortaAND", op_and);
                 break;
             case KW_OR:
-                porta = novoComponente("PortaOR", op_or);
+                gate = novoComponente("PortaOR", op_or);
                 break;
             case KW_XOR:
-                porta = novoComponente("PortaXOR", op_xor);
+                gate = novoComponente("PortaXOR", op_xor);
                 break;
             case KW_NAND:
-                porta = novoComponente("PortaNAND", op_nand);
+                gate = novoComponente("PortaNAND", op_nand);
                 break;
             case KW_NOR:
-                porta = novoComponente("PortaNOR", op_nor);
+                gate = novoComponente("PortaNOR", op_nor);
                 break;
             case KW_XNOR:
-                porta = novoComponente("PortaXNOR", op_xnor);
+                gate = novoComponente("PortaXNOR", op_xnor);
                 break;
             case KW_NOT:
-                porta = novoComponente("PortaNOT", op_not);
+                gate = novoComponente("PortaNOT", op_not);
                 break;
             case KW_BUF:
-                porta = novoComponente("Buffer", op_buf);
+                gate = novoComponente("Buffer", op_buf);
             default:
                 break;
             }
@@ -444,7 +444,7 @@ Module* carregaCircuito(FILE* arquivo)
                 }
 
                 insereTokenString(identificadores, it->valor, -1, -1);
-                copy(porta->nome, it->valor);
+                copy(gate->nome, it->valor);
 
                 avanca(&it);
             }
@@ -473,8 +473,8 @@ Module* carregaCircuito(FILE* arquivo)
                     goto bad_return;
                 }
                 else {
-                    // Guardar o atraso dessa porta
-                    porta->tipo.atraso = atoi(it->valor); //FIXME: tipo errado!
+                    // Guardar o atraso dessa gate
+                    gate->tipo.atraso = atoi(it->valor); //FIXME: tipo errado!
                 }
 
                 avanca(&it);
@@ -500,16 +500,16 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if( identExiste(listaWire, it->valor) ) {
-                // inserir na lista de saidas da porta, esta saida
+                // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaWires, it->valor);
-                insereComponente(porta->listaSaida, out);
-                insereComponente(out->listaEntrada, porta);
+                insereComponente(gate->listaSaida, out);
+                insereComponente(out->listaEntrada, gate);
             }
             else if( identExiste(listaOutput, it->valor) ) {
-                // inserir na lista de saidas da porta, esta saida
+                // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
-                insereComponente(porta->listaSaida, out);
-                insereComponente(out->listaEntrada, porta);
+                insereComponente(gate->listaSaida, out);
+                insereComponente(out->listaEntrada, gate);
             }
             else {
                 show_error_msg("Fio ou saida nao foi encontrado",
@@ -531,7 +531,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            porta_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
+            gate_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
 
             avanca(&it);
 
@@ -542,25 +542,25 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if( identExiste(listaWire, it->valor) ) {
-                // inserir na lista de entradas da porta, esta entrada
+                // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaWires, it->valor);
-                insereComponente(porta->listaEntrada, in);
-                insereComponente(in->listaSaida, porta);
+                insereComponente(gate->listaEntrada, in);
+                insereComponente(in->listaSaida, gate);
             }
             else if( identExiste(listaInput, it->valor) ) {
-                // inserir na lista de entradas da porta, esta entrada
+                // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
-                insereComponente(porta->listaEntrada, in);
-                insereComponente(in->listaSaida, porta);
+                insereComponente(gate->listaEntrada, in);
+                insereComponente(in->listaSaida, gate);
             }
             else if( identExiste(listaOutput, it->valor) ) {
-                // inserir na lista de entradas da porta, esta entrada
+                // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
-                insereComponente(porta->listaEntrada, in);
-                insereComponente(in->listaSaida, porta);
+                insereComponente(gate->listaEntrada, in);
+                insereComponente(in->listaSaida, gate);
             }
             else {
-                show_error_msg("Entrada da porta invalida",
+                show_error_msg("Entrada da porta logica invalida",
                                it->linha, it->coluna,
                                "uma entrada valida (tipos: input, output ou wire)",
                                it->valor);
@@ -570,7 +570,7 @@ Module* carregaCircuito(FILE* arquivo)
             avanca(&it);
 
             if(!it) {
-                if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf ) {
+                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -583,14 +583,14 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if( it->classe != SYM_CLOSE_BRACKET ) {
-                if( porta->tipo.operador == op_not || porta->tipo.operador == op_buf ) {
+                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
                     goto bad_return;
                 }
                 else {
                     if( it->classe == SYM_COMMA ) {
-                        goto porta_inputs;
+                        goto gate_inputs;
                     }
                     else {
                         show_error_msg("Simbolo esperado nao foi encontrado",
@@ -613,8 +613,8 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            // finalmente, inserimos a porta na lista de portas do circuito
-            adicionaPorta(circuito, porta);
+            // finalmente, inserimos a gate na lista de portas logicas do circuito
+            adicionaPorta(circuito, gate);
         }
         else if( it->classe == KW_ENDMODULE ) {
             avanca(&it);
