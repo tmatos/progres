@@ -22,6 +22,15 @@ typedef enum en_verilog_error {
     NO_ERROR = 10
 } VerilogError;
 
+/** @brief Processar a parte do código que possui a declaração
+ *         de cabecalho do module, até o token ';'.
+ *  @param it Endereço para o iterador dos tokens do código fonte.
+ *  @param identifiers Lista de tokens contendo os identificadores já detectados.
+ *  @param livres Lista de identificadores de entrada ou saida ainda nao definidos como tal.
+ *  @return 0 em caso de falha, 1 em caso de sucesso.
+ */
+int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
+
 /** @brief Cria uma estrutura de dados representando o circuito,
            a partir do arquivo com o codigo fonte em Verilog.
  *  @param arquivo O handler do arquivo a ser processado.

@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +16,129 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "lex.h"
+
+int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
+{
+    int virgula = 0;
+
+    Token* t = *it;
+
+    if( t->classe != KW_MODULE ) {
+        show_error_msg("Palavra-chave nao encontrada onde esperada",
+                       t->linha, t->coluna, "module", t->valor);
+        goto load_module_header_bad_return;
+    }
+
+    avanca(&t);
+
+    if(!t) {
+        show_error_msg("Final do arquivo nao esperado", -1, -1, "um identificador", NULL);
+        goto load_module_header_bad_return;
+    }
+    else if( !isIdentificador(t) ) {
+        show_error_msg("Identificador nao encontrado",
+                       t->linha, t->coluna,"identificador valido", t->valor);
+        goto load_module_header_bad_return;
+    }
+    else {
+        // senao, adicione-o a lista de identifiers
+        insereTokenString(identifiers, t->valor, -1, -1);
+    }
+
+    avanca(&t);
+
+    if(!t) {
+        show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou ';", NULL);
+        goto load_module_header_bad_return;
+    }
+    else if( t->classe != SYM_OPEN_BRACKET && t->classe != SYM_SEMICOLON) {
+        // se t->valor nao eh '(' ou ';', pare
+        show_error_msg("Simbolo esperado nao foi encontrado",
+                     t->linha, t->coluna, "(' ou ';", t->valor);
+        goto load_module_header_bad_return;
+    }
+
+    if( t->classe == SYM_OPEN_BRACKET ) {
+        // devemos agora ler os argumentos do modulo
+        avanca(&t);
+
+        virgula = 0; // nao esperando por virgula, por enquanto
+
+        while(1)
+        {
+            if(!t) {
+                if(virgula) {
+                    show_error_msg("Final do arquivo nao esperado",
+                                   -1, -1, ",", NULL);
+                }
+                else {
+                    show_error_msg("Final do arquivo nao esperado",
+                                   -1, -1, "identificador valido ou )", NULL);
+                }
+
+                goto load_module_header_bad_return;
+            }
+
+            if( t->classe == SYM_CLOSE_BRACKET ) {
+                // t->valor eh ')'
+                break;
+            }
+
+            if(virgula) {
+                if( t->classe == SYM_COMMA ) {
+                    virgula = 0;
+                    avanca(&t);
+                    continue;
+                    // TODO: bug de virgula a mais...
+                }
+                else {
+                    show_error_msg("Simbolo esperado nao foi encontrado",
+                                   t->linha, t->coluna, ",' ou ')", t->valor);
+                    goto load_module_header_bad_return;
+                }
+            }
+
+            if( isIdentificador(t) ) {
+                if( identExiste(identifiers, t->valor) ) {
+                    show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+                    goto load_module_header_bad_return;
+                }
+                else {
+                    insereTokenString(identifiers, t->valor, -1, -1);
+                    insereTokenString(livres, t->valor, -1, -1);
+                    virgula = 1;
+                }
+            }
+            else {
+                show_error_msg("Identificador nao foi encontrado",
+                               t->linha, t->coluna, "um identificador", t->valor);
+                goto load_module_header_bad_return;
+            }
+
+            avanca(&t);
+        }
+
+        avanca(&t);
+
+        if(!t) {
+            show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
+            goto load_module_header_bad_return;
+        }
+
+        if( t->classe != SYM_SEMICOLON ) {
+            show_error_msg("Simbolo esperado nao foi encontrado",
+                           t->linha, t->coluna, ";", t->valor);
+            goto load_module_header_bad_return;
+        }
+    }
+
+load_module_header_sucess:
+    *it = t;
+    return 1;
+
+load_module_header_bad_return:
+    return 0;
+}
 
 Module* carregaCircuito(FILE* arquivo)
 {
@@ -56,124 +179,16 @@ Module* carregaCircuito(FILE* arquivo)
     if(!it)
         goto bad_return;
 
-    circuito = novoCircuito();
-
-    if( it->classe != KW_MODULE ) {
-        show_error_msg("Palavra-chave nao encontrada onde esperada",
-                       it->linha, it->coluna, "module", it->valor);
+    if( ! load_module_header(&it, identificadores, identificLivre) )
         goto bad_return;
-    }
 
     avanca(&it);
-
-    if(!it) {
-        show_error_msg("Final do arquivo nao esperado",
-                       -1, -1, "um identificador", NULL);
-        goto bad_return;
-    }
-    else if( !isIdentificador(it) ) {
-        show_error_msg("Identificador nao encontrado",
-                       it->linha, it->coluna, "identificador valido", it->valor);
-        goto bad_return;
-    }
-    else {
-        // senao, adicione-o a lista de identificadores
-        insereTokenString(identificadores, it->valor, -1, -1);
-    }
-
-    avanca(&it);
-
-    if(!it) {
-        show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou ';", NULL);
-        goto bad_return;
-    }
-    else if( it->classe != SYM_OPEN_BRACKET && it->classe != SYM_SEMICOLON) {
-        // se it->valor nao eh '(' ou ';', pare
-        show_error_msg("Simbolo esperado nao foi encontrado",
-                     it->linha, it->coluna, "(' ou ';", it->valor);
-        goto bad_return;
-    }
-
-    if( it->classe == SYM_OPEN_BRACKET ) {
-        // devemos agora ler os parametros do modulo
-        avanca(&it);
-
-        virgula = 0; // nao esperando por virgula, por enquanto
-
-        while(1)
-        {
-            if(!it) {
-                if(virgula) {
-                    show_error_msg("Final do arquivo nao esperado",
-                                   -1, -1, ",", NULL);
-                }
-                else {
-                    show_error_msg("Final do arquivo nao esperado",
-                                   -1, -1, "identificador valido ou )", NULL);
-                }
-
-                goto bad_return;
-            }
-
-            if( it->classe == SYM_CLOSE_BRACKET ) {
-                // it->valor eh ')'
-                break;
-            }
-
-            if(virgula) {
-                if( it->classe == SYM_COMMA ) {
-                    virgula = 0;
-                    avanca(&it);
-                    continue;
-                    // TODO: bug de virgula a mais...
-                }
-                else {
-                    show_error_msg("Simbolo esperado nao foi encontrado",
-                                   it->linha, it->coluna, ",' ou ')", it->valor);
-                    goto bad_return;
-                }
-            }
-
-            if( isIdentificador(it) ) {
-                if( identExiste(identificadores, it->valor) ) {
-                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                    goto bad_return;
-                }
-                else {
-                    insereTokenString(identificadores, it->valor, -1, -1);
-                    insereTokenString(identificLivre, it->valor, -1, -1);
-                    virgula = 1;
-                }
-            }
-            else {
-                show_error_msg("Identificador nao foi encontrado",
-                               it->linha, it->coluna, "um identificador", it->valor);
-                goto bad_return;
-            }
-
-            avanca(&it);
-        }
-
-        avanca(&it);
-
-        if(!it) {
-            show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
-            goto bad_return;
-        }
-
-        if( it->classe != SYM_SEMICOLON ) {
-            show_error_msg("Simbolo esperado nao foi encontrado",
-                           it->linha, it->coluna, ";", it->valor);
-            goto bad_return;
-        }
-    }
-
-    avanca(&it);
-
     if(!it)
         goto bad_return_unexpected_eof;
 
     porta = NULL;
+
+    circuito = novoCircuito();
 
     // process body of the module until it ends
     while(1)
