@@ -15,6 +15,10 @@
  */
 Sinais* simula(Module* circuto, Sinais* entradas);
 
+/** @brief Simulação da avaliação da porta 'buf'
+ */
+ValorLogico computeBufGate(ValorLogico input);
+
 /** @brief Simulação da avaliação da porta 'not'
  */
 ValorLogico computeNotGate(ValorLogico input);
