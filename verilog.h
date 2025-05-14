@@ -42,6 +42,10 @@ Module* carregaCircuito(FILE* arquivo);
  */
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
 
+/** @brief Parsing de 'assign'
+ */
+VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
+
 /** @brief Retorna verdadeiro se uma string representa uma logic gate em Verilog.
  *  @param s Uma string qualquer.
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.

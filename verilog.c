@@ -132,7 +132,7 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
         }
     }
 
-load_module_header_sucess:
+//load_module_header_sucess:
     *it = t;
     return 1;
 
@@ -731,6 +731,21 @@ Module* carregaCircuito(FILE* arquivo)
             // include the param in the circuit struct
             addParam(circuito, param);
         }
+        else if( it->classe == KW_ASSIGN ) {
+            VerilogError err = load_assign(&it, listaWire, listaInput, listaOutput, circuito);
+            switch (err)
+            {
+            case ERROR_VERILOG_BAD_EOF:
+                goto bad_return_unexpected_eof;
+                break;
+            case ERROR_VERILOG_BAD_TOKEN:
+                goto bad_return;
+                break;
+            default:
+                // no error
+                break;
+            }
+        }
         else {
             show_error_msg("Token inesperado foi encontrado",
                            it->linha, it->coluna, "algum comando", it->valor);
@@ -835,7 +850,7 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
         goto load_initial_block_bad_token;
     }
 
-load_initial_block_sucess:
+//load_initial_block_sucess:
     *it = t;
     return NO_ERROR;
 
@@ -844,4 +859,129 @@ load_initial_block_bad_token:
 
 load_initial_block_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module)
+{
+    Componente in;
+    Componente out;
+    Componente gate;
+
+    Token* t = *it;
+
+    avanca(&t);
+    if (!t)
+        goto load_assign_bad_eof;
+
+    if (!isIdentificador(t)) {
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, "um identificador", t->valor);
+        goto load_assign_bad_token;
+    }
+
+    gate = novoComponente("assign", assign);
+
+    // TODO: check for impossible cases
+    
+    if (identExiste(list_wire, t->valor)) {
+        // inserir, na lista de saidas da gate, esta saida
+        out = getComponenteItemPorNome(module->listaWires, t->valor);
+        insereComponente(gate->listaSaida, out);
+        insereComponente(out->listaEntrada, gate);
+    }
+    else if (identExiste(list_out, t->valor)) {
+        // inserir, na lista de saidas da gate, esta saida
+        out = getComponenteItemPorNome(module->listaFiosSaida, t->valor);
+        insereComponente(gate->listaSaida, out);
+        insereComponente(out->listaEntrada, gate);
+    }
+    else {
+        show_error_msg("Identificador previamente declarado nao foi encontrado",
+                       t->linha, t->coluna,
+                       "identificador para wire ou output", t->valor);
+        goto load_assign_bad_token;
+    }
+
+    avanca(&t);
+    if (!t)
+        goto load_assign_bad_eof;
+
+    if ( t->classe != SYM_EQ ) {
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, "=", t->valor);
+        goto load_assign_bad_token;
+    }
+
+    // from here, we expect an expression...
+
+    avanca(&t);
+    if (!t)
+        goto load_assign_bad_eof;
+
+    // simplest expression is another net
+
+    // negation (~) is also simple, but, for now, is not assign anymore
+
+    if ( t->classe == SYM_TILDE ) {
+        gate->tipo.operador = op_not;
+
+        avanca(&t);
+        if (!t)
+            goto load_assign_bad_eof;
+    }
+
+    if ( !isIdentificador(t) ) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "algum identificador", t->valor);
+        goto load_assign_bad_token;
+    }
+
+    if ( identExiste(list_wire, t->valor) ) {
+        // inserir, na lista de entradas da gate, esta entrada
+        in = getComponenteItemPorNome(module->listaWires, t->valor);
+        insereComponente(gate->listaEntrada, in);
+        insereComponente(in->listaSaida, gate);
+    }
+    else if ( identExiste(list_in, t->valor) ) {
+        // inserir, na lista de entradas da gate, esta entrada
+        in = getComponenteItemPorNome(module->listaFiosEntrada, t->valor);
+        insereComponente(gate->listaEntrada, in);
+        insereComponente(in->listaSaida, gate);
+    }
+    else if( identExiste(list_out, t->valor) ) {
+        // inserir, na lista de entradas da gate, esta entrada
+        in = getComponenteItemPorNome(module->listaFiosSaida, t->valor);
+        insereComponente(gate->listaEntrada, in);
+        insereComponente(in->listaSaida, gate);
+    }
+    else {
+        show_error_msg("Este identificador nao consta como alguma net declarada",
+                        t->linha, t->coluna,
+                        "identificador ja declarado (tipos: input, output ou wire)",
+                        t->valor);
+        goto load_assign_bad_token;
+    }
+
+    // TODO: implement expression evaluation and specific data structures
+
+    avanca(&t);
+    if (!t)
+        goto load_assign_bad_eof;
+
+    if ( t->classe != SYM_SEMICOLON ) {
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, ";", t->valor);
+        goto load_assign_bad_token;
+    }
+
+//load_assign_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_assign_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_assign_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
+
 }

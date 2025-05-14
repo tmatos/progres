@@ -21,6 +21,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_localparam_test_v );
   CPPUNIT_TEST( test_carregaCircuito_named_gates_test_v );
   CPPUNIT_TEST( test_carregaCircuito_initial_single_test_v );
+  CPPUNIT_TEST( test_carregaCircuito_assigns_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
   CPPUNIT_TEST_SUITE_END();
 
@@ -152,6 +153,29 @@ public:
     fclose(file);
   }
 
+  void test_carregaCircuito_assigns_v()
+  {
+    Module* circuit = NULL;
+    FILE* file = fopen("./verilog_sample_src/assigns.v", "r");
+    CPPUNIT_ASSERT( file );
+    circuit = carregaCircuito(file);
+    CPPUNIT_ASSERT( circuit );
+    CPPUNIT_ASSERT_EQUAL(1, circuit->listaFiosEntrada->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, circuit->listaFiosSaida->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, circuit->listaWires->tamanho);
+
+    Componente x;
+    x = circuit->listaFiosSaida->itens[0];
+    // x (output) tem uma entrada que vem de um assign simples
+    CPPUNIT_ASSERT_EQUAL(1, x->listaEntrada->tamanho);
+    CPPUNIT_ASSERT_EQUAL(assign, x->listaEntrada->itens[0]->tipo.operador);
+
+    // TODO: more inspections
+
+    free(circuit);
+    fclose(file);
+  }
+
   void test_carregaCircuito_badverilog_XX_v()
   {
     std::list<std::string> list_bad_files = {
@@ -243,7 +267,16 @@ public:
       "./verilog_sample_src/badverilog_79.v",
       "./verilog_sample_src/badverilog_80.v",
       "./verilog_sample_src/badverilog_81.v",
-      "./verilog_sample_src/badverilog_82.v"
+      "./verilog_sample_src/badverilog_82.v",
+      "./verilog_sample_src/badverilog_83.v",
+      "./verilog_sample_src/badverilog_83a.v",
+      "./verilog_sample_src/badverilog_83b.v",
+      "./verilog_sample_src/badverilog_84.v",
+      "./verilog_sample_src/badverilog_84a.v",
+      "./verilog_sample_src/badverilog_85.v",
+      "./verilog_sample_src/badverilog_85a.v",
+      "./verilog_sample_src/badverilog_86.v",
+      "./verilog_sample_src/badverilog_86a.v"
     };
 
     Module* circuit = NULL;

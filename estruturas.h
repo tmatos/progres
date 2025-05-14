@@ -22,7 +22,8 @@ typedef enum en_operador {
     op_buf,
     wire,
     output,
-    input
+    input,
+    assign
 } t_operador;
 
 /** @brief Estrutura que define a porta. Qual sua função logica e seu delay.

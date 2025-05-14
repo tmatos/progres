@@ -201,6 +201,12 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                 createEventsFromOutputs(&fila, t, gate, resultado);
                 break;
 
+            case assign:
+                // TODO: implement expression evaluation and specific data structures
+                resultado = gate->listaEntrada->itens[0]->valorDinamico;
+                createEventsFromOutputs(&fila, t, gate, resultado);
+                break;
+
             default:
                 break;
             }

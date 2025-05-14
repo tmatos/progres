@@ -222,6 +222,8 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
         tc = KW_DEFPARAM;
     else if( iguais(tok, "localparam") )
         tc = KW_LOCALPARAM;
+    else if( iguais(tok, "assign") )
+        tc = KW_ASSIGN;
     else if( iguais(tok, "=") )
         tc = SYM_EQ;
     else if( iguais(tok, ",") )
@@ -252,7 +254,7 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
         tc = SYM_ASTERISK;
     else if( iguais(tok, "/") )
         tc = SYM_SLASH;
-    else if( iguais(tok, "%") )
+    else if( iguais(tok, "\%") )
         tc = SYM_PERCENT;
     else if( iguais(tok, "~") )
         tc = SYM_TILDE;

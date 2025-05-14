@@ -50,11 +50,11 @@ typedef enum en_token_class {
     KW_XNOR,
     KW_XOR,
 
-    SYM_AT,
-    SYM_COMMA,
-    SYM_HASHTAG,
-    SYM_DOT,
-    SYM_EQ,
+    SYM_AT, // @
+    SYM_COMMA, // ,
+    SYM_HASHTAG, // #
+    SYM_DOT, // .
+    SYM_EQ, // =
     SYM_COLON, // :
     SYM_SEMICOLON, // ; 
     SYM_OPEN_BRACKET, // (
@@ -63,15 +63,15 @@ typedef enum en_token_class {
     SYM_CLOSE_SQUAREBRACKET, // ]
     SYM_OPEN_BRACE, // {
     SYM_CLOSE_BRACE, // }
-    SYM_PLUS,
-    SYM_MINUS,
-    SYM_ASTERISK,
-    SYM_SLASH,
-    SYM_PERCENT,
-    SYM_TILDE,
-    SYM_AMPERSAND,
-    SYM_PIPE,
-    SYM_CIRCUMFLEX,
+    SYM_PLUS, // +
+    SYM_MINUS, // -
+    SYM_ASTERISK, // *
+    SYM_SLASH, // /
+    SYM_PERCENT, // %
+    SYM_TILDE, // ~
+    SYM_AMPERSAND, // &
+    SYM_PIPE, // |
+    SYM_CIRCUMFLEX, // ^
 
     NUM_BASE_BINARY,
     NUM_BASE_DECIMAL,
