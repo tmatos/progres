@@ -17,6 +17,7 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_removeTokensPorValor );
   CPPUNIT_TEST( test_isSimbolo );
   CPPUNIT_TEST( test_isIdentificador );
+  CPPUNIT_TEST( test_identExiste );
   CPPUNIT_TEST( test_isPalavra );
   CPPUNIT_TEST( test_apenasDigitos_outro );
   CPPUNIT_TEST( test_isNumNaturalValido );
@@ -171,66 +172,59 @@ public:
 
   void test_isIdentificador()
   {
+    std::list<std::string> list_invalid = {
+      "module", "wire", "reg", "input", "output",
+      "123", "123abc", "+", "++", "$", "$$", "$_"
+    };
+
+    std::list<std::string> list_valid = {
+      "a", "b", "x", "y", "clk", "clock", "CLK",
+      "clr", "CLR", "reset", "_x", "_1", "a_0", "_"
+    };
+
     Token tk;
     tk.linha = 3;
     tk.coluna = 1;
     tk.seguinte = NULL;
 
-    copy(tk.valor, "module");
-    CPPUNIT_ASSERT( !isIdentificador(&tk) );
+    for (auto s : list_valid) {
+      copy(tk.valor, s.c_str());
+      CPPUNIT_ASSERT( isIdentificador(&tk) );
+    }
 
-    copy(tk.valor, "wire");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "reg");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "input");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "output");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "123");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "123abc");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "+");
-    CPPUNIT_ASSERT( ! isIdentificador(&tk) );
-
-    copy(tk.valor, "a");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "b");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "x");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "y");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "clk");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "clock");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "CLK");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "clr");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "CLR");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
-
-    copy(tk.valor, "reset");
-    CPPUNIT_ASSERT( isIdentificador(&tk) );
+    for (auto s : list_invalid) {
+      copy(tk.valor, s.c_str());
+      CPPUNIT_ASSERT( !isIdentificador(&tk) );  
+    }
 
     CPPUNIT_ASSERT( ! isIdentificador((Token*)NULL) );
+  }
+
+  void test_identExiste()
+  {
+    std::string str;
+    ListaToken* lst_tk = NULL;
+
+    CPPUNIT_ASSERT( !identExiste(lst_tk, str.c_str()) );
+
+    lst_tk = novaListaToken();
+    CPPUNIT_ASSERT(lst_tk);
+
+    CPPUNIT_ASSERT( !identExiste(lst_tk, (const char*)NULL ) );
+    CPPUNIT_ASSERT( !identExiste(lst_tk, str.c_str()) );
+    CPPUNIT_ASSERT( !identExiste(lst_tk, "aa") );
+
+    std::list<std::string> lst_str = { "a", "aa", "abc", "+", "(", ")", "**" };
+
+    int line = 1;
+    for (auto s : lst_str) {
+      insereTokenString(lst_tk, s.c_str(), line, 1);
+      line++;
+    }
+
+    for (auto s : lst_str) {
+      CPPUNIT_ASSERT( identExiste(lst_tk, s.c_str()) );
+    }
   }
 
   void test_isPalavra()
