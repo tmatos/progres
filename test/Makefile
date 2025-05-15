@@ -1,13 +1,13 @@
 # Progres
-# Testes unitarios utilizando CppUnit
-# Sumario de cobertura com `lcov`
+# Tests using: CppUnit
+# Coverage report: `lcov`
 
 CC = g++
 CPPC = g++
 
 SRCDIR = ..
 IDIR = ..
-ODIR = .
+ODIR = obj
 TDIR = .
 
 CFLAGS = -I$(IDIR) --coverage -g -O0
@@ -19,12 +19,12 @@ COV_FILE = coverage.txt
 default: tests
 
 SRCTEST = $(shell find $(TDIR) -name '*.cpp')
-OBJTEST = $(patsubst $(TDIR)/%.cpp, $(TDIR)/%.o, $(SRCTEST))
+OBJTEST = $(patsubst $(TDIR)/%.cpp, $(ODIR)/%.o, $(SRCTEST))
 
-$(TDIR)/%.o: $(TDIR)/%.cpp
+$(ODIR)/%.o: $(TDIR)/%.cpp
 	$(CPPC) -c -o $@ $< $(LIBS)
 
-# obs.: main() esta em progres.c
+# Obs.: main() function is in `progres.c`
 SRC = $(shell find $(SRCDIR) -maxdepth 1 -type f \( -iname '*.c' ! -iname 'progres.c' \))
 OBJ = $(patsubst $(SRCDIR)/%.c, $(ODIR)/%.o, $(SRC))
 
@@ -39,6 +39,10 @@ tests: makedir $(TARGET)
 
 coverage: tests
 	lcov -q -d . -c -o $(COV_FILE) && lcov --summary $(COV_FILE)
+
+branchcov: tests
+	lcov -q -d . -c -o $(COV_FILE) --rc lcov_branch_coverage=1
+	lcov --summary $(COV_FILE) --rc lcov_branch_coverage=1
 
 .PHONY: makedir
 makedir:
