@@ -38,6 +38,10 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
  */
 Module* carregaCircuito(FILE* arquivo);
 
+/** @brief Parsing of 'reg' declaration
+ */
+VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
+
 /** @brief Parsing de blocos initial
  */
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);

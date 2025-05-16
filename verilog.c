@@ -285,116 +285,19 @@ Module* carregaCircuito(FILE* arquivo)
                 avanca(&it);
             }
         }
-        else if( it->classe == KW_REG ) {
-            avanca(&it);
-            if(!it)
-               goto bad_return_unexpected_eof;
-
-            int is_signed = 0;
-
-            if(it->classe == KW_SIGNED) {
-                is_signed = 1;
-                
-                avanca(&it);
-                if(!it)
-                    goto bad_return_unexpected_eof;
-            }
-
-            // range specification
-            int range_msb = 0;
-            int range_lsb = 0;
-
-            // optional range specification
-            // range ::= [ msb_constant_expression : lsb_constant_expression ]
-            // TODO: calculate the expressions  
-            if (it->classe == SYM_OPEN_SQUAREBRACKET) {
-                avanca(&it);
-                if (!it)
-                   goto bad_return_unexpected_eof;
-
-                if (isNumNaturalValido(it->valor)) {
-                    range_msb = atoi(it->valor);
-                }
-                else if (identExiste(list_param, it->valor)) {
-                    range_msb = get_param_by_name(circuito->listaParam, it->valor)->value;
-                }
-                else {
-                    show_error_msg("Numero para bit mais significativo nao foi encontrado",
-                                   it->linha, it->coluna, "algum numero", it->valor);
-                    goto bad_return;
-                }
-                    
-                avanca(&it);
-                if (!it)
-                   goto bad_return_unexpected_eof;
-
-                if (it->classe != SYM_COLON) {
-                    show_error_msg("Simbolo inesperado",
-                                   it->linha, it->coluna, ":", it->valor);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if (!it)
-                   goto bad_return_unexpected_eof;
-
-                if (isNumNaturalValido(it->valor)) {
-                    range_lsb = atoi(it->valor);
-                }
-                else if (identExiste(list_param, it->valor)) {
-                    range_lsb = get_param_by_name(circuito->listaParam, it->valor)->value;
-                }
-                else {
-                    show_error_msg("Numero para bit menos significativo nao foi encontrado",
-                                   it->linha, it->coluna, "algum numero", it->valor);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if (!it)
-                   goto bad_return_unexpected_eof;
-
-                if (it->classe != SYM_CLOSE_SQUAREBRACKET) {
-                    show_error_msg("Simbolo inesperado", it->linha, it->coluna, "]", it->valor);
-                    goto bad_return;
-                }
-
-                if ( range_msb < range_lsb ) {
-                    show_error_msg("Range invalido",
-                                   it->anterior->linha, it->anterior->coluna, NULL, NULL);
-                    goto bad_return;
-                }
-
-                avanca(&it);
-                if (!it)
-                   goto bad_return_unexpected_eof;
-            }
-
-            if( !isIdentificador(it) ) {
-                show_error_msg("Identificador nao foi encontrado",
-                               it->linha, it->coluna, "um identificador", it->valor);
+        else if (it->classe == KW_REG) {
+            VerilogError err = load_reg(&it, identificadores, list_param, circuito);
+            switch (err)
+            {
+            case ERROR_VERILOG_BAD_EOF:
+                goto bad_return_unexpected_eof;
+                break;
+            case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
-            }
-
-            // verificar se pode utilizar este identificador
-            if( identExiste(identificadores, it->valor) ) {
-                show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                goto bad_return;
-            }
-            
-            // adicionar na lista de identificadores usados
-            insereTokenString(identificadores, it->valor, -1, -1);
-
-            addRegister(circuito, it->valor, (range_msb - range_lsb + 1), is_signed);
-
-            avanca(&it);
-            if(!it)
-               goto bad_return_unexpected_eof;
-
-            if(it->classe != SYM_SEMICOLON) {
-                show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, ";", it->valor);
-                goto bad_return;
+                break;
+            default:
+                // no error
+                break;
             }
         }
         else if( isPortaLogica(it->valor) ) {
@@ -785,6 +688,136 @@ int isPortaLogica(char* s)
             || iguais(s, "not")
             || iguais(s, "buf")
     );
+}
+
+VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
+{
+    int is_signed;
+    int range_msb;
+    int range_lsb;
+
+    Token* t = *it;
+
+    avanca(&t);
+    if(!t)
+        goto load_reg_bad_eof;
+
+    is_signed = 0;
+
+    if (t->classe == KW_SIGNED) {
+        is_signed = 1;
+        
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+    }
+
+    // range specification
+    range_msb = 0;
+    range_lsb = 0;
+
+    // optional range specification
+    // range ::= [ msb_constant_expression : lsb_constant_expression ]
+    // TODO: calculate the expressions  
+    if (t->classe == SYM_OPEN_SQUAREBRACKET) {
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            range_msb = atoi(t->valor);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            range_msb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit mais significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_reg_bad_token;
+        }
+            
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+
+        if (t->classe != SYM_COLON) {
+            show_error_msg("Simbolo inesperado",
+                           t->linha, t->coluna, ":", t->valor);
+            goto load_reg_bad_token;
+        }
+
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            range_lsb = atoi(t->valor);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit menos significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_reg_bad_token;
+        }
+
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+
+        if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
+            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
+            goto load_reg_bad_token;
+        }
+
+        if ( range_msb < range_lsb ) {
+            show_error_msg("Range invalido",
+                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
+            goto load_reg_bad_token;
+        }
+
+        avanca(&t);
+        if (!t)
+            goto load_reg_bad_eof;
+    }
+
+    if (!isIdentificador(t)) {
+        show_error_msg("Identificador nao foi encontrado",
+                       t->linha, t->coluna, "um identificador", t->valor);
+        goto load_reg_bad_token;
+    }
+
+    // verificar se pode utilizar este identificador
+    if (identExiste(identifiers, t->valor)) {
+        show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+        goto load_reg_bad_token;
+    }
+    
+    // adicionar na lista de identificadores usados
+    insereTokenString(identifiers, t->valor, -1, -1);
+
+    addRegister(module, t->valor, (range_msb - range_lsb + 1), is_signed);
+
+    avanca(&t);
+    if (!t)
+        goto load_reg_bad_eof;
+
+    if (t->classe != SYM_SEMICOLON) {
+        show_error_msg("Simbolo esperado nao foi encontrado",
+                       t->linha, t->coluna, ";", t->valor);
+        goto load_reg_bad_token;
+    }
+
+//load_reg_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_reg_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_reg_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
 }
 
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
