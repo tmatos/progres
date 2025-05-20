@@ -12,8 +12,11 @@
 #include "inoutTests.cpp"
 #include "errosTests.cpp"
 
+int global_silent_mode;
+
 int main(int argc, char **argv)
 {
+  global_silent_mode = 1;
   CppUnit::TextUi::TestRunner runner;
   CppUnit::TextOutputter textOut( &runner.result(), std::cout );
   runner.addTest( Testes_estruturas::suite() );

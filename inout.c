@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,10 +11,13 @@
 #include "sinais.h"
 #include "lex.h"
 #include "inout.h"
+#include "erros.h"
 
 Sinais* erroFatalArquivoCorrompido()
 {
-    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+    if (!global_silent_mode)
+        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+
     return NULL;
 }
 
@@ -35,7 +38,9 @@ Sinais* carregaEntradas(FILE* arquivo)
     it = tokens->primeiro;
 
     if(!it) {
-        printf(MSG_ARQUIVO_ENTRADA_VAZIO);
+        if (!global_silent_mode)
+            printf(MSG_ARQUIVO_ENTRADA_VAZIO);
+
         return NULL;
     }
 
@@ -127,7 +132,9 @@ Sinais* carregaEntradas(FILE* arquivo)
         avanca(&it);
 
         if(!it) {
-            printf(MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
+            if (!global_silent_mode)
+                printf(MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
+
             break;
         }
     }

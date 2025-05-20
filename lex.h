@@ -72,6 +72,7 @@ typedef enum en_token_class {
     SYM_AMPERSAND, // &
     SYM_PIPE, // |
     SYM_CIRCUMFLEX, // ^
+    SYM_GRAVE_ACCENT, // `
 
     NUM_BASE_BINARY,
     NUM_BASE_DECIMAL,

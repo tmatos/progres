@@ -575,9 +575,13 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( len(it->valor) > MAX_PARAM_NAME_SIZE ) {
-                printf("%d:%d: erro: O identificador '%s' excede o tamanho maximo de %d para parametros.\n",
-                       it->linha, it->coluna, it->valor, MAX_PARAM_NAME_SIZE);
+            if (len(it->valor) > MAX_PARAM_NAME_SIZE) {
+                if (!global_silent_mode)
+                    printf("%d:%d: erro: O identificador '%s' excede "
+                           "o tamanho maximo de %d para parametros.\n",
+                           it->linha, it->coluna, it->valor,
+                           MAX_PARAM_NAME_SIZE);
+
                 goto bad_return;
             }
 

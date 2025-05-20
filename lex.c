@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -264,6 +264,8 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
         tc = SYM_PIPE;
     else if( iguais(tok, "^") )
         tc = SYM_CIRCUMFLEX;
+    else if( iguais(tok, "`") )
+        tc = SYM_GRAVE_ACCENT;
 
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 
@@ -387,6 +389,7 @@ int isSimbolo(char c)
             c == '#' ||
             c == '@' ||
             c == '$' ||
+            c == '`' ||
             c == '"' ||
             c == '\'');
 }
@@ -394,6 +397,9 @@ int isSimbolo(char c)
 void exibeListaDeToken(ListaToken* tokens)
 {
     Token* it = NULL;
+
+    if (global_silent_mode)
+        return;
 
     printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
 

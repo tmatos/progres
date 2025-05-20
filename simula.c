@@ -13,6 +13,7 @@
 #include "sinais.h"
 #include "lex.h"
 #include "eventos.h"
+#include "erros.h"
 
 Sinais* simula(Module* circuto, Sinais* entradas)
 {
@@ -57,15 +58,17 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     }
 
     ///
-    printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
-           circuto->listaFiosEntrada->tamanho,
-           entradas->quantidade,
-           validos);
+    if (!global_silent_mode)
+        printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
+               circuto->listaFiosEntrada->tamanho,
+               entradas->quantidade,
+               validos);
     ///
 
-    if( validos < circuto->listaFiosEntrada->tamanho )
-    {
-        printf("AVISO: O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
+    if (validos < circuto->listaFiosEntrada->tamanho) {
+        if (!global_silent_mode)
+            printf("AVISO: O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
+
         return NULL;
     }
 
