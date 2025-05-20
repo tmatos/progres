@@ -26,6 +26,13 @@ void* show_error_lexical(const char *msg, int lin, int col)
     return show_error_msg(msg, lin, col, NULL, NULL);
 }
 
+void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok, int max)
+{
+    if (!global_silent_mode)
+        printf("%d:%d: erro: '%s' relativo a '%s'. Maximo permitido: %d.\n",
+               lin, col, msg, tok, max);
+}
+
 void* show_error_msg(const char* msg, int linha, int coluna, const char* esperado, char *encontrado)
 {
     if (global_silent_mode)

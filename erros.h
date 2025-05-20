@@ -40,6 +40,15 @@ void* show_error_lexical(const char *msg, int lin, int col);
  */
 void* show_error_msg(const char* msg, int linha, int coluna, const char* esperado, char *encontrado);
 
+/** @brief Exibe, na saida padrao, uma mensagem de erro relativa a violacao de restricao para tamanhos.
+ *  @param msg Um texto para a mensagem de erro a ser exibida.
+ *  @param lin A linha onde ocorre o erro, no codigo fonte.
+ *  @param col A coluna onde ocorre o erro, no codigo fonte.
+ *  @param tok String com a representacao do token relativo ao erro.
+ *  @param max Numero que representa o valor maximo admitido.
+ */
+void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok, int max);
+
 /** @brief Exibe uma mensagem de erro por falta de memoria e encerra o programa.
  *  @return void.
  */
