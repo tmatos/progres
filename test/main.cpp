@@ -16,7 +16,7 @@ int global_silent_mode;
 
 int main(int argc, char **argv)
 {
-  global_silent_mode = 1;
+  global_silent_mode = 0; // if 0, will not output msgs to stdout
   CppUnit::TextUi::TestRunner runner;
   CppUnit::TextOutputter textOut( &runner.result(), std::cout );
   runner.addTest( Testes_estruturas::suite() );
