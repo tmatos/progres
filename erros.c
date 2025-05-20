@@ -10,60 +10,55 @@
 
 #include "erros.h"
 
-void* show_error_identifier_duplicate(const char* tok, int lin, int col)
+void show_error_identifier_duplicate(const char* tok, int lin, int col)
 {
-    if (global_silent_mode)
-        return NULL;
-
-    printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
-           lin, col, tok);
-    
-    return NULL;
+    if (!global_silent_mode) {
+        printf("%d:%d: erro: O identificador '%s' ja estava sendo utilizado.\n",
+               lin, col, tok);
+    }
 }
 
-void* show_error_lexical(const char *msg, int lin, int col)
+void show_error_lexical(const char* msg, int lin, int col)
 {
     return show_error_msg(msg, lin, col, NULL, NULL);
 }
 
-void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok, int max)
+void show_error_size_exceeded(const char* msg, int lin, int col, const char* tok, int max)
 {
-    if (!global_silent_mode)
+    if (!global_silent_mode) {
         printf("%d:%d: erro: '%s' relativo a '%s'. Maximo permitido: %d.\n",
                lin, col, msg, tok, max);
+    }
 }
 
-void* show_error_msg(const char* msg, int linha, int coluna, const char* esperado, char *encontrado)
+void show_error_msg(const char* msg, int lin, int col, const char* expected, const char* found)
 {
-    if (global_silent_mode)
-        return NULL;
+    if (!global_silent_mode) {
+        if(lin > 0) {
+            printf("%d:", lin);
 
-    if(linha > 0) {
-        printf("%d:", linha);
+            if(col > 0)
+                printf("%d:", col);
+        }
 
-        if(coluna > 0)
-            printf("%d:", coluna);
+        if(!msg) {
+            printf("Erro desconhecido.\n");
+            return;
+        }
+
+        printf(" erro: %s.", msg);
+
+        if(expected) {
+            printf(" Esperava-se: '%s'", expected);
+
+            if(found)
+                printf(", mas foi encontrado: '%s'", found);
+
+            printf(".");
+        }
+
+        printf("\n");
     }
-
-    if(!msg) {
-        printf("Erro desconhecido.\n");
-        return NULL;
-    }
-
-    printf(" erro: %s.", msg);
-
-    if(esperado) {
-        printf(" Esperava-se: '%s'", esperado);
-
-        if(encontrado)
-            printf(", mas foi encontrado: '%s'", encontrado);
-
-        printf(".");
-    }
-
-    printf("\n");
-
-    return NULL;
 }
 
 void fatal_error_no_memory()

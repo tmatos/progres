@@ -21,11 +21,10 @@ public:
     char esperado[] = "wire";
     char encontrado[] = "qwire";
     
-    // show_error_msg(...) always returns NULL
-    CPPUNIT_ASSERT( ! show_error_msg(msg, linha, coluna, esperado, encontrado) );
+    show_error_msg(msg, linha, coluna, esperado, encontrado);
 
     // msg argument can be a NULL, to show a generic message
-    CPPUNIT_ASSERT( ! show_error_msg(NULL, linha, coluna, esperado, encontrado) );
+    show_error_msg(NULL, linha, coluna, esperado, encontrado);
   }
 
 };

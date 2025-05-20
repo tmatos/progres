@@ -17,28 +17,25 @@ extern int global_silent_mode;
  *  @param tok String com o identificador. 
  *  @param lin A linha onde ocorre o erro.
  *  @param col A coluna onde ocorre o erro.
- *  @return Um NULL, sempre.
  */
-void* show_error_identifier_duplicate(const char* tok, int lin, int col);
+void show_error_identifier_duplicate(const char* tok, int lin, int col);
 
 /** @brief Exibe uma mensagem de erro relativa a analise lexica do arquivo fonte em questao.
  *  @param msg O texto da mensagem de erro a ser exibida.
  *  @param lin A linha onde ocorre o erro no fonte. -1 para omitir.
  *  @param col A coluna onde ocorre o erro no fonte. -1 para omitir.
- *  @return Um NULL, sempre.
  */
-void* show_error_lexical(const char *msg, int lin, int col);
+void show_error_lexical(const char* msg, int lin, int col);
 
 /** @brief Exibe na saida padrao, uma mensagem de erro relativa a analise
             lexica ou sintatica do arquivo fonte em questao.
  *  @param msg O texto da mensagem de erro a ser exibida.
- *  @param linha A linha onde ocorre o erro no fonte. -1 para omitir.
- *  @param coluna A coluna onde ocorre o erro no fonte. -1 para omitir.
- *  @param esperado Uma string com o que era esperado. NULL para omitir.
- *  @param encontrado Uma string com o que foi encontrado no lugar. NULL para omitir.
- *  @return Um NULL, sempre.
+ *  @param lin A linha onde ocorre o erro no fonte. -1 para omitir.
+ *  @param col A coluna onde ocorre o erro no fonte. -1 para omitir.
+ *  @param expected Uma string com o que era esperado. NULL para omitir.
+ *  @param found Uma string com o que foi encontrado no lugar. NULL para omitir.
  */
-void* show_error_msg(const char* msg, int linha, int coluna, const char* esperado, char *encontrado);
+void show_error_msg(const char* msg, int lin, int col, const char* expected, const char* found);
 
 /** @brief Exibe, na saida padrao, uma mensagem de erro relativa a violacao de restricao para tamanhos.
  *  @param msg Um texto para a mensagem de erro a ser exibida.
@@ -50,7 +47,7 @@ void* show_error_msg(const char* msg, int linha, int coluna, const char* esperad
 void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok, int max);
 
 /** @brief Exibe uma mensagem de erro por falta de memoria e encerra o programa.
- *  @return void.
+ *  @return void (program error code: -1)
  */
 void fatal_error_no_memory();
 
