@@ -111,6 +111,18 @@ int pre_processor(ListaToken* lst)
             copy(macro_value, it->valor);
 
             insert_macro(&list_macro, macro_name, macro_value);
+
+            remove_token(lst, it->anterior->anterior->anterior); // grave accent
+            remove_token(lst, it->anterior->anterior); // define directive
+            remove_token(lst, it->anterior); // macro identifier
+
+            temp = it; // macro value
+
+            avanca(&it);
+
+            remove_token(lst, temp);
+
+            continue;
         }
         else if (iguais("undefine", it->valor)) { // TODO
             avanca(&it);
@@ -138,16 +150,11 @@ int pre_processor(ListaToken* lst)
             if (!macro)
                 goto pre_processor_error_undeclared_macro;
 
-            // remove previous '`' token, and update current token
-            temp = it->anterior;
-            it->anterior->anterior->seguinte = it;
-            it->anterior = it->anterior->anterior;
-            free(temp);
+            remove_token(lst, it->anterior); // remove previous '`' token
+            
+            // update current token
             copy(it->valor, macro->value);
-
             it->classe = get_token_class(it->valor);
-
-            lst->tamanho--;
         }
         else {
             show_error_msg("Token inesperado",

@@ -131,6 +131,10 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
  */
 int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna);
 
+/** @brief Remove the token, specified by its pointer, from the list. 
+ */
+void remove_token(ListaToken* list, Token* tok);
+
 /** @brief Remove todos os tokens com o valor indicado da lista.
  */
 int removeTokensPorValor(ListaToken* lst, const char* tok);

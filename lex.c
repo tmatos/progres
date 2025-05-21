@@ -314,6 +314,44 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
     return 1;
 }
 
+void remove_token(ListaToken* list, Token* tok)
+{
+    Token* it = list->primeiro;
+    
+    while (it)
+    {
+        if (it == tok)
+        {
+            if (it->anterior) {
+                if (it->seguinte) {
+                    it->anterior->seguinte = it->seguinte;
+                    it->seguinte->anterior = it->anterior;
+                }
+                else { // caso em que removemos item no final da lista
+                    list->ultimo = it->anterior;
+                    it->anterior->seguinte = NULL;
+                }
+            }
+            else {
+                if (it->seguinte) { // primeiro da lista eh removido e ha outros itens
+                    list->primeiro = it->seguinte;
+                    it->seguinte->anterior = NULL;
+                }
+                else { // lista com um unico item e que sera removido
+                    list->primeiro = NULL;
+                    list->ultimo = NULL;
+                }
+            }
+            
+            list->tamanho--;
+            free(it);
+            break;
+        }
+
+        avanca(&it);
+    }
+}
+
 int removeTokensPorValor(ListaToken* lst, const char* tok)
 {
     Token *tmp = NULL;
