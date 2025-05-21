@@ -212,4 +212,10 @@ unsigned long len(const char* str);
  */
 char* copy(char* dest, const char* src);
 
+/** @brief Get the TokenClass enum value from its respective token string.
+ *  @param s_tok Token string.
+ *  @return Respective TokenClass value, in case of a match. Otherwise: _UNKNOWN
+ */
+TokenClass get_token_class(const char* s_tok);
+
 #endif // LEX_H

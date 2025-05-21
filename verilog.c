@@ -16,6 +16,7 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "lex.h"
+#include "preprocessor.h"
 
 int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
 {
@@ -145,6 +146,7 @@ Module* carregaCircuito(FILE* arquivo)
     Componente in;
     Componente out;
     Componente gate;
+    Token* it = NULL;
     Module* circuito = NULL;
 
     int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
@@ -169,14 +171,17 @@ Module* carregaCircuito(FILE* arquivo)
 
     ListaToken* tokens = tokeniza(arquivo);
 
-    Token* it = NULL;
 
-    if(!tokens)
+    if (!tokens)
+        goto bad_return;
+
+    // pre-processing pass to handle compiler directives, returns 1 if ok
+    if (!pre_processor(tokens))
         goto bad_return;
 
     it = tokens->primeiro;
 
-    if(!it)
+    if (!it)
         goto bad_return;
 
     if( ! load_module_header(&it, identificadores, identificLivre) )
