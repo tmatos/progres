@@ -1,18 +1,19 @@
 
 // flip flop SR
 
-module flipflopSR(q, qn, s, r, clk);
+module flipflop_sr(s, r, q, qn);
 
-input s, r, clk;
+input s, r;
 
 output q, qn;
 
-wire nand1Out;
-wire nand2Out;
+wire nand_1_out;
+wire nand_2_out;
 
-nand(nand1Out, clk, s);
-nand(nand2Out, clk, r);
-nand(q, nand1Out, qn);
-nand(qn, nand2Out, q);
+nor gate_1 (nand_1_out, nand_2_out, r);
+nor gate_2 (nand_2_out, nand_1_out, s);
+
+assign q = nand_1_out;
+assign qn = nand_2_out;
 
 endmodule
