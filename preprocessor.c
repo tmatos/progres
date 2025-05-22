@@ -50,6 +50,46 @@ Macro* get_macro_by_name(ListMacro list, const char* name)
     return NULL;
 }
 
+void remove_macro_by_name(ListMacro* list, const char* name)
+{
+    int i;
+
+    if (!name)
+        return;
+
+    // TODO: refactor this
+    
+    // find the index of the element to remove
+    for ( i = 0 ; i < list->total ; i++ )
+    {
+        if ( iguais(list->itens[i]->name, name) ) {
+            break;
+        }
+    }
+
+    // case of removing the latest element
+    if ( i == (list->total - 1) ) {
+        list->total--;
+        if (list->total == 0) {
+            free(list->itens);
+        }
+        return;
+    }
+
+    // here, we always have a next element
+    while ( i < (list->total - 1) )
+    {
+        i++;
+        copy(list->itens[i-1]->name, list->itens[i]->name);
+        copy(list->itens[i-1]->value, list->itens[i]->value);
+    }
+
+    list->total--;
+    if (list->total == 0) {
+        free(list->itens);
+    }
+}
+
 int pre_processor(ListaToken* lst)
 {
     Token* it;
@@ -124,7 +164,7 @@ int pre_processor(ListaToken* lst)
 
             continue;
         }
-        else if (iguais("undefine", it->valor)) { // TODO
+        else if (iguais("undef", it->valor)) {
             avanca(&it);
             if (!it)
                 goto pre_processor_error_bad_eof;
@@ -140,9 +180,17 @@ int pre_processor(ListaToken* lst)
             if (!macro)
                 goto pre_processor_error_undeclared_macro;
 
-            // remove_macro_by_name(list_macro, macro);
-            // TODO
-            // ???
+            remove_macro_by_name(&list_macro, it->valor);
+
+            temp = it;
+
+            avanca(&it);
+            
+            remove_token(lst, temp->anterior->anterior); // grave accent
+            remove_token(lst, temp->anterior); // undefine directive
+            remove_token(lst, temp); // macro identifier
+            
+            continue;
         }
         else if (isIdentificador(it)) {
             macro = get_macro_by_name(list_macro, it->valor);
