@@ -171,7 +171,7 @@ int pre_processor(ListaToken* lst)
     return 1;
 
 pre_processor_error_bad_eof:
-    show_error_msg("Final inesperado", it->linha, it->coluna, NULL, NULL);
+    show_error_msg("Final inesperado de arquivo", -1, -1, NULL, NULL);
     return 0;
 
 pre_processor_error_undeclared_macro:
