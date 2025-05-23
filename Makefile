@@ -8,10 +8,10 @@ CFLAGS = -I$(INC_DIR) -Wall
 
 TARGET = progres
 
-_DEPS = sinais.h erros.h estruturas.h lex.h eventos.h verilog.h inout.h mem.h simula.h progres.h
+_DEPS = sinais.h erros.h estruturas.h lex.h preprocessor.h eventos.h verilog.h inout.h mem.h simula.h progres.h
 DEPS = $(patsubst %,$(INC_DIR)/%,$(_DEPS))
 
-_OBJ = sinais.o erros.o estruturas.o lex.o eventos.o verilog.o inout.o mem.o simula.o progres.o
+_OBJ = sinais.o erros.o estruturas.o lex.o preprocessor.o eventos.o verilog.o inout.o mem.o simula.o progres.o
 OBJ = $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
 
 default: makedir all

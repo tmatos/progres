@@ -6,6 +6,7 @@
 #include "estruturasTests.cpp"
 #include "sinaisTests.cpp"
 #include "lexTests.cpp"
+#include "preprocessorTests.cpp"
 #include "eventosTests.cpp"
 #include "simulaTests.cpp"
 #include "verilogTests.cpp"
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
   runner.addTest( Testes_estruturas::suite() );
   runner.addTest( Testes_sinais::suite() );
   runner.addTest( Testes_lex::suite() );
+  runner.addTest( Testes_preprocessor::suite() );
   runner.addTest( Testes_eventos::suite() );
   runner.addTest( Testes_simula::suite() );
   runner.addTest( Testes_verilog::suite() );

@@ -163,9 +163,127 @@ void delete_lista_token(ListaToken* list)
 
 int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
 {
-    char s[2] = {tok, '\0'};
+    char s[2];
+    s[0] = tok;
+    s[1] = '\0';
 
     return insereTokenString(lista, s, p_linha, p_coluna);
+}
+
+TokenClass get_token_class(const char* s_tok)
+{
+    int i;
+    TokenClass tc;
+
+    // IMPORTANT: keep track of the count here
+    #define _QTD_CLASSES 43
+    #define _MAX_STRLEN_IN_ARRAY 13
+
+    char from_str[_QTD_CLASSES][_MAX_STRLEN_IN_ARRAY] = {
+        "and", // 1
+        "or",
+        "not",
+        "buf",
+        "nand",
+        "nor",
+        "xor",
+        "xnor",
+        "input",
+        "output",
+        "wire",
+        "reg",
+        "signed",
+        "module",
+        "endmodule",
+        "initial",
+        "begin",
+        "end",
+        "parameter",
+        "defparam",
+        "localparam",
+        "assign",
+        "=",
+        ",",
+        ":",   // = 25
+        ";",
+        "(",
+        ")",
+        "[",
+        "]",   // = 30
+        "{",
+        "}",
+        "#",
+        "+",
+        "-",   // = 35
+        "*",
+        "/",
+        "\%",
+        "~",
+        "&",   // = 40
+        "|",
+        "^",
+        "\x60" // = _QTD_CLASSES
+    };
+
+    TokenClass to_class[_QTD_CLASSES] = {
+        KW_AND, // 1
+        KW_OR,
+        KW_NOT,
+        KW_BUF,
+        KW_NAND,
+        KW_NOR,
+        KW_XOR,
+        KW_XNOR,
+        KW_INPUT,
+        KW_OUTPUT,
+        KW_WIRE,
+        KW_REG,
+        KW_SIGNED,
+        KW_MODULE,
+        KW_ENDMODULE,
+        KW_INITIAL,
+        KW_BEGIN,
+        KW_END,
+        KW_PARAMETER,
+        KW_DEFPARAM,
+        KW_LOCALPARAM,
+        KW_ASSIGN,
+        SYM_EQ,
+        SYM_COMMA,
+        SYM_COLON,
+        SYM_SEMICOLON,
+        SYM_OPEN_BRACKET,
+        SYM_CLOSE_BRACKET,
+        SYM_OPEN_SQUAREBRACKET,
+        SYM_CLOSE_SQUAREBRACKET,
+        SYM_OPEN_BRACE,
+        SYM_CLOSE_BRACE,
+        SYM_HASHTAG,
+        SYM_PLUS,
+        SYM_MINUS,        // = 35
+        SYM_ASTERISK,
+        SYM_SLASH,
+        SYM_PERCENT,
+        SYM_TILDE,
+        SYM_AMPERSAND,    // = 40
+        SYM_PIPE,
+        SYM_CIRCUMFLEX,
+        SYM_GRAVE_ACCENT  // = _QTD_CLASSES
+    };
+
+    tc = _UNKNOWN;
+
+    for ( i = 0; i < _QTD_CLASSES; i++ )
+    {
+        if ( iguais(from_str[i], s_tok) ) {
+            tc = to_class[i];
+            break;
+        }
+    }
+    
+    // TODO: Preencher classe do token para todas elas, nao apenas estas acima
+
+    return tc;
 }
 
 int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna)
@@ -177,99 +295,7 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
     newtok->coluna = p_coluna;
     newtok->anterior = NULL;
     newtok->seguinte = NULL;
-
-    TokenClass tc = _UNKNOWN;
-
-    if( iguais(tok, "and") )
-        tc = KW_AND;
-    else if( iguais(tok, "or") )
-        tc = KW_OR;
-    else if( iguais(tok, "not") )
-        tc = KW_NOT;
-    else if( iguais(tok, "buf") )
-        tc = KW_BUF;
-    else if( iguais(tok, "nand") )
-        tc = KW_NAND;
-    else if( iguais(tok, "nor") )
-        tc = KW_NOR;
-    else if( iguais(tok, "xor") )
-        tc = KW_XOR;
-    else if( iguais(tok, "xnor") )
-        tc = KW_XNOR;
-    else if( iguais(tok, "input") )
-        tc = KW_INPUT;
-    else if( iguais(tok, "output") )
-        tc = KW_OUTPUT;
-    else if( iguais(tok, "wire") )
-        tc = KW_WIRE;
-    else if( iguais(tok, "reg") )
-        tc = KW_REG;
-    else if( iguais(tok, "signed") )
-        tc = KW_SIGNED;
-    else if( iguais(tok, "module") )
-        tc = KW_MODULE;
-    else if( iguais(tok, "endmodule") )
-        tc = KW_ENDMODULE;
-    else if( iguais(tok, "initial") )
-        tc = KW_INITIAL;
-    else if( iguais(tok, "begin") )
-        tc = KW_BEGIN;
-    else if( iguais(tok, "end") )
-        tc = KW_END;
-    else if( iguais(tok, "parameter") )
-        tc = KW_PARAMETER;
-    else if( iguais(tok, "defparam") )
-        tc = KW_DEFPARAM;
-    else if( iguais(tok, "localparam") )
-        tc = KW_LOCALPARAM;
-    else if( iguais(tok, "assign") )
-        tc = KW_ASSIGN;
-    else if( iguais(tok, "=") )
-        tc = SYM_EQ;
-    else if( iguais(tok, ",") )
-        tc = SYM_COMMA;
-    else if( iguais(tok, ":") )
-        tc = SYM_COLON;
-    else if( iguais(tok, ";") )
-        tc = SYM_SEMICOLON;
-    else if( iguais(tok, "(") )
-        tc = SYM_OPEN_BRACKET;
-    else if( iguais(tok, ")") )
-        tc = SYM_CLOSE_BRACKET;
-    else if( iguais(tok, "[") )
-        tc = SYM_OPEN_SQUAREBRACKET;
-    else if( iguais(tok, "]") )
-        tc = SYM_CLOSE_SQUAREBRACKET;
-    else if( iguais(tok, "{") )
-        tc = SYM_OPEN_BRACE;
-    else if( iguais(tok, "}") )
-        tc = SYM_CLOSE_BRACE;
-    else if( iguais(tok, "#") )
-        tc = SYM_HASHTAG;
-    else if( iguais(tok, "+") )
-        tc = SYM_PLUS;
-    else if( iguais(tok, "-") )
-        tc = SYM_MINUS;
-    else if( iguais(tok, "*") )
-        tc = SYM_ASTERISK;
-    else if( iguais(tok, "/") )
-        tc = SYM_SLASH;
-    else if( iguais(tok, "\%") )
-        tc = SYM_PERCENT;
-    else if( iguais(tok, "~") )
-        tc = SYM_TILDE;
-    else if( iguais(tok, "&") )
-        tc = SYM_AMPERSAND;
-    else if( iguais(tok, "|") )
-        tc = SYM_PIPE;
-    else if( iguais(tok, "^") )
-        tc = SYM_CIRCUMFLEX;
-    else if( iguais(tok, "`") )
-        tc = SYM_GRAVE_ACCENT;
-
-    // TODO: Preencher classe do token para todas elas, nao apenas estas acima
-
-    newtok->classe = tc;
+    newtok->classe = get_token_class(tok);
 
     // TODO: Checagens...
 
@@ -286,6 +312,44 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
     lista->tamanho++;
 
     return 1;
+}
+
+void remove_token(ListaToken* list, Token* tok)
+{
+    Token* it = list->primeiro;
+    
+    while (it)
+    {
+        if (it == tok)
+        {
+            if (it->anterior) {
+                if (it->seguinte) {
+                    it->anterior->seguinte = it->seguinte;
+                    it->seguinte->anterior = it->anterior;
+                }
+                else { // caso em que removemos item no final da lista
+                    list->ultimo = it->anterior;
+                    it->anterior->seguinte = NULL;
+                }
+            }
+            else {
+                if (it->seguinte) { // primeiro da lista eh removido e ha outros itens
+                    list->primeiro = it->seguinte;
+                    it->seguinte->anterior = NULL;
+                }
+                else { // lista com um unico item e que sera removido
+                    list->primeiro = NULL;
+                    list->ultimo = NULL;
+                }
+            }
+            
+            list->tamanho--;
+            free(it);
+            break;
+        }
+
+        avanca(&it);
+    }
 }
 
 int removeTokensPorValor(ListaToken* lst, const char* tok)
@@ -389,7 +453,7 @@ int isSimbolo(char c)
             c == '#' ||
             c == '@' ||
             c == '$' ||
-            c == '`' ||
+            c == '`' || // grave accent
             c == '"' ||
             c == '\'');
 }
@@ -401,11 +465,11 @@ void exibeListaDeToken(ListaToken* tokens)
     if (global_silent_mode)
         return;
 
-    printf(" - LISTA DE TOKENS CAPTURADOS -\n\n");
+    printf("-- LISTA DE TOKENS CAPTURADOS --\n\n");
 
     it = tokens->primeiro;
     while(it) {
-        printf("%s\n", it->valor);
+        printf("%s\t\t\t\t\t%d\n", it->valor, it->classe);
         avanca(&it);
     }
 
