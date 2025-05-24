@@ -1,6 +1,6 @@
 /**
  * @file sinais.h
- * @brief Estruturas e funções para manipulação de sinais de entrada e saída.
+ * @brief Estruturas e funï¿½ï¿½es para manipulaï¿½ï¿½o de sinais de entrada e saï¿½da.
  */
 
 #ifndef SINAIS_H
@@ -9,7 +9,7 @@
 
 #define MAX_NOME_SINAL 50
 
-/** @brief Valor lógico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
+/** @brief Valor lï¿½gico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
  */
 typedef enum en_valor {
     zero = 0,
@@ -18,9 +18,9 @@ typedef enum en_valor {
     nulo
 } ValorLogico;
 
-/** @brief Unidades de tempo disponíveis para a duração de um pulso.
+/** @brief Unidades de tempo disponï¿½veis para a duraï¿½ï¿½o de um pulso.
         Na ordem, segundo, milisegundo, microsegundo, nanosegundo e picosegundo.
-        O valor numérico é equivalente ao valor absoluto do módulo do expoente.
+        O valor numï¿½rico ï¿½ equivalente ao valor absoluto do mï¿½dulo do expoente.
 */
 typedef enum en_un_tempo {
     UN_S = 0,
@@ -30,11 +30,11 @@ typedef enum en_un_tempo {
     UN_PS = 12
 } UnidTempo;
 
-/** @brief O tipo das variáveis usadas na representação do tempo.
+/** @brief O tipo das variï¿½veis usadas na representaï¿½ï¿½o do tempo.
  */
 typedef unsigned int Tempo;
 
-/** @brief Um pulso de valor fixo e duração definida.
+/** @brief Um pulso de valor fixo e duraï¿½ï¿½o definida.
  */
 typedef struct st_pulso {
     ValorLogico valor;
@@ -42,7 +42,7 @@ typedef struct st_pulso {
     UnidTempo unidade;
 } Pulso;
 
-/** @brief Um sinal contém um array de pulsos com o último pulso nulo. Semelhantemente a uma string.
+/** @brief Um sinal contï¿½m um array de pulsos com o ï¿½ltimo pulso nulo. Semelhantemente a uma string.
  */
 typedef struct st_sinal {
     char nome[MAX_NOME_SINAL];
@@ -50,7 +50,7 @@ typedef struct st_sinal {
     Tempo duracaoTotal;
 } Sinal;
 
-/** @brief Um conjunto de um ou mais sinais. Podem ser todos de entrada ou todos de saída.
+/** @brief Um conjunto de um ou mais sinais. Podem ser todos de entrada ou todos de saï¿½da.
  */
 typedef struct st_sinais {
     int quantidade;
@@ -65,18 +65,18 @@ Sinal* novoSinal(char *nome);
  */
 int setSinalNome(Sinal* s, char* nome);
 
-/** @brief Define o pulso indicado com sendo nulo. Isto é, seu valor conterá nulo.
+/** @brief Define o pulso indicado com sendo nulo. Isto ï¿½, seu valor conterï¿½ nulo.
  */
 int setPulsoNulo(Pulso* p);
 
 /** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do obj. Sinal,
-            mais um pulso de valor e duração indicados.
-            É como se fosse um append, aqui fazemos uso de realloc.
+            mais um pulso de valor e duraï¿½ï¿½o indicados.
+            ï¿½ como se fosse um append, aqui fazemos uso de realloc.
  */
 int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
 
-/** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de memória.
-            Vazia significa: primeiro e ultimo apontam a NULL e num. de elem. é zero.
+/** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de memï¿½ria.
+            Vazia significa: primeiro e ultimo apontam a NULL e num. de elem. ï¿½ zero.
  */
 Sinais* novaSinais();
 

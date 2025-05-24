@@ -13,11 +13,10 @@
 
 #include <wx/config.h>
 
-class IDEConfig: public wxDialog
+class IDEConfig : public wxDialog
 {
     public:
-
-        IDEConfig(wxWindow* parent,wxWindowID id=wxID_ANY);
+        IDEConfig(wxWindow* parent, wxWindowID id = wxID_ANY);
         virtual ~IDEConfig();
 
         //(*Declarations(IDEConfig)
@@ -31,7 +30,6 @@ class IDEConfig: public wxDialog
         //*)
 
     protected:
-
         //(*Identifiers(IDEConfig)
         static const long ID_BUTTON1;
         static const long ID_BUTTON2;
@@ -42,7 +40,6 @@ class IDEConfig: public wxDialog
         //*)
 
     private:
-
         //(*Handlers(IDEConfig)
         void OnbtnCancelarClick(wxCommandEvent& event);
         void OnbtnSimuladorPathClick(wxCommandEvent& event);

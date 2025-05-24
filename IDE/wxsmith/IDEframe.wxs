@@ -6,7 +6,6 @@
 		<id_arg>0</id_arg>
 		<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
 			<sashpos>400</sashpos>
-			<minsize>10</minsize>
 			<pos>128,272</pos>
 			<size>656,325</size>
 			<minsize>10,10</minsize>
@@ -43,36 +42,41 @@
 		<object class="wxMenuBar" variable="MenuBarPrincipal" member="no">
 			<object class="wxMenu" variable="MenuArquivo" member="no">
 				<label>&amp;Arquivo</label>
-				<object class="wxMenu" name="ID_MENUITEM1" variable="MenuItem2" member="yes">
+				<object class="wxMenu" name="ID_MENU_FILE_NEW" variable="MenuItem2" member="yes">
 					<label>Novo</label>
-					<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItemNovoCircuito" member="yes">
-						<label>Circuto</label>
+					<object class="wxMenuItem" name="ID_MENU_FILE_NEW_CIRCUIT" variable="MenuItemNovoCircuito" member="yes">
+						<label>Circuito</label>
 						<handler function="OnMenuItemNovoCircuitoSelected" entry="EVT_MENU" />
 					</object>
 				</object>
-				<object class="wxMenuItem" name="idMenuOpen" variable="MenuItem1" member="yes">
+				<object class="wxMenuItem" name="ID_MENU_FILE_OPEN" variable="MenuItem1" member="yes">
 					<label>Abrir</label>
 					<accel>Ctrl-O</accel>
 					<help>Abrir um fonte Verilog</help>
 					<handler function="OnMenuItemOpen" entry="EVT_MENU" />
 				</object>
-				<object class="wxMenuItem" name="idMenuSave" variable="MenuItemSave" member="yes">
+				<object class="wxMenuItem" name="ID_MENU_FILE_SAVE" variable="MenuItemSave" member="yes">
 					<label>Salvar</label>
 					<accel>Ctrl-S</accel>
 					<help>Salvar o arquivo em edição.</help>
 					<handler function="OnMenuItemSave" entry="EVT_MENU" />
 				</object>
-				<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
+				<object class="wxMenu" name="ID_MENU_FILE_RECENTS" variable="MenuItem4" member="yes">
 					<label>Recentes</label>
+					<object class="wxMenuItem" name="ID_MENU_FILE_RECENTS_CLEAR" variable="MenuItem6" member="yes">
+						<label>Limpar</label>
+						<help>Limpar a lista de arquivos abertos mais recentemente.</help>
+						<enabled>0</enabled>
+					</object>
 				</object>
-				<object class="wxMenuItem" name="idMenuClose" variable="MenuItemClose" member="yes">
+				<object class="wxMenuItem" name="ID_MENU_FILE_CLOSE" variable="MenuItemClose" member="yes">
 					<label>Fechar</label>
 					<accel>Ctrl-W</accel>
 					<help>Fechar o arquivo em edição.</help>
 					<handler function="OnMenuItemCloseSelected" entry="EVT_MENU" />
 				</object>
 				<object class="separator" />
-				<object class="wxMenuItem" name="idMenuQuit" variable="MenuItemSair" member="no">
+				<object class="wxMenuItem" name="ID_MENU_FILE_QUIT" variable="MenuItemSair" member="no">
 					<label>Sair</label>
 					<accel>Alt-F4</accel>
 					<help>Encerrar o aplicativo.</help>
@@ -81,7 +85,7 @@
 			</object>
 			<object class="wxMenu" variable="Menu2" member="yes">
 				<label>Editar</label>
-				<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItemSelecionarTudo" member="yes">
+				<object class="wxMenuItem" name="ID_MENU_EDIT_SELECTALL" variable="MenuItemSelecionarTudo" member="yes">
 					<label>Selecionar tudo</label>
 					<accel>Ctrl-A</accel>
 					<handler function="OnMenuItemSelecionarTudoSelected" entry="EVT_MENU" />
@@ -106,23 +110,23 @@
 				</object>
 			</object>
 			<object class="wxMenu" variable="Menu1" member="yes">
-				<label>Simulação</label>
-				<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItemAnalisar" member="yes">
+				<label>Simulation</label>
+				<object class="wxMenuItem" name="ID_MENU_SIMULATION_ANALYSE" variable="MenuItemAnalisar" member="yes">
 					<label>Analisar circuito</label>
 					<accel>F5</accel>
 					<handler function="OnMenuItemAnalisarSelected" entry="EVT_MENU" />
 				</object>
 			</object>
 			<object class="wxMenu" variable="MenuOpcoes" member="yes">
-				<label>Opções</label>
-				<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItemConfig" member="yes">
-					<label>Configurações</label>
+				<label>Options</label>
+				<object class="wxMenuItem" name="ID_MENU_OPTIONS_CONFIG" variable="MenuItemConfig" member="yes">
+					<label>Configs</label>
 					<handler function="OnMenuItemConfigSelected" entry="EVT_MENU" />
 				</object>
 			</object>
 			<object class="wxMenu" variable="MenuAjuda" member="no">
 				<label>Ajuda</label>
-				<object class="wxMenuItem" name="idMenuAbout" variable="MenuItemSobre" member="no">
+				<object class="wxMenuItem" name="ID_MENU_HELP_ABOUT" variable="MenuItemSobre" member="no">
 					<label>Sobre</label>
 					<accel>F1</accel>
 					<help>Exibir info sobre o aplicativo.</help>

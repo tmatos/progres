@@ -25,52 +25,53 @@ const long IDEConfig::ID_CHECKBOX1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(IDEConfig,wxDialog)
-	//(*EventTable(IDEConfig)
-	//*)
+  //(*EventTable(IDEConfig)
+  //*)
 END_EVENT_TABLE()
 
-IDEConfig::IDEConfig(wxWindow* parent,wxWindowID id)
+IDEConfig::IDEConfig(wxWindow* parent, wxWindowID id)
 {
-	//(*Initialize(IDEConfig)
-	Create(parent, wxID_ANY, _("Configurações"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
-	SetClientSize(wxSize(480,340));
-	btnSalvar = new wxButton(this, ID_BUTTON1, _("Salvar"), wxPoint(304,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	btnCancelar = new wxButton(this, ID_BUTTON2, _("Cancelar"), wxPoint(392,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	lblSimuladorPath = new wxStaticText(this, ID_STATICTEXT1, _("Simulador:"), wxPoint(24,23), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	txtSimuladorPath = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(80,20), wxSize(304,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	btnSimuladorPath = new wxButton(this, ID_BUTTON3, _("Selecionar"), wxPoint(392,19), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	ChkAbrirUltimoAoIniciar = new wxCheckBox(this, ID_CHECKBOX1, _("Reabrir último documento ao iniciar"), wxPoint(24,168), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-	ChkAbrirUltimoAoIniciar->SetValue(false);
-	fileDiagSimuladorPath = new wxFileDialog(this, _("Selecionar o executavel do simulador"), wxEmptyString, wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_DEFAULT_STYLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
+    //(*Initialize(IDEConfig)
+    Create(parent, wxID_ANY, _("Configurações"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    SetClientSize(wxSize(480,340));
+    btnSalvar = new wxButton(this, ID_BUTTON1, _("Salvar"), wxPoint(304,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    btnCancelar = new wxButton(this, ID_BUTTON2, _("Cancelar"), wxPoint(392,304), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    lblSimuladorPath = new wxStaticText(this, ID_STATICTEXT1, _("Simulador:"), wxPoint(16,22), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    txtSimuladorPath = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(80,20), wxSize(304,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    btnSimuladorPath = new wxButton(this, ID_BUTTON3, _("Selecionar"), wxPoint(392,15), wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    ChkAbrirUltimoAoIniciar = new wxCheckBox(this, ID_CHECKBOX1, _("Reabrir documento anteriormente fechado ao iniciar"), wxPoint(20,150), wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    ChkAbrirUltimoAoIniciar->SetValue(false);
+    fileDiagSimuladorPath = new wxFileDialog(this, _("Selecionar o executavel do simulador"), wxEmptyString, wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_DEFAULT_STYLE|wxFD_FILE_MUST_EXIST, wxDefaultPosition, wxDefaultSize, _T("wxFileDialog"));
 
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSalvarClick);
-	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnCancelarClick);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSimuladorPathClick);
-	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&IDEConfig::OnChkAbrirUltimoAoIniciarClick);
-	//*)
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSalvarClick);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnCancelarClick);
+    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&IDEConfig::OnbtnSimuladorPathClick);
+    Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&IDEConfig::OnChkAbrirUltimoAoIniciarClick);
+    //*)
 
-	config = new wxConfig(_("ProgresIDE"));
+    config = new wxConfig(_("ProgresIDE"));
 
     if ( config->Read(_("SimuladorExePath"), &simuladorExePath) ) {
         txtSimuladorPath->ChangeValue(simuladorExePath);
     }
     else {
+        //TODO
     }
 
     if ( config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar) ) {
         ChkAbrirUltimoAoIniciar->SetValue(AbrirUltimoAoIniciar);
     }
     else {
+        //TODO
     }
 
 }
 
 IDEConfig::~IDEConfig()
 {
-	//(*Destroy(IDEConfig)
-	//*)
+    //(*Destroy(IDEConfig)
+    //*)
 }
-
 
 void IDEConfig::OnbtnCancelarClick(wxCommandEvent& event)
 {
@@ -79,11 +80,14 @@ void IDEConfig::OnbtnCancelarClick(wxCommandEvent& event)
 
 void IDEConfig::OnbtnSimuladorPathClick(wxCommandEvent& event)
 {
-    wxFileDialog ExeDialog(this, _("Selecionar o executável do simulador"), _(""), _(""),
+    wxFileDialog ExeDialog(this,
+                           _("Selecionar o executável do simulador"),
+                           _(""),
+                           _(""),
                            _("Arquivos executáveis (*.exe)|*.exe|Todos os arquivos (*.*)|*.*"),
-                           wxFILE_MUST_EXIST);
+                           wxFD_FILE_MUST_EXIST);
 
-    if(ExeDialog.ShowModal() == wxID_OK)
+    if ( ExeDialog.ShowModal() == wxID_OK )
     {
         simuladorExePath = ExeDialog.GetPath();
         txtSimuladorPath->ChangeValue(simuladorExePath);

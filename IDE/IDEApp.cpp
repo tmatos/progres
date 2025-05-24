@@ -4,7 +4,7 @@
  * Author:    Tiago Matos ()
  * Created:   2014-06-12
  * Copyright: Tiago Matos ()
- * License:
+ * License:   MIT
  **************************************************************/
 
 #include "IDEApp.h"
@@ -23,11 +23,10 @@ bool IDEApp::OnInit()
     wxInitAllImageHandlers();
     if ( wxsOK )
     {
-    	IDEFrame* Frame = new IDEFrame(0);
-    	Frame->Show();
-    	SetTopWindow(Frame);
+        IDEFrame* Frame = new IDEFrame(0);
+        Frame->Show();
+        SetTopWindow(Frame);
     }
     //*)
     return wxsOK;
-
 }

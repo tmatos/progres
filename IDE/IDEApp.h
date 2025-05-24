@@ -1,10 +1,10 @@
 /***************************************************************
- * Name:      IDEApp.h
+ * Name:    IDEApp.h
  * Purpose:   Defines Application Class
- * Author:    Tiago Matos ()
+ * Author:  Tiago Matos ()
  * Created:   2014-06-12
  * Copyright: Tiago Matos ()
- * License:
+ * License:   MIT
  **************************************************************/
 
 #ifndef IDEAPP_H

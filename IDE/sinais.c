@@ -1,6 +1,6 @@
 /*
  Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, Tiago Matos, Joao Victor, Luciano Almeida
+ (C) 2014, Tiago Matos
 
  Under the terms of the MIT license.
 */
@@ -12,11 +12,11 @@
 #include "sinais.h"
 #include "memoria.h"
 
-Sinal* novoSinal(char *nome)
+Sinal* novoSinal(char* nome)
 {
-    Sinal *sinal = (Sinal*) xmalloc(sizeof(Sinal));
+    Sinal* sinal = (Sinal*) xmalloc(sizeof(Sinal));
 
-    if(nome)
+    if (nome)
         setSinalNome(sinal, nome);
     else
         setSinalNome(sinal, "");
@@ -30,8 +30,9 @@ Sinal* novoSinal(char *nome)
     return sinal;
 }
 
-int setSinalNome(Sinal* s, char* nome) {
-    if(!s || !nome)
+int setSinalNome(Sinal* s, char* nome)
+{
+    if ( !s || !nome )
         return 0;
 
     strcpy(s->nome, nome);
@@ -39,8 +40,9 @@ int setSinalNome(Sinal* s, char* nome) {
     return 1;
 }
 
-int setPulsoNulo(Pulso* p) {
-    if(!p)
+int setPulsoNulo(Pulso* p)
+{
+    if (!p)
         return 0;
 
     p->valor = nulo;
@@ -50,20 +52,21 @@ int setPulsoNulo(Pulso* p) {
     return 1;
 }
 
-int addPulso(Sinal* s, ValorLogico valor, Tempo duracao) {
+int addPulso(Sinal* s, ValorLogico valor, Tempo duracao)
+{
     int tamanho;
     Pulso *it = NULL;
 
-    if(!s)
+    if (!s)
         return 0;
 
-    if(!s->pulsos)
+    if (!s->pulsos)
         return 0;
 
     tamanho = 1;
 
     it = s->pulsos;
-    while(it->valor != nulo) {
+    while ( it->valor != nulo ) {
         tamanho++;
         it++;
     }
@@ -72,7 +75,7 @@ int addPulso(Sinal* s, ValorLogico valor, Tempo duracao) {
 
     s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
 
-    // acessando a penúltima posição, lembre q é um vetor!
+    // acessando a penï¿½ltima posiï¿½ï¿½o, lembre q ï¿½ um vetor!
     s->pulsos[tamanho - 2].valor = valor;
     s->pulsos[tamanho - 2].tempo = duracao;
 
@@ -83,10 +86,11 @@ int addPulso(Sinal* s, ValorLogico valor, Tempo duracao) {
     return 1;
 }
 
-Sinais* novaSinais() {
+Sinais* novaSinais()
+{
     Sinais* s = (Sinais*) xmalloc(sizeof(Sinais));
 
-    if(s) {
+    if (s) {
         s->quantidade = 0;
         s->lista = NULL;
     }
@@ -94,12 +98,13 @@ Sinais* novaSinais() {
     return s;
 }
 
-int addSinal(Sinais* s, char* nome) {
-    if(!s) {
+int addSinal(Sinais* s, char* nome)
+{
+    if (!s) {
         s = novaSinais();
     }
 
-    if(s->quantidade == 0) {
+    if (s->quantidade == 0) {
         s->quantidade++;
 
         s->lista = (Sinal*) xmalloc(sizeof(Sinal));
@@ -129,22 +134,22 @@ int addSinal(Sinais* s, char* nome) {
     return 1;
 }
 
-int addSinalPronto(Sinais *ls, Sinal *sinal)
+int addSinalPronto(Sinais* ls, Sinal* sinal)
 {
-    Pulso *it = NULL;
+    Pulso* it = NULL;
 
-    if(!sinal)
+    if (!sinal)
         return 0;
 
-    if(!ls)
+    if (!ls)
         ls = novaSinais();
 
     addSinal(ls, sinal->nome);
 
     it = sinal->pulsos;
-    while(it->valor != nulo)
+    while ( it->valor != nulo )
     {
-        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o último)
+        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o ï¿½ltimo)
         addPulso( ls->lista + (ls->quantidade - 1), it->valor, it->tempo );
         it++;
     }

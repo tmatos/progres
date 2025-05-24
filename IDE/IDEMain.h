@@ -4,7 +4,7 @@
  * Author:    Tiago Matos ()
  * Created:   2014-06-12
  * Copyright: Tiago Matos ()
- * License:
+ * License:   MIT
  **************************************************************/
 
 #ifndef IDEMAIN_H
@@ -22,11 +22,10 @@
 #include <wx/statusbr.h>
 //*)
 
-class IDEFrame: public wxFrame
+class IDEFrame : public wxFrame
 {
     public:
-
-        IDEFrame(wxWindow* parent,wxWindowID id = -1);
+        IDEFrame(wxWindow* parent, wxWindowID id = -1);
         virtual ~IDEFrame();
 
         void carregaConfigs();
@@ -61,46 +60,48 @@ class IDEFrame: public wxFrame
         static const long ID_NOTEBOOK1;
         static const long ID_LISTBOXERROS;
         static const long ID_SPLITTERWINDOW1;
-        static const long ID_MENUITEM2;
-        static const long ID_MENUITEM1;
-        static const long idMenuOpen;
-        static const long idMenuSave;
-        static const long ID_MENUITEM8;
-        static const long idMenuClose;
-        static const long idMenuQuit;
-        static const long ID_MENUITEM6;
+        static const long ID_MENU_FILE_NEW_CIRCUIT;
+        static const long ID_MENU_FILE_NEW;
+        static const long ID_MENU_FILE_OPEN;
+        static const long ID_MENU_FILE_SAVE;
+        static const long ID_MENU_FILE_RECENTS_CLEAR;
+        static const long ID_MENU_FILE_RECENTS;
+        static const long ID_MENU_FILE_CLOSE;
+        static const long ID_MENU_FILE_QUIT;
+        static const long ID_MENU_EDIT_SELECTALL;
         static const long ID_MENUITEM_TESTE;
         static const long ID_MENUITEM_ENTRADA_NOVO;
         static const long ID_MENUITEM_ENTRADA_ABRIR;
-        static const long ID_MENUITEM4;
-        static const long ID_MENUITEM7;
-        static const long idMenuAbout;
+        static const long ID_MENU_SIMULATION_ANALYSE;
+        static const long ID_MENU_OPTIONS_CONFIG;
+        static const long ID_MENU_HELP_ABOUT;
         static const long ID_STATUSBAR1;
         //*)
 
         //(*Declarations(IDEFrame)
-        wxMenu* MenuItem2;
-        wxMenuItem* MenuItemSave;
-        wxMenuItem* MenuItemClose;
-        wxMenuItem* MenuItem5;
-        wxMenuItem* MenuItemNovoCircuito;
-        wxTextCtrl* EditBox;
-        wxMenu* Menu3;
-        wxMenuItem* MenuItem1;
-        wxMenuItem* MenuItem4;
-        wxMenu* MenuOpcoes;
-        wxNotebook* bookFontes;
-        wxMenu* Menu1;
-        wxMenuItem* MenuItem3;
-        wxMenuItem* MenuItemTeste;
-        wxMenuItem* MenuItemConfig;
-        wxMenuItem* MenuItemAnalisar;
-        wxSplitterWindow* SplitterWindow1;
-        wxMenu* Menu2;
-        wxStatusBar* StatusBarPrincipal;
-        wxMenuItem* MenuItemSelecionarTudo;
         wxListBox* ListBoxErros;
+        wxMenu* Menu1;
+        wxMenu* Menu2;
+        wxMenu* Menu3;
         wxMenu* Menu4;
+        wxMenu* MenuItem2;
+        wxMenu* MenuItem4;
+        wxMenu* MenuOpcoes;
+        wxMenuItem* MenuItem1;
+        wxMenuItem* MenuItem3;
+        wxMenuItem* MenuItem5;
+        wxMenuItem* MenuItem6;
+        wxMenuItem* MenuItemAnalisar;
+        wxMenuItem* MenuItemClose;
+        wxMenuItem* MenuItemConfig;
+        wxMenuItem* MenuItemNovoCircuito;
+        wxMenuItem* MenuItemSave;
+        wxMenuItem* MenuItemSelecionarTudo;
+        wxMenuItem* MenuItemTeste;
+        wxNotebook* bookFontes;
+        wxSplitterWindow* SplitterWindow1;
+        wxStatusBar* StatusBarPrincipal;
+        wxTextCtrl* EditBox;
         //*)
 
         wxString verilogFilePath;

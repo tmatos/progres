@@ -4,34 +4,38 @@
 
 #include "memoria.h"
 
-void* xmalloc(size_t t) {
+void* xmalloc(size_t t)
+{
     void* p = malloc(t);
 
-    if(!p)
+    if (!p)
         fatal_error_no_memory();
 
     return p;
 }
 
-void* xrealloc(void* m, size_t t) {
+void* xrealloc(void* m, size_t t)
+{
     void* p = realloc(m, t);
 
-    if(!p)
+    if (!p)
         fatal_error_no_memory();
 
     return p;
 }
 
-void* xcalloc(size_t n, size_t t) {
+void* xcalloc(size_t n, size_t t)
+{
     void* p = calloc(n, t);
 
-    if(!p)
+    if (!p)
         fatal_error_no_memory();
 
     return p;
 }
 
-void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *encontrado) {
+void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char* encontrado)
+{
 //    if(linha > 0)
 //    {
 //        printf("%d:", linha);
@@ -55,7 +59,8 @@ void* show_error_msg(char* msg, int linha, int coluna, char* esperado, char *enc
     return NULL;
 }
 
-void fatal_error_no_memory() {
+void fatal_error_no_memory()
+{
 //    printf("\nERRO FATAL: Sem memoria para alocar.\n");
 //    exit(-1);
 }

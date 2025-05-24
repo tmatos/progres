@@ -14,6 +14,7 @@
 #include "sinais.h"
 
 #include <wx/msgdlg.h>
+#include <wx/aboutdlg.h>
 #include <wx/dcclient.h>
 #include <wx/textfile.h>
 #include <wx/filename.h>
@@ -28,7 +29,9 @@
 
 //helper functions
 enum wxbuildinfoformat {
-    short_f, long_f };
+    short_f,
+    long_f
+};
 
 wxString wxbuildinfo(wxbuildinfoformat format)
 {
@@ -57,20 +60,21 @@ const long IDEFrame::ID_TEXTCTRL_FONTE = wxNewId();
 const long IDEFrame::ID_NOTEBOOK1 = wxNewId();
 const long IDEFrame::ID_LISTBOXERROS = wxNewId();
 const long IDEFrame::ID_SPLITTERWINDOW1 = wxNewId();
-const long IDEFrame::ID_MENUITEM2 = wxNewId();
-const long IDEFrame::ID_MENUITEM1 = wxNewId();
-const long IDEFrame::idMenuOpen = wxNewId();
-const long IDEFrame::idMenuSave = wxNewId();
-const long IDEFrame::ID_MENUITEM8 = wxNewId();
-const long IDEFrame::idMenuClose = wxNewId();
-const long IDEFrame::idMenuQuit = wxNewId();
-const long IDEFrame::ID_MENUITEM6 = wxNewId();
+const long IDEFrame::ID_MENU_FILE_NEW_CIRCUIT = wxNewId();
+const long IDEFrame::ID_MENU_FILE_NEW = wxNewId();
+const long IDEFrame::ID_MENU_FILE_OPEN = wxNewId();
+const long IDEFrame::ID_MENU_FILE_SAVE = wxNewId();
+const long IDEFrame::ID_MENU_FILE_RECENTS_CLEAR = wxNewId();
+const long IDEFrame::ID_MENU_FILE_RECENTS = wxNewId();
+const long IDEFrame::ID_MENU_FILE_CLOSE = wxNewId();
+const long IDEFrame::ID_MENU_FILE_QUIT = wxNewId();
+const long IDEFrame::ID_MENU_EDIT_SELECTALL = wxNewId();
 const long IDEFrame::ID_MENUITEM_TESTE = wxNewId();
 const long IDEFrame::ID_MENUITEM_ENTRADA_NOVO = wxNewId();
 const long IDEFrame::ID_MENUITEM_ENTRADA_ABRIR = wxNewId();
-const long IDEFrame::ID_MENUITEM4 = wxNewId();
-const long IDEFrame::ID_MENUITEM7 = wxNewId();
-const long IDEFrame::idMenuAbout = wxNewId();
+const long IDEFrame::ID_MENU_SIMULATION_ANALYSE = wxNewId();
+const long IDEFrame::ID_MENU_OPTIONS_CONFIG = wxNewId();
+const long IDEFrame::ID_MENU_HELP_ABOUT = wxNewId();
 const long IDEFrame::ID_STATUSBAR1 = wxNewId();
 //*)
 
@@ -79,7 +83,7 @@ BEGIN_EVENT_TABLE(IDEFrame,wxFrame)
     //*)
 END_EVENT_TABLE()
 
-IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
+IDEFrame::IDEFrame(wxWindow* parent, wxWindowID id)
 {
     //(*Initialize(IDEFrame)
     wxMenuItem* MenuItemSair;
@@ -92,13 +96,12 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     SetClientSize(wxSize(640,480));
     SplitterWindow1 = new wxSplitterWindow(this, ID_SPLITTERWINDOW1, wxPoint(128,272), wxSize(656,325), wxSP_3D, _T("ID_SPLITTERWINDOW1"));
     SplitterWindow1->SetMinSize(wxSize(10,10));
-    SplitterWindow1->SetMinimumPaneSize(10);
     SplitterWindow1->SetSashGravity(0.5);
     bookFontes = new wxNotebook(SplitterWindow1, ID_NOTEBOOK1, wxPoint(156,100), wxSize(176,64), 0, _T("ID_NOTEBOOK1"));
     EditBox = new wxTextCtrl(bookFontes, ID_TEXTCTRL_FONTE, wxEmptyString, wxPoint(191,70), wxSize(543,208), wxTE_MULTILINE|wxTE_RICH2|wxTE_DONTWRAP, wxDefaultValidator, _T("ID_TEXTCTRL_FONTE"));
     EditBox->SetMinSize(wxSize(-1,-1));
     EditBox->SetMaxSize(wxSize(-1,-1));
-    wxFont EditBoxFont(11,wxSCRIPT,wxFONTSTYLE_NORMAL,wxNORMAL,false,_T("Courier New"),wxFONTENCODING_DEFAULT);
+    wxFont EditBoxFont(11,wxFONTFAMILY_SCRIPT,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_NORMAL,false,_T("Courier New"),wxFONTENCODING_DEFAULT);
     EditBox->SetFont(EditBoxFont);
     bookFontes->AddPage(EditBox, wxEmptyString, false);
     ListBoxErros = new wxListBox(SplitterWindow1, ID_LISTBOXERROS, wxPoint(0,276), wxSize(551,49), 0, 0, 0, wxDefaultValidator, _T("ID_LISTBOXERROS"));
@@ -109,23 +112,26 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     MenuBarPrincipal = new wxMenuBar();
     MenuArquivo = new wxMenu();
     MenuItem2 = new wxMenu();
-    MenuItemNovoCircuito = new wxMenuItem(MenuItem2, ID_MENUITEM2, _("Circuto"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemNovoCircuito = new wxMenuItem(MenuItem2, ID_MENU_FILE_NEW_CIRCUIT, _("Circuito"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->Append(MenuItemNovoCircuito);
-    MenuArquivo->Append(ID_MENUITEM1, _("Novo"), MenuItem2, wxEmptyString);
-    MenuItem1 = new wxMenuItem(MenuArquivo, idMenuOpen, _("Abrir\tCtrl-O"), _("Abrir um fonte Verilog"), wxITEM_NORMAL);
+    MenuArquivo->Append(ID_MENU_FILE_NEW, _("Novo"), MenuItem2, wxEmptyString);
+    MenuItem1 = new wxMenuItem(MenuArquivo, ID_MENU_FILE_OPEN, _("Abrir\tCtrl-O"), _("Abrir um fonte Verilog"), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItem1);
-    MenuItemSave = new wxMenuItem(MenuArquivo, idMenuSave, _("Salvar\tCtrl-S"), _("Salvar o arquivo em edição."), wxITEM_NORMAL);
+    MenuItemSave = new wxMenuItem(MenuArquivo, ID_MENU_FILE_SAVE, _("Salvar\tCtrl-S"), _("Salvar o arquivo em edição."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSave);
-    MenuItem4 = new wxMenuItem(MenuArquivo, ID_MENUITEM8, _("Recentes"), wxEmptyString, wxITEM_NORMAL);
-    MenuArquivo->Append(MenuItem4);
-    MenuItemClose = new wxMenuItem(MenuArquivo, idMenuClose, _("Fechar\tCtrl-W"), _("Fechar o arquivo em edição."), wxITEM_NORMAL);
+    MenuItem4 = new wxMenu();
+    MenuItem6 = new wxMenuItem(MenuItem4, ID_MENU_FILE_RECENTS_CLEAR, _("Limpar"), _("Limpar a lista de arquivos abertos mais recentemente."), wxITEM_NORMAL);
+    MenuItem4->Append(MenuItem6);
+    MenuItem6->Enable(false);
+    MenuArquivo->Append(ID_MENU_FILE_RECENTS, _("Recentes"), MenuItem4, wxEmptyString);
+    MenuItemClose = new wxMenuItem(MenuArquivo, ID_MENU_FILE_CLOSE, _("Fechar\tCtrl-W"), _("Fechar o arquivo em edição."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemClose);
     MenuArquivo->AppendSeparator();
-    MenuItemSair = new wxMenuItem(MenuArquivo, idMenuQuit, _("Sair\tAlt-F4"), _("Encerrar o aplicativo."), wxITEM_NORMAL);
+    MenuItemSair = new wxMenuItem(MenuArquivo, ID_MENU_FILE_QUIT, _("Sair\tAlt-F4"), _("Encerrar o aplicativo."), wxITEM_NORMAL);
     MenuArquivo->Append(MenuItemSair);
     MenuBarPrincipal->Append(MenuArquivo, _("&Arquivo"));
     Menu2 = new wxMenu();
-    MenuItemSelecionarTudo = new wxMenuItem(Menu2, ID_MENUITEM6, _("Selecionar tudo\tCtrl-A"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemSelecionarTudo = new wxMenuItem(Menu2, ID_MENU_EDIT_SELECTALL, _("Selecionar tudo\tCtrl-A"), wxEmptyString, wxITEM_NORMAL);
     Menu2->Append(MenuItemSelecionarTudo);
     MenuBarPrincipal->Append(Menu2, _("Editar"));
     Menu3 = new wxMenu();
@@ -139,15 +145,15 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
     Menu4->Append(MenuItem5);
     MenuBarPrincipal->Append(Menu4, _("Entradas"));
     Menu1 = new wxMenu();
-    MenuItemAnalisar = new wxMenuItem(Menu1, ID_MENUITEM4, _("Analisar circuito\tF5"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemAnalisar = new wxMenuItem(Menu1, ID_MENU_SIMULATION_ANALYSE, _("Analisar circuito\tF5"), wxEmptyString, wxITEM_NORMAL);
     Menu1->Append(MenuItemAnalisar);
-    MenuBarPrincipal->Append(Menu1, _("Simulação"));
+    MenuBarPrincipal->Append(Menu1, _("Simulation"));
     MenuOpcoes = new wxMenu();
-    MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENUITEM7, _("Configurações"), wxEmptyString, wxITEM_NORMAL);
+    MenuItemConfig = new wxMenuItem(MenuOpcoes, ID_MENU_OPTIONS_CONFIG, _("Configs"), wxEmptyString, wxITEM_NORMAL);
     MenuOpcoes->Append(MenuItemConfig);
-    MenuBarPrincipal->Append(MenuOpcoes, _("Opções"));
+    MenuBarPrincipal->Append(MenuOpcoes, _("Options"));
     MenuAjuda = new wxMenu();
-    MenuItemSobre = new wxMenuItem(MenuAjuda, idMenuAbout, _("Sobre\tF1"), _("Exibir info sobre o aplicativo."), wxITEM_NORMAL);
+    MenuItemSobre = new wxMenuItem(MenuAjuda, ID_MENU_HELP_ABOUT, _("Sobre\tF1"), _("Exibir info sobre o aplicativo."), wxITEM_NORMAL);
     MenuAjuda->Append(MenuItemSobre);
     MenuBarPrincipal->Append(MenuAjuda, _("Ajuda"));
     SetMenuBar(MenuBarPrincipal);
@@ -160,27 +166,27 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
 
     Connect(ID_TEXTCTRL_FONTE,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&IDEFrame::OnEditBoxText);
     Connect(ID_LISTBOXERROS,wxEVT_COMMAND_LISTBOX_DOUBLECLICKED,(wxObjectEventFunction)&IDEFrame::OnListBoxErrosDClick);
-    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemNovoCircuitoSelected);
-    Connect(idMenuOpen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemOpen);
-    Connect(idMenuSave,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSave);
-    Connect(idMenuClose,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemCloseSelected);
-    Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnQuit);
-    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSelecionarTudoSelected);
+    Connect(ID_MENU_FILE_NEW_CIRCUIT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemNovoCircuitoSelected);
+    Connect(ID_MENU_FILE_OPEN,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemOpen);
+    Connect(ID_MENU_FILE_SAVE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSave);
+    Connect(ID_MENU_FILE_CLOSE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemCloseSelected);
+    Connect(ID_MENU_FILE_QUIT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnQuit);
+    Connect(ID_MENU_EDIT_SELECTALL,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemSelecionarTudoSelected);
     Connect(ID_MENUITEM_TESTE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemTesteSelected);
     Connect(ID_MENUITEM_ENTRADA_NOVO,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemEntradaNovoSelected);
     Connect(ID_MENUITEM_ENTRADA_ABRIR,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemEntradaAbrirSelected);
-    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemAnalisarSelected);
-    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemConfigSelected);
-    Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnAbout);
+    Connect(ID_MENU_SIMULATION_ANALYSE,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemAnalisarSelected);
+    Connect(ID_MENU_OPTIONS_CONFIG,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnMenuItemConfigSelected);
+    Connect(ID_MENU_HELP_ABOUT,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&IDEFrame::OnAbout);
     //*)
 
     defaultWindowTitle = _("Progres IDE");
     SetTitle(defaultWindowTitle);
 
-    // Configuração default para o exec. do simulador
+    // Configuração default para o exececutável do simulador
     wxConfig *config = new wxConfig(_("ProgresIDE"));
     config->Read(_("SimuladorExePath"), &simuladorExePath);
-    if(simuladorExePath.IsEmpty())
+    if (simuladorExePath.IsEmpty())
     {
         config->Write(_("SimuladorExePath"), _("progres"));
         simuladorExePath = _("progres");
@@ -189,21 +195,20 @@ IDEFrame::IDEFrame(wxWindow* parent,wxWindowID id)
 
     carregaConfigs();
 
-    if(AbrirUltimoAoIniciar) {
-        if(!UltimoArquivoVerilog.IsEmpty()) {
-            if(wxFile::Exists(UltimoArquivoVerilog))
+    if (AbrirUltimoAoIniciar) {
+        if (!UltimoArquivoVerilog.IsEmpty()) {
+            if (wxFile::Exists(UltimoArquivoVerilog))
                 CarregarArquivoVerilog(UltimoArquivoVerilog);
         }
     }
 
     arquivoNaoSalvo = false;
-
     ondas = NULL;
 }
 
 IDEFrame::~IDEFrame()
 {
-    if(AbrirUltimoAoIniciar)
+    if (AbrirUltimoAoIniciar)
     {
         wxConfig *config = new wxConfig(_("ProgresIDE"));
         config->Write(_("UltimoArquivoVerilog"), verilogFilePath);
@@ -216,19 +221,20 @@ IDEFrame::~IDEFrame()
 
 void IDEFrame::carregaConfigs()
 {
-    wxConfig *config = new wxConfig(_("ProgresIDE"));
+    wxConfig* config = new wxConfig(_("ProgresIDE"));
 
     config->Read(_("SimuladorExePath"), &simuladorExePath);
 
-    if(config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar))
+    if (config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar))
         config->Read(_("UltimoArquivoVerilog"), &UltimoArquivoVerilog);
     else
         AbrirUltimoAoIniciar = false;
 
     delete config;
 
-    if(simuladorExePath.IsEmpty())
-        wxMessageBox(_("O executável do simulador não foi definido. Por-favor selecione-o nas configurações."), _("Aviso"));
+    if (simuladorExePath.IsEmpty())
+        wxMessageBox(_("O executável do simulador não foi definido. Por favor selecione-o nas configurações."),
+                     _("Aviso"));
 }
 
 void IDEFrame::OnQuit(wxCommandEvent& event)
@@ -238,15 +244,31 @@ void IDEFrame::OnQuit(wxCommandEvent& event)
 
 void IDEFrame::OnAbout(wxCommandEvent& event)
 {
-    wxString msg = _("Progres IDE\n(C) 2014 Tiago Matos\n\ntiagoms88@gmail.com");
-    wxMessageBox(msg, _("Progres"));
+    //wxString msg = _("Progres IDE\n(C) 2014 Tiago Matos\n\ntiagoms88@gmail.com");
+    //wxMessageBox(msg, _("Progres"));
+
+    wxAboutDialogInfo aboutInfo;
+
+    aboutInfo.SetName(_("Progres IDE"));
+    aboutInfo.SetVersion(_("0.1 alpha"));
+    aboutInfo.SetDescription(_("Verilog Circuit Simulation"));
+    aboutInfo.SetCopyright("(C) 2014-2015");
+    aboutInfo.SetWebSite("https://github.com/tmatos/progres");
+    aboutInfo.AddDeveloper("Tiago Matos");
+
+    wxAboutBox(aboutInfo);
 }
 
 void IDEFrame::OnMenuItemOpen(wxCommandEvent& event)
 {
-    wxFileDialog FileDialogFonte(this, _("Selecionar arquivo"), _(""), _(""), _("Arquivos do Verilog (*.v)|*.v|Qualquer arquivo (*.*)|*.*"), wxFILE_MUST_EXIST);
+    wxFileDialog FileDialogFonte(this,
+                                 _("Selecionar arquivo"),
+                                 _(""),
+                                 _(""),
+                                 _("Arquivos do Verilog (*.v)|*.v|Qualquer arquivo (*.*)|*.*"),
+                                 wxFD_FILE_MUST_EXIST);
 
-    if(FileDialogFonte.ShowModal() == wxID_OK)
+    if ( FileDialogFonte.ShowModal() == wxID_OK )
     {
         CarregarArquivoVerilog(FileDialogFonte.GetPath());
     }
@@ -263,7 +285,9 @@ void IDEFrame::CarregarArquivoVerilog(wxString arquivo)
     bookFontes->ChangeSelection(0);
 
     textLenght = EditBox->GetNumberOfLines();
-    StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
+    wxString statusText;
+    statusText << textLenght << " linhas";
+    StatusBarPrincipal->SetStatusText(statusText, 1);
 
     ListBoxErros->Clear();
 
@@ -277,59 +301,74 @@ void IDEFrame::SetTituloJanelaComArquivo(wxString nome)
 
 void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
 {
-    if(arquivoNaoSalvo)
+    if (arquivoNaoSalvo)
     {
-        wxMessageBox(_("Salve o arquivo primeiro."), _("Aviso"));
+        wxMessageBox(_("Salve o arquivo primeiro."),
+                     _("Aviso"));
         return;
     }
 
-    if(verilogFilePath.IsEmpty())
+    if ( verilogFilePath.IsEmpty() )
     {
-        wxMessageBox(_("Não há arquivo aberto."), _("Erro"));
+        wxMessageBox(_("Inexiste arquivo de circuito aberto."),
+                     _("Erro"),
+                     wxICON_ERROR);
+        return;
     }
-    else
+
+    wxArrayString saida;
+
+    wxString comando;
+
+    comando << simuladorExePath << " " << verilogFilePath;
+
+    if ( !waveinFilePath.IsEmpty() ) {
+        comando << " " << waveinFilePath;
+    }
+
+    ListBoxErros->Append(_("DEBUG> EXECUTE: ") + comando);
+
+    // synchronous
+    int r = wxExecute(comando, saida, wxEXEC_SYNC, NULL);
+
+    if ( r == -1 ) {
+        wxMessageBox(_("Problema ao executar o comando do simulador"),
+                     _("Erro"),
+                     wxICON_ERROR);
+        ListBoxErros->Append(_("DEBUG> FALHA: -1"));
+        return;
+    }
+
+    ListBoxErros->Clear();
+
+    for ( unsigned int i = 0 ; i < saida.Count() ; i++ ) {
+        ListBoxErros->Append(saida[i]);
+    }
+
+    if (!waveinFilePath.IsEmpty())
     {
-        wxArrayString saida;
+        Sinais* ondas_out = NULL;
+        waveoutFilePath = waveinFilePath + _(".out");
+        ondas_out = carregaArquivoSinais( waveoutFilePath.ToStdString().c_str() );
 
-        wxString comando = simuladorExePath + _(" ") + verilogFilePath;
-
-        if(!waveinFilePath.IsEmpty())
-            comando = comando + _(" ") + waveinFilePath;
-
-        wxExecute(comando, saida);
-
-        ListBoxErros->Clear();
-
-        for(unsigned int i = 0 ; i < saida.Count() ; i++)
-            ListBoxErros->Append(saida[i]);
-
-        if(!waveinFilePath.IsEmpty())
+        if (ondas_out)
         {
-            Sinais* ondas_out = NULL;
+            SinaisDrawPane* panel = new SinaisDrawPane(bookFontes);
 
-            waveoutFilePath = waveinFilePath + _(".out");
-
-            ondas_out = carregaArquivoSinais( (const char*) waveoutFilePath.mb_str() );
-
-            if(ondas_out)
+            if ( bookFontes->GetPageCount() == 3 )
             {
-                SinaisDrawPane *panel = new SinaisDrawPane(bookFontes);
-
-                if(bookFontes->GetPageCount() == 3)
-                {
-                    delete bookFontes->GetPage(2);
-                    bookFontes->RemovePage(2);
-                }
-
-                bookFontes->AddPage(panel, waveoutFilePath);
-                bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
-
-                panel->setSinais(waveoutFilePath, false);
+              delete bookFontes->GetPage(2);
+              bookFontes->RemovePage(2);
             }
-            else
-            {
-                wxMessageBox(_("Sem valores de saída para a simulação."), _("Erro"));
-            }
+
+            bookFontes->AddPage(panel, waveoutFilePath);
+            bookFontes->ChangeSelection(bookFontes->GetPageCount() - 1);
+
+            panel->setSinais(waveoutFilePath, false);
+        }
+        else {
+            wxMessageBox(_("Sem valores de saída para a simulação."),
+                         _("Erro"));
         }
     }
 }
@@ -344,18 +383,19 @@ int IDEFrame::PerguntaSalvarArquivo()
 
 void IDEFrame::OnMenuItemNovoCircuitoSelected(wxCommandEvent& event)
 {
-    if(arquivoNaoSalvo)
+    if (arquivoNaoSalvo)
     {
         int resp = PerguntaSalvarArquivo();
 
-        if (resp == wxYES)
-            SalvarArquivoAtual();
-        else if (resp == wxCANCEL)
-            return;
+        if (resp == wxYES) {
+          SalvarArquivoAtual();
+        }
+        else if (resp == wxCANCEL) {
+          return;
+        }
     }
 
     FecharArquivoAtual();
-
     bookFontes->ChangeSelection(0);
 }
 
@@ -363,11 +403,16 @@ void IDEFrame::OnMenuItemEntradaNovoSelected(wxCommandEvent& event)
 {
     wxTextFile novoArquivo;
 
-    wxFileDialog NewEntradaDialog(this, _("Novo arquivo de entradas"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    wxFileDialog NewEntradaDialog(this,
+                                  _("Novo arquivo de entradas"),
+                                  _(""),
+                                  _(""),
+                                  _("Arquivos de entrada (*.in)|*.in"),
+                                  wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
-    if(NewEntradaDialog.ShowModal() == wxID_OK)
+    if ( NewEntradaDialog.ShowModal() == wxID_OK )
     {
-        if( novoArquivo.Create( NewEntradaDialog.GetPath() ) )
+        if ( novoArquivo.Create( NewEntradaDialog.GetPath() ) )
         {
             novoArquivo.AddLine( _("entrada1 {}") );
             novoArquivo.Write();
@@ -378,18 +423,23 @@ void IDEFrame::OnMenuItemEntradaNovoSelected(wxCommandEvent& event)
 
             AtualizaTudoParaNovaEntrada( NewEntradaDialog.GetPath() );
         }
-        else
-        {
-            wxMessageBox(_("Impossibilitado de criar o arquivo."), _("Erro"));
+        else {
+            wxMessageBox(_("Impossibilitado de criar o arquivo."),
+                         _("Erro"));
         }
     }
 }
 
 void IDEFrame::OnMenuItemEntradaAbrirSelected(wxCommandEvent& event)
 {
-    wxFileDialog EntradaDialog(this, _("Abrir"), _(""), _(""), _("Arquivos de entrada (*.in)|*.in|Qualquer arquivo (*.*)|*.*"), wxFILE_MUST_EXIST);
+    wxFileDialog EntradaDialog(this,
+                               _("Abrir"),
+                               _(""),
+                               _(""),
+                               _("Arquivos de entrada (*.in)|*.in|Qualquer arquivo (*.*)|*.*"),
+                               wxFD_FILE_MUST_EXIST);
 
-    if(EntradaDialog.ShowModal() == wxID_OK)
+    if ( EntradaDialog.ShowModal() == wxID_OK )
     {
         AtualizaTudoParaNovaEntrada(EntradaDialog.GetPath());
     }
@@ -429,24 +479,26 @@ void IDEFrame::AtualizaTudoParaNovaEntrada(wxString novoPathArquivoWaveIn)
 
 void IDEFrame::OnEditBoxText(wxCommandEvent& event)
 {
-        textLenght = EditBox->GetNumberOfLines();
-        StatusBarPrincipal->SetStatusText(wxString::Format(wxT("%i"), textLenght), 1);
+    wxString statusText;
+    textLenght = EditBox->GetNumberOfLines();
+    statusText << textLenght << " linhas";
+    StatusBarPrincipal->SetStatusText(statusText, 1);
 
-        arquivoNaoSalvo = true;
+    arquivoNaoSalvo = true;
 
-        if(verilogFilePath.IsEmpty())
-        {
-            SetTituloJanelaComArquivo(_("Arquivo não salvo *"));
-            bookFontes->SetPageText(0, _("Arquivo não salvo *"));
-        }
-        else
-        {
-            SetTituloJanelaComArquivo(verilogFilePath + _(" *"));
-            bookFontes->SetPageText(0, verilogFilePath + _(" *"));
-        }
+    if ( verilogFilePath.IsEmpty() )
+    {
+        SetTituloJanelaComArquivo(_("Arquivo não salvo *"));
+        bookFontes->SetPageText(0, _("Arquivo não salvo *"));
+    }
+    else {
+        SetTituloJanelaComArquivo(verilogFilePath + _(" *"));
+        bookFontes->SetPageText(0, verilogFilePath + _(" *"));
+    }
 
-//        if(event.GetId() != ID_LISTBOXERROS)
-//            EditBox->SetStyle(0, EditBox->GetLastPosition(), wxTextAttr(*wxBLACK, *wxWHITE));
+//  if( event.GetId() != ID_LISTBOXERROS ) {
+//      EditBox->SetStyle(0, EditBox->GetLastPosition(), wxTextAttr(*wxBLACK, *wxWHITE));
+//  }
 }
 
 void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
@@ -461,8 +513,9 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
     {
         wxString token = partes.GetNextToken();
 
-        if ( token.ToLong(&line) );
+        if ( token.ToLong(&line) ) {
             line--; // reajuste da origem das linhas
+        }
     }
 
     long posicao = EditBox->XYToPosition(0, line); // posicao na seq. completa do texto
@@ -477,7 +530,7 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
-    if(bookFontes->GetSelection() == 0) {
+    if ( bookFontes->GetSelection() == 0 ) {
         EditBox->SelectAll();
         EditBox->SetFocus();
     }
@@ -496,18 +549,21 @@ void IDEFrame::OnMenuItemSave(wxCommandEvent& event)
 
 void IDEFrame::SalvarArquivoAtual()
 {
-    wxFileDialog SaveDialog(this, _("Salvar arquivo Verilog"), _(""), _(""), _("Arquivos do Verilog (*.v)|*.v"), wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+    wxFileDialog SaveDialog(this,
+                            _("Salvar arquivo Verilog"),
+                            _(""),
+                            _(""),
+                            _("Arquivos do Verilog (*.v)|*.v"),
+                            wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
     wxTextFile arquivo;
 
-    if(verilogFilePath.IsEmpty())
+    if (verilogFilePath.IsEmpty())
     {
-        if(SaveDialog.ShowModal() == wxID_OK)
-        {
+        if ( SaveDialog.ShowModal() == wxID_OK ) {
             wxString pathArquivo = SaveDialog.GetPath();
 
-            if(arquivo.Create(pathArquivo))
-            {
+            if ( arquivo.Create(pathArquivo) ) {
                 arquivo.AddLine(EditBox->GetValue());
                 arquivo.Write();
                 arquivo.Close();
@@ -517,15 +573,15 @@ void IDEFrame::SalvarArquivoAtual()
                 bookFontes->SetPageText(0, verilogFilePath);
                 arquivoNaoSalvo = false;
             }
-            else
-            {
-                wxMessageBox(_("Impossibilitado de salvar o arquivo."), _("Erro"));
+            else {
+                wxMessageBox(_("Impossibilitado de salvar o arquivo."),
+                             _("Erro"));
             }
         }
     }
     else
     {
-        if(arquivo.Open(verilogFilePath))
+        if (arquivo.Open(verilogFilePath))
         {
             arquivo.Clear();
             arquivo.AddLine(EditBox->GetValue());
@@ -536,23 +592,25 @@ void IDEFrame::SalvarArquivoAtual()
             bookFontes->SetPageText(0, verilogFilePath);
             arquivoNaoSalvo = false;
         }
-        else
-        {
-            wxMessageBox(_("Impossibilitado de salvar o arquivo."), _("Erro"));
+        else {
+            wxMessageBox(_("Impossibilitado de salvar o arquivo."),
+                         _("Erro"));
         }
     }
 }
 
 void IDEFrame::OnMenuItemCloseSelected(wxCommandEvent& event)
 {
-    if(arquivoNaoSalvo)
+    if (arquivoNaoSalvo)
     {
         int resp = PerguntaSalvarArquivo();
 
-        if (resp == wxYES)
+        if (resp == wxYES) {
             SalvarArquivoAtual();
-        else if (resp == wxCANCEL)
+        }
+        else if (resp == wxCANCEL) {
             return;
+        }
     }
 
     FecharArquivoAtual();

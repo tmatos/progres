@@ -8,29 +8,30 @@
 #include <wx/dialog.h>
 //*)
 
-class EdicaoDeSinal: public wxDialog
+class EdicaoDeSinal : public wxDialog
 {
     public:
-
-        EdicaoDeSinal(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
+        EdicaoDeSinal(wxWindow* parent,
+                      wxWindowID id = wxID_ANY,
+                      const wxPoint& pos = wxDefaultPosition,
+                      const wxSize& size = wxDefaultSize);
+        
         virtual ~EdicaoDeSinal();
 
         void setFile(wxString filePath);
 
         //(*Declarations(EdicaoDeSinal)
-        wxTextCtrl* txtWaveIn;
         wxButton* btnSalvar;
+        wxTextCtrl* txtWaveIn;
         //*)
 
     protected:
-
         //(*Identifiers(EdicaoDeSinal)
         static const long ID_TEXTCTRL1;
         static const long idBtn_Salvar;
         //*)
 
     private:
-
         //(*Handlers(EdicaoDeSinal)
         void OnbtnDescartarClick(wxCommandEvent& event);
         void OnbtnSalvarClick(wxCommandEvent& event);

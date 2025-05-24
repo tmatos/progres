@@ -1,6 +1,6 @@
 /*
  Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, Tiago Matos, Joao Victor, Luciano Almeida
+ (C) 2014, Tiago Matos
 
  Under the terms of the MIT license.
 */
@@ -245,7 +245,7 @@ int isIdentificador(Token* tk)
     if(!tk)
         return 0;
 
-    if(!isalpha(tk->valor[0])) // se nao comeca com letra, nao eh identificador valido
+    if (!isalpha(tk->valor[0])) // se nao comeca com letra, nao eh identificador valido
         return 0;
 
     for(i = 1 ; i < len(tk->valor) ; i++) {

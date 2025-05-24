@@ -6,13 +6,14 @@
 
 #define MSG_ARQUIVO_ENTRADA_CORROMPIDO " " // bogus
 
-Sinais* carregaEntradas(FILE *arquivo) {
+Sinais* carregaEntradas(FILE* arquivo)
+{
     int indice = -1; // indexador do vetor de sinais de entrada
     ValorLogico valorLogico;
-    Sinais *entradas = novaSinais();
-    Token *it = NULL;
+    Sinais* entradas = novaSinais();
+    Token* it = NULL;
 
-    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada já lidos
+    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
 
     ListaToken* tokens = tokeniza(arquivo);
 
@@ -21,13 +22,14 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
     it = tokens->primeiro;
 
-    if(!it) {
+    if (!it) {
         printf("Arquivo de entrada aparentemente vazio.\n");
         return NULL;
     }
 
-    while(1) {
-        if( isSimbolo( it->valor[0] ) ) {
+    while (1)
+    {
+        if ( isSimbolo( it->valor[0] ) ) {
             printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
@@ -44,28 +46,28 @@ Sinais* carregaEntradas(FILE *arquivo) {
             return NULL;
         }
 
-        if( iguais(it->valor, "{") ) {
+        if ( iguais(it->valor, "{") ) {
             // loop para um sinal
-            while(1) {
+            while (1) {
                 avanca(&it);
 
-                if(!it) {
+                if (!it) {
                     printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
                 valorLogico = nulo;
 
-                if(iguais(it->valor, "0")) {
+                if (iguais(it->valor, "0")) {
                     valorLogico = zero;
                 }
-                else if(iguais(it->valor, "1")) {
+                else if (iguais(it->valor, "1")) {
                     valorLogico = um;
                 }
-                else if(iguais(it->valor, "x") || iguais(it->valor, "X")) {
+                else if (iguais(it->valor, "x") || iguais(it->valor, "X")) {
                     valorLogico = xis;
                 }
-                else if(iguais(it->valor, "}")){
+                else if (iguais(it->valor, "}")){
                     break;
                 }
                 else {
@@ -75,20 +77,20 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
                 avanca(&it);
 
-                if(!it) {
+                if (!it) {
                     printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
-                if(iguais(it->valor, "(")) {
+                if (iguais(it->valor, "(")) {
                     avanca(&it);
 
-                    if(!it) {
+                    if (!it) {
                         printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
-                    if(isNumNaturalValido(it->valor)) {
+                    if (isNumNaturalValido(it->valor)) {
                         addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
                     }
                     else {
@@ -98,23 +100,24 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
                     avanca(&it);
 
-                    if(!it) {
+                    if (!it) {
                         printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
-                    if( iguais(it->valor, ")") ) {
+                    if ( iguais(it->valor, ")") ) {
                         avanca(&it);
 
-                        if(!it) {
+                        if (!it) {
                             printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                             return NULL;
                         }
 
-                        if( iguais(it->valor, ",") )
+                        if ( iguais(it->valor, ",") ) {
                             continue;
-                        else if( iguais(it->valor, "}") )
+                        } else if ( iguais(it->valor, "}") ) {
                             break;
+                        }
                     }
                     else {
                         printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
@@ -134,7 +137,7 @@ Sinais* carregaEntradas(FILE *arquivo) {
 
         avanca(&it);
 
-        if(!it) {
+        if (!it) {
             printf("Arquivo de entrada completamente lido.\n");
             break;
         }
@@ -146,27 +149,30 @@ Sinais* carregaEntradas(FILE *arquivo) {
 void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
 {
     int si; // indexador dos sinais na lista de sinais de entrada
-    Sinal *itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
-    Pulso *it = NULL; // Iterador para os pulsos em um Sinal
+    Sinal* itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
+    Pulso* it = NULL; // Iterador para os pulsos em um Sinal
 
-    if(!sinaisSaida || !arqSaida)
+    if ( !sinaisSaida || !arqSaida ) {
         return;
+    }
 
     si = 0;
     itSinais = sinaisSaida->lista;
 
-    while(si < sinaisSaida->quantidade)
+    while (si < sinaisSaida->quantidade)
     {
         fprintf(arqSaida, "%s {", itSinais[si].nome);
 
         it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
 
-        while(it->valor != nulo)
+        while (it->valor != nulo)
         {
-            if(it != itSinais[si].pulsos) // Insere virgula apenas se não é a primeira iteração
+            // Insere virgula apenas se nao e a primeira iteracao
+            if ( it != itSinais[si].pulsos ) {
                 fprintf(arqSaida, ", ");
+            }
 
-            switch(it->valor)
+            switch (it->valor)
             {
                 case um:
                     fprintf(arqSaida, "1(%d)", it->tempo);
@@ -190,13 +196,14 @@ void salvarSinais(Sinais *sinaisSaida, FILE *arqSaida)
     }
 }
 
-Sinais* carregaArquivoSinais(const char* path) {
-    if(!path)
+Sinais* carregaArquivoSinais(const char* path)
+{
+    if (!path)
         return NULL;
 
-    FILE *waveFile = fopen(path, "r");
+    FILE* waveFile = fopen(path, "r");
 
-    if(!waveFile) {
+    if (!waveFile) {
         printf("Impossibilitado de abrir o arquivo de sinais: %s\n", path);
         return NULL;
     }

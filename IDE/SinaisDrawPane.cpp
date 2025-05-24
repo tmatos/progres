@@ -2,6 +2,8 @@
 #include <wx/wx.h>
 #include <wx/sizer.h>
 #include <wx/font.h>
+#include <wx/colour.h>
+#include <wx/settings.h>
 
 #include "SinaisDrawPane.h"
 #include "EdicaoDeSinal.h"
@@ -25,8 +27,11 @@ BEGIN_EVENT_TABLE(SinaisDrawPane, wxPanel)
 // captura os eventos do sistema para redesenho
 EVT_PAINT(SinaisDrawPane::paintEvent)
 
-// clique duplo no gráfico
+// clique duplo no grafico
 EVT_LEFT_DCLICK(SinaisDrawPane::mouseDoubleClick)
+
+// clique simples no grafico com btn direito
+EVT_RIGHT_UP(SinaisDrawPane::mouseRightClick)
 
 END_EVENT_TABLE()
 
@@ -42,16 +47,24 @@ END_EVENT_TABLE()
  void SinaisDrawPane::keyReleased(wxKeyEvent& event) {}
  */
 
+void SinaisDrawPane::mouseRightClick(wxMouseEvent& event)
+{
+    wxClientDC dc(this);
+    wxPoint p = event.GetLogicalPosition(dc);
+
+    wxString msg;
+    msg << "x = " << p.x << " ; y = " << p.y;
+
+    wxMessageBox(msg, _("DEBUG"));
+}
+
 void SinaisDrawPane::mouseDoubleClick(wxMouseEvent& event)
 {
-    if(isInputFile && !estaEmEdicao)
+    if ( isInputFile && !estaEmEdicao )
     {
         EdicaoDeSinal *editor = new EdicaoDeSinal(this);
-
         editor->setFile(waveFilePath);
-
         estaEmEdicao = true;
-
         editor->Show();
     }
 }
@@ -61,6 +74,25 @@ SinaisDrawPane::SinaisDrawPane(wxWindow* parent) : wxPanel(parent)
     ondas = NULL;
     bool isInputFile = true;
     bool estaEmEdicao = false;
+    
+    wxSystemSettings sisConfig;
+    
+    wxColour corDeFundoSis = sisConfig.GetColour(wxSYS_COLOUR_BACKGROUND);
+    wxColour preto("black");
+    wxColour branco("white");
+    
+    if ( corDeFundoSis.Red() > 100 &&
+         corDeFundoSis.Green() > 100 &&
+         corDeFundoSis.Blue() > 100 )
+    {
+        corDoTexto = preto;
+        corDaLinha = preto;
+    }
+    else
+    {
+        corDoTexto = branco;
+        corDaLinha = branco;
+    }
 }
 
 void SinaisDrawPane::paintEvent(wxPaintEvent & evt)
@@ -78,24 +110,24 @@ void SinaisDrawPane::paintNow()
 void SinaisDrawPane::setSinais(wxString filePath, bool isInput)
 {
     ondas = carregaArquivoSinais( (const char*) filePath.mb_str() );
-
     isInputFile = isInput;
     waveFilePath = filePath;
-
     Refresh();
 }
 
 void SinaisDrawPane::render(wxDC&  canvas)
 {
-    if(!ondas)
+    if (!ondas)
     {
         canvas.SetPen(*wxRED);
-        canvas.DrawText( _("Arquivo vazio ou com formato errado."), wxPoint(30, 30) );
-
+        canvas.DrawText( _("Arquivo vazio ou com formato errado."),
+                         wxPoint(30, 30) );
         return;
     }
 
-    int i, j, k;
+    int i;
+    int j;
+    unsigned int k;
 
     const int hzTam = 15; // comprimeto horizontal de uma unidade de tempo
     const int vrTam = 15; // altura de um pulso entre 0 e 1
@@ -107,33 +139,37 @@ void SinaisDrawPane::render(wxDC&  canvas)
     int yTexto = y0;
 
     // nomes das entradas
-    canvas.SetTextForeground(*wxBLACK);
+    canvas.SetTextForeground(corDoTexto);
 
-    for(i=0 ; i < ondas->quantidade ; i++)
+    for ( i=0 ; i < ondas->quantidade ; i++ )
     {
-        canvas.DrawText( wxString::FromUTF8(ondas->lista[i].nome), wxPoint(5, yTexto) );
+        canvas.DrawText( wxString::FromUTF8(ondas->lista[i].nome),
+                         wxPoint(5, yTexto) );
         yTexto = yTexto + spacmtSinal;
     }
 
     canvas.SetPen(*wxLIGHT_GREY_PEN);
 
     // linhas verticais do grid
-    for(i=0 ; i < ondas->quantidade+1 ; i++)
+    for ( i=0 ; i < ondas->quantidade+1 ; i++ )
     {
         canvas.DrawLine(    5, y0 + (i * spacmtSinal) - 7,
-                          2000, y0 + (i * spacmtSinal) - 7 );
+                         2000, y0 + (i * spacmtSinal) - 7 );
     }
 
     // linhas horizontais do grid e numeração
     canvas.SetTextForeground(*wxBLUE);
 
-    wxFont fonte(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-    canvas.SetFont(fonte);
+    wxFont font(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+    canvas.SetFont(font);
 
-    for(j=0 ; j < 120  ; j++)
+    for ( j=0 ; j < 120  ; j++ )
     {
-        if(j%5 == 0)
-            canvas.DrawText( wxString::Format(_("%i"), j), wxPoint(x0 + (j*hzTam) + 2, 10 ) );
+        if ( j%5 == 0 )
+        {
+            canvas.DrawText( wxString::Format(_("%i"), j),
+                             wxPoint(x0 + (j*hzTam) + 2, 10 ) );
+        }
 
         canvas.DrawLine( x0 + (j*hzTam), 10,
                          x0 + (j*hzTam), yTexto+10 );
@@ -141,39 +177,41 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
     y = y0;
 
-    canvas.SetPen(*wxBLACK_PEN);
+    canvas.SetPen(wxPen(corDaLinha));
 
-    for(i=0 ; i < ondas->quantidade ; i++)
+    for ( i=0 ; i < ondas->quantidade ; i++ )
     {
         x = x0;
 
         Pulso* it = ondas->lista[i].pulsos;
 
-        while(it->valor != nulo)
+        while ( it->valor != nulo )
         {
-            switch(it->valor)
+            switch (it->valor)
             {
             case um:
-                canvas.DrawLine(x, y,
-                                 x + (hzTam * it->tempo), y);
+                canvas.DrawLine(x                      , y,
+                                x + (hzTam * it->tempo), y);
                 break;
             case zero:
-                canvas.DrawLine(x, (y + vrTam),
-                                 x + (hzTam * it->tempo), (y + vrTam));
+                canvas.DrawLine(x                      , (y + vrTam),
+                                x + (hzTam * it->tempo), (y + vrTam));
                 break;
             case xis:
-                for(k=0 ; k < it->tempo ; k++)
+                for( k=0 ; k < it->tempo ; k++ )
                 {
-                    canvas.DrawLine((x + (k*hzTam)), y,
-                                     (x + hzTam + (k*hzTam)), (y + vrTam));
+                    canvas.DrawLine( (x + (k*hzTam))        , y,
+                                     (x + hzTam + (k*hzTam)), (y + vrTam) );
 
-                    canvas.DrawLine((x + (k*hzTam)), (y + vrTam),
-                                     (x + hzTam + (k*hzTam)), y);
+                    canvas.DrawLine( (x + (k*hzTam))        , (y + vrTam),
+                                 (x + hzTam + (k*hzTam)), y );
                 }
                 break;
+            case nulo:
+               break;
             }
 
-            x = x + hzTam * it->tempo;
+            x = x + (hzTam * it->tempo);
 
             it++;
         }

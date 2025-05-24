@@ -16,7 +16,7 @@
 		</object>
 		<object class="wxStaticText" name="ID_STATICTEXT1" variable="lblSimuladorPath" member="yes">
 			<label>Simulador:</label>
-			<pos>24,23</pos>
+			<pos>16,22</pos>
 		</object>
 		<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="txtSimuladorPath" member="yes">
 			<pos>80,20</pos>
@@ -24,12 +24,12 @@
 		</object>
 		<object class="wxButton" name="ID_BUTTON3" variable="btnSimuladorPath" member="yes">
 			<label>Selecionar</label>
-			<pos>392,19</pos>
+			<pos>392,15</pos>
 			<handler function="OnbtnSimuladorPathClick" entry="EVT_BUTTON" />
 		</object>
 		<object class="wxCheckBox" name="ID_CHECKBOX1" variable="ChkAbrirUltimoAoIniciar" member="yes">
-			<label>Reabrir último documento ao iniciar</label>
-			<pos>24,168</pos>
+			<label>Reabrir documento anteriormente fechado ao iniciar</label>
+			<pos>20,150</pos>
 			<handler function="OnChkAbrirUltimoAoIniciarClick" entry="EVT_CHECKBOX" />
 		</object>
 		<object class="wxFileDialog" variable="fileDiagSimuladorPath" member="yes">
