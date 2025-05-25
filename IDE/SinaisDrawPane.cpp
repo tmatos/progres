@@ -1,3 +1,9 @@
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
+
+ Under terms of the MIT license.
+*********************************/
 
 #include <wx/wx.h>
 #include <wx/sizer.h>
@@ -128,6 +134,7 @@ void SinaisDrawPane::render(wxDC&  canvas)
     int i;
     int j;
     unsigned int k;
+    int l;
 
     const int hzTam = 15; // comprimeto horizontal de uma unidade de tempo
     const int vrTam = 15; // altura de um pulso entre 0 e 1
@@ -185,29 +192,45 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
         Pulso* it = ondas->lista[i].pulsos;
 
-        while ( it->valor != nulo )
+        while ( it->valor != VAL_BLANK )
         {
             switch (it->valor)
             {
-            case um:
-                canvas.DrawLine(x                      , y,
-                                x + (hzTam * it->tempo), y);
+            case VAL_1:
+                canvas.DrawLine( x                      , y,
+                                 x + (hzTam * it->tempo), y );
                 break;
-            case zero:
-                canvas.DrawLine(x                      , (y + vrTam),
-                                x + (hzTam * it->tempo), (y + vrTam));
+            case VAL_0:
+                canvas.DrawLine( x                      , y + vrTam,
+                                 x + (hzTam * it->tempo), y + vrTam );
                 break;
-            case xis:
-                for( k=0 ; k < it->tempo ; k++ )
+            case VAL_X:
+                for ( k=0; k < it->tempo; k++ )
                 {
-                    canvas.DrawLine( (x + (k*hzTam))        , y,
-                                     (x + hzTam + (k*hzTam)), (y + vrTam) );
+                    canvas.DrawLine( x + hzTam*(k)      , y,
+                                     x + hzTam*(1 + k), y + vrTam );
 
-                    canvas.DrawLine( (x + (k*hzTam))        , (y + vrTam),
-                                 (x + hzTam + (k*hzTam)), y );
+                    canvas.DrawLine( x + hzTam*(k)    , y + vrTam,
+                                     x + hzTam*(1 + k), y );
                 }
                 break;
-            case nulo:
+            case VAL_Z:
+                for ( k=0; k < it->tempo; k++ )
+                {
+                    for ( l=0; l < hzTam; l+=2 )
+                    {
+                        canvas.DrawLine( x + k*(hzTam) + l, y,
+                                         x + k*(hzTam) + l, y + vrTam - 1 );
+                    }
+
+                    for ( l=1; l < hzTam; l+=2 )
+                    {
+                        canvas.DrawLine( x + k*(hzTam) + l, y,
+                                         x + k*(hzTam) + l, y + vrTam - 3 );
+                    }
+                }
+               break;
+            case VAL_BLANK:
                break;
             }
 

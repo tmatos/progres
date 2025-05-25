@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, Tiago Matos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +45,7 @@ int setPulsoNulo(Pulso* p)
     if (!p)
         return 0;
 
-    p->valor = nulo;
+    p->valor = VAL_BLANK;
     p->tempo = 0;
     p->unidade = UN_S;
 
@@ -66,7 +66,7 @@ int addPulso(Sinal* s, ValorLogico valor, Tempo duracao)
     tamanho = 1;
 
     it = s->pulsos;
-    while ( it->valor != nulo ) {
+    while ( it->valor != VAL_BLANK ) {
         tamanho++;
         it++;
     }
@@ -75,7 +75,7 @@ int addPulso(Sinal* s, ValorLogico valor, Tempo duracao)
 
     s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
 
-    // acessando a pen�ltima posi��o, lembre q � um vetor!
+    // acessando a penultima posicao, lembre que eh um vetor!
     s->pulsos[tamanho - 2].valor = valor;
     s->pulsos[tamanho - 2].tempo = duracao;
 
@@ -147,9 +147,9 @@ int addSinalPronto(Sinais* ls, Sinal* sinal)
     addSinal(ls, sinal->nome);
 
     it = sinal->pulsos;
-    while ( it->valor != nulo )
+    while (it->valor != VAL_BLANK)
     {
-        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o �ltimo)
+        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o ultimo)
         addPulso( ls->lista + (ls->quantidade - 1), it->valor, it->tempo );
         it++;
     }

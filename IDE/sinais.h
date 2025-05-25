@@ -1,40 +1,52 @@
 /**
  * @file sinais.h
- * @brief Estruturas e fun��es para manipula��o de sinais de entrada e sa�da.
+ * @brief Estruturas e funções para manipulação de sinais de entrada e saída.
  */
 
 #ifndef SINAIS_H
 
 #define SINAIS_H
 
-#define MAX_NOME_SINAL 50
+#define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
-/** @brief Valor l�gico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
+/** @brief Valor lógico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
  */
-typedef enum en_valor {
-    zero = 0,
-    um = 1,
-    xis,
-    nulo
+typedef enum en_logic_value {
+    VAL_0 = 0,
+    VAL_1 = 1,
+    VAL_X = 2,
+    VAL_Z = 3,
+    VAL_BLANK
 } ValorLogico;
 
-/** @brief Unidades de tempo dispon�veis para a dura��o de um pulso.
-        Na ordem, segundo, milisegundo, microsegundo, nanosegundo e picosegundo.
-        O valor num�rico � equivalente ao valor absoluto do m�dulo do expoente.
+/** @brief Unidades de tempo disponíveis para a duração de um pulso.
+        Na ordem: segundo, milisegundo, microsegundo, nanosegundo, picosegundo e fentosegundo.
+        O valor numérico é equivalente ao valor absoluto do módulo do expoente.
 */
 typedef enum en_un_tempo {
     UN_S = 0,
+    UN_100MS = 1,
+    UN_10MS = 2,
     UN_MS = 3,
+    UN_100US = 4,
+    UN_10US = 5,
     UN_US = 6,
+    UN_100NS = 7,
+    UN_10NS = 8,
     UN_NS = 9,
-    UN_PS = 12
+    UN_100PS = 10,
+    UN_10PS = 11,
+    UN_PS = 12,
+    UN_100FS = 13,
+    UN_10FS = 14,
+    UN_FS = 15
 } UnidTempo;
 
-/** @brief O tipo das vari�veis usadas na representa��o do tempo.
+/** @brief O tipo das variáveis usadas na representação do tempo.
  */
 typedef unsigned int Tempo;
 
-/** @brief Um pulso de valor fixo e dura��o definida.
+/** @brief Um pulso de valor fixo e duração definida.
  */
 typedef struct st_pulso {
     ValorLogico valor;
