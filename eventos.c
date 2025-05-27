@@ -140,3 +140,17 @@ Transicao* popEvento(Evento** fila)
 
     return ret;
 }
+
+void delete_list_transicao(Transicao** list)
+{
+    Transicao* pt = *list;
+    Transicao* pta;
+
+    while (pt) {
+        pta = pt;
+        pt = pt->proximo;
+        free(pta);
+    }
+
+    *list = NULL;
+}

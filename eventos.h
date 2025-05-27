@@ -43,6 +43,11 @@ struct st_evento {
 typedef Evento* FilaEventos;
 
 /**
+ * @brief Desalocar da memória a lista passada.
+ */
+void delete_list_transicao(Transicao** list);
+
+/**
  * @brief Adiciona à fila um evento no tempo t que faz a transição do valor de comp para o novoValor.
           Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
           desse evento, a nova transição.
