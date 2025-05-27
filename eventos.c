@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdlib.h>
 
@@ -12,6 +12,17 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "mem.h"
+
+Evento* new_evento_at(Tempo t)
+{
+    Evento* e = (Evento*) xmalloc(sizeof(Evento));
+    e->quando = t;
+    e->listaTransicao = NULL;
+    e->ultimaTransicao = NULL;
+    e->proximo = NULL;
+
+    return e;
+}
 
 void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor)
 {
@@ -24,14 +35,12 @@ void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor
 
     if( !(*fila) )
     {
-        evt = (Evento*) xmalloc(sizeof(Evento));
-        evt->quando = t;
+        evt = new_evento_at(t);
         evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
         evt->listaTransicao->fio = comp;
         evt->listaTransicao->novoValor = novoValor;
         evt->listaTransicao->proximo = NULL;
         evt->ultimaTransicao = evt->listaTransicao;
-        evt->proximo = NULL;
 
         *fila = evt;
     }
@@ -46,8 +55,7 @@ void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor
 
         if(!it) // inserir evento na ultima posicao da fila
         {
-            evt = (Evento*) xmalloc(sizeof(Evento));
-            evt->quando = t;
+            evt = new_evento_at(t);
             evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
             evt->listaTransicao->fio = comp;
             evt->listaTransicao->novoValor = novoValor;
@@ -69,8 +77,7 @@ void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor
         {
             if(ant == NULL) // inserir evento no inicio da fila
             {
-                evt = (Evento*) xmalloc(sizeof(Evento));
-                evt->quando = t;
+                evt = new_evento_at(t);
                 evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
                 evt->listaTransicao->fio = comp;
                 evt->listaTransicao->novoValor = novoValor;
@@ -83,8 +90,7 @@ void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor
             }
             else // inserir entre dois eventos, o anterior e o seguinte
             {
-                evt = (Evento*) xmalloc(sizeof(Evento));
-                evt->quando = t;
+                evt = new_evento_at(t);
                 evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
                 evt->listaTransicao->fio = comp;
                 evt->listaTransicao->novoValor = novoValor;

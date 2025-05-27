@@ -1,7 +1,7 @@
 /**
  * @file eventos.h
- * @brief Fila de eventos usada na simulação.
-          Não é fila FIFO, a ordem é dada pelo valor de tempo dos eventos.
+ * @brief Fila de eventos usada na simulaÃ§Ã£o.
+          NÃ£o Ã© fila FIFO, a ordem Ã© dada pelo valor de tempo dos eventos.
  */
 
 #ifndef EVENTOS_H
@@ -14,45 +14,58 @@
 typedef struct st_transicao Transicao;
 
 /**
- * @brief Estrutura que representa uma transição do valor lógico de um fio.
-          Um lista é formada pelo encadeamento dessas transições.
-          Esta lista é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
+ * @brief Estrutura que representa uma transiÃ§Ã£o do valor lÃ³gico de um fio.
+          Um lista Ã© formada pelo encadeamento dessas transiÃ§Ãµes.
+          Esta lista Ã© referenciada pelo seu primeiro elemento, e temos que o Ãºltimo precede um NULL.
  */
 struct st_transicao {
     Componente fio; // Indica o componente sobre o qual o evento se origina, apenas fios
-    ValorLogico novoValor; // Novo valor lógico a ser setado
+    ValorLogico novoValor; // Novo valor lÃ³gico a ser setado
     Transicao* proximo;
 };
+
+typedef Transicao* ListTransicao;
 
 typedef struct st_evento Evento;
 
 /**
- * @brief Estrutura para um evento. Um lista é formada pelo encadeamento desses eventos.
-          Como toda inserção nessa lista é ordenada por tempo, temos assim uma fila de eventos.
-          Esta fila é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
+ * @brief Estrutura para um evento. Um lista Ã© formada pelo encadeamento desses eventos.
+          Como toda inserÃ§Ã£o nessa lista Ã© ordenada por tempo, temos assim uma fila de eventos.
+          Esta fila Ã© referenciada pelo seu primeiro elemento, e temos que o Ãºltimo precede um NULL.
  */
 struct st_evento {
-    Tempo quando; // Indica o instante de ocorrência do evento
+    Tempo quando; // Indica o instante de ocorrÃªncia do evento
     Transicao* listaTransicao;
     Transicao* ultimaTransicao;
     Evento* proximo;
 };
 
+typedef Evento* FilaEventos;
+
 /**
- * @brief Adiciona à fila um evento no tempo t que faz a transição do valor de comp para o novoValor.
-          Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
-          desse evento, a nova transição.
+ * @brief Adiciona Ã  fila um evento no tempo t que faz a transiÃ§Ã£o do valor de comp para o novoValor.
+          Mas se houver jÃ¡ na fila evento marcado para t, apenas adiciona Ã  lista de transiÃ§Ãµes
+          desse evento, a nova transiÃ§Ã£o.
  */
 void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor);
 
 /**
- * @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
-          Se não houver evento nesse tempo t, retornará NULL.
+ * @brief Cria um novo evento, sem transiÃ§Ãµes definidas, no tempo t.
+ * @param t Tempo em que ocorre o evento.
+ * @return Ponteiro para Evento alocado.
+ */
+Evento* new_evento_at(Tempo t);
+
+/**
+ * @brief Retorna uma lista das transiÃ§Ãµes que ocorrem exatamente em determinado tempo t.
+          Se nÃ£o houver evento nesse tempo t, retornarÃ¡ NULL.
+ * @return Ponteiro para struct Transicao, ou NULL caso nÃ£o haja eventos no tempo t.
  */
 Transicao* getTransicoesEm(Evento* fila, Tempo t);
 
 /**
- * @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
+ * @brief Remove da fila o evento mais prÃ³ximo e devolve a lista de transiÃ§Ãµes referente.
+ * @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
  */
 Transicao* popEvento(Evento **fila);
 
