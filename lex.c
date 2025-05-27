@@ -574,13 +574,16 @@ ListaToken* tokeniza(FILE* arquivo)
     while(1) {
         A: // Label para parte A do automato
 
-        copy(tok, "");
         c = fgetc(arquivo);
 
-        if(c == EOF)
+        A_1: // parte A sem captura de novo char
+        
+        copy(tok, "");
+
+        if (c == EOF)
             goto encerrar;
 
-        if(isspace(c)) {
+        if (isspace(c)) {
             if(c == '\n') {
                 coluna = 0;
                 linha++;
@@ -592,13 +595,14 @@ ListaToken* tokeniza(FILE* arquivo)
             goto A;
         }
 
-        if(c == '/') {
+        if (c == '/') {
             comentarios: // Label para inicio da parte que trata os comentarios
 
             coluna++;
             c = fgetc(arquivo);
 
-            if(c == '/') {
+            // line comment
+            if (c == '/') {
                 coluna++;
 
                 while(c != '\n') {
@@ -614,12 +618,12 @@ ListaToken* tokeniza(FILE* arquivo)
 
                 goto A;
             }
-            else if(c == '*') {
+            else if (c == '*') { // multi-line
                 coluna++;
 
                 c = fgetc(arquivo);
 
-                while(1) {
+                while (1) {
                     M: // Label para a parte de comentario de multiplas linhas
 
                     if(c == EOF)
@@ -648,10 +652,10 @@ ListaToken* tokeniza(FILE* arquivo)
 
                 goto A;
             }
-            // TODO: recognize SYM_SLASH
             else {
-                show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_SYMBOL, linha, coluna);
-                break;
+                // recognize SYM_SLASH
+                insereToken(tokens, '/', linha, coluna);
+                goto A_1;
             }
         }
         else if(c == '"') {

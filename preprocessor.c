@@ -192,6 +192,51 @@ int pre_processor(ListaToken* lst)
             
             continue;
         }
+        else if (iguais("timescale", it->valor)) {
+            // time_unit / time_precision
+            // ex.: 1 ns / 1 ps
+
+            avanca(&it);
+            if (!it)
+                goto pre_processor_error_bad_eof;
+
+            // [time_unit] / time_precision
+            // [number] unit / number unit
+
+            avanca(&it);
+            if (!it)
+                goto pre_processor_error_bad_eof;
+
+            // [time_unit] / time_precision
+            // number [unit] / number unit
+
+            avanca(&it);
+            if (!it)
+                goto pre_processor_error_bad_eof;
+
+            // time_unit [/] time_precision
+            // number unit [/] number unit
+
+            avanca(&it);
+            if (!it)
+                goto pre_processor_error_bad_eof;
+
+            // time_unit / [time_precision]
+            // number unit / [number] unit
+
+            avanca(&it);
+            if (!it)
+                goto pre_processor_error_bad_eof;
+
+            // time_unit / [time_precision]
+            // number unit / number [unit]
+
+        }
+        else if (iguais("resetall", it->valor)) {
+
+            // TODO
+
+        }
         else if (isIdentificador(it)) {
             macro = get_macro_by_name(list_macro, it->valor);
 

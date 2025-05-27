@@ -16,6 +16,7 @@ class Testes_preprocessor : public CppUnit::TestFixture
   CPPUNIT_TEST( test_pre_processor_insert_macro_get_macro_by_name );
   CPPUNIT_TEST( test_pre_processor_remove_macro_by_name );
   CPPUNIT_TEST( test_pre_processor_define );
+  CPPUNIT_TEST( test_pre_processor_directives_v );
   CPPUNIT_TEST( test_pre_processor_undef_v );
   CPPUNIT_TEST( test_pre_processor_badpreproc_XX_v );
   CPPUNIT_TEST_SUITE_END();
@@ -159,6 +160,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(n_tok_out + (5 + 7), n_tok_in);
 
     CPPUNIT_ASSERT( !strcmp(list_tok->primeiro->valor, "module") );
+  }
+
+  void test_pre_processor_directives_v()
+  {
+    FILE* fp = fopen("./verilog_sample_src/preproc_directives.v", "r");
+    CPPUNIT_ASSERT(fp);
+
+    ListaToken* list_tok = tokeniza(fp);
+    CPPUNIT_ASSERT(list_tok);
+
+    int ret = pre_processor(list_tok);
+    CPPUNIT_ASSERT_EQUAL(1, ret);
   }
 
   void test_pre_processor_badpreproc_XX_v()
