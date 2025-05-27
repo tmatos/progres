@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdlib.h>
 
@@ -17,39 +17,41 @@
 
 Sinais* simula(Module* circuto, Sinais* entradas)
 {
-    int i, j, validos;
+    int i;
+    int j;
+    int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
     Tempo t;
 
-    Transicao *listaTr = NULL;
-    Transicao *itTr = NULL;
+    Transicao* listaTr = NULL;
+    Transicao* itTr = NULL;
 
-    Evento *fila = NULL;
-    Pulso *p = NULL;
+    Evento* fila = NULL;
+    Pulso* p = NULL;
 
-    ListaComponente *portasAlteradas = NULL;
+    ListaComponente* portasAlteradas = NULL;
     Componente gate = NULL;
 
-    ValorLogico resultado;
+    ValorLogico result;
     ValorLogico valor_xor_in_a;
     ValorLogico valor_xor_in_b;
     ValorLogico valor_xnor_in_a;
     ValorLogico valor_xnor_in_b;
 
-    Sinais *saidas = novaSinais();
+    Sinais* saidas = novaSinais();
 
-    if(!circuto || !entradas) {
+    if (!circuto || !entradas) {
         return NULL;
     }
 
     validos = 0;
 
     // Validacao da correspencia das entradas entre os arquivos '.v' e '.in'
-    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
-        for( j=0 ; j < entradas->quantidade ; j++ )
+        for ( j=0 ; j < entradas->quantidade ; j++ )
         {
-            if( iguais( circuto->listaFiosEntrada->itens[i]->nome, entradas->lista[j].nome ) )
-            {
+            if ( iguais(circuto->listaFiosEntrada->itens[i]->nome,
+                        entradas->lista[j].nome) ) {
                 circuto->listaFiosEntrada->itens[i]->sinalEntrada = &(entradas->lista[j]);
                 validos++;
                 break;
@@ -57,17 +59,19 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         }
     }
 
-    ///
-    if (!global_silent_mode)
+    // print matches msg
+    if (!global_silent_mode) {
         printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
                circuto->listaFiosEntrada->tamanho,
                entradas->quantidade,
                validos);
-    ///
+    }
 
     if (validos < circuto->listaFiosEntrada->tamanho) {
-        if (!global_silent_mode)
-            printf("AVISO: O arquivo de entradas tem menos sinais de entrada que o circuito.\n");
+        if (!global_silent_mode) {
+            printf("AVISO: O arquivo de entradas tem menos "
+                   "sinais de entrada que o circuito.\n");
+        }
 
         return NULL;
     }
@@ -75,12 +79,12 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     // Inicializacao da fila de eventos com os valores das entradas
     fila = NULL;
 
-    for( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
         t = 0;
 
         p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
-        while(p->valor != VAL_BLANK)
+        while (p->valor != VAL_BLANK)
         {
             insereEvento(&fila,
                          t,
@@ -97,12 +101,13 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                      VAL_X); // este sinal fica ate infitito
     }
 
-    // ATENCAO: Sabemos que todos os componentes sao inicializados com o valorDinamico em X
+    // ATENCAO: Sabemos que todos os componentes sao
+    // inicializados com o valorDinamico em X.
 
-    // A partir daqui, ocorre a simulacao propriamente dita, usado fila de eventos
+    // A partir daqui, ocorre a simulacao propriamente dita:
     t = 0;
 
-    while(fila)
+    while (fila)
     {
         portasAlteradas = novaListaComponente();
 
@@ -111,23 +116,24 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         listaTr = popEvento(&fila);
         itTr = listaTr;
 
-        // atualiza valores de fios e faz uma lista das portas alteradas pelas transicoes em listaTr
-        while(itTr)
+        // atualiza valores de fios e faz uma lista das
+        // portas alteradas pelas transicoes em listaTr
+        while (itTr)
         {
-            if( itTr->fio->valorDinamico != itTr->novoValor ) // apenas se houver mudanca de valor no fio
+            // apenas se houver mudanca de valor no fio
+            if ( itTr->fio->valorDinamico != itTr->novoValor )
             {
-                for( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+                for ( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
                 {
-                    if( !contemComponente( portasAlteradas, itTr->fio->listaSaida->itens[i] ) )
-                    {
+                    if ( !contemComponente(portasAlteradas,
+                                           itTr->fio->listaSaida->itens[i]) ) {
                         insereComponente(portasAlteradas,
                                          itTr->fio->listaSaida->itens[i]);
                     }
                 }
 
-                if( itTr->fio->tipo.operador == output )
-                {
-                    if( !(itTr->fio->sinalSaida) ) {
+                if (itTr->fio->tipo.operador == output) {
+                    if ( !(itTr->fio->sinalSaida) ) {
                         itTr->fio->sinalSaida = novoSinal( itTr->fio->nome );
                     }
                     addPulso(itTr->fio->sinalSaida,
@@ -144,65 +150,49 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         // popEvento() nao liberou mem da lista de transicoes, fazemos isso aqui
         delete_list_transicao(&listaTr);
 
-        for( i=0 ; i < portasAlteradas->tamanho ; i++ )
+        for ( i=0 ; i < portasAlteradas->tamanho ; i++ )
         {
             gate = portasAlteradas->itens[i];
 
-            switch( gate->tipo.operador )
+            switch (gate->tipo.operador)
             {
             case op_not:
-                resultado = computeNotGate(gate->listaEntrada->itens[0]->valorDinamico);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeNotGate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
-
             case op_buf:
-                resultado = computeBufGate(gate->listaEntrada->itens[0]->valorDinamico);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeBufGate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
-
             case op_and:
-                resultado = computeAndGate(gate->listaEntrada);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeAndGate(gate->listaEntrada);
                 break;
-
             case op_or:
-                resultado = computeOrGate(gate->listaEntrada);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeOrGate(gate->listaEntrada);
                 break;
-
             case op_xor:
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-                resultado = computeXorGate(valor_xor_in_a, valor_xor_in_b);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeXorGate(valor_xor_in_a, valor_xor_in_b);
                 break;
-
             case op_nand:
-                resultado = computeNandGate(gate->listaEntrada);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeNandGate(gate->listaEntrada);
                 break;
-
             case op_nor:
-                resultado = computeNorGate(gate->listaEntrada);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeNorGate(gate->listaEntrada);
                 break;
-
             case op_xnor:
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-                resultado = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
                 break;
-
             case assign:
                 // TODO: implement expression evaluation and specific data structures
-                resultado = gate->listaEntrada->itens[0]->valorDinamico;
-                createEventsFromOutputs(&fila, t, gate, resultado);
+                result = gate->listaEntrada->itens[0]->valorDinamico;
                 break;
-
             default:
                 break;
             }
+
+            createEventsFromOutputs(&fila, t, gate, result);
         }
 
         // free mem
@@ -358,7 +348,7 @@ void createEventsFromOutputs(Evento** fila, Tempo t, Componente gate, ValorLogic
     int j;
 
     // cria eventos relativos as saidas da porta
-    for( j=0 ; j < gate->listaSaida->tamanho ; j++ )
+    for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
         insereEvento(fila,
                      t + gate->tipo.atraso,
