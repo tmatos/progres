@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 #include "sinais.h"
 #include "erros.h"
 #include "mem.h"
+#include "lex.h"
 
 Sinal* novoSinal(const char* nome)
 {
@@ -143,4 +144,26 @@ int addSinalPronto(Sinais* ls, Sinal* sinal)
     }
 
     return 1;
+}
+
+UnidTempo get_timeunit_from_str(const char* str)
+{
+    if (!str)
+        return UN_INVALID;
+
+    if (iguais(str, "s")) {
+        return UN_S;
+    } else if (iguais(str, "ms")) {
+        return UN_MS;
+    } else if (iguais(str, "us")) {
+        return UN_US;
+    } else if (iguais(str, "ns")) {
+        return UN_NS;
+    } else if (iguais(str, "ps")) {
+        return UN_PS;
+    } else if (iguais(str, "fs")) {
+        return UN_FS;
+    }
+    
+    return UN_INVALID;
 }

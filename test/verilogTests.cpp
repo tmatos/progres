@@ -299,6 +299,7 @@ public:
     std::list<std::string> list_bad_files = {
       "./verilog_sample_src/badtimescale_00.v",
       "./verilog_sample_src/badtimescale_01.v",
+      "./verilog_sample_src/badtimescale_01a.v",
       "./verilog_sample_src/badtimescale_02.v",
       "./verilog_sample_src/badtimescale_03.v",
       "./verilog_sample_src/badtimescale_04.v",
@@ -306,7 +307,9 @@ public:
       "./verilog_sample_src/badtimescale_06.v",
       "./verilog_sample_src/badtimescale_07.v",
       "./verilog_sample_src/badtimescale_08.v",
-      "./verilog_sample_src/badtimescale_09.v"
+      "./verilog_sample_src/badtimescale_09.v",
+      "./verilog_sample_src/badtimescale_10.v",
+      "./verilog_sample_src/badtimescale_11.v"
     };
 
     Module* circuit = NULL;

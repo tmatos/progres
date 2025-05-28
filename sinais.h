@@ -20,8 +20,8 @@ typedef enum en_logic_value {
 } ValorLogico;
 
 /** @brief Unidades de tempo disponíveis para a duração de um pulso.
-        Na ordem: segundo, milisegundo, microsegundo, nanosegundo, picosegundo e fentosegundo.
-        O valor numérico é equivalente ao valor absoluto do módulo do expoente.
+           Na ordem: segundo, milisegundo, microsegundo, nanosegundo, picosegundo e femtosegundo.
+           O valor numérico é equivalente ao valor absoluto do módulo do expoente.
 */
 typedef enum en_un_tempo {
     UN_S = 0,
@@ -39,8 +39,15 @@ typedef enum en_un_tempo {
     UN_PS = 12,
     UN_100FS = 13,
     UN_10FS = 14,
-    UN_FS = 15
+    UN_FS = 15,
+    UN_INVALID = -1
 } UnidTempo;
+
+/** @brief Retorna o valor da enum UnidTempo relativo ao que está contido na string str fornecida.
+ *  @param str String contendo a unidade. Ex.: "s", "ms", "us", "ns", "ps", "fs".
+ *  @return O valor da enum UnidTempo respectivo. Se a string não contém a unidade: UN_INVALID.
+ */
+UnidTempo get_timeunit_from_str(const char* str);
 
 /** @brief O tipo das variáveis usadas na representação do tempo.
  */
