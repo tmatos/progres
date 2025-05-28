@@ -24,6 +24,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_bufgates_v );
   CPPUNIT_TEST( test_simula_samplefile_xorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
+  CPPUNIT_TEST( test_simula_samplefile_delays_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -416,6 +417,63 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+  }
+
+  void test_simula_samplefile_delays_v()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* outputs = NULL;
+    Sinais* sim_outputs = NULL;
+    Sinal os;
+    Sinal ss;
+    Pulso* pos;
+    Pulso* pss;
+
+    FILE* f_delays_v = fopen("./verilog_sample_src/delays.v", "r");
+    FILE* f_delays_in = fopen("./inout_sample_files/delays.in", "r");
+    FILE* f_delays_in_out = fopen("./inout_sample_files/delays.in.out", "r");
+
+    CPPUNIT_ASSERT(f_delays_v);
+    CPPUNIT_ASSERT(f_delays_in);
+    CPPUNIT_ASSERT(f_delays_in_out);
+
+    circuit = carregaCircuito(f_delays_v);
+    CPPUNIT_ASSERT(circuit);
+
+    inputs = carregaEntradas(f_delays_in);
+    CPPUNIT_ASSERT(inputs);
+
+    outputs = carregaEntradas(f_delays_in_out);
+    CPPUNIT_ASSERT(outputs);
+
+    CPPUNIT_ASSERT_EQUAL(8, outputs->quantidade);
+    CPPUNIT_ASSERT(outputs->lista);
+
+    sim_outputs = simula(circuit, inputs);
+
+    CPPUNIT_ASSERT(sim_outputs);
+    CPPUNIT_ASSERT_EQUAL(8, sim_outputs->quantidade);
+    CPPUNIT_ASSERT(sim_outputs->lista);
+
+    for (int i = 0; i < outputs->quantidade; i++)
+    {
+      os = outputs->lista[i];
+      ss = sim_outputs->lista[i];
+
+      pos = os.pulsos;
+      pss = ss.pulsos;
+
+      while (pos->valor != VAL_BLANK && pss->valor != VAL_BLANK)
+      {
+        CPPUNIT_ASSERT_EQUAL(pos->tempo, pss->tempo);
+        CPPUNIT_ASSERT_EQUAL(pos->unidade, pss->unidade);
+        CPPUNIT_ASSERT_EQUAL(pos->valor, pss->valor);
+
+        pos = pos + 1;
+        pss = pss + 1;
+      }
+    }
   }
 
 };
