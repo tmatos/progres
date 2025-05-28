@@ -15,6 +15,7 @@ LIBS = -lcppunit
 
 TARGET = progrestest
 COV_FILE = coverage.txt
+HTML_DIR = cov_reports
 
 default: tests
 
@@ -40,9 +41,13 @@ tests: makedir $(TARGET)
 coverage: tests
 	lcov -q -d . -c -o $(COV_FILE) && lcov --summary $(COV_FILE)
 
+html: coverage
+	genhtml -o $(HTML_DIR) $(COV_FILE)
+
 branchcov: tests
 	lcov -q -d . -c -o $(COV_FILE) --rc lcov_branch_coverage=1
 	lcov --summary $(COV_FILE) --rc lcov_branch_coverage=1
+	genhtml -o $(HTML_DIR) $(COV_FILE)
 
 .PHONY: makedir
 makedir:

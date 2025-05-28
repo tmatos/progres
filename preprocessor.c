@@ -85,9 +85,6 @@ void remove_macro_by_name(ListMacro* list, const char* name)
     }
 
     list->total--;
-    if (list->total == 0) {
-        free(list->itens);
-    }
 }
 
 int pre_processor(ListaToken* lst)

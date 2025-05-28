@@ -179,6 +179,8 @@ Module* carregaCircuito(FILE* arquivo)
     if (!pre_processor(tokens))
         goto bad_return;
 
+    circuito = novoCircuito();
+
     it = tokens->primeiro;
 
     before_module:
@@ -212,8 +214,6 @@ Module* carregaCircuito(FILE* arquivo)
         goto bad_return_unexpected_eof;
 
     gate = NULL;
-
-    circuito = novoCircuito();
 
     // process body of the module until it ends
     while(1)
