@@ -7,8 +7,8 @@
 
 #define LEX_H
 
-#define MAX_TOKEN_SIZE 80 // Qtde m�xima de caracteres permitidos em um Token
-#define MAX_DIGITOS_NUM 4 // Qtde m�xima de digitos num n�mero inteiro a ser reconhecido
+#define MAX_TOKEN_SIZE 80 // Qtde máxima de caracteres permitidos em um Token
+#define MAX_DIGITOS_NUM 4 // Qtde máxima de digitos num número inteiro a ser reconhecido
 
 /** @brief .
  */
@@ -48,7 +48,7 @@ ListaToken* novaListaToken();
             deve-se especificar a posicao do mesmo no arquivo.
  *  @param lista Onde sera inserido o token.
  *  @param tok Um token de apenas um caractere.
- *  @param p_linha Linha no arquivo onde est� o token.
+ *  @param p_linha Linha no arquivo onde está o token.
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
  *  @return Verdadeiro caso sucesso, falso caso falhe.
  */
@@ -58,7 +58,7 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna);
             deve-se especificar a posicao do mesmo no arquivo.
  *  @param lista Onde sera inserido o token.
  *  @param tok Uma string contendo o token.
- *  @param p_linha Linha no arquivo onde est� o token.
+ *  @param p_linha Linha no arquivo onde está o token.
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
  *  @return Verdadeiro caso sucesso, falso caso falhe.
  */
@@ -83,23 +83,23 @@ int isSimbolo(char c);
  */
 void exibeListaDeToken(ListaToken* tokens);
 
-/** @brief Retorna verdadeiro se duas strings s�o iguais.
+/** @brief Retorna verdadeiro se duas strings são iguais.
  */
 int iguais(char* a, char* b);
 
-/** @brief Avanca o iterador de token para o pr�ximo da lista.
+/** @brief Avanca o iterador de token para o próximo da lista.
  *  @param t Um ponteiro para um ponteiro de um Token.
  *  @return Void.
  */
 void avanca(Token** t);
 
-/** @brief Verifica se um token � uma palavra reservada em Verilog.
+/** @brief Verifica se um token é uma palavra reservada em Verilog.
  *  @param tk Um objeto Token.
  *  @return Verdadeiro se o valor do token for palavra reservada em Verilog, falso c. c.
  */
 int isPalavra(Token* tk);
 
-/** @brief Verifica se um token � um nome permitido de identificador.
+/** @brief Verifica se um token é um nome permitido de identificador.
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se o valor do token for um nome permitido de identificador, falso c.c.
  */
@@ -108,7 +108,7 @@ int isIdentificador(Token* tk);
 /** @brief Retorna verdadeiro se a string esta contida em algum token da lista.
  *  @param lst Uma lista de Tokens.
  *  @param str Uma string qualquer.
- *  @return Verdadeiro se str � o valor de algum Token em lst, falso caso contr�rio.
+ *  @return Verdadeiro se str é o valor de algum Token em lst, falso caso contrário.
  */
 int identExiste(ListaToken* lst, char* str);
 
@@ -119,14 +119,14 @@ int identExiste(ListaToken* lst, char* str);
  */
 ListaToken* tokeniza(FILE *arquivo);
 
-/** @brief Verifica se uma string cont�m apenas d�gitos (0, 1, 2, ..., 9).
+/** @brief Verifica se uma string contém apenas dígitos (0, 1, 2, ..., 9).
  *  @param str Uma string qualquer.
- *  @return Verdadeiro se h� apenas d�gitos, falso na ocorr�ncia de qualquer outro tipo de caractere.
+ *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
  */
 int apenasDigitos(char* str);
 
-/** @brief Verifica se uma string cont�m um n�mero que pode ser convertido.
-            Mais especeificamente, se � um natural menor que 10000.
+/** @brief Verifica se uma string contém um número que pode ser convertido.
+            Mais especeificamente, se é um natural menor que 10000.
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se pode ser convertido.
  */

@@ -50,7 +50,7 @@ formato extremamente simples:
 * Comentários de uma linha são válidos, tudo que seguir um `//` será ignorado.
 
 * Cada sinal inicia com um identificador que o denomina. Em seguida e entre chaves, estará
-uma sequência de pulsos de valor específico ("0", "1" ou "x"), com seus determinados
+uma sequência de pulsos de valor específico ("0", "1", "z" ou "x"), com seus determinados
 tempos de duração. Sendo cada pulso separado por vírgula um do outro.
 
 Exemplo:
@@ -83,7 +83,7 @@ unid. tempo: 0123456789
 ## 3. Compilação e instalação
 
 O código fonte é escrito principalmente em C e deverá compilar sob qualquer ambiente
-com suporte ao padrão C89. Um makefile é provido, portanto basta apenar utilizar:
+com suporte ao padrão C99. Um makefile é provido, portanto basta apenar utilizar:
 
 ```
 make
@@ -92,10 +92,11 @@ make
 Para gerar o executável, que poderá ser copiado para qualquer local desejado.
 
 
-## 4. Contato
+## 4. Contatos
 
 * Email: tiago AT tmatos.net
 * Site: https://tmatos.net
+* Repo: https://github.com/tmatos/progres
 
 
-(C) 2014, 2015 Tiago Matos Santos
+(C) 2014, 2025 Tiago Matos Santos

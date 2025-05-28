@@ -54,7 +54,7 @@ typedef struct st_pulso {
     UnidTempo unidade;
 } Pulso;
 
-/** @brief Um sinal cont�m um array de pulsos com o �ltimo pulso nulo. Semelhantemente a uma string.
+/** @brief Um sinal contém um array de pulsos com o último pulso nulo. Semelhantemente a uma string.
  */
 typedef struct st_sinal {
     char nome[MAX_NOME_SINAL];
@@ -62,7 +62,7 @@ typedef struct st_sinal {
     Tempo duracaoTotal;
 } Sinal;
 
-/** @brief Um conjunto de um ou mais sinais. Podem ser todos de entrada ou todos de sa�da.
+/** @brief Um conjunto de um ou mais sinais. Podem ser todos de entrada ou todos de saída.
  */
 typedef struct st_sinais {
     int quantidade;
@@ -77,18 +77,20 @@ Sinal* novoSinal(char *nome);
  */
 int setSinalNome(Sinal* s, char* nome);
 
-/** @brief Define o pulso indicado com sendo nulo. Isto �, seu valor conter� nulo.
+/** @brief Define o pulso p indicado com sendo nulo.
+ *         Isto é, seu valor conterá VAL_BLANK e terá tempo zero.
  */
 int setPulsoNulo(Pulso* p);
 
 /** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do obj. Sinal,
-            mais um pulso de valor e dura��o indicados.
-            � como se fosse um append, aqui fazemos uso de realloc.
+            mais um pulso de valor e duração indicados.
+            é como se fosse um append, aqui fazemos uso de realloc.
  */
 int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
 
-/** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de mem�ria.
-            Vazia significa: primeiro e ultimo apontam a NULL e num. de elem. � zero.
+/** @brief Inicializa um nova estrutura Sinas vazia e retorna seu endereço de memória.
+           Vazia significa que os elementos primeiro e ultimo apontam para NULL
+           e o número de elementos é zero.
  */
 Sinais* novaSinais();
 

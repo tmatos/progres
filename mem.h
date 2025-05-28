@@ -1,21 +1,21 @@
 /**
  * @file mem.h
- * @brief ProtÛtipos dos wrapers para funÁıes de manipulaÁ„o de memÛria.
+ * @brief Prot√≥tipos dos wrapers para fun√ß√µes de manipula√ß√£o de mem√≥ria.
  */
 
 #ifndef MEM_H
 
 #define MEM_H
 
-/** @brief Wrapper para malloc com verificaÁ„o de erro
+/** @brief Wrapper para a fun√ß√£o malloc com verifica√ß√£o de erro.
  */
 void* xmalloc(size_t t);
 
-/** @brief Wrapper para realloc com verificaÁ„o de erro
+/** @brief Wrapper para a fun√ß√£o realloc com verifica√ß√£o de erro.
  */
 void* xrealloc(void* p, size_t t);
 
-/** @brief Wrapper para calloc com verificaÁ„o de erro
+/** @brief Wrapper para a fun√ß√£o calloc com verifica√ß√£o de erro.
  */
 void* xcalloc(size_t n, size_t t);
 

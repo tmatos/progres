@@ -9,7 +9,7 @@
 
 #define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
-/** @brief Valor lógico de um pulso. Aqui, nulo serve para indicar o fim de uma "string" de pulsos.
+/** @brief Valor lógico de um pulso. Aqui, VAL_BLANK serve para indicar o fim de uma "string" de pulsos.
  */
 typedef enum en_logic_value {
     VAL_0 = 0,
@@ -71,26 +71,28 @@ typedef struct st_sinais {
     Sinal* lista;
 } Sinais;
 
-/** @brief Inicializa um sinal vazio com um respectivo nome.
+/** @brief Inicializa um sinal vazio com o respectivo nome indicado.
  */
 Sinal* novoSinal(const char* nome);
 
-/** @brief Muda a string contendo o nome do sinal para a indicada.
+/** @brief Muda a string contendo o nome do sinal dentro de s para a indicada por nome.
  */
 int setSinalNome(Sinal* s, const char* nome);
 
-/** @brief Define o pulso indicado com sendo nulo. Isto é, seu valor conteré nulo.
+/** @brief Define o pulso p indicado com sendo nulo.
+ *         Isto é, seu valor conterá VAL_BLANK e terá tempo zero.
  */
 int setPulsoNulo(Pulso* p);
 
-/** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do obj. Sinal,
+/** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do objeto Sinal,
            mais um pulso de valor e duração indicados.
            é como se fosse um append, aqui fazemos uso de realloc.
  */
 int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
 
-/** @brief Inicializa um nova estrutura Sinas vazia e devolve sua pos. de memória.
-            Vazia significa: primeiro e último apontam a NULL e num. de elem. é zero.
+/** @brief Inicializa um nova estrutura Sinas vazia e retorna seu endereço de memória.
+           Vazia significa que os elementos primeiro e ultimo apontam para NULL
+           e o número de elementos é zero.
  */
 Sinais* novaSinais();
 
