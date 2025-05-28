@@ -299,7 +299,7 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
 
     // TODO: Checagens...
 
-    if(lista->tamanho == 0) {
+    if (lista->tamanho == 0) {
         lista->primeiro = newtok;
         lista->ultimo = newtok;
     }
@@ -354,23 +354,20 @@ void remove_token(ListaToken* list, Token* tok)
 
 int removeTokensPorValor(ListaToken* lst, const char* tok)
 {
-    Token *tmp = NULL;
-    Token *anterior = NULL;
-    Token *it = NULL;
+    Token* tmp = NULL;
+    Token* anterior = NULL;
+    Token* it = NULL;
 
-    if(!lst || !tok)
+    if (!lst || !tok)
         return 0;
 
-    if(!lst->primeiro)
-        return 1;
-
     it = lst->primeiro;
-    while(it)
+    while (it)
     {
-        if(iguais(it->valor, tok))
+        if (iguais(it->valor, tok))
         {
-            if(anterior) {
-                if(it->seguinte) {
+            if (anterior) {
+                if (it->seguinte) {
                     anterior->seguinte = it->seguinte;
                     it->seguinte->anterior = anterior;
                     tmp = it;
@@ -389,7 +386,7 @@ int removeTokensPorValor(ListaToken* lst, const char* tok)
                 }
             }
             else {
-                if(it->seguinte) { // primeiro da lista eh removido e ha outros itens
+                if (it->seguinte) { // primeiro da lista eh removido e ha outros itens
                     tmp = it;
                     lst->primeiro = it->seguinte;
                     avanca(&it);
@@ -418,7 +415,9 @@ int removeTokensPorValor(ListaToken* lst, const char* tok)
 
 int anexa(char* str, char c)
 {
-    char tmp[2] = {c, '\0'};
+    char tmp[2];
+    tmp[0] = c;
+    tmp[1] = '\0';
 
     strcat(str, tmp);
 
@@ -468,7 +467,7 @@ void exibeListaDeToken(ListaToken* tokens)
     printf("-- LISTA DE TOKENS CAPTURADOS --\n\n");
 
     it = tokens->primeiro;
-    while(it) {
+    while (it) {
         printf("%s\t\t\t\t\t%d\n", it->valor, it->classe);
         avanca(&it);
     }
@@ -482,16 +481,16 @@ int identExiste(ListaToken* lst, const char* str)
 
     int retorno = 0;
 
-    if(!lst || !str)
+    if (!lst || !str)
         return retorno;
 
-    if(!lst->primeiro)
+    if (!lst->primeiro)
         return retorno;
 
     it = lst->primeiro;
-    while(it)
+    while (it)
     {
-        if(iguais(it->valor, str)) {
+        if (iguais(it->valor, str)) {
             retorno = 1;
             break;
         }
@@ -509,7 +508,7 @@ int iguais(const char* a, const char* b)
 
 void avanca(Token** t)
 {
-    if(*t)
+    if (*t)
         *t = (*t)->seguinte;
 }
 
@@ -517,12 +516,12 @@ int isPalavra(Token* tk)
 {
     int i;
 
-    if(!tk)
+    if (!tk)
         return 0;
 
-    for( i = 0 ; i < NUM_RESERV_KEYWORDS ; ++i )
+    for (i = 0; i < NUM_RESERV_KEYWORDS; ++i)
     {
-        if( iguais(tk->valor, arrayPalavrasReservadas[i]) )
+        if ( iguais(tk->valor, arrayPalavrasReservadas[i]) )
             return 1;    
     }
     
@@ -534,24 +533,25 @@ int isIdentificador(Token* tk)
     int i;
     int simbol = 0;
 
-    if(!tk)
+    if (!tk)
         return 0;
 
     // se nao comeca com letra ou underscore, nao eh identificador valido
-    if( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
+    if ( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
         return 0;
 
-    for(i = 1 ; i < len(tk->valor) ; i++) {
-        if( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
+    for (i = 1; i < len(tk->valor); ++i)
+    {
+        if ( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
             simbol = 1;
             break;
         }
     }
 
-    if(simbol) // se contem algo a mais que letras ou numeros, nao eh identificador valido
+    if (simbol) // se contem algo a mais que letras ou numeros, nao eh identificador valido
         return 0;
 
-    if(isPalavra(tk)) // palavra reservada nao pode ser identificador
+    if (isPalavra(tk)) // palavra reservada nao pode ser identificador
         return 0;
 
     return 1;
@@ -571,7 +571,8 @@ ListaToken* tokeniza(FILE* arquivo)
 
     tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
-    while(1) {
+    while (1)
+    {
         A: // Label para parte A do automato
 
         c = fgetc(arquivo);
@@ -584,7 +585,7 @@ ListaToken* tokeniza(FILE* arquivo)
             goto encerrar;
 
         if (isspace(c)) {
-            if(c == '\n') {
+            if (c == '\n') {
                 coluna = 0;
                 linha++;
             }
@@ -605,11 +606,12 @@ ListaToken* tokeniza(FILE* arquivo)
             if (c == '/') {
                 coluna++;
 
-                while(c != '\n') {
+                while (c != '\n')
+                {
                     c = fgetc(arquivo);
                     coluna++;
 
-                    if(c == EOF)
+                    if (c == EOF)
                         goto encerrar;
                 }
 
@@ -623,23 +625,24 @@ ListaToken* tokeniza(FILE* arquivo)
 
                 c = fgetc(arquivo);
 
-                while (1) {
+                while (1)
+                {
                     M: // Label para a parte de comentario de multiplas linhas
 
-                    if(c == EOF)
+                    if (c == EOF)
                         goto encerrar;
 
-                    if(c == '\n') {
+                    if (c == '\n') {
                         coluna = 0;
                         linha++;
                     }
                     else
                         coluna++;
 
-                    if(c == '*') {
+                    if (c == '*') {
                         c = fgetc(arquivo);
 
-                        if(c == '/') {
+                        if (c == '/') {
                             coluna++;
                             break;
                         }
@@ -658,21 +661,22 @@ ListaToken* tokeniza(FILE* arquivo)
                 goto A_1;
             }
         }
-        else if(c == '"') {
+        else if (c == '"') {
             coluna++;
 
             anexa(tok, c);
 
             c = fgetc(arquivo);
 
-            while(1) {
+            while (1)
+            {
                 // S: captura de strings literais
-                if(c == EOF) {
+                if (c == EOF) {
                     insereTokenString(tokens, tok, linha, coluna - len(tok));
                     goto encerrar;
                 }
 
-                if(c == '\n') {
+                if (c == '\n') {
                     coluna = 0;
                     linha++;
                 }
@@ -681,7 +685,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
                 anexa(tok, c);
 
-                if(c == '"') {
+                if (c == '"') {
                     insereTokenString(tokens, tok, linha, coluna - len(tok));
                     break;
                 }
@@ -694,7 +698,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
         // B: a parte B do automato
 
-        if(isSimbolo(c)) {
+        if (isSimbolo(c)) {
             // TODO: capture symbols larger than 1 char
             coluna++;
             insereToken(tokens, c, linha, coluna);
@@ -710,13 +714,14 @@ ListaToken* tokeniza(FILE* arquivo)
             coluna++;
             anexa(tok, c);
 
-            while (1) {
+            while (1)
+            {
                 P: // Label para parte P do automato
 
                 c = fgetc(arquivo);
 
                 if (isspace(c)) {
-                    if(c == '\n') {
+                    if (c == '\n') {
                         coluna = 0;
                         linha++;
                     }
@@ -741,7 +746,7 @@ ListaToken* tokeniza(FILE* arquivo)
                     anexa(tok, c);
 
                     // verificar tamanho maximo de palavra
-                    if( len(tok) > MAX_TOKEN_SIZE ) {
+                    if (len(tok) > MAX_TOKEN_SIZE) {
                         show_error_lexical(MSG_ERROR_LEX_TOKEN_SIZE_MAXED,
                                            linha,
                                            coluna - len(tok) );
@@ -750,7 +755,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
                     goto P;
                 }
-                else if(c == EOF) {
+                else if (c == EOF) {
                     insereTokenString(tokens, tok, linha, coluna - len(tok));
                     goto encerrar;
                 }
@@ -778,12 +783,12 @@ int apenasDigitos(const char* str)
 {
     int i;
 
-    if(!str)
+    if (!str)
         return 0;
 
-    for( i=0 ; i < len(str) ; i++ )
+    for ( i=0; i < len(str); i++ )
     {
-        if( !isdigit(str[i]) )
+        if ( !isdigit(str[i]) )
             return 0;
     }
 
@@ -792,11 +797,11 @@ int apenasDigitos(const char* str)
 
 int isNumNaturalValido(const char* str)
 {
-    if(!str)
+    if (!str)
         return 0;
 
     // importante nao ser um valor muito grande, esses numeros
-    if( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
+    if ( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
         return 0;
     }
 
