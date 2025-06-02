@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([progres], [0.0.5], [tiago@tmatos.net])
-AM_INIT_AUTOMAKE(-Wall)
+AM_INIT_AUTOMAKE(foreign -Wall)
 AC_CONFIG_SRCDIR([./])
 AC_CONFIG_HEADERS([config.h])
 
