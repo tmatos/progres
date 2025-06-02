@@ -860,11 +860,6 @@ load_reg_bad_eof:
 
 VerilogError load_directive(Token** it, Module* module)
 {
-    Tempo timescale_number;
-    UnidTempo timescale_unit;
-    Tempo timescale_precision_number;
-    UnidTempo timescale_precision_unit;
-
     Token* t = *it;
 
     avanca(&t);
@@ -916,8 +911,7 @@ VerilogError load_directive(Token** it, Module* module)
         if (!isNumNaturalValido(t->valor))
             goto load_directive_bad_number;
         
-        timescale_precision_number = (Tempo) atoi(t->valor);
-        module->timescale_precision_number = timescale_precision_number;
+        module->timescale_precision_number = (Tempo) atoi(t->valor);
 
         avanca(&t);
 
