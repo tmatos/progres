@@ -8,7 +8,7 @@
 #define PROGRES_H
 
 /// Program version number, as string
-#define _PROGRES_VERSION "0.0.3-beta"
+#define _PROGRES_VERSION "0.0.5-beta"
 
 /// Brief command line help string
 #define _HELP_STRING_BRIEF "Usage: progres [verilog file] [input stimulus file]\n"
