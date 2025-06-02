@@ -1,4 +1,6 @@
 
+AUTOMAKE_OPTIONS = foreign
+
 SRC_DIR = .
 INC_DIR = .
 OBJ_DIR = obj
