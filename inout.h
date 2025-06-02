@@ -30,6 +30,10 @@ Sinais* carregaEntradas(FILE* arquivo);
  */
 void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 
+/** @brief Export VCD to file.
+ */
+void save_vcd(Module* module, Sinais* sinais, FILE* file);
+
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
 */
 Sinais* erroFatalArquivoCorrompido();

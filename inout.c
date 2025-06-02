@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "progres.h"
+#include "estruturas.h"
 #include "sinais.h"
 #include "lex.h"
 #include "inout.h"
@@ -182,4 +184,70 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
 
         si++;
     }
+}
+
+void save_vcd(Module* module, Sinais* sinais, FILE* file)
+{
+    int i;
+    char s;
+    Tempo t;
+
+    fprintf(file, "$date\n");
+    fprintf(file, "  \n");
+    fprintf(file, "$end\n");
+    fprintf(file, "$version\n");
+    fprintf(file, "  progres %s\n", _PROGRES_VERSION);
+    fprintf(file, "$end\n");
+    fprintf(file, "$comment\n  $end\n");
+    fprintf(file, "$timescale ");
+    fprintf(file, "%llu ns ", module->timescale_number); // TODO
+    fprintf(file, "$end\n");
+    fprintf(file, "$scope module %s ", "nome"); // TODO
+    fprintf(file, "$end\n");
+
+    s = '#';
+    for ( i=0; i < sinais->quantidade; i++ )
+    {
+        fprintf(file, "$var %s 1 ", "wire"); // TODO
+        fprintf(file, "%c ", s);
+        fprintf(file, "%s $end\n", sinais->lista[i].nome);
+        s++;
+    }
+
+    fprintf(file, "$upscope $end\n");
+    fprintf(file, "$enddefinitions $end\n");
+    fprintf(file, "$dumpvars\n");
+
+    s = '#';
+    for ( i=0; i < sinais->quantidade; i++ )
+    {
+        switch (sinais->lista[i].pulsos->valor)
+        {
+            case VAL_1:
+                fprintf(file, "1%c\n", s);
+                break;
+            case VAL_0:
+                fprintf(file, "0%c\n", s);
+                break;
+            case VAL_X:
+                fprintf(file, "x%c\n",s);
+                break;
+            case VAL_Z:
+                fprintf(file, "z%c\n", s);
+                break;
+            case VAL_BLANK:
+                break;
+        }
+    }
+
+    fprintf(file, "$end\n");
+    
+    t = 0;
+
+    fprintf(file, "#%llu\n", t);
+
+    // pegar a menor:
+    //sinais->lista[i].duracaoTotal
+
+    // TODO
 }
