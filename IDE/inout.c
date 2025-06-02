@@ -45,19 +45,16 @@ Sinais* carregaEntradas(FILE* arquivo)
         addSinal(entradas, it->valor);
         indice++;
 
-        avanca(&it);
-
-        if(!it) {
+        if (!avanca(&it)) {
             printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
         if ( iguais(it->valor, "{") ) {
             // loop para um sinal
-            while (1) {
-                avanca(&it);
-
-                if (!it) {
+            while (1)
+            {
+                if (!avanca(&it)) {
                     printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
@@ -84,17 +81,13 @@ Sinais* carregaEntradas(FILE* arquivo)
                     return NULL;
                 }
 
-                avanca(&it);
-
-                if (!it) {
+                if (!avanca(&it)) {
                     printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
                 if (iguais(it->valor, "(")) {
-                    avanca(&it);
-
-                    if (!it) {
+                    if (!avanca(&it)) {
                         printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
@@ -107,17 +100,13 @@ Sinais* carregaEntradas(FILE* arquivo)
                         return NULL;
                     }
 
-                    avanca(&it);
-
-                    if (!it) {
+                    if (!avanca(&it)) {
                         printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
                     if ( iguais(it->valor, ")") ) {
-                        avanca(&it);
-
-                        if (!it) {
+                        if (!avanca(&it)) {
                             printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                             return NULL;
                         }
@@ -144,9 +133,7 @@ Sinais* carregaEntradas(FILE* arquivo)
             return NULL;
         }
 
-        avanca(&it);
-
-        if (!it) {
+        if (!avanca(&it)) {
             printf("Arquivo de entrada completamente lido.\n");
             break;
         }

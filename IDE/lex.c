@@ -194,10 +194,17 @@ int iguais(char* a, char* b)
     return !strcmp(a, b);
 }
 
-void avanca(Token** t)
+Token* avanca(Token** it)
 {
-    if(*t)
-        *t = (*t)->seguinte;
+    if (!it)
+        return NULL;
+
+    if (*it) {
+        *it = (*it)->seguinte;
+        return *it;
+    }
+
+    return NULL;
 }
 
 int isPalavra(Token* tk)

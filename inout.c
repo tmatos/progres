@@ -45,9 +45,9 @@ Sinais* carregaEntradas(FILE* arquivo)
     }
 
     // loop para o conjunto de sinais
-    while(1)
+    while (1)
     {
-        if( isSimbolo( it->valor[0] ) )
+        if ( isSimbolo(it->valor[0]) )
             return erroFatalArquivoCorrompido();
 
         // TODO: check signal name duplication errors
@@ -57,20 +57,16 @@ Sinais* carregaEntradas(FILE* arquivo)
         addSinal(entradas, it->valor);
         indice++;
 
-        avanca(&it);
-
-        if(!it)
+        if (!avanca(&it))
             return erroFatalArquivoCorrompido();
 
-        if( !iguais(it->valor, "{") )
+        if ( !iguais(it->valor, "{") )
             return erroFatalArquivoCorrompido();
 
         // loop para um sinal
-        while(1)
+        while (1)
         {
-            avanca(&it);
-
-            if(!it)
+            if (!avanca(&it))
                 return erroFatalArquivoCorrompido();
 
             valorLogico = VAL_BLANK;
@@ -91,17 +87,13 @@ Sinais* carregaEntradas(FILE* arquivo)
                 return erroFatalArquivoCorrompido();
             }
 
-            avanca(&it);
-
-            if(!it)
+            if(!avanca(&it))
                 return erroFatalArquivoCorrompido();
 
             if( !iguais(it->valor, "(") )
                 return erroFatalArquivoCorrompido();
 
-            avanca(&it);
-
-            if(!it)
+            if(!avanca(&it))
                 return erroFatalArquivoCorrompido();
 
             if( !isNumNaturalValido(it->valor) )
@@ -109,17 +101,13 @@ Sinais* carregaEntradas(FILE* arquivo)
             
             addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
 
-            avanca(&it);
-
-            if(!it)
+            if(!avanca(&it))
                 return erroFatalArquivoCorrompido();
 
             if( !iguais(it->valor, ")") )
                 return erroFatalArquivoCorrompido();
 
-            avanca(&it);
-
-            if(!it)
+            if(!avanca(&it))
                 return erroFatalArquivoCorrompido();
 
             if( iguais(it->valor, ",") )
@@ -129,9 +117,7 @@ Sinais* carregaEntradas(FILE* arquivo)
              
         }
 
-        avanca(&it);
-
-        if(!it) {
+        if(!avanca(&it)) {
             if (!global_silent_mode)
                 printf(MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
 

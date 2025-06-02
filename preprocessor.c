@@ -109,13 +109,11 @@ int pre_processor(ListaToken* lst)
             continue;
         }
 
-        avanca(&it);
-        if (!it)
+        if (!avanca(&it))
             goto pre_processor_error_bad_eof;
 
         if (iguais("define", it->valor)) {
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             if (!isIdentificador(it)) {
@@ -133,9 +131,7 @@ int pre_processor(ListaToken* lst)
 
             copy(macro_name, it->valor);
             
-            avanca(&it);
-            
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             if (len(it->valor) > MAX_MACRO_VALUE_SIZE) {
@@ -162,8 +158,7 @@ int pre_processor(ListaToken* lst)
             continue;
         }
         else if (iguais("undef", it->valor)) {
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             if (!isIdentificador(it)) {
@@ -193,36 +188,31 @@ int pre_processor(ListaToken* lst)
             // time_unit / time_precision
             // ex.: 1 ns / 1 ps
 
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             // [time_unit] / time_precision
             // [number] unit / number unit
 
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             // [time_unit] / time_precision
             // number [unit] / number unit
 
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             // time_unit [/] time_precision
             // number unit [/] number unit
 
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             // time_unit / [time_precision]
             // number unit / [number] unit
 
-            avanca(&it);
-            if (!it)
+            if (!avanca(&it))
                 goto pre_processor_error_bad_eof;
 
             // time_unit / [time_precision]

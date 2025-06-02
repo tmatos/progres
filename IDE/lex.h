@@ -7,6 +7,8 @@
 
 #define LEX_H
 
+#include<stdio.h>
+
 #define MAX_TOKEN_SIZE 80 // Qtde máxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 4 // Qtde máxima de digitos num número inteiro a ser reconhecido
 
@@ -87,11 +89,14 @@ void exibeListaDeToken(ListaToken* tokens);
  */
 int iguais(char* a, char* b);
 
-/** @brief Avanca o iterador de token para o próximo da lista.
- *  @param t Um ponteiro para um ponteiro de um Token.
- *  @return Void.
+/** @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
+ *  @param it Um ponteiro para um ponteiro de um Token.
+ *  @return O endereço do próximo token, que já estará atualizado no iterador.
+ *          Este pode ser NULL, que indica o final da lista.
+ *          Caso o argumento passado seja NULL ou a derreferenciação deste argumento
+ *          também o seja, será retornado NULL.
  */
-void avanca(Token** t);
+Token* avanca(Token** it);
 
 /** @brief Verifica se um token é uma palavra reservada em Verilog.
  *  @param tk Um objeto Token.
