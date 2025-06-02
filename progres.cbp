@@ -11,7 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="sample\ok.v sample\ok.in sample\ok.out" />
+				<Option parameters="sample/meio_somador.v sample/meio_somador.in" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -72,6 +72,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="verilog.h" />
+		<Unit filename="preprocessor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="preprocessor.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -179,12 +179,34 @@ Module* carregaCircuito(FILE* arquivo)
     if (!pre_processor(tokens))
         goto bad_return;
 
+    circuito = novoCircuito();
+
     it = tokens->primeiro;
+
+    before_module:
 
     if (!it)
         goto bad_return;
 
-    if( ! load_module_header(&it, identificadores, identificLivre) )
+    if (it->classe == SYM_GRAVE_ACCENT) {
+        VerilogError err = load_directive(&it, circuito);
+
+        switch (err)
+        {
+        case ERROR_VERILOG_BAD_TOKEN:
+            goto bad_return;
+            break;
+        default:
+            // no error
+            break;
+        }
+
+        avanca(&it);
+
+        goto before_module;
+    }
+
+    if ( !load_module_header(&it, identificadores, identificLivre) )
         goto bad_return;
 
     avanca(&it);
@@ -192,8 +214,6 @@ Module* carregaCircuito(FILE* arquivo)
         goto bad_return_unexpected_eof;
 
     gate = NULL;
-
-    circuito = novoCircuito();
 
     // process body of the module until it ends
     while(1)
@@ -545,6 +565,18 @@ Module* carregaCircuito(FILE* arquivo)
                 return circuito;
             }
         }
+        else if (it->classe == SYM_GRAVE_ACCENT) {
+            VerilogError err = load_directive(&it, circuito);
+            switch (err)
+            {
+            case ERROR_VERILOG_BAD_TOKEN:
+                goto bad_return;
+                break;
+            default:
+                // no error
+                break;
+            }
+        }
         else if( it->classe == KW_INITIAL ) {
             VerilogError err = load_initial_block(&it, identificadores, list_param, circuito);
             switch (err)
@@ -824,6 +856,88 @@ load_reg_bad_token:
 
 load_reg_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_directive(Token** it, Module* module)
+{
+    Token* t = *it;
+
+    avanca(&t);
+
+    // note: the pre-processor did some validation
+
+    if (iguais("resetall", t->valor)) {
+        module->timescale_number = (Tempo) 1;
+        module->timescale_unit = UN_NS;
+        module->timescale_precision_number = (Tempo) 1;
+        module->timescale_precision_unit = UN_NS;
+
+        // FIXME: should not be module wide
+    }
+    else if (iguais("timescale", t->valor)) {
+        // time_unit / time_precision
+        // ex.: 1 ns / 1 ps
+
+        avanca(&t);
+
+        // [time_unit] / time_precision
+        // [number] unit / number unit
+        if (!isNumNaturalValido(t->valor))
+            goto load_directive_bad_number;
+        
+        module->timescale_number = (Tempo) atoi(t->valor);
+
+        avanca(&t);
+
+        // [time_unit] / time_precision
+        // number [unit] / number unit
+        module->timescale_unit = get_timeunit_from_str(t->valor);
+        if (module->timescale_unit == UN_INVALID)
+            goto load_directive_bad_time_unit;
+
+        avanca(&t);
+
+        // time_unit [/] time_precision
+        // number unit [/] number unit
+        if (!iguais("/", t->valor)) {
+            show_error_msg("Token inesperado", t->linha, t->coluna, "/", t->valor);
+            goto load_directive_bad_token;
+        }
+
+        avanca(&t);
+
+        // time_unit / [time_precision]
+        // number unit / [number] unit
+        if (!isNumNaturalValido(t->valor))
+            goto load_directive_bad_number;
+        
+        module->timescale_precision_number = (Tempo) atoi(t->valor);
+
+        avanca(&t);
+
+        // time_unit / [time_precision]
+        // number unit / number [unit]
+        module->timescale_precision_unit = get_timeunit_from_str(t->valor);
+        if (module->timescale_precision_unit == UN_INVALID)
+            goto load_directive_bad_time_unit;
+    }
+
+//load_directive_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_directive_bad_number:
+    show_error_msg("Numero invalido", t->linha, t->coluna,
+                   "numero inteiro nao negativo", t->valor);
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_directive_bad_time_unit:
+    show_error_msg("Unidade invalida", t->linha, t->coluna,
+                   "unidade de tempo (us, ns, ps, ...)", t->valor);
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_directive_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
 }
 
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)

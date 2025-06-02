@@ -113,6 +113,11 @@ typedef struct st_module {
     ListaReg listaReg;
 
     ListaParam listaParam;
+
+    Tempo timescale_number;
+    UnidTempo timescale_unit;
+    Tempo timescale_precision_number;
+    UnidTempo timescale_precision_unit;
 } Module;
 
 /** @brief Inicialização de uma estrutura de circuito.

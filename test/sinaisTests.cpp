@@ -15,6 +15,8 @@ class Testes_sinais : public CppUnit::TestFixture
   CPPUNIT_TEST( test_novaSinais );
   CPPUNIT_TEST( test_addSinal );
   CPPUNIT_TEST( test_addSinalPronto );
+  CPPUNIT_TEST( test_get_timeunit_from_str_valid_units );
+  CPPUNIT_TEST( test_get_timeunit_from_str_invalid_units );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -155,5 +157,32 @@ public:
     CPPUNIT_ASSERT_EQUAL( sinais->lista[1].pulsos[2].tempo, (Tempo)(5) );
   }
 
-};
+  void test_get_timeunit_from_str_valid_units()
+  {
+    // Testa todas as strings de entrada válidas
+    CPPUNIT_ASSERT_EQUAL((int)UN_S,  (int)get_timeunit_from_str("s"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_MS, (int)get_timeunit_from_str("ms"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_US, (int)get_timeunit_from_str("us"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_NS, (int)get_timeunit_from_str("ns"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_PS, (int)get_timeunit_from_str("ps"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_FS, (int)get_timeunit_from_str("fs"));
+  }
+  
+  void test_get_timeunit_from_str_invalid_units()
+  {
+    // Testa strings que não representam uma unidade válida
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("GHz"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("segundos"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str(" random "));
 
+    // NULL pointer e string vazia
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str(NULL));
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str(""));
+
+    // Sensibilidade a maiúsculas/minúsculas
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("S"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("Ms"));
+    CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("US"));
+  }
+
+};

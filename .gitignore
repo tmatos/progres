@@ -10,3 +10,4 @@ generated-docs/
 .vscode/settings.json
 IDE/IDE.layout
 benchmarks/
+test/cov_reports/

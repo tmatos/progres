@@ -36,6 +36,11 @@ Module* novoCircuito()
     circuito->listaParam.total = 0;
     circuito->listaParam.itens = NULL;
 
+    circuito->timescale_number = (Tempo) 1;
+    circuito->timescale_unit = UN_NS;
+    circuito->timescale_precision_number = (Tempo) 1;
+    circuito->timescale_precision_unit = UN_NS;
+
     return circuito;
 }
 

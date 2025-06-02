@@ -91,7 +91,7 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                          circuto->listaFiosEntrada->itens[i],
                          p->valor);
 
-            t = t + p->tempo;
+            t = t + p->tempo * circuto->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
@@ -192,7 +192,7 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                 break;
             }
 
-            createEventsFromOutputs(&fila, t, gate, result);
+            createEventsFromOutputs(&fila, t, circuto->timescale_number, gate, result);
         }
 
         // free mem
@@ -343,7 +343,7 @@ ValorLogico computeNandGate(ListaComponente* inputs)
     return out;
 }
 
-void createEventsFromOutputs(Evento** fila, Tempo t, Componente gate, ValorLogico result)
+void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result)
 {
     int j;
 
@@ -351,7 +351,7 @@ void createEventsFromOutputs(Evento** fila, Tempo t, Componente gate, ValorLogic
     for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
         insereEvento(fila,
-                     t + gate->tipo.atraso,
+                     t + gate->tipo.atraso * timescale /* * (circuto->timescale_unit/UN_FS) */,
                      gate->listaSaida->itens[j],
                      result);
     }

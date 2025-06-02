@@ -42,6 +42,11 @@ Module* carregaCircuito(FILE* arquivo);
  */
 VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
 
+/** @brief Parsing das diretivas, algumas que não foram tratadas no pre-processamento.
+ *  @return Código de erro do tipo VerilogError.
+ */
+VerilogError load_directive(Token** it, Module* module);
+
 /** @brief Parsing de blocos initial
  */
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);

@@ -23,6 +23,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_initial_single_test_v );
   CPPUNIT_TEST( test_carregaCircuito_assigns_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
+  CPPUNIT_TEST( test_carregaCircuito_badtimescale_XX_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -289,6 +290,39 @@ public:
       CPPUNIT_ASSERT( fp );
       circuit = carregaCircuito(fp);
       CPPUNIT_ASSERT( !circuit );
+      fclose(fp);
+    }
+  }
+
+  void test_carregaCircuito_badtimescale_XX_v()
+  {
+    std::list<std::string> list_bad_files = {
+      "./verilog_sample_src/badtimescale_00.v",
+      "./verilog_sample_src/badtimescale_01.v",
+      "./verilog_sample_src/badtimescale_01a.v",
+      "./verilog_sample_src/badtimescale_02.v",
+      "./verilog_sample_src/badtimescale_03.v",
+      "./verilog_sample_src/badtimescale_04.v",
+      "./verilog_sample_src/badtimescale_05.v",
+      "./verilog_sample_src/badtimescale_06.v",
+      "./verilog_sample_src/badtimescale_07.v",
+      "./verilog_sample_src/badtimescale_08.v",
+      "./verilog_sample_src/badtimescale_09.v",
+      "./verilog_sample_src/badtimescale_10.v",
+      "./verilog_sample_src/badtimescale_11.v"
+    };
+
+    Module* circuit = NULL;
+    FILE* fp = NULL;
+
+    for ( std::string path : list_bad_files )
+    {
+      fp = fopen(path.c_str(), "r");
+      CPPUNIT_ASSERT(fp);
+
+      circuit = carregaCircuito(fp);
+      CPPUNIT_ASSERT(!circuit);
+
       fclose(fp);
     }
   }

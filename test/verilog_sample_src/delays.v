@@ -1,3 +1,5 @@
+`resetall
+`timescale 1 ns / 1 ns
 
 // logic gates with propagation delays
 
@@ -21,5 +23,7 @@ and #22 (outand1, in0, in1);
 
 or #2 (outor0, in0, in1);
 or #22 (outor1, in0, in1);
+
+`resetall
 
 endmodule

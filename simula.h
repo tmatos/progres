@@ -50,6 +50,6 @@ ValorLogico computeNandGate(ListaComponente* inputs);
 /** @brief Cria novos eventos na fila de acordo com a saidas (result) computadas
  *         para a porta lógica (gate), no tempo t indicado. 
  */
-void createEventsFromOutputs(Evento** fila, Tempo t, Componente gate, ValorLogico result);
+void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result);
 
 #endif // SIMULA_H
