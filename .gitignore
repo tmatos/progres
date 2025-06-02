@@ -17,6 +17,5 @@ config.log
 config.status
 aclocal.m4
 compile
-install-sh
 missing
 stamp-h1
