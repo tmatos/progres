@@ -59,5 +59,6 @@ clean:
 	rm -f ./*.o
 	rm -f ./*.gcno
 	rm -f ./*.gcda
+	if [ $(HTML_DIR) != . ]; then rm -rf $(HTML_DIR); fi
 	rm -f $(COV_FILE)
 	rm -f $(TARGET)
