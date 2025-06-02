@@ -172,16 +172,16 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
             switch(it->valor)
             {
                 case VAL_1:
-                    fprintf(arqSaida, "1(%d)", it->tempo);
+                    fprintf(arqSaida, "1(%llu)", it->tempo);
                     break;
                 case VAL_0:
-                    fprintf(arqSaida, "0(%d)", it->tempo);
+                    fprintf(arqSaida, "0(%llu)", it->tempo);
                     break;
                 case VAL_X:
-                    fprintf(arqSaida, "x(%d)", it->tempo);
+                    fprintf(arqSaida, "x(%llu)", it->tempo);
                     break;
                 case VAL_Z:
-                    fprintf(arqSaida, "z(%d)", it->tempo);
+                    fprintf(arqSaida, "z(%llu)", it->tempo);
                     break;
                 case VAL_BLANK:
                     break;

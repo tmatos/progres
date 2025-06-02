@@ -51,7 +51,7 @@ UnidTempo get_timeunit_from_str(const char* str);
 
 /** @brief O tipo das variáveis usadas na representação do tempo.
  */
-typedef unsigned int Tempo;
+typedef unsigned long long int Tempo;
 
 /** @brief Um pulso de valor fixo e duração definida.
  */
