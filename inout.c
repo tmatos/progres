@@ -25,6 +25,7 @@ Sinais* carregaEntradas(FILE* arquivo)
 {
     int indice = -1; // indexador do vetor de sinais de entrada
     ValorLogico valorLogico;
+    Tempo duracao;
     Sinais* entradas = novaSinais();
     Token* it = NULL;
 
@@ -99,7 +100,8 @@ Sinais* carregaEntradas(FILE* arquivo)
             if( !isNumNaturalValido(it->valor) )
                 return erroFatalArquivoCorrompido();
             
-            addPulso(entradas->lista + indice, valorLogico, atoi(it->valor));
+            duracao = strtol(it->valor, NULL, 10);
+            addPulso((entradas->lista + indice), valorLogico, duracao);
 
             if(!avanca(&it))
                 return erroFatalArquivoCorrompido();

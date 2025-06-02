@@ -846,7 +846,7 @@ VerilogError load_directive(Token** it, Module* module)
         if (!isNumNaturalValido(t->valor))
             goto load_directive_bad_number;
         
-        module->timescale_number = (Tempo) atoi(t->valor);
+        module->timescale_number = (Tempo) strtol(t->valor, NULL, 10);
 
         avanca(&t);
 
@@ -872,7 +872,7 @@ VerilogError load_directive(Token** it, Module* module)
         if (!isNumNaturalValido(t->valor))
             goto load_directive_bad_number;
         
-        module->timescale_precision_number = (Tempo) atoi(t->valor);
+        module->timescale_precision_number = (Tempo) strtol(t->valor, NULL, 10);
 
         avanca(&t);
 
@@ -939,7 +939,7 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
 
     // agora ele espera um literal ou parametro
     if (isNumNaturalValido(t->valor)) {
-        left_reg->value = atoi(t->valor);
+        left_reg->value = strtol(t->valor, NULL, 10);
     }
     else if (identExiste(list_param, t->valor)) {
         Param* p = get_param_by_name(module->listaParam, t->valor);
