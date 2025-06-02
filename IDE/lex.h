@@ -143,4 +143,11 @@ int isNumNaturalValido(char* str);
  */
 unsigned long len(const char* str);
 
+/** @brief Wrapper to strcpy()
+ *  @param dest Destination C string
+ *  @param src Source C string
+ *  @return Return of strcpy()
+ */
+char* copy(char* dest, const char* src);
+
 #endif // LEX_H

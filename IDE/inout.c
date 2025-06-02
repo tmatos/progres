@@ -37,7 +37,7 @@ Sinais* carregaEntradas(FILE* arquivo)
     while (1)
     {
         if ( isSimbolo( it->valor[0] ) ) {
-            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+            printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
@@ -47,7 +47,7 @@ Sinais* carregaEntradas(FILE* arquivo)
         indice++;
 
         if (!avanca(&it)) {
-            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+            printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 
@@ -56,7 +56,7 @@ Sinais* carregaEntradas(FILE* arquivo)
             while (1)
             {
                 if (!avanca(&it)) {
-                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                    printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
@@ -78,18 +78,18 @@ Sinais* carregaEntradas(FILE* arquivo)
                     break;
                 }
                 else {
-                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                    printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
                 if (!avanca(&it)) {
-                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                    printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
 
                 if (iguais(it->valor, "(")) {
                     if (!avanca(&it)) {
-                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
@@ -98,18 +98,18 @@ Sinais* carregaEntradas(FILE* arquivo)
                         addPulso(entradas->lista + indice, valorLogico, duracao);
                     }
                     else {
-                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
                     if (!avanca(&it)) {
-                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
 
                     if ( iguais(it->valor, ")") ) {
                         if (!avanca(&it)) {
-                            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                            printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                             return NULL;
                         }
 
@@ -120,18 +120,18 @@ Sinais* carregaEntradas(FILE* arquivo)
                         }
                     }
                     else {
-                        printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                         return NULL;
                     }
                 }
                 else {
-                    printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+                    printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
                     return NULL;
                 }
             }
         }
         else {
-            printf(MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+            printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
             return NULL;
         }
 

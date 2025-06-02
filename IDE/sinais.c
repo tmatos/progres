@@ -11,6 +11,7 @@
 
 #include "sinais.h"
 #include "memoria.h"
+#include "lex.h"
 
 Sinal* novoSinal(char* nome)
 {
@@ -35,7 +36,7 @@ int setSinalNome(Sinal* s, char* nome)
     if ( !s || !nome )
         return 0;
 
-    strcpy(s->nome, nome);
+    copy(s->nome, nome);
 
     return 1;
 }

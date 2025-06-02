@@ -36,7 +36,7 @@ int setSinalNome(Sinal* s, const char* nome)
     if(!s || !nome)
         return 0;
 
-    strcpy(s->nome, nome);
+    copy(s->nome, nome);
 
     return 1;
 }

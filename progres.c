@@ -13,6 +13,7 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "inout.h"
+#include "lex.h"
 #include "verilog.h"
 #include "simula.h"
 
@@ -37,7 +38,7 @@ int main(int argc, char* argv[])
     arg_offset = 0;
 
     if (argc < 2 || !strcmp(argv[1], "-h")) {
-        printf(_HELP_STRING_BRIEF);
+        printf("%s", _HELP_STRING_BRIEF);
         exit(0);
     }
 
@@ -118,11 +119,11 @@ int main(int argc, char* argv[])
 
     // se foi fornecido o argumento com path para arquivo de saida
     if ( (argc - arg_offset) > 3) {
-        strcpy(str_wave_out_filepath, argv[3+arg_offset]);
+        copy(str_wave_out_filepath, argv[3+arg_offset]);
     }
     else {
         // senao, deriva-se do arquivo de entrada
-        strcpy(str_wave_out_filepath, argv[2+arg_offset]);
+        copy(str_wave_out_filepath, argv[2+arg_offset]);
         strcat(str_wave_out_filepath, ".out");
     }
 

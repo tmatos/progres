@@ -35,7 +35,7 @@ int insereTokenString(ListaToken* lista, char* tok, int p_linha, int p_coluna)
 {
     Token* novo = (Token*) xmalloc(sizeof(Token));
 
-    strcpy(novo->valor, tok);
+    copy(novo->valor, tok);
     novo->linha = p_linha;
     novo->coluna = p_coluna;
     novo->seguinte = NULL;
@@ -287,7 +287,7 @@ ListaToken* tokeniza(FILE *arquivo)
 
     while(1) {
         // A
-        strcpy(tok, "");
+        copy(tok, "");
         c = fgetc(arquivo);
 
         if(c == EOF) {
@@ -497,4 +497,10 @@ unsigned long len(const char *str)
 {
     // TODO: restrict to a maximum lenght
     return strlen(str);
+}
+
+char* copy(char* dest, const char* src)
+{
+    // TODO: restrict to a maximum length
+    return strcpy(dest, src);
 }

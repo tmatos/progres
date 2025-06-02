@@ -391,7 +391,7 @@ Module* carregaCircuito(FILE* arquivo)
                 }
                 else {
                     // Guardar o atraso dessa gate
-                    gate->tipo.atraso = atoi(it->valor); //FIXME: tipo errado!
+                    gate->tipo.atraso = strtol(it->valor, NULL, 10); //FIXME: tipo errado!
                 }
 
                 if (!avanca(&it)) {
@@ -625,7 +625,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            param->value = atoi(it->valor);
+            param->value = strtol(it->valor, NULL, 10);
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
@@ -729,7 +729,7 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
             goto load_reg_bad_eof;
 
         if (isNumNaturalValido(t->valor)) {
-            range_msb = atoi(t->valor);
+            range_msb = strtol(t->valor, NULL, 10);
         }
         else if (identExiste(list_param, t->valor)) {
             range_msb = get_param_by_name(module->listaParam, t->valor)->value;
@@ -753,7 +753,7 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
             goto load_reg_bad_eof;
 
         if (isNumNaturalValido(t->valor)) {
-            range_lsb = atoi(t->valor);
+            range_lsb = strtol(t->valor, NULL, 10);
         }
         else if (identExiste(list_param, t->valor)) {
             range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
