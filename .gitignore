@@ -11,3 +11,12 @@ generated-docs/
 IDE/IDE.layout
 benchmarks/
 test/cov_reports/
+autom4te.cache/
+autoscan.log
+config.log
+config.status
+aclocal.m4
+compile
+install-sh
+missing
+stamp-h1
