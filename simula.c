@@ -91,7 +91,7 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                          circuto->listaFiosEntrada->itens[i],
                          p->valor);
 
-            t = t + p->tempo * circuto->timescale_number;
+            t = t + p->tempo * circuto->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
@@ -351,7 +351,7 @@ void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente
     for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
         insereEvento(fila,
-                     t + gate->tipo.atraso * timescale,
+                     t + gate->tipo.atraso * timescale /* * (circuto->timescale_unit/UN_FS) */,
                      gate->listaSaida->itens[j],
                      result);
     }
