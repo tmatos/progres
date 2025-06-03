@@ -167,3 +167,24 @@ UnidTempo get_timeunit_from_str(const char* str)
     
     return UN_INVALID;
 }
+
+char* get_str_from_timeunit(UnidTempo unit)
+{
+    switch (unit)
+    {
+    case UN_S:
+        return "s";
+    case UN_MS:
+        return "ms";
+    case UN_US:
+        return "us";
+    case UN_NS:
+        return "ns";
+    case UN_PS:
+        return "ps";
+    case UN_FS:
+        return "fs";
+    default:
+        return "ns";
+    }
+}

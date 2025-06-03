@@ -97,9 +97,13 @@ typedef struct st_list_reg {
     Register** itens;
 } ListaReg;
 
+#define MAX_MODULE_NAME 1024
+
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
  */
 typedef struct st_module {
+    char name[MAX_MODULE_NAME];
+
     ListaComponente* listaFiosEntrada;
     Sinais* sinaisEntrada;
 

@@ -49,6 +49,12 @@ typedef enum en_un_tempo {
  */
 UnidTempo get_timeunit_from_str(const char* str);
 
+/** @brief Retorna a string que representa unidade de tempo.
+ *  @param unit Unidade de tempo, da enum UnidTempo.
+ *  @return Uma string com valor: "s", "ms", "us", "ns", "ps" ou "fs".
+ */
+char* get_str_from_timeunit(UnidTempo unit);
+
 /** @brief O tipo das variáveis usadas na representação do tempo.
  */
 typedef unsigned long long int Tempo;

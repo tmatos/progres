@@ -41,6 +41,8 @@ Module* novoCircuito()
     circuito->timescale_precision_number = (Tempo) 1;
     circuito->timescale_precision_unit = UN_NS;
 
+    copy(circuito->name, "");
+
     return circuito;
 }
 

@@ -161,6 +161,24 @@ int main(int argc, char* argv[])
     if (!global_silent_mode)
         printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
 
+    // export of VCD file
+    strcat(str_wave_out_filepath, ".vcd");
+    f_wave_out = fopen(str_wave_out_filepath, "w");
+
+    if (!f_wave_out) {
+        if (!global_silent_mode)
+            printf("Erro ao tentar abrir arquivo VCD de saida '%s' para gravacao.\n",
+                   str_wave_out_filepath);
+
+        exit(1);
+    }
+
+    save_vcd(circuto1, sinais_saidas, f_wave_out);
+    fclose(f_wave_out);
+    
+    if (!global_silent_mode)
+        printf("Arquivo VCD tambem salvo, em '%s'.\n", str_wave_out_filepath);
+
     // free mem (outputs)
     if (sinais_saidas) {
         for ( i=0 ; i < sinais_saidas->quantidade ; i++ )

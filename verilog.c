@@ -18,7 +18,7 @@
 #include "lex.h"
 #include "preprocessor.h"
 
-int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
+int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module)
 {
     int virgula = 0;
 
@@ -42,6 +42,7 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
     else {
         // senao, adicione-o a lista de identifiers
         insereTokenString(identifiers, t->valor, -1, -1);
+        copy(module->name, t->valor);
     }
 
     if (!avanca(&t)) {
@@ -200,7 +201,7 @@ Module* carregaCircuito(FILE* arquivo)
         goto before_module;
     }
 
-    if ( !load_module_header(&it, identificadores, identificLivre) )
+    if ( !load_module_header(&it, identificadores, identificLivre, circuito) )
         goto bad_return;
 
     if (!avanca(&it))

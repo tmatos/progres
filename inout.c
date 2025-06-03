@@ -193,61 +193,177 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
     Tempo t;
 
     fprintf(file, "$date\n");
-    fprintf(file, "  \n");
+    fprintf(file, "  \n"); // TODO
     fprintf(file, "$end\n");
     fprintf(file, "$version\n");
     fprintf(file, "  progres %s\n", _PROGRES_VERSION);
     fprintf(file, "$end\n");
-    fprintf(file, "$comment\n  $end\n");
-    fprintf(file, "$timescale ");
-    fprintf(file, "%llu ns ", module->timescale_number); // TODO
-    fprintf(file, "$end\n");
-    fprintf(file, "$scope module %s ", "nome"); // TODO
+    fprintf(file, "$comment\n");
+    fprintf(file, "  \n"); // ?
     fprintf(file, "$end\n");
 
-    s = '#';
+    fprintf(file, "$timescale ");
+    fprintf(file, "%llu", module->timescale_number);
+    fprintf(file, "%s ", get_str_from_timeunit(module->timescale_unit));
+    fprintf(file, "$end\n");
+
+    fprintf(file, "$scope module %s ", module->name);
+    fprintf(file, "$end\n");
+
+    s = '%';
+
     for ( i=0; i < sinais->quantidade; i++ )
     {
-        fprintf(file, "$var %s 1 ", "wire"); // TODO
-        fprintf(file, "%c ", s);
+        fprintf(file, "$var %s 1 ", "wire"); // TODO: number of bits
+        fprintf(file, "%c ", (s + i));
         fprintf(file, "%s $end\n", sinais->lista[i].nome);
-        s++;
     }
 
     fprintf(file, "$upscope $end\n");
     fprintf(file, "$enddefinitions $end\n");
-    fprintf(file, "$dumpvars\n");
 
-    s = '#';
+    fprintf(file, "$dumpvars\n");
     for ( i=0; i < sinais->quantidade; i++ )
     {
-        switch (sinais->lista[i].pulsos->valor)
-        {
-            case VAL_1:
-                fprintf(file, "1%c\n", s);
-                break;
-            case VAL_0:
-                fprintf(file, "0%c\n", s);
-                break;
-            case VAL_X:
-                fprintf(file, "x%c\n",s);
-                break;
-            case VAL_Z:
-                fprintf(file, "z%c\n", s);
-                break;
-            case VAL_BLANK:
-                break;
-        }
+        fprintf(file, "%c", get_char_from_logic_value(sinais->lista[i].pulsos->valor));
+        fprintf(file, "%c\n", (s + i));
     }
-
     fprintf(file, "$end\n");
     
     t = 0;
 
     fprintf(file, "#%llu\n", t);
 
-    // pegar a menor:
-    //sinais->lista[i].duracaoTotal
+    for ( i=0; i < sinais->quantidade; i++ )
+    {
+        fprintf(file, "%c", get_char_from_logic_value(sinais->lista[i].pulsos->valor));
+        fprintf(file, "%c\n", (s + i));
+    }
 
-    // TODO
+    Pulso* p;
+    Tempo t_menor;
+    ValorLogico v_menor;
+    int i_menor;
+
+    if (sinais->quantidade == 0)
+        return;
+    
+    Tempo t_max = 0;
+    for ( i=0; i < sinais->quantidade; i++ )
+    {
+        if (sinais->lista[i].duracaoTotal > t_max) {
+            t_max = sinais->lista[i].duracaoTotal;
+        }
+    }
+
+    do
+    {
+        i_menor = 0;
+        p = sinais->lista[i_menor].pulsos;
+        t_menor = p->tempo;
+        v_menor = p->valor;
+        
+        Tempo t_sum = p->tempo;
+
+        p++;
+        while (p->valor != VAL_BLANK)
+        {
+            t_sum += p->tempo;
+
+            if (t_sum >= t) {
+                t_menor = t_sum;
+                v_menor = p->valor;
+                break;
+            }
+
+            p++;
+        }
+
+        for ( i=1; i < sinais->quantidade; i++ )
+        {
+            p = sinais->lista[i].pulsos;
+            if (p)
+                t_sum = p->tempo;
+            else
+                t_sum = 0;
+
+            while (p && p->valor != VAL_BLANK)
+            {
+                t_sum += p->tempo;
+
+                if (t_sum > t) {
+                    if (t_sum < t_menor) {
+                        i_menor = i;
+                        t_menor = t_sum;
+                        v_menor = p->valor;
+                    }
+
+                    break;
+                }
+
+                p++;
+            }
+        }
+
+        fprintf(file, "#%llu\n", t);
+
+        for ( i=0; i < sinais->quantidade; i++ )
+        {
+            Pulso* p_prev;
+            p_prev = NULL;
+            p = sinais->lista[i].pulsos;
+            if (p)
+                t_sum = p->tempo;
+            else
+                t_sum = 0;
+
+            while (p && p->valor != VAL_BLANK)
+            {
+                t_sum += p->tempo;
+
+                if (t_sum >= t) {
+                    if (t_sum < t_menor) {
+                        fprintf(file, "%c", get_char_from_logic_value(p->valor));
+                    }
+                    else {
+                        // if (p_prev)
+                            fprintf(file, "%c", get_char_from_logic_value(p_prev->valor));
+                        // else
+                        //     fprintf(file, "%c", 'x');
+                    }
+
+                    fprintf(file, "%c\n", (char) (s + i) );
+
+                    break;
+                }
+
+                p_prev = p;
+                p++;
+            }
+        }
+
+        t = t + t_menor;
+
+        // FIXME
+
+    } while (t < t_max);    
+
+    fprintf(file, "#%llu\n", t);
+}
+
+char get_char_from_logic_value(ValorLogico value)
+{
+    switch (value)
+    {
+        case VAL_1:
+            return '1';
+        case VAL_0:
+            return '0';
+        case VAL_X:
+            return 'x';
+        case VAL_Z:
+            return 'z';
+        default:
+            return 'x';
+    }
 }
