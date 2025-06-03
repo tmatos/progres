@@ -168,7 +168,7 @@ UnidTempo get_timeunit_from_str(const char* str)
     return UN_INVALID;
 }
 
-char* get_str_from_timeunit(UnidTempo unit)
+const char* get_str_from_timeunit(UnidTempo unit)
 {
     switch (unit)
     {
