@@ -11,6 +11,7 @@
 #include "progres.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "eventos.h"
 #include "lex.h"
 #include "inout.h"
 #include "erros.h"
@@ -189,8 +190,7 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
 void save_vcd(Module* module, Sinais* sinais, FILE* file)
 {
     int i;
-    char s;
-    Tempo t;
+    char s = '%';
 
     fprintf(file, "$date\n");
     fprintf(file, "  \n"); // TODO
@@ -210,8 +210,6 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
     fprintf(file, "$scope module %s ", module->name);
     fprintf(file, "$end\n");
 
-    s = '%';
-
     for ( i=0; i < sinais->quantidade; i++ )
     {
         fprintf(file, "$var %s 1 ", "wire"); // TODO: number of bits
@@ -229,126 +227,66 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
         fprintf(file, "%c\n", (s + i));
     }
     fprintf(file, "$end\n");
+
+    Evento* fila = NULL;
+    Tempo t = 0;
     
-    t = 0;
-
-    fprintf(file, "#%llu\n", t);
-
-    for ( i=0; i < sinais->quantidade; i++ )
-    {
-        fprintf(file, "%c", get_char_from_logic_value(sinais->lista[i].pulsos->valor));
-        fprintf(file, "%c\n", (s + i));
-    }
-
+    Transicao* list_tran = NULL;
+    Transicao* it = NULL;
     Pulso* p;
-    Tempo t_menor;
-    ValorLogico v_menor;
-    int i_menor;
+    ValorLogico v;
 
-    if (sinais->quantidade == 0)
-        return;
-    
-    Tempo t_max = 0;
-    for ( i=0; i < sinais->quantidade; i++ )
+    for ( i=0 ; i < sinais->quantidade ; i++ )
     {
-        if (sinais->lista[i].duracaoTotal > t_max) {
-            t_max = sinais->lista[i].duracaoTotal;
-        }
-    }
+        t = 0;
+        p = sinais->lista[i].pulsos;
 
-    do
-    {
-        i_menor = 0;
-        p = sinais->lista[i_menor].pulsos;
-        t_menor = p->tempo;
-        v_menor = p->valor;
-        
-        Tempo t_sum = p->tempo;
-
-        p++;
         while (p->valor != VAL_BLANK)
         {
-            t_sum += p->tempo;
+            insereEvento(&fila,
+                         t,
+                         module->listaFiosSaida->itens[i], // !! caution!
+                         p->valor);
 
-            if (t_sum >= t) {
-                t_menor = t_sum;
-                v_menor = p->valor;
-                break;
-            }
+            t += p->tempo * module->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
 
             p++;
         }
 
-        for ( i=1; i < sinais->quantidade; i++ )
+        insereEvento(&fila,
+                     t,
+                     module->listaFiosSaida->itens[i], // !! caution!
+                     VAL_X);
+    }
+
+    t = 0;
+
+    while (fila)
+    {
+        t = fila->quando;
+
+        list_tran = popEvento(&fila);
+        it = list_tran;
+
+        while (it)
         {
-            p = sinais->lista[i].pulsos;
-            if (p)
-                t_sum = p->tempo;
-            else
-                t_sum = 0;
-
-            while (p && p->valor != VAL_BLANK)
-            {
-                t_sum += p->tempo;
-
-                if (t_sum > t) {
-                    if (t_sum < t_menor) {
-                        i_menor = i;
-                        t_menor = t_sum;
-                        v_menor = p->valor;
-                    }
-
-                    break;
-                }
-
-                p++;
-            }
+            it->fio->valorDinamico = it->novoValor;
+            it = it->proximo;
         }
 
+        // #time
         fprintf(file, "#%llu\n", t);
 
-        for ( i=0; i < sinais->quantidade; i++ )
+        for ( i=0 ; i < module->listaFiosSaida->tamanho ; i++ )
         {
-            Pulso* p_prev;
-            p_prev = NULL;
-            p = sinais->lista[i].pulsos;
-            if (p)
-                t_sum = p->tempo;
-            else
-                t_sum = 0;
-
-            while (p && p->valor != VAL_BLANK)
-            {
-                t_sum += p->tempo;
-
-                if (t_sum >= t) {
-                    if (t_sum < t_menor) {
-                        fprintf(file, "%c", get_char_from_logic_value(p->valor));
-                    }
-                    else {
-                        // if (p_prev)
-                            fprintf(file, "%c", get_char_from_logic_value(p_prev->valor));
-                        // else
-                        //     fprintf(file, "%c", 'x');
-                    }
-
-                    fprintf(file, "%c\n", (char) (s + i) );
-
-                    break;
-                }
-
-                p_prev = p;
-                p++;
-            }
+            v = module->listaFiosSaida->itens[i]->valorDinamico;
+            fprintf(file, "%c", get_char_from_logic_value(v));
+            fprintf(file, "%c\n", (char) (s + i));
         }
+    }
 
-        t = t + t_menor;
-
-        // FIXME
-
-    } while (t < t_max);    
-
-    fprintf(file, "#%llu\n", t);
+    // final line
+    fprintf(file, "#%llu\n", (Tempo) (t+1));
 }
 
 char get_char_from_logic_value(ValorLogico value)
