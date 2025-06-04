@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "progres.h"
 #include "estruturas.h"
@@ -192,9 +193,13 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
     int i;
     char s = '%';
 
+    time_t epoch = time(NULL);
+    struct tm* dt = localtime(&epoch);
     fprintf(file, "$date\n");
-    fprintf(file, "  \n"); // TODO
+    fprintf(file, "  %04d/%02d/%02d", (dt->tm_year + 1900), (dt->tm_mon + 1), dt->tm_mday);
+    fprintf(file, " - %02d:%02d\n", dt->tm_hour, dt->tm_min);
     fprintf(file, "$end\n");
+
     fprintf(file, "$version\n");
     fprintf(file, "  progres %s\n", _PROGRES_VERSION);
     fprintf(file, "$end\n");
