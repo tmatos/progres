@@ -71,11 +71,11 @@ segundo { 0(2),1(1),x(3),0(1) }
 Neste arquivo, temos as representações dos sinas abaixo:
 
 ```
-                    ___
-   primeiro: XX_____
+                    ▁▁▁
+   primeiro: ╳╳▁▁▁▁▁▏  
 unid. tempo: 0123456789
-               _
-    segundo: __ XXX____
+               ▁▁      
+    segundo: ▁▁▏ ╳╳╳▁▁▁
 unid. tempo: 0123456789
 ```
 
