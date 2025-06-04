@@ -13,7 +13,7 @@ No momento, provê a simulação de circuitos combinacionais escritos em Verilog
 Na interface de linha de comando:
 
 ```
-progres fonte.v [entradas.in] [saidas.out]
+progres [-s] fonte.v [entradas.in] [saidas.out]
 ```
 
 Argumentos entre colchetes são opcionais.
@@ -36,6 +36,8 @@ o programa tentará simular o circuito com esta entrada e gerar a saída corresp
 Se houver sucesso na simulação, um arquivo de saída será criado conforme especificado nos
 argumentos do programa ou, se estes foram omitidos, será criado um arquivo com o mesmo 
 nome do arquivo de entrada porém com a extensão mudada para `.out`.
+
+`-s` Omite todas as mensagens textuais de saída.
 
 
 ## 2. Arquivos de entrada e saída
@@ -63,7 +65,7 @@ primeiro
  X(2), 0(5), 1(3)
 }
 
-segundo { 0(2),1(1),x(3),0(1) }
+segundo { 0(2),1(2),x(3),0(3) }
 
 // Final do arquivo de entrada
 ```
