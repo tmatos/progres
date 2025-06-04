@@ -63,7 +63,7 @@ primeiro
  X(2), 0(5), 1(3)
 }
 
-segundo { 0(2),1(1),x(3),0(1) }
+segundo { 0(2),1(2),x(3),0(3) }
 
 // Final do arquivo de entrada
 ```
@@ -72,10 +72,10 @@ Neste arquivo, temos as representações dos sinas abaixo:
 
 ```
                     ___
-   primeiro: XX_____
+   primeiro: ╳╳_____▏  
 unid. tempo: 0123456789
-               _
-    segundo: __ XXX____
+               __
+    segundo: __▏ ╳╳╳___
 unid. tempo: 0123456789
 ```
 
