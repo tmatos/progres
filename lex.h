@@ -210,7 +210,7 @@ int isNumNaturalValido(const char* str);
  *  @param str A null terminated C string
  *  @return Lenght of str
  */
-unsigned long len(const char* str);
+size_t len(const char* str);
 
 /** @brief Wrapper to strcpy()
  *  @param dest Destination C string
