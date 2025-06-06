@@ -9,6 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+  #include <unistd.h>
+#else
+  #include <getopt.h>
+#endif
+
 #include "progres.h"
 #include "estruturas.h"
 #include "sinais.h"
