@@ -28,7 +28,9 @@ int global_silent_mode;
 int main(int argc, char* argv[])
 {
     int i;
-    int arg_offset;
+    char* s_verilog_source = NULL;
+    char* s_wave_in = NULL;
+    char* s_wave_out = NULL;
     FILE* f_verilog_source = NULL;
     FILE* f_wave_in = NULL;
     FILE* f_wave_out = NULL;
@@ -40,104 +42,142 @@ int main(int argc, char* argv[])
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 
     global_silent_mode = 0;
-    
-    arg_offset = 0;
 
-    if (argc < 2 || !strcmp(argv[1], "-h")) {
+    if (argc < 2) {
         printf("%s", _HELP_STRING_BRIEF);
         exit(0);
     }
 
-    if (!strcmp(argv[1], "-v")) {
-        printf("Progres Verilog Simulator - version %s\n"
-               "(C) 2014-2025 Tiago Matos (tmatos.net)\n",
-               _PROGRES_VERSION);
-        exit(0);
-    }
-    
-    if (!strcmp(argv[1], "-s")) {
-        global_silent_mode = 1;
-        arg_offset++;
+    int opt;
+
+    while ( (opt = getopt(argc, argv, "vhsc:i:o:")) != -1 )
+    {
+        switch (opt)
+        {
+        case 'v':
+            printf("Progres Verilog Simulator - version %s\n"
+                   "(C) 2014-2025 Tiago Matos (tmatos.net)\n",
+                   _PROGRES_VERSION);
+            exit(0);
+        case 'h':
+            printf("%s", _HELP_STRING_BRIEF);
+            exit(0);
+        case 's':
+            global_silent_mode = 1;
+            break;
+        case 'c':
+            s_verilog_source = (char*) malloc( sizeof(char) * (len(optarg) + 1) );
+            copy(s_verilog_source, optarg);
+            break;
+        case 'i':
+            s_wave_in = (char*) malloc( sizeof(char) * (len(optarg) + 1) );
+            copy(s_wave_in, optarg);
+            break;
+        case 'o':
+            if (len(optarg) > MAX_FILE_PATH_SIZE) {
+                printf("error: file name size exceeds maximum lenght of %d chars\n",
+                       MAX_FILE_PATH_SIZE);
+                exit(1);
+            }
+            s_wave_out = (char*) malloc( sizeof(char) * (len(optarg) + 1) );
+            copy(s_wave_out, optarg);
+            break;
+        default: // '?'
+            printf("%s", _HELP_STRING_BRIEF);
+            exit(1);
+        }
     }
 
-    if ( (argc - arg_offset) < 2 ) {
-        exit(0);
+    if (!s_verilog_source) {
+        if (!global_silent_mode) {
+            printf("error: a verilog file should be given with the -c option\n");
+        }
+
+        exit(1);
     }
 
-    f_verilog_source = fopen(argv[1+arg_offset], "r");
+    f_verilog_source = fopen(s_verilog_source, "r");
 
     if (!f_verilog_source) {
-        if (!global_silent_mode)
-            printf("Impossibilitado de abrir o arquivo: %s\n", argv[1+arg_offset]);
+        if (!global_silent_mode) {
+            printf("error: unnable to open the file: %s\n", s_verilog_source);
+        }
 
         exit(1);
     }
     
-    if (!global_silent_mode)
-        printf("Abrindo o arquivo de circuito: %s\n", argv[1+arg_offset]);
+    if (!global_silent_mode) {
+        printf("Opening verilg file: %s\n", s_verilog_source);
+    }
 
     circuto1 = carregaCircuito(f_verilog_source);
 
     fclose(f_verilog_source);
 
     if (circuto1) {
-        if (!global_silent_mode)
+        if (!global_silent_mode) {
             printf("Circuito carregado com sucesso.\n");
+        }
     }
     else {
-        if (!global_silent_mode)
-            printf("Erro com o carregamento do codigo fonte do cicuito.\n");
+        if (!global_silent_mode) {
+            printf("error: loading the circuit source file.\n");
+        }
 
         exit(1);
     }
 
     // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
-    if ( (argc - arg_offset) == 2) {
-        if (!global_silent_mode)
-            printf("Para haver simulacao, um arquivo de entrada deve ser fornecido.\n");
+    if (!s_wave_in) {
+        if (!global_silent_mode) {
+            printf("For simulations, an input file should be given with the -i option.\n");
+        }
 
         exit(0);
     }
 
-    // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
-    f_wave_in = fopen(argv[2+arg_offset], "r");
+    f_wave_in = fopen(s_wave_in, "r");
 
     if (!f_wave_in) {
-        if (!global_silent_mode)
-            printf("Impossibilitado de abrir o arquivo de entrada: %s\n", argv[2+arg_offset]);
+        if (!global_silent_mode) {
+            printf("error: unnable to open input file: %s\n", s_wave_in);
+        }
 
         exit(1);
     }
 
-    if (!global_silent_mode)
-        printf("Abrindo o arquivo de entrada: %s\n", argv[2+arg_offset]);
+    if (!global_silent_mode) {
+        printf("Opening input file: %s\n", s_wave_in);
+    }
 
     sinais_entradas = carregaEntradas(f_wave_in);
 
     fclose(f_wave_in);
 
     if (!sinais_entradas) {
-        if (!global_silent_mode)
-            printf("Nao ha entradas para a simulacao do circuito.\n");
+        if (!global_silent_mode) {
+            printf("error: Nao ha entradas para a simulacao do circuito.\n");
+        }
 
         exit(1);
     }
 
     // se foi fornecido o argumento com path para arquivo de saida
-    if ( (argc - arg_offset) > 3) {
-        copy(str_wave_out_filepath, argv[3+arg_offset]);
+    if (s_wave_out) {
+        copy(str_wave_out_filepath, s_wave_out);
     }
     else {
         // senao, deriva-se do arquivo de entrada
-        copy(str_wave_out_filepath, argv[2+arg_offset]);
+        copy(str_wave_out_filepath, s_wave_in);
         strcat(str_wave_out_filepath, ".out");
     }
 
     sinais_saidas = simula(circuto1, sinais_entradas);
 
     if (sinais_saidas) {
-        if (!global_silent_mode)
+        if (!global_silent_mode) {
             printf("Simulacao concluida com saidas geradas.\n");
+        }
     }
 
     // free mem (inputs)
@@ -154,9 +194,10 @@ int main(int argc, char* argv[])
     f_wave_out = fopen(str_wave_out_filepath, "w");
 
     if (!f_wave_out) {
-        if (!global_silent_mode)
+        if (!global_silent_mode) {
             printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n",
                    str_wave_out_filepath);
+        }
 
         exit(1);
     }
@@ -164,8 +205,18 @@ int main(int argc, char* argv[])
     salvarSinais(sinais_saidas, f_wave_out);
     fclose(f_wave_out);
     
-    if (!global_silent_mode)
+    if (!global_silent_mode) {
         printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
+    }
+
+    if (s_verilog_source)
+        free(s_verilog_source);
+
+    if (s_wave_in)
+        free(s_wave_in);
+
+    if (s_wave_out)
+        free(s_wave_out);
 
     // free mem (outputs)
     if (sinais_saidas) {
