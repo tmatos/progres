@@ -20,7 +20,7 @@
 
 int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
 {
-    int virgula = 0;
+    int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
 
     Token* t = *it;
 
@@ -56,15 +56,15 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
     }
 
     if (t->classe == SYM_OPEN_BRACKET) {
-        // devemos agora ler os argumentos do modulo
+        // devemos agora ler os argumentos do module
         avanca(&t);
 
-        virgula = 0; // nao esperando por virgula, por enquanto
+        expect_comma = 0; // nao esperando por virgula, por enquanto
 
         while (1)
         {
             if (!t) {
-                if (virgula) {
+                if (expect_comma) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ",", NULL);
                 }
@@ -81,36 +81,33 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
                 break;
             }
 
-            if (virgula) {
+            if (expect_comma) {
                 if (t->classe == SYM_COMMA) {
-                    virgula = 0;
+                    expect_comma = 0;
                     avanca(&t);
                     continue;
                     // TODO: bug de virgula a mais...
                 }
-                else {
-                    show_error_msg("Simbolo esperado nao foi encontrado",
-                                   t->linha, t->coluna, ",' ou ')", t->valor);
-                    goto load_module_header_bad_return;
-                }
+
+                show_error_msg("Simbolo esperado nao foi encontrado",
+                               t->linha, t->coluna, ",' ou ')", t->valor);
+                goto load_module_header_bad_return;
             }
 
-            if (isIdentificador(t)) {
-                if ( identExiste(identifiers, t->valor) ) {
-                    show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
-                    goto load_module_header_bad_return;
-                }
-                else {
-                    insereTokenString(identifiers, t->valor, -1, -1);
-                    insereTokenString(livres, t->valor, -1, -1);
-                    virgula = 1;
-                }
-            }
-            else {
+            if ( !isIdentificador(t) ) {
                 show_error_msg("Identificador nao foi encontrado",
                                t->linha, t->coluna, "um identificador", t->valor);
                 goto load_module_header_bad_return;
             }
+
+            if ( identExiste(identifiers, t->valor) ) {
+                show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+                goto load_module_header_bad_return;
+            }
+
+            insereTokenString(identifiers, t->valor, -1, -1);
+            insereTokenString(livres, t->valor, -1, -1);
+            expect_comma = 1;
 
             avanca(&t);
         }
@@ -143,7 +140,7 @@ Module* carregaCircuito(FILE* arquivo)
     Token* it = NULL;
     Module* circuito = NULL;
 
-    int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
+    int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
 
     // lista de todos os identificadores
     ListaToken* identificadores = novaListaToken();
@@ -221,12 +218,12 @@ Module* carregaCircuito(FILE* arquivo)
 
             avanca(&it);
 
-            virgula = 0; // nao esperando por uma virgula inicialmente
+            expect_comma = 0; // nao esperando por uma virgula inicialmente
 
             while (1)
             {
                 if (!it) {
-                    if (virgula) {
+                    if (expect_comma) {
                         show_error_msg("Final do arquivo nao esperado",
                                        -1, -1, ",", NULL);
                     }
@@ -241,9 +238,9 @@ Module* carregaCircuito(FILE* arquivo)
                 if (it->classe == SYM_SEMICOLON)
                     break;
 
-                if (virgula) {
+                if (expect_comma) {
                     if (it->classe == SYM_COMMA) {
-                        virgula = 0;
+                        expect_comma = 0;
                         avanca(&it);
                         continue; // ainda permite uma virgula a mais...
                     }
@@ -274,31 +271,29 @@ Module* carregaCircuito(FILE* arquivo)
                     // atribui como saida o identificador na estrutura
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
-                else if( iguais(tipo, "wire") ) {
+                else if ( iguais(tipo, "wire") ) {
 
-                    if( isIdentificador(it) ) {
-                        if( identExiste(identificadores, it->valor) ) {
-                            show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                            goto bad_return;
-                        }
-                        else {
-                            insereTokenString(identificadores, it->valor, -1, -1);
-                            insereTokenString(listaWire, it->valor, -1, -1);
-
-                            // atribui como wire o identificador na estrutura
-                            adicionaWire(circuito, novoComponente(it->valor, wire));
-                        }
-                    }
-                    else {
+                    if ( !isIdentificador(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
                                        it->linha, it->coluna, "um identificador", it->valor);
                         goto bad_return;
                     }
+
+                    if ( identExiste(identificadores, it->valor) ) {
+                        show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                        goto bad_return;
+                    }
+
+                    insereTokenString(identificadores, it->valor, -1, -1);
+                    insereTokenString(listaWire, it->valor, -1, -1);
+
+                    // atribui como wire o identificador na estrutura
+                    adicionaWire(circuito, novoComponente(it->valor, wire));
                 }
 
                 removeTokensPorValor(identificLivre, it->valor);
 
-                virgula = 1;
+                expect_comma = 1;
 
                 avanca(&it);
             }
@@ -442,7 +437,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            gate_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
+        gate_inputs: // Label para a parte onde ha leitura de entradas da porta logica
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
@@ -1088,5 +1083,4 @@ load_assign_bad_token:
 
 load_assign_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
-
 }
