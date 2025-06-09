@@ -143,25 +143,24 @@ Module* carregaCircuito(FILE* arquivo)
     int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
 
     // lista de todos os identificadores
-    ListaToken* identificadores = novaListaToken();
+    ListaToken* identifiers = novaListaToken();
 
     // lista de identificadores de entrada ou saida ainda nao definidos como tal
-    ListaToken* identificLivre = novaListaToken();
+    ListaToken* identifiers_to_be = novaListaToken();
 
     // lista de todos os identificadores das entradas
-    ListaToken* listaInput = novaListaToken();
+    ListaToken* list_input = novaListaToken();
 
     // lista de todos os identificadores das saidas
-    ListaToken* listaOutput = novaListaToken();
+    ListaToken* list_output = novaListaToken();
 
     // lista de todos os identificadores de wire
-    ListaToken* listaWire = novaListaToken();
+    ListaToken* list_wire = novaListaToken();
 
     // list for params
     ListaToken* list_param = novaListaToken();
 
     ListaToken* tokens = tokeniza(arquivo);
-
 
     if (!tokens)
         goto bad_return;
@@ -197,7 +196,7 @@ Module* carregaCircuito(FILE* arquivo)
         goto before_module;
     }
 
-    if ( !load_module_header(&it, identificadores, identificLivre) )
+    if ( !load_module_header(&it, identifiers, identifiers_to_be) )
         goto bad_return;
 
     if (!avanca(&it))
@@ -251,7 +250,7 @@ Module* carregaCircuito(FILE* arquivo)
                     }
                 }
 
-                if ( !iguais(tipo, "wire") && !identExiste(identificLivre, it->valor) ) {
+                if ( !iguais(tipo, "wire") && !identExiste(identifiers_to_be, it->valor) ) {
                     show_error_msg("Identificador invalido",
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
@@ -260,13 +259,13 @@ Module* carregaCircuito(FILE* arquivo)
                 }
 
                 if ( iguais(tipo, "input") ) {
-                    insereTokenString(listaInput, it->valor, -1, -1);
+                    insereTokenString(list_input, it->valor, -1, -1);
 
                     // atribui como entrada o identificador na estrutura
                     adicionaEntrada( circuito, novoComponente(it->valor, input) );
                 }
                 else if ( iguais(tipo, "output") ) {
-                    insereTokenString(listaOutput, it->valor, -1, -1);
+                    insereTokenString(list_output, it->valor, -1, -1);
 
                     // atribui como saida o identificador na estrutura
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
@@ -279,19 +278,19 @@ Module* carregaCircuito(FILE* arquivo)
                         goto bad_return;
                     }
 
-                    if ( identExiste(identificadores, it->valor) ) {
+                    if ( identExiste(identifiers, it->valor) ) {
                         show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                         goto bad_return;
                     }
 
-                    insereTokenString(identificadores, it->valor, -1, -1);
-                    insereTokenString(listaWire, it->valor, -1, -1);
+                    insereTokenString(identifiers, it->valor, -1, -1);
+                    insereTokenString(list_wire, it->valor, -1, -1);
 
                     // atribui como wire o identificador na estrutura
                     adicionaWire(circuito, novoComponente(it->valor, wire));
                 }
 
-                removeTokensPorValor(identificLivre, it->valor);
+                removeTokensPorValor(identifiers_to_be, it->valor);
 
                 expect_comma = 1;
 
@@ -299,7 +298,7 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if (it->classe == KW_REG) {
-            VerilogError err = load_reg(&it, identificadores, list_param, circuito);
+            VerilogError err = load_reg(&it, identifiers, list_param, circuito);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -352,12 +351,12 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if( isIdentificador(it) ) {  
-                if( identExiste(identificadores, it->valor) ) {
+                if( identExiste(identifiers, it->valor) ) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     goto bad_return;
                 }
 
-                insereTokenString(identificadores, it->valor, -1, -1);
+                insereTokenString(identifiers, it->valor, -1, -1);
                 copy(gate->nome, it->valor);
 
                 avanca(&it);
@@ -407,13 +406,13 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( identExiste(listaWire, it->valor) ) {
+            if( identExiste(list_wire, it->valor) ) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaSaida, out);
                 insereComponente(out->listaEntrada, gate);
             }
-            else if( identExiste(listaOutput, it->valor) ) {
+            else if( identExiste(list_output, it->valor) ) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaSaida, out);
@@ -445,19 +444,19 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( identExiste(listaWire, it->valor) ) {
+            if( identExiste(list_wire, it->valor) ) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(listaInput, it->valor) ) {
+            else if( identExiste(list_input, it->valor) ) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(listaOutput, it->valor) ) {
+            else if( identExiste(list_output, it->valor) ) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaEntrada, in);
@@ -527,11 +526,11 @@ Module* carregaCircuito(FILE* arquivo)
             }
             else {
                 // Liberar a memoria alocada no inicio da funcao
-                delete_lista_token(identificadores);
-                delete_lista_token(identificLivre);
-                delete_lista_token(listaInput);
-                delete_lista_token(listaOutput);
-                delete_lista_token(listaWire);
+                delete_lista_token(identifiers);
+                delete_lista_token(identifiers_to_be);
+                delete_lista_token(list_input);
+                delete_lista_token(list_output);
+                delete_lista_token(list_wire);
                 delete_lista_token(list_param);
                 delete_lista_token(tokens);
                 return circuito;
@@ -550,7 +549,7 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            VerilogError err = load_initial_block(&it, identificadores, list_param, circuito);
+            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -577,7 +576,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
     
-            if (identExiste(identificadores, it->valor)) {
+            if (identExiste(identifiers, it->valor)) {
                 show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                 goto bad_return;
             }
@@ -589,7 +588,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            insereTokenString(identificadores, it->valor, -1, -1);
+            insereTokenString(identifiers, it->valor, -1, -1);
             insereTokenString(list_param, it->valor, -1, -1);
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
@@ -637,7 +636,7 @@ Module* carregaCircuito(FILE* arquivo)
             addParam(circuito, param);
         }
         else if (it->classe == KW_ASSIGN) {
-            VerilogError err = load_assign(&it, listaWire, listaInput, listaOutput, circuito);
+            VerilogError err = load_assign(&it, list_wire, list_input, list_output, circuito);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -667,11 +666,11 @@ bad_return_unexpected_eof:
 
 bad_return:
     // free mem allocated in the head of this func
-    delete_lista_token(identificadores);
-    delete_lista_token(identificLivre);
-    delete_lista_token(listaInput);
-    delete_lista_token(listaOutput);
-    delete_lista_token(listaWire);
+    delete_lista_token(identifiers);
+    delete_lista_token(identifiers_to_be);
+    delete_lista_token(list_input);
+    delete_lista_token(list_output);
+    delete_lista_token(list_wire);
     delete_lista_token(list_param);
     delete_lista_token(tokens);
 
