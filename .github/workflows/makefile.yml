@@ -1,4 +1,7 @@
-name: Makefile CI
+name: "Makefile CI"
+permissions:
+  contents: read
+  pull-requests: write
 
 on:
   push:
