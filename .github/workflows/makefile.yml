@@ -17,14 +17,21 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
     - name: Build target
       run: make
+    - name: Archive executables
+      uses: actions/upload-artifact@v4
+      with:
+        name: executable
+        path: progres*
 
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
     - name: Install cppunit and lcov
       run: |
         sudo apt-get update
@@ -34,6 +41,11 @@ jobs:
       run: |
         cd test
         make coverage
+    - name: Archive test coverage artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: test/coverage.txt
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
@@ -46,4 +58,3 @@ jobs:
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: test/coverage.txt
-    
