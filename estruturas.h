@@ -68,7 +68,8 @@ struct st_componente {
     ListaComponente* listaSaida;
     Sinal* sinalSaida;
 
-    ValorLogico valorDinamico; // fio
+    ValorLogico valorDinamico; // in case of a net type
+    unsigned int size; // size in bits
 };
 
 /** @brief Estrutura que representa uma lista de componentes.

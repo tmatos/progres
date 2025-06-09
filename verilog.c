@@ -137,8 +137,14 @@ Module* carregaCircuito(FILE* arquivo)
     Componente in;
     Componente out;
     Componente gate;
+    Componente net;
     Token* it = NULL;
     Module* circuito = NULL;
+
+    int range_msb;
+    int range_lsb;
+
+    VerilogError err;
 
     int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
 
@@ -271,6 +277,22 @@ Module* carregaCircuito(FILE* arquivo)
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
                 else if ( iguais(tipo, "wire") ) {
+                    range_msb = 0;
+                    range_lsb = 0;
+
+                    err = load_range(&it, circuito, list_param, &range_msb, &range_lsb);
+                    switch (err)
+                    {
+                    case ERROR_VERILOG_BAD_EOF:
+                        goto bad_return_unexpected_eof;
+                        break;
+                    case ERROR_VERILOG_BAD_TOKEN:
+                        goto bad_return;
+                        break;
+                    default:
+                        // no error
+                        break;
+                    }
 
                     if ( !isIdentificador(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
@@ -287,7 +309,9 @@ Module* carregaCircuito(FILE* arquivo)
                     insereTokenString(list_wire, it->valor, -1, -1);
 
                     // atribui como wire o identificador na estrutura
-                    adicionaWire(circuito, novoComponente(it->valor, wire));
+                    net = novoComponente(it->valor, wire);
+                    net->size = (range_msb - range_lsb + 1);
+                    adicionaWire(circuito, net);
                 }
 
                 removeTokensPorValor(identifiers_to_be, it->valor);
