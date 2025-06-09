@@ -25,7 +25,11 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: binary-${{ matrix.os }}
-        path: ./progres*
+        path: |
+          progres*
+          !*.cbp
+          !*.c
+          !*.h
 
   tests:
     runs-on: ubuntu-latest
