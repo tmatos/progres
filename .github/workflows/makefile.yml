@@ -24,7 +24,7 @@ jobs:
     - name: Archive executables
       uses: actions/upload-artifact@v4
       with:
-        name: executable
+        name: binary-${{ matrix.os }}
         path: progres*
 
   tests:
