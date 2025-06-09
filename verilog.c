@@ -696,6 +696,7 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     int is_signed;
     int range_msb;
     int range_lsb;
+    VerilogError err;
 
     Token* t = *it;
 
@@ -716,65 +717,19 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     range_msb = 0;
     range_lsb = 0;
 
-    // optional range specification
-    // range ::= [ msb_constant_expression : lsb_constant_expression ]
-    // TODO: calculate the expressions  
-    if (t->classe == SYM_OPEN_SQUAREBRACKET) {
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
+    err = load_range(&t, module, list_param, &range_msb, &range_lsb);
 
-        if (isNumNaturalValido(t->valor)) {
-            range_msb = strtol(t->valor, NULL, 10);
-        }
-        else if (identExiste(list_param, t->valor)) {
-            range_msb = get_param_by_name(module->listaParam, t->valor)->value;
-        }
-        else {
-            show_error_msg("Numero para bit mais significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
-            goto load_reg_bad_token;
-        }
-        
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (t->classe != SYM_COLON) {
-            show_error_msg("Simbolo inesperado",
-                           t->linha, t->coluna, ":", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (isNumNaturalValido(t->valor)) {
-            range_lsb = strtol(t->valor, NULL, 10);
-        }
-        else if (identExiste(list_param, t->valor)) {
-            range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
-        }
-        else {
-            show_error_msg("Numero para bit menos significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
-            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if ( range_msb < range_lsb ) {
-            show_error_msg("Range invalido",
-                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
+    switch (err)
+    {
+    case ERROR_VERILOG_BAD_EOF:
+        goto load_reg_bad_eof;
+        break;
+    case ERROR_VERILOG_BAD_TOKEN:
+        goto load_reg_bad_token;
+        break;
+    default:
+        // no error
+        break;
     }
 
     if (!isIdentificador(t)) {
@@ -811,6 +766,82 @@ load_reg_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_reg_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb)
+{
+    Token* t = *it;
+    
+    // optional range specification
+    // range ::= [ msb_constant_expression : lsb_constant_expression ]
+    // TODO: calculate the expressions
+    if (t->classe == SYM_OPEN_SQUAREBRACKET) {
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            *range_msb = strtol(t->valor, NULL, 10);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            *range_msb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit mais significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_range_bad_token;
+        }
+        
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (t->classe != SYM_COLON) {
+            show_error_msg("Simbolo inesperado",
+                           t->linha, t->coluna, ":", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            *range_lsb = strtol(t->valor, NULL, 10);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            *range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit menos significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
+            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if ( *range_msb < *range_lsb ) {
+            show_error_msg("Range invalido",
+                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+    }
+
+//load_range_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_range_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_range_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 

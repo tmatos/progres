@@ -38,6 +38,16 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
  */
 Module* carregaCircuito(FILE* arquivo);
 
+/** @brief Parsing de definições de range.
+ *  @param it Endereço para o iterador dos tokens.
+ *  @param module Pointer to verilog module struct.
+ *  @param list_param Params definidos.
+ *  @param range_msb Ponteiro para a variável que guarda o indice do bit mais significativo.
+ *  @param range_lsb Ponteiro para a variável que guarda o indice do bit menos significativo.
+ *  @return Código de erro do tipo VerilogError.
+ */
+VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb);
+
 /** @brief Parsing of 'reg' declaration
  */
 VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
