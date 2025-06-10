@@ -13,10 +13,11 @@
 #include "sinais.h"
 #include "mem.h"
 
-Evento* new_evento_at(Tempo t)
+Evento* new_event_at(Tempo t, EventKind k)
 {
     Evento* e = (Evento*) xmalloc(sizeof(Evento));
     e->quando = t;
+    e->kind = k;
     e->listaTransicao = NULL;
     e->ultimaTransicao = NULL;
     e->proximo = NULL;
@@ -24,83 +25,75 @@ Evento* new_evento_at(Tempo t)
     return e;
 }
 
-void insereEvento(Evento** fila, Tempo t, Componente comp, ValorLogico novoValor)
+void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior
     Evento* it = NULL; // iterador para eventos
 
-    if(!comp)
+    if (!comp)
         return;
 
-    if( !(*fila) )
+    evt = new_event_at(t, k);
+
+    evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
+    evt->listaTransicao->fio = comp;
+    evt->listaTransicao->reg = r;
+    evt->listaTransicao->novoValor = novoValor;
+    evt->listaTransicao->proximo = NULL;
+
+    // empty queue
+    if ( !(*fila) ) {
+        evt->ultimaTransicao = evt->listaTransicao;
+        *fila = evt;
+
+        return;
+    }
+
+    ant = NULL; // evento anterior
+    it = *fila; // iterador de evento
+    while ( it && (it->quando < t) )
     {
-        evt = new_evento_at(t);
-        evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
-        evt->listaTransicao->fio = comp;
-        evt->listaTransicao->novoValor = novoValor;
-        evt->listaTransicao->proximo = NULL;
+        ant = it;
+        it = it->proximo;
+    }
+
+     // insert the event at the last position in queue
+    if (!it) {
         evt->ultimaTransicao = evt->listaTransicao;
 
-        *fila = evt;
+        evt->proximo = it;
+        ant->proximo = evt;
+
+        return;
     }
-    else
+
+    // um evento no instante existe, adicionar a lista de transicoes
+    if (t == it->quando)
     {
-        ant = NULL; // evento anterior
-        it = *fila; // iterador de evento
-        while( it && (it->quando < t) ) {
-            ant = it;
-            it = it->proximo;
-        }
+        it->ultimaTransicao->proximo = evt->listaTransicao;
+        it->ultimaTransicao = evt->listaTransicao;
 
-        if(!it) // inserir evento na ultima posicao da fila
-        {
-            evt = new_evento_at(t);
-            evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
-            evt->listaTransicao->fio = comp;
-            evt->listaTransicao->novoValor = novoValor;
-            evt->listaTransicao->proximo = NULL;
+        free(evt);
+
+        return;
+    }
+
+    if (t < it->quando)
+    {
+        // insert event at the beginning of the queue
+        if (ant == NULL) {
             evt->ultimaTransicao = evt->listaTransicao;
-
             evt->proximo = it;
-            ant->proximo = evt;
-        }
-        else if(t == it->quando) // um evento no instante existe, adicionar a lista de transicoes
-        {
-            it->ultimaTransicao->proximo = (Transicao*) xmalloc(sizeof(Transicao));
-            it->ultimaTransicao = it->ultimaTransicao->proximo;
-            it->ultimaTransicao->proximo = NULL;
-            it->ultimaTransicao->fio = comp;
-            it->ultimaTransicao->novoValor = novoValor;
-        }
-        else if(t < it->quando)
-        {
-            if(ant == NULL) // inserir evento no inicio da fila
-            {
-                evt = new_evento_at(t);
-                evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
-                evt->listaTransicao->fio = comp;
-                evt->listaTransicao->novoValor = novoValor;
-                evt->listaTransicao->proximo = NULL;
-                evt->ultimaTransicao = evt->listaTransicao;
+            *fila = evt; // ele vira o primeiro da fila
 
-                evt->proximo = it;
-
-                *fila = evt; // ele vira o primeiro da fila
-            }
-            else // inserir entre dois eventos, o anterior e o seguinte
-            {
-                evt = new_evento_at(t);
-                evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
-                evt->listaTransicao->fio = comp;
-                evt->listaTransicao->novoValor = novoValor;
-                evt->listaTransicao->proximo = NULL;
-                evt->ultimaTransicao = evt->listaTransicao;
-
-                evt->proximo = it;
-                ant->proximo = evt;
-            }
+            return;
         }
+        
+        // insert between two events, the previous and next
+        evt->ultimaTransicao = evt->listaTransicao;
+        evt->proximo = it;
+        ant->proximo = evt;
     }
 }
 
@@ -108,7 +101,8 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t)
 {
     Evento* it = fila; // iterador de evento
     
-    while( it && (it->quando < t)  ) {
+    while( it && (it->quando < t)  )
+    {
         it = it->proximo;
     }
 
@@ -118,7 +112,7 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t)
         return NULL;
 }
 
-Transicao* popEvento(Evento** fila)
+Transicao* pop_event(Evento** fila)
 {
     Transicao* ret = NULL;
     Evento* dead = NULL;

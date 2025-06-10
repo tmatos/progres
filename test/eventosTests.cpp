@@ -10,13 +10,13 @@
 class Testes_eventos : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_eventos );
-  CPPUNIT_TEST( test_insereEvento );
+  CPPUNIT_TEST( test_insert_event );
   CPPUNIT_TEST( test_getTransicoesEm );
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void test_insereEvento()
+  void test_insert_event()
   {
     Evento* fila = NULL;
 
@@ -24,7 +24,7 @@ public:
     Componente c0 = novoComponente( (char*)"entrada_componente_0", input );
     ValorLogico v = VAL_1;
 
-    insereEvento( &fila, t, c0, v );
+    insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
   
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT_EQUAL(fila->quando, t);
@@ -38,7 +38,7 @@ public:
     v = VAL_0;
     Componente c1 = novoComponente( (char*)"entrada_componente_1", input );
 
-    insereEvento( &fila, t, c1, v );
+    insert_event( &fila, t, EVT_NET_TRANSITION, c1, NULL, v );
 
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT_EQUAL( (Tempo)5000, fila->quando );
@@ -69,7 +69,7 @@ public:
     Componente c0 = novoComponente( (char*)"wire_component_0", wire );
     ValorLogico v = VAL_1;
 
-    insereEvento( &fila, t, c0, v );
+    insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->listaTransicao);
     CPPUNIT_ASSERT( !fila->proximo );
@@ -82,12 +82,12 @@ public:
     CPPUNIT_ASSERT( ! getTransicoesEm(fila, (Tempo)15000 ) );
 
     Componente c1 = novoComponente( (char*)"wire_component_1", wire );
-    insereEvento( &fila, (Tempo)7000, c1, VAL_0 );
+    insert_event( &fila, (Tempo)7000, EVT_NET_TRANSITION, c1, NULL, VAL_0 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
 
     Componente c2 = novoComponente( (char*)"wire_component_2", wire );
-    insereEvento( &fila, (Tempo)5550, c2, VAL_1 );
+    insert_event( &fila, (Tempo)5550, EVT_NET_TRANSITION, c2, NULL, VAL_1 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
     CPPUNIT_ASSERT(fila->proximo->proximo);

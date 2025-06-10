@@ -19,12 +19,23 @@ typedef struct st_transicao Transicao;
           Esta lista é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
  */
 struct st_transicao {
-    Componente fio; // Indica o componente sobre o qual o evento se origina, apenas fios
+    Componente fio; // Indica o componente sobre o qual o evento se origina, apenas wires
+    Register* reg; // in case of a transition in register value
     ValorLogico novoValor; // Novo valor lógico a ser setado
     Transicao* proximo;
 };
 
 typedef Transicao* ListTransicao;
+
+/**
+ * @brief Enum para identificação dos tipos de evento que podem ocorrer na simulação.
+ */
+typedef enum en_event_kind
+{
+    EVT_NET_TRANSITION,
+    EVT_REG_ATTRIBUTION,
+    EVT_SYS_TASK,
+} EventKind;
 
 typedef struct st_evento Evento;
 
@@ -35,8 +46,12 @@ typedef struct st_evento Evento;
  */
 struct st_evento {
     Tempo quando; // Indica o instante de ocorrência do evento
+
+    EventKind kind;
+
     Transicao* listaTransicao;
     Transicao* ultimaTransicao;
+
     Evento* proximo;
 };
 
@@ -52,14 +67,15 @@ void delete_list_transicao(Transicao** list);
           Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
           desse evento, a nova transição.
  */
-void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor);
+void insert_event(Evento **fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor);
 
 /**
  * @brief Cria um novo evento, sem transições definidas, no tempo t.
  * @param t Tempo em que ocorre o evento.
+ * @param k Tipo do evento, conforme EventKind.
  * @return Ponteiro para Evento alocado.
  */
-Evento* new_evento_at(Tempo t);
+Evento* new_event_at(Tempo t, EventKind k);
 
 /**
  * @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
@@ -72,6 +88,6 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t);
  * @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
  * @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
  */
-Transicao* popEvento(Evento **fila);
+Transicao* pop_event(Evento **fila);
 
 #endif // EVENTOS_H

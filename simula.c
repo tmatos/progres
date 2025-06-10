@@ -22,13 +22,13 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
     Tempo t;
 
-    Transicao* listaTr = NULL;
-    Transicao* itTr = NULL;
+    Transicao* list_tr = NULL;
+    Transicao* tr = NULL; // iterator
 
     Evento* fila = NULL;
     Pulso* p = NULL;
 
-    ListaComponente* portasAlteradas = NULL;
+    ListaComponente* list_changed_gates = NULL;
     Componente gate = NULL;
 
     ValorLogico result;
@@ -88,18 +88,22 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
         while (p->valor != VAL_BLANK)
         {
-            insereEvento(&fila,
+            insert_event(&fila,
                          t,
+                         EVT_NET_TRANSITION,
                          circuto->listaFiosEntrada->itens[i],
+                         NULL,
                          p->valor);
 
             t = t + p->tempo * circuto->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
-        insereEvento(&fila,
+        insert_event(&fila,
                      t,
+                     EVT_NET_TRANSITION,
                      circuto->listaFiosEntrada->itens[i],
+                     NULL,
                      VAL_X); // este sinal fica ate infitito
     }
 
@@ -111,50 +115,50 @@ Sinais* simula(Module* circuto, Sinais* entradas)
 
     while (fila)
     {
-        portasAlteradas = novaListaComponente();
+        list_changed_gates = novaListaComponente();
 
         t = fila->quando;
 
-        listaTr = popEvento(&fila);
-        itTr = listaTr;
+        list_tr = pop_event(&fila);
+        tr = list_tr;
 
         // atualiza valores de fios e faz uma lista das
-        // portas alteradas pelas transicoes em listaTr
-        while (itTr)
+        // portas alteradas pelas transicoes em list_tr
+        while (tr)
         {
             // apenas se houver mudanca de valor no fio
-            if ( itTr->fio->valorDinamico != itTr->novoValor )
+            if ( tr->fio->valorDinamico != tr->novoValor )
             {
-                for ( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+                for ( i=0 ; i < tr->fio->listaSaida->tamanho ; i++ )
                 {
-                    if ( !contemComponente(portasAlteradas,
-                                           itTr->fio->listaSaida->itens[i]) ) {
-                        insereComponente(portasAlteradas,
-                                         itTr->fio->listaSaida->itens[i]);
+                    if ( !contemComponente(list_changed_gates,
+                                           tr->fio->listaSaida->itens[i]) ) {
+                        insereComponente(list_changed_gates,
+                                         tr->fio->listaSaida->itens[i]);
                     }
                 }
 
-                if (itTr->fio->tipo.operador == output) {
-                    if ( !(itTr->fio->sinalSaida) ) {
-                        itTr->fio->sinalSaida = novoSinal( itTr->fio->nome );
+                if (tr->fio->tipo.operador == output) {
+                    if ( !(tr->fio->sinalSaida) ) {
+                        tr->fio->sinalSaida = novoSinal( tr->fio->nome );
                     }
-                    addPulso(itTr->fio->sinalSaida,
-                             itTr->fio->valorDinamico,
-                             t - itTr->fio->sinalSaida->duracaoTotal);
+                    addPulso(tr->fio->sinalSaida,
+                             tr->fio->valorDinamico,
+                             t - tr->fio->sinalSaida->duracaoTotal);
                 }
 
-                itTr->fio->valorDinamico = itTr->novoValor;
+                tr->fio->valorDinamico = tr->novoValor;
             }
 
-            itTr = itTr->proximo;
+            tr = tr->proximo;
         }
 
-        // popEvento() nao liberou mem da lista de transicoes, fazemos isso aqui
-        delete_list_transicao(&listaTr);
+        // pop_event() nao liberou mem da lista de transicoes, fazemos isso aqui
+        delete_list_transicao(&list_tr);
 
-        for ( i=0 ; i < portasAlteradas->tamanho ; i++ )
+        for ( i=0 ; i < list_changed_gates->tamanho ; i++ )
         {
-            gate = portasAlteradas->itens[i];
+            gate = list_changed_gates->itens[i];
 
             // be prepared, in case of 3 stage logic gates
             if (gate->listaEntrada->tamanho == 2) {
@@ -216,10 +220,10 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         }
 
         // free mem
-        if(portasAlteradas->tamanho != 0)
-            free(portasAlteradas->itens);
-        free(portasAlteradas);
-        portasAlteradas = NULL;
+        if(list_changed_gates->tamanho != 0)
+            free(list_changed_gates->itens);
+        free(list_changed_gates);
+        list_changed_gates = NULL;
     }
 
     // copia as saidas da simulacao do ciruito para o retorno da funcao
@@ -474,9 +478,11 @@ void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente
     // cria eventos relativos as saidas da porta
     for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
-        insereEvento(fila,
+        insert_event(fila,
                      t + gate->tipo.atraso * timescale /* * (circuto->timescale_unit/UN_FS) */,
+                     EVT_NET_TRANSITION,
                      gate->listaSaida->itens[j],
+                     NULL,
                      result);
     }
 }
