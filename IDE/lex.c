@@ -130,7 +130,7 @@ int anexa(char* str, char c)
 {
     char tmp[2] = {c, '\0'};
 
-    strcat(str, tmp);
+    strncat(str, tmp, MAX_TOKEN_SIZE);
 
     // TODO: Checagens...
 
@@ -495,12 +495,10 @@ int isNumNaturalValido(char* str)
 
 unsigned long len(const char *str)
 {
-    // TODO: restrict to a maximum lenght
-    return strlen(str);
+    return strnlen(str, MAX_FILE_SIZE_BYTES);
 }
 
 char* copy(char* dest, const char* src)
 {
-    // TODO: restrict to a maximum length
-    return strcpy(dest, src);
+    return strncpy(dest, src, MAX_TOKEN_SIZE);
 }

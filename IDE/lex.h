@@ -9,6 +9,9 @@
 
 #include<stdio.h>
 
+// maximum size of a file in bytes (1024×1024×256 = 268435456 bytes)
+#define MAX_FILE_SIZE_BYTES 268435456
+
 #define MAX_TOKEN_SIZE 80 // Qtde máxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 4 // Qtde máxima de digitos num número inteiro a ser reconhecido
 

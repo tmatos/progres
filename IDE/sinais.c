@@ -36,7 +36,7 @@ int setSinalNome(Sinal* s, char* nome)
     if ( !s || !nome )
         return 0;
 
-    copy(s->nome, nome);
+    strncpy(s->nome, nome, MAX_NOME_SINAL);
 
     return 1;
 }
