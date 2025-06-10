@@ -22,6 +22,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_named_gates_test_v );
   CPPUNIT_TEST( test_carregaCircuito_initial_single_test_v );
   CPPUNIT_TEST( test_carregaCircuito_assigns_v );
+  CPPUNIT_TEST( test_carregaCircuito_tri_state_gates_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
   CPPUNIT_TEST( test_carregaCircuito_badtimescale_XX_v );
   CPPUNIT_TEST_SUITE_END();
@@ -173,6 +174,18 @@ public:
 
     // TODO: more inspections
 
+    free(circuit);
+    fclose(file);
+  }
+
+  void test_carregaCircuito_tri_state_gates_v()
+  {
+    Module* circuit = NULL;
+    FILE* file = fopen("./verilog_sample_src/tri_state_gates.v", "r");
+    CPPUNIT_ASSERT(file);
+    circuit = carregaCircuito(file);
+    CPPUNIT_ASSERT(circuit);
+    
     free(circuit);
     fclose(file);
   }

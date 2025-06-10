@@ -171,6 +171,12 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
                 case VAL_Z:
                     fprintf(arqSaida, "z(%llu)", it->tempo);
                     break;
+                case VAL_H:
+                    fprintf(arqSaida, "1(%llu)", it->tempo);
+                    break;
+                case VAL_L:
+                    fprintf(arqSaida, "0(%llu)", it->tempo);
+                    break;
                 case VAL_BLANK:
                     break;
             }

@@ -25,6 +25,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_xorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_delays_v );
+  CPPUNIT_TEST( test_simula_samplefile_tri_state_gates_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -474,6 +475,50 @@ public:
         pss = pss + 1;
       }
     }
+  }
+
+  void test_simula_samplefile_tri_state_gates_v()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* outputs = NULL;
+    Sinal s;
+    FILE* f_v = fopen("./verilog_sample_src/tri_state_gates.v", "r");
+    FILE* f_in = fopen("./inout_sample_files/tri_state_gates.in", "r");
+
+    CPPUNIT_ASSERT( f_v );
+    CPPUNIT_ASSERT( f_in );
+
+    circuit = carregaCircuito(f_v);
+    CPPUNIT_ASSERT( circuit );
+
+    inputs = carregaEntradas(f_in);
+    CPPUNIT_ASSERT( inputs );
+
+    outputs = simula(circuit, inputs);
+    CPPUNIT_ASSERT( outputs );
+    CPPUNIT_ASSERT_EQUAL( 4, outputs->quantidade );
+    CPPUNIT_ASSERT( outputs->lista );
+
+    CPPUNIT_ASSERT( ! strcmp("o0", outputs->lista[0].nome ) );
+
+    s = outputs->lista[0];
+    CPPUNIT_ASSERT( s.pulsos );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)12, s.duracaoTotal );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)4, s.pulsos[0].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[1].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_Z, s.pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[2].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
+    
+    // TODO: check all cases in the Table 7-5 of Std 1364-2005
   }
 
 };

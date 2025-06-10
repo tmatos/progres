@@ -175,19 +175,23 @@ TokenClass get_token_class(const char* s_tok)
     int i;
     TokenClass tc;
 
-    // IMPORTANT: keep track of the count here
-    #define _QTD_CLASSES 43
+    // IMPORTANT: keep track of the count here!
+    #define _QTD_CLASSES 47
     #define _MAX_STRLEN_IN_ARRAY 13
 
     char from_str[_QTD_CLASSES][_MAX_STRLEN_IN_ARRAY] = {
-        "and", // 1
-        "or",
-        "not",
+        "and",  // 1
+        "or",   // 2
+        "not",  // 3
         "buf",
         "nand",
         "nor",
         "xor",
         "xnor",
+        "bufif0",
+        "bufif1",
+        "notif0",
+        "notif1",
         "input",
         "output",
         "wire",
@@ -204,36 +208,40 @@ TokenClass get_token_class(const char* s_tok)
         "assign",
         "=",
         ",",
-        ":",   // = 25
-        ";",
+        ":",
+        ";",     // = 30
         "(",
         ")",
         "[",
-        "]",   // = 30
-        "{",
+        "]",
+        "{",     // = 35
         "}",
         "#",
         "+",
-        "-",   // = 35
-        "*",
+        "-",
+        "*",     // = 40
         "/",
         "\%",
         "~",
-        "&",   // = 40
-        "|",
+        "&",
+        "|",     // = 45
         "^",
-        "\x60" // = _QTD_CLASSES
+        "\x60"   // = _QTD_CLASSES
     };
 
     TokenClass to_class[_QTD_CLASSES] = {
-        KW_AND, // 1
-        KW_OR,
-        KW_NOT,
-        KW_BUF,
-        KW_NAND,
+        KW_AND,  // 1
+        KW_OR,   // 2
+        KW_NOT,  // 3
+        KW_BUF,  // 4
+        KW_NAND, // 5
         KW_NOR,
         KW_XOR,
         KW_XNOR,
+        KW_BUFIF0,
+        KW_BUFIF1,
+        KW_NOTIF0,
+        KW_NOTIF1,
         KW_INPUT,
         KW_OUTPUT,
         KW_WIRE,
@@ -260,13 +268,13 @@ TokenClass get_token_class(const char* s_tok)
         SYM_CLOSE_BRACE,
         SYM_HASHTAG,
         SYM_PLUS,
-        SYM_MINUS,        // = 35
-        SYM_ASTERISK,
+        SYM_MINUS,
+        SYM_ASTERISK,     // = 40
         SYM_SLASH,
         SYM_PERCENT,
         SYM_TILDE,
-        SYM_AMPERSAND,    // = 40
-        SYM_PIPE,
+        SYM_AMPERSAND,
+        SYM_PIPE,         // = 45
         SYM_CIRCUMFLEX,
         SYM_GRAVE_ACCENT  // = _QTD_CLASSES
     };

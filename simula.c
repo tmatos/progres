@@ -36,6 +36,8 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     ValorLogico valor_xor_in_b;
     ValorLogico valor_xnor_in_a;
     ValorLogico valor_xnor_in_b;
+    ValorLogico valor_control;
+    ValorLogico valor_data;
 
     Sinais* saidas = novaSinais();
 
@@ -154,6 +156,12 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         {
             gate = portasAlteradas->itens[i];
 
+            // be prepared, in case of 3 stage logic gates
+            if (gate->listaEntrada->tamanho == 2) {
+                valor_data = gate->listaEntrada->itens[0]->valorDinamico;
+                valor_control =gate->listaEntrada->itens[1]->valorDinamico;
+            }
+
             switch (gate->tipo.operador)
             {
             case op_not:
@@ -183,6 +191,18 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
                 result = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
+                break;
+            case OP_BUF_IF0:
+                result = compute_buf_if0_gate(valor_data, valor_control);
+                break;
+            case OP_BUF_IF1:
+                result = compute_buf_if1_gate(valor_data, valor_control);
+                break;
+            case OP_NOT_IF0:
+                result = compute_not_if0_gate(valor_data, valor_control);
+                break;
+            case OP_NOT_IF1:
+                result = compute_not_if1_gate(valor_data, valor_control);
                 break;
             case assign:
                 // TODO: implement expression evaluation and specific data structures
@@ -341,6 +361,110 @@ ValorLogico computeNandGate(ListaComponente* inputs)
     }
 
     return out;
+}
+
+ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_1)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_0 && data == VAL_0 )
+        return VAL_L;
+
+    if ( control != VAL_0 && data == VAL_1 )
+        return VAL_H;
+    
+    return data;
+}
+
+ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_0)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_1 && data == VAL_0 )
+        return VAL_L;
+
+    if ( control != VAL_1 && data == VAL_1 )
+        return VAL_H;
+    
+    return data;
+}
+
+ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_1)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_0 && data == VAL_0 )
+        return VAL_H;
+
+    if ( control != VAL_0 && data == VAL_1 )
+        return VAL_L;
+
+    switch (data)
+    {
+    case VAL_0:
+        return VAL_1;
+        break;
+    case VAL_1:
+        return VAL_0;
+        break;
+    case VAL_L:
+        return VAL_1;
+        break;
+    case VAL_H:
+        return VAL_0;
+        break;
+    default:
+        break;
+    }
+
+    return VAL_X;
+}
+
+ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_0)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_1 && data == VAL_0 )
+        return VAL_H;
+
+    if ( control != VAL_1 && data == VAL_1 )
+        return VAL_L;
+
+    switch (data)
+    {
+    case VAL_0:
+        return VAL_1;
+        break;
+    case VAL_1:
+        return VAL_0;
+        break;
+    case VAL_L:
+        return VAL_1;
+        break;
+    case VAL_H:
+        return VAL_0;
+        break;
+    default:
+        break;
+    }
+
+    return VAL_X;
 }
 
 void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result)

@@ -143,6 +143,8 @@ Module* carregaCircuito(FILE* arquivo)
 
     int range_msb;
     int range_lsb;
+    int input_count;
+    int output_count;
 
     VerilogError err;
 
@@ -336,7 +338,7 @@ Module* carregaCircuito(FILE* arquivo)
                 break;
             }
         }
-        else if( isPortaLogica(it->valor) ) {
+        else if (is_logic_gate(it)) {
             gate = NULL;
             
             switch (it->classe)
@@ -364,18 +366,31 @@ Module* carregaCircuito(FILE* arquivo)
                 break;
             case KW_BUF:
                 gate = novoComponente("Buffer", op_buf);
+                break;
+            case KW_BUFIF0:
+                gate = novoComponente("BufIf0", OP_BUF_IF0);
+                break;
+            case KW_BUFIF1:
+                gate = novoComponente("BufIf0", OP_BUF_IF1);
+                break;
+            case KW_NOTIF0:
+                gate = novoComponente("NotIf0", OP_NOT_IF0);
+                break;
+            case KW_NOTIF1:
+                gate = novoComponente("NotIf0", OP_NOT_IF1);
+                break;
             default:
                 break;
             }
 
-            if(!avanca(&it)) {
+            if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1,
                                "(', identificador ou '#", NULL);
                 goto bad_return;
             }
 
-            if( isIdentificador(it) ) {  
-                if( identExiste(identifiers, it->valor) ) {
+            if (isIdentificador(it)) {  
+                if (identExiste(identifiers, it->valor)) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     goto bad_return;
                 }
@@ -393,7 +408,7 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if (it->classe == SYM_HASHTAG) {
-                if(!avanca(&it)) {
+                if (!avanca(&it)) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, "um numero inteiro nao negativo", NULL);
                     goto bad_return;
@@ -424,19 +439,23 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if(!avanca(&it)) {
+            if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "identificador para wire ou output", NULL);
                 goto bad_return;
             }
 
-            if( identExiste(list_wire, it->valor) ) {
+            output_count = 0;
+
+        //gate_outputs: // Label para a parte onde ha leitura de saidas da porta logica
+
+            if (identExiste(list_wire, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaSaida, out);
                 insereComponente(out->listaEntrada, gate);
             }
-            else if( identExiste(list_output, it->valor) ) {
+            else if (identExiste(list_output, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaSaida, out);
@@ -449,16 +468,22 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
+            output_count++;
+
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ",", NULL);
                 goto bad_return;
             }
 
-            if( it->classe != SYM_COMMA ) {
+            if (it->classe != SYM_COMMA) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ",", it->valor);
                 goto bad_return;
             }
+
+            // TODO: read possible multiple outputs for 'buf' as well 'not' gates
+
+            input_count = 0;
 
         gate_inputs: // Label para a parte onde ha leitura de entradas da porta logica
 
@@ -468,19 +493,19 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( identExiste(list_wire, it->valor) ) {
+            if (identExiste(list_wire, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(list_input, it->valor) ) {
+            else if (identExiste(list_input, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(list_output, it->valor) ) {
+            else if (identExiste(list_output, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaEntrada, in);
@@ -494,8 +519,10 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
+            input_count++;
+
             if (!avanca(&it)) {
-                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
+                if ( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -507,22 +534,23 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( it->classe != SYM_CLOSE_BRACKET ) {
-                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
+            if (it->classe != SYM_CLOSE_BRACKET) {
+                if ( (gate->tipo.operador == op_not) ||
+                     (gate->tipo.operador == op_buf) || 
+                     (is_tristate_logic(gate) && input_count == 2) ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
                     goto bad_return;
                 }
-                else {
-                    if( it->classe == SYM_COMMA ) {
-                        goto gate_inputs;
-                    }
-                    else {
-                        show_error_msg("Simbolo esperado nao foi encontrado",
-                                       it->linha, it->coluna, ")' ou ',", it->valor);
-                        goto bad_return;
-                    }
+                
+                if (it->classe == SYM_COMMA) {
+                    // keep reading all the gate inputs
+                    goto gate_inputs;
                 }
+                
+                show_error_msg("Simbolo esperado nao foi encontrado",
+                               it->linha, it->coluna, ")' ou ',", it->valor);
+                goto bad_return;
             }
 
             if (!avanca(&it)) {
@@ -530,7 +558,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( it->classe != SYM_SEMICOLON ) {
+            if (it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ";", it->valor);
                 goto bad_return;
@@ -699,6 +727,54 @@ bad_return:
     delete_lista_token(tokens);
 
     return NULL;
+}
+
+int is_logic_gate(const Token* t)
+{
+    int i;
+
+    TokenClass g[13] = {
+        KW_AND,    // 0
+        KW_OR,     // 1
+        KW_NOT,    // 2
+        KW_BUF,    // 3
+        KW_NAND,   // 4
+        KW_NOR,    // 5
+        KW_XOR,    // 7
+        KW_XNOR,   // 8
+        KW_BUFIF0, // 9
+        KW_BUFIF1, // 10
+        KW_NOTIF0, // 11
+        KW_NOTIF1, // 12
+    };
+
+    for ( i = 0; i < 13; i++ )
+    {
+        if (t->classe == g[i])
+            return 1;
+    }
+    
+    return 0;
+}
+
+int is_tristate_logic(Componente gate)
+{
+    int i;
+
+    t_operador op[4] = {
+        OP_BUF_IF0, // 0
+        OP_BUF_IF1, // 1
+        OP_NOT_IF0, // 2
+        OP_NOT_IF1, // 3
+    };
+
+    for ( i = 0; i < 4; i++ )
+    {
+        if (gate->tipo.operador == op[i])
+            return 1;
+    }
+    
+    return 0;
 }
 
 int isPortaLogica(char* s)

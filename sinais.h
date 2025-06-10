@@ -16,6 +16,8 @@ typedef enum en_logic_value {
     VAL_1 = 1,
     VAL_X = 2,
     VAL_Z = 3,
+    VAL_L = 4,
+    VAL_H = 5,
     VAL_BLANK
 } ValorLogico;
 

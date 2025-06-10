@@ -49,6 +49,10 @@ typedef enum en_token_class {
     KW_WIRE,
     KW_XNOR,
     KW_XOR,
+    KW_BUFIF0,
+    KW_BUFIF1,
+    KW_NOTIF0,
+    KW_NOTIF1,
 
     SYM_AT, // @
     SYM_COMMA, // ,

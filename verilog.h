@@ -65,7 +65,19 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
  */
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
 
-/** @brief Retorna verdadeiro se uma string representa uma logic gate em Verilog.
+/** @brief Retorna verdadeiro se um Token representa um logic gate em Verilog.
+ *  @param t Um Token pointer qualquer.
+ *  @return Verdadeiro se t for: "and", "or", "nand", "buf", "not", "bufif0", etc.
+ */
+int is_logic_gate(const Token* t);
+
+/** @brief Retorna verdadeiro se um logic gate é de 3 estados.
+ *  @param gate Um Componente que representa um logic gate.
+ *  @return Verdadeiro se o gate for: "bufif0", "bufif1", "notif0" ou "notif1".
+ */
+int is_tristate_logic(Componente gate);
+
+/** @brief Retorna verdadeiro se uma string representa um logic gate em Verilog.
  *  @param s Uma string qualquer.
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.
  */

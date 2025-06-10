@@ -47,6 +47,22 @@ ValorLogico computeNorGate(ListaComponente* inputs);
  */
 ValorLogico computeNandGate(ListaComponente* inputs);
 
+/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+ */
+ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data);
+
+/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+ */
+ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data);
+
+/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+ */
+ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data);
+
+/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+ */
+ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
+
 /** @brief Cria novos eventos na fila de acordo com a saidas (result) computadas
  *         para a porta lógica (gate), no tempo t indicado. 
  */
