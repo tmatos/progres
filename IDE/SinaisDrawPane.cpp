@@ -39,6 +39,9 @@ EVT_LEFT_DCLICK(SinaisDrawPane::mouseDoubleClick)
 // clique simples no grafico com btn direito
 EVT_RIGHT_UP(SinaisDrawPane::mouseRightClick)
 
+// clique simples no grafico com btn esquerdo
+EVT_LEFT_UP(SinaisDrawPane::mouseReleased)
+
 END_EVENT_TABLE()
 
 // some useful events
@@ -52,6 +55,16 @@ END_EVENT_TABLE()
  void SinaisDrawPane::keyPressed(wxKeyEvent& event) {}
  void SinaisDrawPane::keyReleased(wxKeyEvent& event) {}
  */
+
+void SinaisDrawPane::mouseReleased(wxMouseEvent& event)
+{
+    wxClientDC dc(this);
+    wxPoint p = event.GetLogicalPosition(dc);
+
+    guide = p.x;
+
+    Refresh();
+}
 
 void SinaisDrawPane::mouseRightClick(wxMouseEvent& event)
 {
@@ -68,7 +81,6 @@ void SinaisDrawPane::mouseDoubleClick(wxMouseEvent& event)
 {
     if ( isInputFile && !estaEmEdicao )
     {
-        EdicaoDeSinal *editor = new EdicaoDeSinal(this);
         editor->setFile(waveFilePath);
         estaEmEdicao = true;
         editor->Show();
@@ -80,6 +92,8 @@ SinaisDrawPane::SinaisDrawPane(wxWindow* parent) : wxPanel(parent)
     ondas = NULL;
     bool isInputFile = true;
     bool estaEmEdicao = false;
+
+    editor = new EdicaoDeSinal(this);
     
     wxSystemSettings sisConfig;
     
@@ -123,6 +137,8 @@ void SinaisDrawPane::setSinais(wxString filePath, bool isInput)
 
 void SinaisDrawPane::render(wxDC&  canvas)
 {
+    canvas.Clear();
+
     if (!ondas)
     {
         canvas.SetPen(*wxRED);
@@ -136,12 +152,16 @@ void SinaisDrawPane::render(wxDC&  canvas)
     unsigned int k;
     int l;
 
-    const int hzTam = 15; // comprimeto horizontal de uma unidade de tempo
+    hzTam = 15; // comprimeto horizontal de uma unidade de tempo
     const int vrTam = 15; // altura de um pulso entre 0 e 1
     const int spacmtSinal = 30; // espaçamento vertical entre os sinais
 
-    int x0 = 70, y0 = 30; // início do desenho
-    int x = x0, y = y0;
+    // drawing start coords
+    int x0 = 70;
+    int y0 = 30; 
+
+    int x = x0;
+    int y = y0;
 
     int yTexto = y0;
 
@@ -157,14 +177,14 @@ void SinaisDrawPane::render(wxDC&  canvas)
 
     canvas.SetPen(*wxLIGHT_GREY_PEN);
 
-    // linhas verticais do grid
+    // linhas horizontais do grid
     for ( i=0 ; i < ondas->quantidade+1 ; i++ )
     {
         canvas.DrawLine(    5, y0 + (i * spacmtSinal) - 7,
                          2000, y0 + (i * spacmtSinal) - 7 );
     }
 
-    // linhas horizontais do grid e numeração
+    // linhas verticais do grid e numeração
     canvas.SetTextForeground(*wxBLUE);
 
     wxFont font(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
@@ -240,6 +260,13 @@ void SinaisDrawPane::render(wxDC&  canvas)
         }
 
         y = y + spacmtSinal;
+    }
+
+    if (guide > x0)
+    {
+        canvas.SetPen(*wxGREEN_PEN);
+        canvas.DrawLine( guide, 1,
+                         guide, 700 );
     }
 
 }

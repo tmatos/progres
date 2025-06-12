@@ -5,6 +5,7 @@
 #include "wx/panel.h"
 
 #include "sinais.h"
+#include "EdicaoDeSinal.h"
 
 class SinaisDrawPane : public wxPanel
 {
@@ -23,6 +24,7 @@ public:
 
     void mouseDoubleClick(wxMouseEvent& event);
     void mouseRightClick(wxMouseEvent& event);
+    void mouseReleased(wxMouseEvent& event);
     
     // eventos que podem ser uteis
     /*
@@ -38,8 +40,14 @@ public:
 
 private:
     Sinais* ondas;
+    EdicaoDeSinal* editor;
+
     wxColour corDoTexto;
     wxColour corDaLinha;
+    
+    int hzTam = 15;
+
+    int guide = 0;
     
     DECLARE_EVENT_TABLE()
 };
