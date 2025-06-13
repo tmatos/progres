@@ -1,0 +1,44 @@
+name: "CI tests"
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Install cppunit and lcov
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcppunit-dev
+        sudo apt-get install -y lcov
+    - name: Run tests
+      run: |
+        cd test
+        make coverage
+    - name: Archive test coverage artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: test/coverage.txt
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: test
+        file: coverage.txt
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Upload coverage reports to Codacy
+      uses: codacy/codacy-coverage-reporter-action@v1.3.0
+      with:
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+        coverage-reports: test/coverage.txt
