@@ -111,6 +111,7 @@ class IDEFrame : public wxFrame
         wxString simuladorExePath;
         bool AbrirUltimoAoIniciar;
         wxString UltimoArquivoVerilog;
+        wxString UltimoArquivoEntrada;
 
         wxString defaultWindowTitle;
         long textLenght;

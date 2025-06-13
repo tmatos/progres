@@ -195,11 +195,18 @@ IDEFrame::IDEFrame(wxWindow* parent, wxWindowID id)
 
     carregaConfigs();
 
-    if (AbrirUltimoAoIniciar) {
-        if (!UltimoArquivoVerilog.IsEmpty()) {
-            if (wxFile::Exists(UltimoArquivoVerilog))
-                CarregarArquivoVerilog(UltimoArquivoVerilog);
-        }
+    if ( AbrirUltimoAoIniciar &&
+         !UltimoArquivoVerilog.IsEmpty() &&
+         wxFile::Exists(UltimoArquivoVerilog) )
+    {
+        CarregarArquivoVerilog(UltimoArquivoVerilog);
+    }
+
+    if ( AbrirUltimoAoIniciar &&
+         !UltimoArquivoEntrada.IsEmpty() &&
+         wxFile::Exists(UltimoArquivoEntrada) )
+    {
+        AtualizaTudoParaNovaEntrada(UltimoArquivoEntrada);
     }
 
     arquivoNaoSalvo = false;
@@ -211,7 +218,10 @@ IDEFrame::~IDEFrame()
     if (AbrirUltimoAoIniciar)
     {
         wxConfig *config = new wxConfig(_("ProgresIDE"));
+
         config->Write(_("UltimoArquivoVerilog"), verilogFilePath);
+        config->Write(_("UltimoArquivoEntrada"), waveinFilePath);
+
         delete config;
     }
 
@@ -225,16 +235,23 @@ void IDEFrame::carregaConfigs()
 
     config->Read(_("SimuladorExePath"), &simuladorExePath);
 
-    if (config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar))
+    AbrirUltimoAoIniciar = false;
+    UltimoArquivoVerilog = "";
+    UltimoArquivoEntrada = "";
+
+    if ( config->Read(_("AbrirUltimoAoIniciar"), &AbrirUltimoAoIniciar) )
+    {
         config->Read(_("UltimoArquivoVerilog"), &UltimoArquivoVerilog);
-    else
-        AbrirUltimoAoIniciar = false;
+        config->Read(_("UltimoArquivoEntrada"), &UltimoArquivoEntrada);
+    }
 
     delete config;
 
-    if (simuladorExePath.IsEmpty())
+    if ( simuladorExePath.IsEmpty() )
+    {
         wxMessageBox(_("O executável do simulador não foi definido. Por favor selecione-o nas configurações."),
                      _("Aviso"));
+    }
 }
 
 void IDEFrame::OnQuit(wxCommandEvent& event)
@@ -331,7 +348,8 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
     // synchronous
     int r = wxExecute(comando, saida, wxEXEC_SYNC, NULL);
 
-    if ( r == -1 ) {
+    if ( r == -1 )
+    {
         wxMessageBox(_("Problema ao executar o comando do simulador"),
                      _("Erro"),
                      wxICON_ERROR);
@@ -423,7 +441,8 @@ void IDEFrame::OnMenuItemEntradaNovoSelected(wxCommandEvent& event)
 
             AtualizaTudoParaNovaEntrada( NewEntradaDialog.GetPath() );
         }
-        else {
+        else
+        {
             wxMessageBox(_("Impossibilitado de criar o arquivo."),
                          _("Erro"));
         }
@@ -530,7 +549,8 @@ void IDEFrame::OnListBoxErrosDClick(wxCommandEvent& event)
 
 void IDEFrame::OnMenuItemSelecionarTudoSelected(wxCommandEvent& event)
 {
-    if ( bookFontes->GetSelection() == 0 ) {
+    if ( bookFontes->GetSelection() == 0 )
+    {
         EditBox->SelectAll();
         EditBox->SetFocus();
     }
