@@ -1,5 +1,6 @@
 # Progres
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fb0ddea5ab95440d9b20438d01cc694a)](https://app.codacy.com/gh/tmatos/progres?utm_source=github.com&utm_medium=referral&utm_content=tmatos/progres&utm_campaign=Badge_Grade)
 [![Build Status](https://github.com/tmatos/progres/actions/workflows/makefile.yml/badge.svg)](https://github.com/tmatos/progres/actions)
 [![codecov](https://codecov.io/gh/tmatos/progres/graph/badge.svg?token=XCUNGD1HQD)](https://codecov.io/gh/tmatos/progres)
 
