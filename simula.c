@@ -11,6 +11,7 @@
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "strutil.h"
 #include "lex.h"
 #include "eventos.h"
 #include "erros.h"

@@ -8,7 +8,8 @@ CFLAGS = -I$(INC_DIR) -Wall
 
 TARGET = progres
 
-SRC = sinais.c erros.c estruturas.c lex.c preprocessor.c eventos.c verilog.c inout.c mem.c simula.c progres.c
+SRC  = strutil.c sinais.c erros.c estruturas.c lex.c preprocessor.c
+SRC += eventos.c verilog.c inout.c mem.c simula.c progres.c
 
 DEPS = $(patsubst %.c, $(SRC_DIR)/%.h, $(SRC))
 

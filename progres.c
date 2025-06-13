@@ -13,7 +13,7 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "inout.h"
-#include "lex.h"
+#include "strutil.h"
 #include "verilog.h"
 #include "simula.h"
 
@@ -22,7 +22,8 @@ int global_silent_mode;
 int main(int argc, char* argv[])
 {
     int i;
-    int arg_offset;
+    int arg_offset = 0;
+
     FILE* f_verilog_source = NULL;
     FILE* f_wave_in = NULL;
     FILE* f_wave_out = NULL;
@@ -34,22 +35,20 @@ int main(int argc, char* argv[])
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 
     global_silent_mode = 0;
-    
-    arg_offset = 0;
 
-    if (argc < 2 || !strcmp(argv[1], "-h")) {
+    if ( argc < 2 || iguais(argv[1], "-h") ) {
         printf("%s", _HELP_STRING_BRIEF);
         exit(0);
     }
 
-    if (!strcmp(argv[1], "-v")) {
+    if ( iguais(argv[1], "-v") ) {
         printf("Progres Verilog Simulator - version %s\n"
                "(C) 2014-2025 Tiago Matos (tmatos.net)\n",
                _PROGRES_VERSION);
         exit(0);
     }
     
-    if (!strcmp(argv[1], "-s")) {
+    if ( iguais(argv[1], "-s") ) {
         global_silent_mode = 1;
         arg_offset++;
     }
@@ -86,7 +85,7 @@ int main(int argc, char* argv[])
     }
 
     // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
-    if ( (argc - arg_offset) == 2) {
+    if ( (argc - arg_offset) == 2 ) {
         if (!global_silent_mode)
             printf("Para haver simulacao, um arquivo de entrada deve ser fornecido.\n");
 
@@ -118,13 +117,13 @@ int main(int argc, char* argv[])
     }
 
     // se foi fornecido o argumento com path para arquivo de saida
-    if ( (argc - arg_offset) > 3) {
+    if ( (argc - arg_offset) > 3 ) {
         copy(str_wave_out_filepath, argv[3+arg_offset]);
     }
     else {
         // senao, deriva-se do arquivo de entrada
         copy(str_wave_out_filepath, argv[2+arg_offset]);
-        strcat(str_wave_out_filepath, ".out");
+        strncat(str_wave_out_filepath, ".out", 4);
     }
 
     sinais_saidas = simula(circuto1, sinais_entradas);

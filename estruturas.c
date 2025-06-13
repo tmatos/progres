@@ -12,6 +12,7 @@
 #include "progres.h"
 #include "sinais.h"
 #include "estruturas.h"
+#include "strutil.h"
 #include "lex.h"
 #include "erros.h"
 #include "mem.h"

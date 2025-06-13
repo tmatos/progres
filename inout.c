@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "sinais.h"
+#include "strutil.h"
 #include "lex.h"
 #include "inout.h"
 #include "erros.h"

@@ -15,6 +15,7 @@
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "strutil.h"
 #include "lex.h"
 #include "preprocessor.h"
 
@@ -414,10 +415,10 @@ Module* carregaCircuito(FILE* arquivo)
                     goto bad_return;
                 }
                 else if ( !isNumNaturalValido(it->valor) ) {
-                    char esperado[100];
-                    sprintf(esperado,
-                            "um numero inteiro nao negativo e com ate %d digitos",
-                            MAX_DIGITOS_NUM);
+                    char esperado[67];
+                    snprintf(esperado, 67,
+                             "um numero inteiro nao negativo e com ate %d digitos",
+                             MAX_DIGITOS_NUM);
                     show_error_msg("Numero valido nao foi encontrado",
                                    it->linha, it->coluna, esperado, it->valor);
                     goto bad_return;

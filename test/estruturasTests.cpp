@@ -3,6 +3,7 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
+#include "../strutil.h"
 #include "../lex.h"
 #include "../sinais.h"
 #include "../estruturas.h"

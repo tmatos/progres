@@ -12,6 +12,7 @@
 
 #include "progres.h"
 #include "erros.h"
+#include "strutil.h"
 #include "lex.h"
 #include "mem.h"
 
@@ -421,19 +422,6 @@ int removeTokensPorValor(ListaToken* lst, const char* tok)
     return 1;
 }
 
-int anexa(char* str, char c)
-{
-    char tmp[2];
-    tmp[0] = c;
-    tmp[1] = '\0';
-
-    strcat(str, tmp);
-
-    // TODO: Checagens...
-
-    return 1;
-}
-
 int isSimbolo(char c)
 {
     return (c == '(' ||
@@ -507,11 +495,6 @@ int identExiste(ListaToken* lst, const char* str)
     }
 
     return retorno;
-}
-
-int iguais(const char* a, const char* b)
-{
-    return !strcmp(a, b);
 }
 
 Token* avanca(Token** it)
@@ -792,45 +775,4 @@ ListaToken* tokeniza(FILE* arquivo)
     free(tok);
 
     return tokens;
-}
-
-int apenasDigitos(const char* str)
-{
-    int i;
-
-    if (!str)
-        return 0;
-
-    for ( i=0; i < len(str); i++ )
-    {
-        if ( !isdigit(str[i]) )
-            return 0;
-    }
-
-    return 1;
-}
-
-int isNumNaturalValido(const char* str)
-{
-    if (!str)
-        return 0;
-
-    // importante nao ser um valor muito grande, esses numeros
-    if ( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
-        return 0;
-    }
-
-    return 1;
-}
-
-size_t len(const char* str)
-{
-    // TODO: restrict to a maximum length
-    return strlen(str);
-}
-
-char* copy(char* dest, const char* src)
-{
-    // TODO: restrict to a maximum length
-    return strcpy(dest, src);
 }

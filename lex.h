@@ -143,10 +143,6 @@ void remove_token(ListaToken* list, Token* tok);
  */
 int removeTokensPorValor(ListaToken* lst, const char* tok);
 
-/** @brief Faz o apend de um char numa string qualquer.
- */
-int anexa(char* str, char c);
-
 /** @brief Retorna verdadeiro se c for um simbolo em Verilog.
  *  @param c Um char qualquer.
  *  @return True se c for simbolo, False caso contrario.
@@ -157,10 +153,6 @@ int isSimbolo(char c);
  *  @return Void.
  */
 void exibeListaDeToken(ListaToken* tokens);
-
-/** @brief Retorna verdadeiro se duas strings são iguais.
- */
-int iguais(const char* a, const char* b);
 
 /** @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
  *  @param it Um ponteiro para um ponteiro de um Token.
@@ -196,32 +188,6 @@ int identExiste(ListaToken* lst, const char* str);
  *  @return A lista de tokens.
  */
 ListaToken* tokeniza(FILE *arquivo);
-
-/** @brief Verifica se uma string contém apenas dígitos (0, 1, 2, ..., 9).
- *  @param str Uma string qualquer.
- *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
- */
-int apenasDigitos(const char* str);
-
-/** @brief Verifica se uma string contém um número que pode ser convertido.
-            Mais especeificamente, se é um natural menor que 10000.
- *  @param str Uma string qualquer.
- *  @return Verdadeiro se pode ser convertido.
- */
-int isNumNaturalValido(const char* str);
-
-/** @brief Wrapper to strlen()
- *  @param str A null terminated C string
- *  @return Lenght of str
- */
-size_t len(const char* str);
-
-/** @brief Wrapper to strcpy()
- *  @param dest Destination C string
- *  @param src Source C string
- *  @return Return of strcpy()
- */
-char* copy(char* dest, const char* src);
 
 /** @brief Get the TokenClass enum value from its respective token string.
  *  @param s_tok Token string.

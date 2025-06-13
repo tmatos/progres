@@ -13,6 +13,7 @@
 #include "sinais.h"
 #include "erros.h"
 #include "mem.h"
+#include "strutil.h"
 #include "lex.h"
 
 Sinal* novoSinal(const char* nome)
