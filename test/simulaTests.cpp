@@ -44,7 +44,7 @@ public:
   void test_simula_CircuitoVazio()
   {
     Module *circ = novoCircuito();
-    Sinais *inputs = novaSinais();
+    Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
 
     CPPUNIT_ASSERT(circ);
@@ -60,7 +60,7 @@ public:
   void test_simula_CircuitoUmaEntrada()
   {
     Module *circ = novoCircuito();
-    Sinais *inputs = novaSinais();
+    Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
 
     char str_nome_entrada_1[50] = "sinal_in_1";
@@ -68,10 +68,10 @@ public:
     CPPUNIT_ASSERT(circ);
     CPPUNIT_ASSERT(inputs);
 
-    addSinal( inputs, str_nome_entrada_1 );
-    addPulso( &(inputs->lista[0]), VAL_1, (Tempo)20 );    // 0
-    addPulso( &(inputs->lista[0]), VAL_0, (Tempo)50 );  // 1
-    addPulso( &(inputs->lista[0]), VAL_1, (Tempo)105 );   // 2
+    add_new_signal( inputs, str_nome_entrada_1 );
+    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)20 );    // 0
+    add_new_pulse( &(inputs->lista[0]), VAL_0, (Tempo)50 );  // 1
+    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)105 );   // 2
 
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );

@@ -40,7 +40,7 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     ValorLogico valor_control;
     ValorLogico valor_data;
 
-    Sinais* saidas = novaSinais();
+    Sinais* saidas = new_signal_list();
 
     if (!circuto || !entradas) {
         return NULL;
@@ -141,11 +141,11 @@ Sinais* simula(Module* circuto, Sinais* entradas)
 
                 if (tr->fio->tipo.operador == output) {
                     if ( !(tr->fio->sinalSaida) ) {
-                        tr->fio->sinalSaida = novoSinal( tr->fio->nome );
+                        tr->fio->sinalSaida = new_signal( tr->fio->nome );
                     }
-                    addPulso(tr->fio->sinalSaida,
-                             tr->fio->valorDinamico,
-                             t - tr->fio->sinalSaida->duracaoTotal);
+                    add_new_pulse(tr->fio->sinalSaida,
+                                  tr->fio->valorDinamico,
+                                  t - tr->fio->sinalSaida->duracaoTotal);
                 }
 
                 tr->fio->valorDinamico = tr->novoValor;
@@ -230,8 +230,8 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     // copia as saidas da simulacao do ciruito para o retorno da funcao
     for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
     {
-        addSinalPronto(saidas,
-                       circuto->listaFiosSaida->itens[i]->sinalSaida);
+        insert_signal(saidas,
+                      circuto->listaFiosSaida->itens[i]->sinalSaida);
     }
 
     return saidas;

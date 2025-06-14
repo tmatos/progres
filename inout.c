@@ -27,7 +27,7 @@ Sinais* carregaEntradas(FILE* arquivo)
     int indice = -1; // indexador do vetor de sinais de entrada
     ValorLogico valorLogico;
     Tempo duracao;
-    Sinais* entradas = novaSinais();
+    Sinais* entradas = new_signal_list();
     Token* it = NULL;
 
     ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
@@ -56,7 +56,7 @@ Sinais* carregaEntradas(FILE* arquivo)
 
         insereTokenString(nomesUsados, it->valor, it->linha, it->coluna);
 
-        addSinal(entradas, it->valor);
+        add_new_signal(entradas, it->valor);
         indice++;
 
         if (!avanca(&it))
@@ -102,7 +102,7 @@ Sinais* carregaEntradas(FILE* arquivo)
                 return erroFatalArquivoCorrompido();
             
             duracao = strtol(it->valor, NULL, 10);
-            addPulso((entradas->lista + indice), valorLogico, duracao);
+            add_new_pulse((entradas->lista + indice), valorLogico, duracao);
 
             if(!avanca(&it))
                 return erroFatalArquivoCorrompido();

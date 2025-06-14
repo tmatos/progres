@@ -9,7 +9,9 @@
 
 #define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
-/** @brief Valor lógico de um pulso. Aqui, VAL_BLANK serve para indicar o fim de uma "string" de pulsos.
+/** @brief Enum para representação dos valores lógicos utilizados nas simulações.
+ *         Aqui, VAL_BLANK serve unicamente para indicar o final de um array de pulsos.
+ *         De forma semelhante ao que acontece com '0x00' para strings em C.
  */
 typedef enum en_logic_value {
     VAL_0 = 0,
@@ -81,36 +83,44 @@ typedef struct st_sinais {
 } Sinais;
 
 /** @brief Inicializa um sinal vazio com o respectivo nome indicado.
+ *  @param nome String com o nome do sinal a ser criado.
+ *  @return Ponteiro para o sinal recém criado.
  */
-Sinal* novoSinal(const char* nome);
+Sinal* new_signal(const char* nome);
 
 /** @brief Muda a string contendo o nome do sinal dentro de s para a indicada por nome.
+ *  @param s Sinal que terá o nome modificado.
+ *  @param nome String contendo o novo nome do sinal.
  */
-int setSinalNome(Sinal* s, const char* nome);
+int set_signal_name(Sinal* s, const char* nome);
 
 /** @brief Define o pulso p indicado com sendo nulo.
  *         Isto é, seu valor conterá VAL_BLANK e terá tempo zero.
+ *  @param p Ponteiro para o pulso a ser afetado. 
  */
-int setPulsoNulo(Pulso* p);
+int set_pulse_blank(Pulso* p);
 
 /** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do objeto Sinal,
            mais um pulso de valor e duração indicados.
            é como se fosse um append, aqui fazemos uso de realloc.
+    @param s Ponteiro para um sinal.
+    @param valor Valor lógico do pulso a ser adicionado.
+    @param duracao Duracao, em unidade adimensional, de tempo do pulso a ser inserido.
  */
-int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
+int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
 
 /** @brief Inicializa um nova estrutura Sinas vazia e retorna seu endereço de memória.
            Vazia significa que os elementos primeiro e ultimo apontam para NULL
            e o número de elementos é zero.
  */
-Sinais* novaSinais();
+Sinais* new_signal_list();
 
 /** @brief Insere um sinal em branco na estrutura Sinais.
  */
-int addSinal(Sinais* s, const char* nome);
+int add_new_signal(Sinais* s, const char* nome);
 
 /** @brief Copia um sinal para a estrutura Sinais.
  */
-int addSinalPronto(Sinais* ls, Sinal* sinal);
+int insert_signal(Sinais* ls, Sinal* sinal);
 
 #endif // SINAIS_H
