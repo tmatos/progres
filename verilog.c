@@ -726,6 +726,7 @@ bad_return:
     delete_lista_token(list_wire);
     delete_lista_token(list_param);
     delete_lista_token(tokens);
+    free_module(&circuito);
 
     return NULL;
 }

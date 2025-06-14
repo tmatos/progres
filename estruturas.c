@@ -45,6 +45,42 @@ Module* novoCircuito()
     return circuito;
 }
 
+void free_module(Module** mod)
+{
+    if ( *mod == NULL )
+        return;
+
+    if ( (*mod)->listaFiosEntrada->itens )
+        free( (*mod)->listaFiosEntrada->itens );
+    free( (*mod)->listaFiosEntrada );
+
+    if ( (*mod)->listaFiosSaida->itens )
+        free( (*mod)->listaFiosSaida->itens );
+    free( (*mod)->listaFiosSaida );
+
+    if ( (*mod)->listaPortas->itens )
+        free( (*mod)->listaPortas->itens );
+    free( (*mod)->listaPortas );
+
+    if ( (*mod)->listaWires->itens )
+        free( (*mod)->listaWires->itens );
+    free( (*mod)->listaWires );
+
+    if ( (*mod)->listaParam.itens )
+        free( (*mod)->listaParam.itens );
+
+    if ( (*mod)->listaReg.itens )
+        free( (*mod)->listaReg.itens );
+
+    if ( (*mod)->sinaisEntrada )
+        free( (*mod)->sinaisEntrada );
+    
+    if ( (*mod)->sinaisSaida )
+        free( (*mod)->sinaisSaida );
+    
+    free( *mod );
+}
+
 void adicionaEntrada(Module* circ, Componente comp)
 {
     if(!circ || !comp)

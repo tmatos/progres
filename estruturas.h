@@ -129,6 +129,11 @@ typedef struct st_module {
  */
 Module* novoCircuito();
 
+/** @brief Dealocate all the memory of a Module structure.
+ *  @param mod Pointer to a pointer of Module type.
+ */
+void free_module(Module** mod);
+
 /** @brief Inserir um registrador novo no circuito.
  *  @param circ Ponteiro para o circuito.
  *  @param name Nome dado ao registrador.

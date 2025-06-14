@@ -142,6 +142,7 @@ int main(int argc, char* argv[])
             free(sinais_entradas->lista);
 
         free(sinais_entradas);
+        sinais_entradas = NULL;
     }
 
     f_wave_out = fopen(str_wave_out_filepath, "w");
@@ -169,34 +170,10 @@ int main(int argc, char* argv[])
             free(sinais_saidas->lista);
 
         free(sinais_saidas);
+        sinais_saidas = NULL;
     }
 
-    // free mem (circuit)
-    if (circuto1) {
-        if (circuto1->listaFiosEntrada->itens)
-            free(circuto1->listaFiosEntrada->itens);
-        free(circuto1->listaFiosEntrada);
-
-        if (circuto1->listaFiosSaida->itens)
-            free(circuto1->listaFiosSaida->itens);
-        free(circuto1->listaFiosSaida);
-
-        if (circuto1->listaPortas->itens)
-            free(circuto1->listaPortas->itens);
-        free(circuto1->listaPortas);
-
-        if (circuto1->listaWires->itens)
-            free(circuto1->listaWires->itens);
-        free(circuto1->listaWires);
-
-        if (circuto1->listaParam.itens)
-            free(circuto1->listaParam.itens);
-
-        if (circuto1->listaReg.itens)
-            free(circuto1->listaReg.itens);
-        
-        free(circuto1);
-    }
+    free_module(&circuto1);
 
     return 0;
 }
