@@ -1,4 +1,4 @@
-name: "Makefile CI"
+name: "CI tests"
 permissions:
   contents: read
   pull-requests: write
@@ -10,26 +10,6 @@ on:
     branches: [ "main" ]
 
 jobs:
-
-  build:
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-    - name: Build target
-      run: make
-    - name: Archive executables
-      uses: actions/upload-artifact@v4
-      with:
-        name: binary-${{ matrix.os }}
-        path: |
-          progres*
-          !*.cbp
-          !*.c
-          !*.h
 
   tests:
     runs-on: ubuntu-latest

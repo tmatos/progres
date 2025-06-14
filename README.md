@@ -1,7 +1,9 @@
 # Progres
 
-[![Build Status](https://github.com/tmatos/progres/actions/workflows/makefile.yml/badge.svg)](https://github.com/tmatos/progres/actions)
-[![codecov](https://codecov.io/gh/tmatos/progres/graph/badge.svg?token=XCUNGD1HQD)](https://codecov.io/gh/tmatos/progres)
+[![CI build](https://github.com/tmatos/progres/actions/workflows/build.yml/badge.svg)](https://github.com/tmatos/progres/actions/workflows/build.yml)
+[![CI tests](https://github.com/tmatos/progres/actions/workflows/tests.yml/badge.svg)](https://github.com/tmatos/progres/actions/workflows/tests.yml)
+[![Codacy Badge Grade](https://app.codacy.com/project/badge/Grade/8b26336f5528494cafa64eaa7ac673d6)](https://app.codacy.com/gh/tmatos/progres/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge Coverage](https://app.codacy.com/project/badge/Coverage/8b26336f5528494cafa64eaa7ac673d6)](https://app.codacy.com/gh/tmatos/progres/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 Event-driven simulator for a subset of the Verilog language.
 
