@@ -82,38 +82,36 @@ ListaComponente* novaListaComponente()
     return novaListaComponenteTamanho(0);
 }
 
-ListaComponente* novaListaComponenteTamanho(int tamanho)
+ListaComponente* novaListaComponenteTamanho(int size)
 {
     int i;
-    ListaComponente *listaCp;
+    ListaComponente* list_comp;
 
-    listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
-    listaCp->tamanho = tamanho;
+    list_comp = (ListaComponente*) xmalloc( sizeof(ListaComponente) );
+    list_comp->tamanho = size;
 
-    if(tamanho == 0) {
-        listaCp->itens = NULL;
+    if (size == 0) {
+        list_comp->itens = NULL;
     }
     else {
-        listaCp->itens = (Componente*) xmalloc(sizeof(Componente) * tamanho);
+        list_comp->itens = (Componente*) xmalloc( sizeof(Componente) * size );
 
-        for(i=0 ; i<tamanho ; i++)
-            listaCp->itens[i] = NULL;
+        for ( i = 0; i < size; i++ ) {
+            list_comp->itens[i] = NULL;
+        }
     }
 
-    return listaCp;
+    return list_comp;
 }
 
 void insereComponente(ListaComponente* ls, Componente cp)
 {
-    if(!ls)
-        ls = novaListaComponente();
+    ls->tamanho++;
 
-    if(ls->tamanho == 0) {
-        ls->tamanho++;
+    if (ls->tamanho == 1) {
         ls->itens = (Componente*) xmalloc(sizeof(Componente));
     }
     else {
-        ls->tamanho++;
         ls->itens = (Componente*) xrealloc( ls->itens, sizeof(Componente) * ls->tamanho );
     }
 
@@ -222,6 +220,28 @@ Componente novoComponente(const char* nome, t_operador porta)
     c->valorDinamico = VAL_X;
 
     return c;
+}
+
+void delete_componente(Componente* c)
+{
+    if ( !(*c) )
+        return;
+
+    if ( (*c)->listaEntrada ) {
+        if ( (*c)->listaEntrada->itens ) {
+            free( (*c)->listaEntrada->itens );
+        }
+        free( (*c)->listaEntrada );
+    }
+
+    if ( (*c)->listaSaida ) {
+        if ( (*c)->listaSaida->itens ) {
+            free( (*c)->listaSaida->itens );
+        }
+        free( (*c)->listaSaida );
+    }
+
+    free(*c);
 }
 
 Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)

@@ -1101,7 +1101,7 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
 {
     Componente in;
     Componente out;
-    Componente gate;
+    Componente gate = NULL;
 
     Token* t = *it;
 
@@ -1210,8 +1210,10 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
     return NO_ERROR;
 
 load_assign_bad_token:
+    delete_componente(&gate);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_assign_bad_eof:
+    delete_componente(&gate);
     return ERROR_VERILOG_BAD_EOF;
 }

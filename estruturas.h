@@ -195,13 +195,19 @@ Componente getOutputPorNome(Module* circ, const char* nome);
  */
 Componente novoComponente(const char* nome, t_operador porta);
 
+/** @brief Libera completamente um Componente da memória.
+ *  @param c Ponteiro para um tipo Componente.
+ */
+void delete_componente(Componente* c);
+
 /** @brief Inicializa a estrutura de lista de componentes vazia.
  */
 ListaComponente* novaListaComponente();
 
-/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado.
+/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado para itens.
+ *  @param size Tamanho a ser pré alocado para itens.
  */
-ListaComponente* novaListaComponenteTamanho(int tamanho);
+ListaComponente* novaListaComponenteTamanho(int size);
 
 /** @brief Insere o componente na lista de componentes.
  */
