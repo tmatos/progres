@@ -136,6 +136,7 @@ ListaToken* novaListaToken()
     l->primeiro = NULL;
     l->ultimo = NULL;
     l->tamanho = 0;
+    l->file[0] = '\0';
 
     return l;
 }

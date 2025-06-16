@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
 {
     int i;
     int arg_offset = 0;
+    char* str_verilog_source;
 
-    FILE* f_verilog_source = NULL;
     FILE* f_wave_in = NULL;
     FILE* f_wave_out = NULL;
 
@@ -57,21 +57,9 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
-    f_verilog_source = fopen(argv[1+arg_offset], "r");
+    str_verilog_source = argv[1 + arg_offset];
 
-    if (!f_verilog_source) {
-        if (!global_silent_mode)
-            printf("Impossibilitado de abrir o arquivo: %s\n", argv[1+arg_offset]);
-
-        exit(1);
-    }
-    
-    if (!global_silent_mode)
-        printf("Abrindo o arquivo de circuito: %s\n", argv[1+arg_offset]);
-
-    circuto1 = carregaCircuito(f_verilog_source);
-
-    fclose(f_verilog_source);
+    circuto1 = carregaCircuito(str_verilog_source);
 
     if (circuto1) {
         if (!global_silent_mode)

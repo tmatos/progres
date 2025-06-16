@@ -96,13 +96,12 @@ public:
     Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
-    FILE* f_andgates_v = fopen("./verilog_sample_src/andgates.v", "r");
+    char s_andgates_v[] = "./verilog_sample_src/andgates.v";
     FILE* f_andgates_in = fopen("./inout_sample_files/andgates.in", "r");
 
-    CPPUNIT_ASSERT( f_andgates_v );
     CPPUNIT_ASSERT( f_andgates_in );
 
-    circuit = carregaCircuito(f_andgates_v);
+    circuit = carregaCircuito(s_andgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_andgates_in);
@@ -125,6 +124,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_orgates_v()
@@ -132,13 +133,12 @@ public:
     Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
-    FILE* f_orgates_v = fopen("./verilog_sample_src/orgates.v", "r");
+    char s_orgates_v[] = "./verilog_sample_src/orgates.v";
     FILE* f_orgates_in = fopen("./inout_sample_files/orgates.in", "r");
 
-    CPPUNIT_ASSERT( f_orgates_v );
     CPPUNIT_ASSERT( f_orgates_in );
 
-    circuit = carregaCircuito(f_orgates_v);
+    circuit = carregaCircuito(s_orgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_orgates_in);
@@ -161,6 +161,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_nandgates_v()
@@ -168,13 +170,12 @@ public:
     Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
-    FILE* f_nandgates_v = fopen("./verilog_sample_src/nandgates.v", "r");
+    char s_nandgates_v[] = "./verilog_sample_src/nandgates.v";
     FILE* f_nandgates_in = fopen("./inout_sample_files/nandgates.in", "r");
 
-    CPPUNIT_ASSERT( f_nandgates_v );
     CPPUNIT_ASSERT( f_nandgates_in );
 
-    circuit = carregaCircuito(f_nandgates_v);
+    circuit = carregaCircuito(s_nandgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_nandgates_in);
@@ -197,6 +198,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_norgates_v()
@@ -204,13 +207,12 @@ public:
     Module* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
-    FILE* f_norgates_v = fopen("./verilog_sample_src/norgates.v", "r");
+    char s_norgates_v[] = "./verilog_sample_src/norgates.v";
     FILE* f_norgates_in = fopen("./inout_sample_files/norgates.in", "r");
 
-    CPPUNIT_ASSERT( f_norgates_v );
     CPPUNIT_ASSERT( f_norgates_in );
 
-    circuit = carregaCircuito(f_norgates_v);
+    circuit = carregaCircuito(s_norgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_norgates_in);
@@ -233,6 +235,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_notgates_v()
@@ -241,13 +245,12 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
-    FILE* f_notgates_v = fopen("./verilog_sample_src/notgates.v", "r");
+    char s_notgates_v[] = "./verilog_sample_src/notgates.v";
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
 
-    CPPUNIT_ASSERT( f_notgates_v );
     CPPUNIT_ASSERT( f_notgates_in );
 
-    circuit = carregaCircuito(f_notgates_v);
+    circuit = carregaCircuito(s_notgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_notgates_in);
@@ -293,6 +296,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_bufgates_v()
@@ -301,13 +306,12 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
-    FILE* f_bufgates_v = fopen("./verilog_sample_src/bufgates.v", "r");
+    char s_bufgates_v[] = "./verilog_sample_src/bufgates.v";
     FILE* f_bufgates_in = fopen("./inout_sample_files/bufgates.in", "r");
 
-    CPPUNIT_ASSERT( f_bufgates_v );
     CPPUNIT_ASSERT( f_bufgates_in );
 
-    circuit = carregaCircuito(f_bufgates_v);
+    circuit = carregaCircuito(s_bufgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_bufgates_in);
@@ -335,6 +339,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)13, s.pulsos[3].tempo );
+
+    free_module(&circuit);
   }
   
   void test_simula_samplefile_xorgates_v()
@@ -343,13 +349,12 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
-    FILE* f_xorgates_v = fopen("./verilog_sample_src/xorgates.v", "r");
+    char s_xorgates_v[] = "./verilog_sample_src/xorgates.v";
     FILE* f_xorgates_in = fopen("./inout_sample_files/xorgates.in", "r");
 
-    CPPUNIT_ASSERT( f_xorgates_v );
     CPPUNIT_ASSERT( f_xorgates_in );
 
-    circuit = carregaCircuito(f_xorgates_v);
+    circuit = carregaCircuito(s_xorgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_xorgates_in);
@@ -377,6 +382,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_xnorgates_v()
@@ -385,13 +392,12 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
-    FILE* f_xnorgates_v = fopen("./verilog_sample_src/xnorgates.v", "r");
+    char s_xnorgates_v[] = "./verilog_sample_src/xnorgates.v";
     FILE* f_xnorgates_in = fopen("./inout_sample_files/xnorgates.in", "r");
 
-    CPPUNIT_ASSERT( f_xnorgates_v );
     CPPUNIT_ASSERT( f_xnorgates_in );
 
-    circuit = carregaCircuito(f_xnorgates_v);
+    circuit = carregaCircuito(s_xnorgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_xnorgates_in);
@@ -419,6 +425,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_delays_v()
@@ -428,15 +436,14 @@ public:
     Sinais* outputs = NULL;
     Sinais* sim_outputs = NULL;
 
-    FILE* f_delays_v = fopen("./verilog_sample_src/delays.v", "r");
+    char s_delays_v[] = "./verilog_sample_src/delays.v";
     FILE* f_delays_in = fopen("./inout_sample_files/delays.in", "r");
     FILE* f_delays_in_out = fopen("./inout_sample_files/delays.in.out", "r");
 
-    CPPUNIT_ASSERT(f_delays_v);
     CPPUNIT_ASSERT(f_delays_in);
     CPPUNIT_ASSERT(f_delays_in_out);
 
-    circuit = carregaCircuito(f_delays_v);
+    circuit = carregaCircuito(s_delays_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = carregaEntradas(f_delays_in);
@@ -455,6 +462,8 @@ public:
     CPPUNIT_ASSERT(sim_outputs->lista);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
+
+    free_module(&circuit);
   }
 
   void test_simula_samplefile_tri_state_gates_v()
@@ -463,13 +472,12 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinal s;
-    FILE* f_v = fopen("./verilog_sample_src/tri_state_gates.v", "r");
+    char s_v[] = "./verilog_sample_src/tri_state_gates.v";
     FILE* f_in = fopen("./inout_sample_files/tri_state_gates.in", "r");
 
-    CPPUNIT_ASSERT( f_v );
     CPPUNIT_ASSERT( f_in );
 
-    circuit = carregaCircuito(f_v);
+    circuit = carregaCircuito(s_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = carregaEntradas(f_in);
@@ -497,6 +505,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
+
+    free_module(&circuit);
     
     // TODO: check all cases in the Table 7-5 of Std 1364-2005
   }
@@ -508,15 +518,14 @@ public:
     Sinais* outputs = NULL;
     Sinais* sim_outputs = NULL;
 
-    FILE* f_v = fopen("./verilog_sample_src/numbers.v", "r");
+    char s_v[] = "./verilog_sample_src/numbers.v";
     FILE* f_in = fopen("./inout_sample_files/numbers.in", "r");
     FILE* f_out = fopen("./inout_sample_files/numbers.in.out", "r");
 
-    CPPUNIT_ASSERT(f_v);
     CPPUNIT_ASSERT(f_in);
     CPPUNIT_ASSERT(f_out);
 
-    circuit = carregaCircuito(f_v);
+    circuit = carregaCircuito(s_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = carregaEntradas(f_in);
@@ -535,6 +544,8 @@ public:
     CPPUNIT_ASSERT(sim_outputs->lista);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
+
+    free_module(&circuit);
   }
 
   bool helper_compare_signal_lists(Sinais* list_a, Sinais* list_b)

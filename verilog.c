@@ -133,7 +133,7 @@ load_module_header_bad_return:
     return 0;
 }
 
-Module* carregaCircuito(FILE* arquivo)
+Module* carregaCircuito(const char* file_path)
 {
     Componente in;
     Componente out;
@@ -141,6 +141,7 @@ Module* carregaCircuito(FILE* arquivo)
     Componente net;
     Token* it = NULL;
     Module* circuito = NULL;
+    FILE* f_verilog_source;
 
     int range_msb;
     int range_lsb;
@@ -150,6 +151,20 @@ Module* carregaCircuito(FILE* arquivo)
     VerilogError err;
 
     int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
+
+    f_verilog_source = fopen(file_path, "r");
+
+    if (!f_verilog_source) {
+        if (!global_silent_mode) {
+            printf("Impossibilitado de abrir o arquivo: %s\n", file_path);
+        }
+
+        return NULL;
+    }
+    
+    if (!global_silent_mode) {
+        printf("Abrindo o arquivo de circuito: %s\n", file_path);
+    }
 
     // lista de todos os identificadores
     ListaToken* identifiers = novaListaToken();
@@ -169,10 +184,12 @@ Module* carregaCircuito(FILE* arquivo)
     // list for params
     ListaToken* list_param = novaListaToken();
 
-    ListaToken* tokens = tokeniza(arquivo);
+    ListaToken* tokens = tokeniza(f_verilog_source);
 
     if (!tokens)
         goto bad_return;
+
+    copy(tokens->file, file_path);
 
     // pre-processing pass to handle compiler directives, returns 1 if ok
     if (!pre_processor(tokens))
@@ -573,26 +590,28 @@ Module* carregaCircuito(FILE* arquivo)
             // finalmente, inserimos a gate na lista de portas logicas do circuito
             adicionaPorta(circuito, gate);
         }
-        else if( it->classe == KW_ENDMODULE ) {
+        else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
 
             // nao deve haver mais nada alem do endmodule
-            if(it) {
+            if (it) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "nenhum codigo a mais", it->valor);
                 goto bad_return;
             }
-            else {
-                // Liberar a memoria alocada no inicio da funcao
-                delete_lista_token(identifiers);
-                delete_lista_token(identifiers_to_be);
-                delete_lista_token(list_input);
-                delete_lista_token(list_output);
-                delete_lista_token(list_wire);
-                delete_lista_token(list_param);
-                delete_lista_token(tokens);
-                return circuito;
-            }
+            
+            // Liberar a memoria alocada no inicio da funcao
+            delete_lista_token(identifiers);
+            delete_lista_token(identifiers_to_be);
+            delete_lista_token(list_input);
+            delete_lista_token(list_output);
+            delete_lista_token(list_wire);
+            delete_lista_token(list_param);
+            delete_lista_token(tokens);
+
+            fclose(f_verilog_source);
+
+            return circuito;
         }
         else if (it->classe == SYM_GRAVE_ACCENT) {
             VerilogError err = load_directive(&it, circuito);
@@ -731,7 +750,9 @@ bad_return:
     delete_lista_token(list_wire);
     delete_lista_token(list_param);
     delete_lista_token(tokens);
+
     free_module(&circuito);
+    fclose(f_verilog_source);
 
     return NULL;
 }

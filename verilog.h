@@ -33,10 +33,10 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
 
 /** @brief Cria uma estrutura de dados representando o circuito,
            a partir do arquivo com o codigo fonte em Verilog.
- *  @param arquivo O handler do arquivo a ser processado.
- *  @return A estrutura de dados do circuito.
+ *  @param file_path String com o caminho do arquivo a ser processado.
+ *  @return A estrutura de dados do circuito ou NULL em caso de erro.
  */
-Module* carregaCircuito(FILE* arquivo);
+Module* carregaCircuito(const char* file_path);
 
 /** @brief Parsing de definições de range.
  *  @param it Endereço para o iterador dos tokens.

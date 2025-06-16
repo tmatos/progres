@@ -7,6 +7,12 @@
 
 #define LEX_H
 
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__vxworks)
+    #define MAX_PATH_LENGTH 255
+#else
+    #define MAX_PATH_LENGTH 1023
+#endif
+
 #define MAX_TOKEN_SIZE 128 /// Qtde maxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 13 /// Qtde maxima de digitos num numero inteiro a ser reconhecido
 
@@ -105,6 +111,7 @@ typedef struct st_listaToken {
     Token* primeiro;
     Token* ultimo;
     int tamanho;
+    char file[MAX_PATH_LENGTH];
 } ListaToken;
 
 /** @brief Inicializa uma lista vazia, isto é, com zero elementos.
