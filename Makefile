@@ -4,7 +4,7 @@ INC_DIR = .
 OBJ_DIR = obj
 
 CC = gcc
-CFLAGS = -I$(INC_DIR) -Wall
+CFLAGS = -I$(INC_DIR) -Wall -Wextra
 
 TARGET = progres
 

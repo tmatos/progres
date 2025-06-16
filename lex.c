@@ -528,7 +528,7 @@ int isPalavra(Token* tk)
 
 int isIdentificador(Token* tk)
 {
-    int i;
+    unsigned int i;
     int simbol = 0;
 
     if (!tk)
@@ -538,7 +538,7 @@ int isIdentificador(Token* tk)
     if ( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
         return 0;
 
-    for (i = 1; i < len(tk->valor); ++i)
+    for ( i = 1; i < len(tk->valor); ++i )
     {
         if ( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
             simbol = 1;

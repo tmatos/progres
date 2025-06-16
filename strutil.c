@@ -35,7 +35,7 @@ int iguais(const char* a, const char* b)
 
 int apenasDigitos(const char* str)
 {
-    int i;
+    unsigned int i;
 
     if (!str)
         return 0;
