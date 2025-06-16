@@ -490,11 +490,16 @@ Module* carregaCircuito(FILE* arquivo)
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
-                               -1, -1, "um identificador", NULL);
+                               -1, -1, "um identificador ou numero", NULL);
                 goto bad_return;
             }
 
-            if (identExiste(list_wire, it->valor)) {
+            if ( it->classe == NUM_BASE_DECIMAL ) {
+                Componente num = novoComponente("literal_number_decimal", LITERAL_NUMBER);
+                num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
+                insereComponente(gate->listaEntrada, num); // TODO: free mem later
+            }
+            else if (identExiste(list_wire, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaEntrada, in);
@@ -515,7 +520,7 @@ Module* carregaCircuito(FILE* arquivo)
             else {
                 show_error_msg("Entrada da porta logica invalida",
                                it->linha, it->coluna,
-                               "uma entrada valida (tipos: input, output ou wire)",
+                               "uma entrada valida (tipo net ou numero literal)",
                                it->valor);
                 goto bad_return;
             }
@@ -1152,9 +1157,9 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
     if (!avanca(&t))
         goto load_assign_bad_eof;
 
-    // simplest expression is another net
-
-    // negation (~) is also simple, but, for now, is not assign anymore
+    // simplest expression is another net,
+    // logic synthesis, in this case, creates a buf.
+    // negation (~) is also simple, it creates a not.
 
     if ( t->classe == SYM_TILDE ) {
         gate->tipo.operador = op_not;

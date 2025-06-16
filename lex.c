@@ -174,7 +174,6 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
 TokenClass get_token_class(const char* s_tok)
 {
     int i;
-    TokenClass tc;
 
     // IMPORTANT: keep track of the count here!
     #define _QTD_CLASSES 47
@@ -280,19 +279,20 @@ TokenClass get_token_class(const char* s_tok)
         SYM_GRAVE_ACCENT  // = _QTD_CLASSES
     };
 
-    tc = _UNKNOWN;
-
     for ( i = 0; i < _QTD_CLASSES; i++ )
     {
         if ( iguais(from_str[i], s_tok) ) {
-            tc = to_class[i];
-            break;
+            return to_class[i];
         }
+    }
+
+    if ( apenasDigitos(s_tok) ) {
+        return NUM_BASE_DECIMAL;
     }
     
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 
-    return tc;
+    return _UNKNOWN;
 }
 
 int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna)
@@ -698,6 +698,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
         if (isSimbolo(c)) {
             // TODO: capture symbols larger than 1 char
+        symbols_capture:
             coluna++;
             insereToken(tokens, c, linha, coluna);
             goto A;
@@ -735,9 +736,7 @@ ListaToken* tokeniza(FILE* arquivo)
                 }
                 else if (isSimbolo(c)) {
                     insereTokenString(tokens, tok, linha, coluna - len(tok));
-                    coluna++;
-                    insereToken(tokens, c, linha, coluna);
-                    break;
+                    goto symbols_capture;
                 }
                 else if(isalnum(c) || c == '_') {
                     coluna++;

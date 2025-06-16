@@ -26,6 +26,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_delays_v );
   CPPUNIT_TEST( test_simula_samplefile_tri_state_gates_v );
+  CPPUNIT_TEST( test_simula_samplefile_numbers_v );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -426,10 +427,6 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinais* sim_outputs = NULL;
-    Sinal os;
-    Sinal ss;
-    Pulso* pos;
-    Pulso* pss;
 
     FILE* f_delays_v = fopen("./verilog_sample_src/delays.v", "r");
     FILE* f_delays_in = fopen("./inout_sample_files/delays.in", "r");
@@ -457,24 +454,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(8, sim_outputs->quantidade);
     CPPUNIT_ASSERT(sim_outputs->lista);
 
-    for (int i = 0; i < outputs->quantidade; i++)
-    {
-      os = outputs->lista[i];
-      ss = sim_outputs->lista[i];
-
-      pos = os.pulsos;
-      pss = ss.pulsos;
-
-      while (pos->valor != VAL_BLANK && pss->valor != VAL_BLANK)
-      {
-        CPPUNIT_ASSERT_EQUAL(pos->tempo, pss->tempo);
-        CPPUNIT_ASSERT_EQUAL(pos->unidade, pss->unidade);
-        CPPUNIT_ASSERT_EQUAL(pos->valor, pss->valor);
-
-        pos = pos + 1;
-        pss = pss + 1;
-      }
-    }
+    CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
   }
 
   void test_simula_samplefile_tri_state_gates_v()
@@ -519,6 +499,80 @@ public:
     CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
     
     // TODO: check all cases in the Table 7-5 of Std 1364-2005
+  }
+
+  void test_simula_samplefile_numbers_v()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* outputs = NULL;
+    Sinais* sim_outputs = NULL;
+
+    FILE* f_v = fopen("./verilog_sample_src/numbers.v", "r");
+    FILE* f_in = fopen("./inout_sample_files/numbers.in", "r");
+    FILE* f_out = fopen("./inout_sample_files/numbers.in.out", "r");
+
+    CPPUNIT_ASSERT(f_v);
+    CPPUNIT_ASSERT(f_in);
+    CPPUNIT_ASSERT(f_out);
+
+    circuit = carregaCircuito(f_v);
+    CPPUNIT_ASSERT(circuit);
+
+    inputs = carregaEntradas(f_in);
+    CPPUNIT_ASSERT(inputs);
+    CPPUNIT_ASSERT_EQUAL(1, inputs->quantidade);
+    CPPUNIT_ASSERT(inputs->lista);
+
+    outputs = carregaEntradas(f_out);
+    CPPUNIT_ASSERT(outputs);
+    CPPUNIT_ASSERT_EQUAL(2, outputs->quantidade);
+    CPPUNIT_ASSERT(outputs->lista);
+
+    sim_outputs = simula(circuit, inputs);
+    CPPUNIT_ASSERT(sim_outputs);
+    CPPUNIT_ASSERT_EQUAL(2, sim_outputs->quantidade);
+    CPPUNIT_ASSERT(sim_outputs->lista);
+
+    CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
+  }
+
+  bool helper_compare_signal_lists(Sinais* list_a, Sinais* list_b)
+  {
+    Sinal os;
+    Sinal ss;
+    Pulso* pos;
+    Pulso* pss;
+
+    // basic len check
+    if ( list_a->quantidade != list_b->quantidade ) {
+      return false;
+    }
+
+    // compare all pairs
+    for (int i = 0; i < list_a->quantidade; i++)
+    {
+      os = list_a->lista[i];
+      ss = list_b->lista[i];
+
+      pos = os.pulsos;
+      pss = ss.pulsos;
+
+      // check all the signal in the pair
+      while ( pos->valor != VAL_BLANK && pss->valor != VAL_BLANK )
+      {
+        if ( pos->tempo != pss->tempo ||
+             pos->unidade != pss->unidade ||
+             pos->valor != pss->valor ) {
+          return false;
+        }
+
+        pos = pos + 1;
+        pss = pss + 1;
+      }
+    }
+
+    return true;
   }
 
 };

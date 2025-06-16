@@ -181,3 +181,15 @@ UnidTempo get_timeunit_from_str(const char* str)
 invalid_timeunit:
     return UN_INVALID;
 }
+
+ValorLogico long_to_logicvalue(long n)
+{
+    // Check the least significant bit of n
+    // If the LSB is 1, (n & 1) will be 1
+    // If the LSB is 0, (n & 1) will be 0
+    
+    if (n & 1)
+        return VAL_1;
+    
+    return VAL_0;
+}

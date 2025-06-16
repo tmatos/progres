@@ -64,7 +64,12 @@ Sinais* simula(Module* circuto, Sinais* entradas)
 
     // print matches msg
     if (!global_silent_mode) {
-        printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
+        printf("----------\n"
+               "Entradas: \n"
+               "   .v = %d\n"
+               "  .in = %d\n"
+               "match = %d\n"
+               "----------\n",
                circuto->listaFiosEntrada->tamanho,
                entradas->quantidade,
                validos);

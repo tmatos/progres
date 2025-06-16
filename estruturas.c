@@ -247,11 +247,15 @@ Componente novoComponente(const char* nome, t_operador porta)
     c->tipo.operador = porta;
     c->tipo.atraso = 0; // atraso default eh zero
 
-    c->listaEntrada = novaListaComponente();
+    c->listaEntrada = NULL;
     c->sinalEntrada = NULL;
-
-    c->listaSaida = novaListaComponente();
+    c->listaSaida = NULL;
     c->sinalSaida = NULL;
+
+    if (porta != LITERAL_NUMBER) {
+        c->listaEntrada = novaListaComponente();
+        c->listaSaida = novaListaComponente();
+    }
 
     c->valorDinamico = VAL_X;
 

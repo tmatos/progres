@@ -23,6 +23,13 @@ typedef enum en_logic_value {
     VAL_BLANK
 } ValorLogico;
 
+/** @brief Convert from a long integer to a one bit logic value of type ValorLogico.
+ *         It takes the least significant bit of n to define the value.
+ *  @param n A number of type long integer.
+ *  @return Either VAL_0 or VAL_1, from enum ValorLogico.
+ */
+ValorLogico long_to_logicvalue(long n);
+
 /** @brief Unidades de tempo disponíveis para a duração de um pulso.
            Na ordem: segundo, milisegundo, microsegundo, nanosegundo, picosegundo e femtosegundo.
            O valor numérico é equivalente ao valor absoluto do módulo do expoente.

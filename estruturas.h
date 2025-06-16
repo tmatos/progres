@@ -24,6 +24,7 @@ typedef enum en_operador {
     OP_BUF_IF1,
     OP_NOT_IF0,
     OP_NOT_IF1,
+    LITERAL_NUMBER,
     wire,
     output,
     input,
@@ -72,7 +73,7 @@ struct st_componente {
     ListaComponente* listaSaida;
     Sinal* sinalSaida;
 
-    ValorLogico valorDinamico; // in case of a net type
+    ValorLogico valorDinamico; // in case of a net type (or literal number)
     unsigned int size; // size in bits
 };
 
