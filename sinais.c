@@ -56,8 +56,9 @@ int set_pulse_blank(Pulso* p)
 
 int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao)
 {
-    int tamanho = 1;
-    Pulso* it = NULL;
+    int tamanho;
+    int qtd;
+    Pulso* it;
 
     if (!s)
         return 0;
@@ -65,21 +66,33 @@ int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao)
     if (!s->pulsos)
         return 0;
 
+    tamanho = 2; // tamanho minimo de array de pulsos com algum valor
+
+    qtd = 0;
     it = s->pulsos;
+
+    // add na contagem a qtd de pulsos (com valor) ja existente
     while(it->valor != VAL_BLANK)
     {
-        tamanho++;
+        qtd++;
         it++;
     }
 
-    tamanho++;
-    s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
+    tamanho += qtd;
 
-    // acessando a penultima posicao, lembre q eh um vetor!
-    s->pulsos[tamanho - 2].valor = valor;
-    s->pulsos[tamanho - 2].tempo = duracao;
+    if ( (qtd > 0) && (s->pulsos[qtd - 1].valor == valor) ) {
+        s->pulsos[qtd - 1].tempo += duracao;
+    }
+    else {
+        s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
 
-    set_pulse_blank( &(s->pulsos[tamanho - 1]) );
+        // acessando a penultima posicao, lembre que eh um vetor
+        s->pulsos[tamanho - 2].valor = valor;
+        s->pulsos[tamanho - 2].tempo = duracao;
+
+        // acessando a ultima posicao
+        set_pulse_blank( &(s->pulsos[tamanho - 1]) );
+    }
 
     s->duracaoTotal += duracao;
 
@@ -98,42 +111,52 @@ Sinais* new_signal_list()
     return s;
 }
 
-int add_new_signal(Sinais* s, const char* nome)
+int add_new_signal(Sinais* list, const char* nome)
 {
-    s->quantidade++;
+    Sinal* s;
 
-    if (s->quantidade == 1) {
-        s->lista = (Sinal*) xmalloc(sizeof(Sinal));
+    list->quantidade++;
+
+    if ( list->quantidade == 1 ) {
+        list->lista = (Sinal*) xmalloc(sizeof(Sinal));
     }
     else {
-        s->lista = (Sinal*) xrealloc( s->lista, sizeof(Sinal) * s->quantidade );
+        list->lista = (Sinal*) xrealloc( list->lista,
+                                         sizeof(Sinal) * list->quantidade );
     }
-    
-    set_signal_name( s->lista + (s->quantidade - 1), nome);
-    s->lista[s->quantidade - 1].pulsos = (Pulso*) xmalloc(sizeof(Pulso));
-    set_pulse_blank( s->lista[s->quantidade - 1].pulsos + 0 );
-    s->lista[s->quantidade - 1].duracaoTotal = 0;
+
+    s = list->lista + (list->quantidade - 1);
+    set_signal_name(s, nome);
+
+    s->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
+    set_pulse_blank( s->pulsos + 0 );
+    s->duracaoTotal = 0;
     
     return 1;
 }
 
-int insert_signal(Sinais* ls, Sinal* sinal)
+int insert_signal(Sinais* list_sinal, Sinal* sinal)
 {
     Pulso *it = NULL;
 
     if (!sinal)
         return 0;
 
-    if (!ls)
-        ls = new_signal_list();
+    if (!list_sinal) // FIXME
+        list_sinal = new_signal_list();
 
-    add_new_signal(ls, sinal->nome);
+    add_new_signal(list_sinal, sinal->nome);
 
     it = sinal->pulsos;
     while(it->valor != VAL_BLANK)
     {
-        // adiciona cada pulso do sinal original para o novo sinal da lista (ou seja, o ultimo)
-        add_new_pulse( ls->lista + (ls->quantidade - 1), it->valor, it->tempo );
+        // add cada pulso do sinal original ao novo sinal
+        // criado na lista destino (que esta na ultima posicao)
+        
+        add_new_pulse( list_sinal->lista + (list_sinal->quantidade - 1),
+                       it->valor,
+                       it->tempo );
+
         it++;
     }
 

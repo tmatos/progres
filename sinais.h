@@ -113,6 +113,7 @@ int set_pulse_blank(Pulso* p);
     @param s Ponteiro para um sinal.
     @param valor Valor lógico do pulso a ser adicionado.
     @param duracao Duracao, em unidade adimensional, de tempo do pulso a ser inserido.
+    @return 1 em caso de sucesso, 0 caso falhe.
  */
 int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
 
@@ -122,12 +123,18 @@ int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
  */
 Sinais* new_signal_list();
 
-/** @brief Insere um sinal em branco na estrutura Sinais.
+/** @brief Insere um sinal em branco na struct que representa uma lista de Sinais.
+ *  @param list Uma lista de sinais.
+ *  @param nome String com o nome do sinal em branco.
+ *  @return 1 em caso de sucesso
  */
-int add_new_signal(Sinais* s, const char* nome);
+int add_new_signal(Sinais* list, const char* nome);
 
-/** @brief Copia um sinal para a estrutura Sinais.
+/** @brief Copia um sinal para a struct que representa uma lista de sinais.
+ *  @param list_sinal Uma lista de sinais.
+ *  @param sinal O sinal a ser copiado.
+ *  @return 1 em caso de sucesso, 0 caso falhe.
  */
-int insert_signal(Sinais* ls, Sinal* sinal);
+int insert_signal(Sinais* list_sinal, Sinal* sinal);
 
 #endif // SINAIS_H
