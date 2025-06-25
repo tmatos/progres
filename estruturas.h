@@ -113,11 +113,9 @@ typedef struct st_module {
     Sinais* sinaisSaida;
 
     ListaComponente* listaWires;
-
     ListaComponente* listaPortas;
 
     ListaReg listaReg;
-
     ListaParam listaParam;
 
     Tempo timescale_number;

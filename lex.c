@@ -177,7 +177,7 @@ TokenClass get_token_class(const char* s_tok)
     int i;
 
     // IMPORTANT: keep track of the count here!
-    #define _QTD_CLASSES 47
+    #define _QTD_CLASSES 48
     #define _MAX_STRLEN_IN_ARRAY 13
 
     char from_str[_QTD_CLASSES][_MAX_STRLEN_IN_ARRAY] = {
@@ -227,6 +227,7 @@ TokenClass get_token_class(const char* s_tok)
         "&",
         "|",     // = 45
         "^",
+        "$",
         "\x60"   // = _QTD_CLASSES
     };
 
@@ -277,6 +278,7 @@ TokenClass get_token_class(const char* s_tok)
         SYM_AMPERSAND,
         SYM_PIPE,         // = 45
         SYM_CIRCUMFLEX,
+        SYM_DOLLAR,
         SYM_GRAVE_ACCENT  // = _QTD_CLASSES
     };
 

@@ -15,6 +15,7 @@
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "eventos.h"
 #include "strutil.h"
 #include "lex.h"
 #include "preprocessor.h"
@@ -147,6 +148,9 @@ Module* carregaCircuito(const char* file_path)
     int range_lsb;
     int input_count;
     int output_count;
+
+    Evento* initial_tran_events = NULL;
+    Evento* initial_task_events = NULL;
 
     VerilogError err;
 
@@ -626,7 +630,7 @@ Module* carregaCircuito(const char* file_path)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito);
+            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito, &initial_task_events);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -733,7 +737,7 @@ Module* carregaCircuito(const char* file_path)
             goto bad_return;
         }
 
-        if(!avanca(&it))
+        if (!avanca(&it))
             goto bad_return_unexpected_eof;
             
     }
@@ -750,6 +754,36 @@ bad_return:
     delete_lista_token(list_wire);
     delete_lista_token(list_param);
     delete_lista_token(tokens);
+
+    if (initial_tran_events) {
+        Evento* tmp;
+        Evento* evt_it = initial_tran_events;
+
+        while (evt_it)
+        {
+            if ( evt_it->listaTransicao )
+                delete_list_transicao( &(evt_it->listaTransicao) );
+
+            tmp = evt_it;
+            evt_it = evt_it->proximo;
+            free(tmp);
+        }
+    }
+    
+    if (initial_task_events) {
+        Evento* tmp;
+        Evento* evt_it = initial_task_events;
+
+        while (evt_it)
+        {
+            if ( evt_it->listaTransicao )
+                delete_list_transicao( &(evt_it->listaTransicao) );
+
+            tmp = evt_it;
+            evt_it = evt_it->proximo;
+            free(tmp);
+        }
+    }
 
     free_module(&circuito);
     fclose(f_verilog_source);
@@ -1054,13 +1088,31 @@ load_directive_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 }
 
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
+VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
 {
     Token* t = *it;
     Register* left_reg = NULL;
 
     if (!avanca(&t))
         goto load_initial_block_bad_eof;
+
+    // systask handling
+    if (t->classe == SYM_DOLLAR) {
+        VerilogError err = load_systask(&t, initial_task_events, module);
+        switch (err)
+        {
+        case ERROR_VERILOG_BAD_EOF:
+            goto load_initial_block_bad_eof;
+            break;
+        case ERROR_VERILOG_BAD_TOKEN:
+            goto load_initial_block_bad_token;
+            break;
+        default:
+            // no error
+            goto load_initial_block_sucess;
+            break;
+        }
+    }
 
     // treat a single statement attrib, for now
 
@@ -1113,7 +1165,7 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
         goto load_initial_block_bad_token;
     }
 
-//load_initial_block_sucess:
+load_initial_block_sucess:
     *it = t;
     return NO_ERROR;
 
@@ -1242,5 +1294,97 @@ load_assign_bad_token:
 
 load_assign_bad_eof:
     delete_componente(&gate);
+    return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module)
+{
+    int count = 0; // task arg counter
+
+    Token* t = *it;
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if ( !isIdentificador(t) ) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "o nome de uma task", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !iguais(t->valor, "display") ) {
+        show_error_msg("Task invalida ou nao suportada",
+                        t->linha, t->coluna, "o nome de uma task suportada", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if (t->classe != SYM_OPEN_BRACKET) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "(", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    // read arguments
+
+    char str[MAX_TOKEN_SIZE];
+    str[0] = '\0';
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    // first arg SHOULD be a string
+
+    copy(str, t->valor);
+
+    // there may be zero to n more args
+
+systask_args_load:
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if (t->classe == SYM_CLOSE_BRACKET) {
+        if ( !avanca(&t) )
+            goto load_systask_bad_eof;
+
+        if (t->classe != SYM_SEMICOLON) {
+            show_error_msg("Token inesperado foi encontrado",
+                            t->linha, t->coluna, ";", t->valor);
+            goto load_systask_bad_token;
+        }
+
+        goto load_systask_sucess;
+    }
+
+    if (t->classe != SYM_COMMA) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, ", ou )", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+    
+    // check arg validity and save to some stack
+    // if (t->class == ???)
+
+    count++;
+
+    goto systask_args_load;
+
+load_systask_sucess:
+
+    insert_task_event(initial_task_events, (Tempo)0, TASK_DISPLAY, str);
+
+    *it = t;
+    return NO_ERROR;
+
+load_systask_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_systask_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }

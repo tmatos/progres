@@ -21,6 +21,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaCircuito_localparam_test_v );
   CPPUNIT_TEST( test_carregaCircuito_named_gates_test_v );
   CPPUNIT_TEST( test_carregaCircuito_initial_single_test_v );
+  CPPUNIT_TEST( test_carregaCircuito_display_v );
   CPPUNIT_TEST( test_carregaCircuito_assigns_v );
   CPPUNIT_TEST( test_carregaCircuito_tri_state_gates_v );
   CPPUNIT_TEST( test_carregaCircuito_badverilog_XX_v );
@@ -146,6 +147,17 @@ public:
     free_module(&circuit);
   }
 
+  void test_carregaCircuito_display_v()
+  {
+    Module* m = carregaCircuito("./verilog_sample_src/display.v");
+
+    CPPUNIT_ASSERT(m);
+
+    // TODO: more inspections
+
+    free_module(&m);
+  }
+  
   void test_carregaCircuito_assigns_v()
   {
     Module* circuit = carregaCircuito("./verilog_sample_src/assigns.v");
@@ -275,7 +287,19 @@ public:
       "./verilog_sample_src/badverilog_85.v",
       "./verilog_sample_src/badverilog_85a.v",
       "./verilog_sample_src/badverilog_86.v",
-      "./verilog_sample_src/badverilog_86a.v"
+      "./verilog_sample_src/badverilog_86a.v",
+      "./verilog_sample_src/badverilog_87.v",
+      "./verilog_sample_src/badverilog_87a.v",
+      "./verilog_sample_src/badverilog_87b.v",
+      "./verilog_sample_src/badverilog_87c.v",
+      "./verilog_sample_src/badverilog_87d.v",
+      "./verilog_sample_src/badverilog_87e.v",
+      "./verilog_sample_src/badverilog_87f.v",
+      "./verilog_sample_src/badverilog_87g.v",
+      "./verilog_sample_src/badverilog_87h.v",
+      "./verilog_sample_src/badverilog_87i.v",
+      "./verilog_sample_src/badverilog_87j.v",
+      "./verilog_sample_src/badverilog_87k.v"
     };
 
     Module* circuit = NULL;

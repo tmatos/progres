@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include "estruturas.h"
+#include "eventos.h"
 #include "lex.h"
 
 /** @brief Enum para tipos de error nas rotinas de parsing
@@ -59,11 +60,15 @@ VerilogError load_directive(Token** it, Module* module);
 
 /** @brief Parsing de blocos initial
  */
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
+VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
 
 /** @brief Parsing de 'assign'
  */
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
+
+/** @brief Parsing of system tasks
+ */
+VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module);
 
 /** @brief Retorna verdadeiro se um Token representa um logic gate em Verilog.
  *  @param t Um Token pointer qualquer.

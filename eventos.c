@@ -12,6 +12,8 @@
 #include "estruturas.h"
 #include "sinais.h"
 #include "mem.h"
+#include "lex.h"
+#include "strutil.h"
 
 Evento* new_event_at(Tempo t, EventKind k)
 {
@@ -37,10 +39,14 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register
     evt = new_event_at(t, k);
 
     evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
+    
     evt->listaTransicao->fio = comp;
     evt->listaTransicao->reg = r;
     evt->listaTransicao->novoValor = novoValor;
     evt->listaTransicao->proximo = NULL;
+
+    evt->listaTransicao->task_type = TASK_UNKNOWN;
+    evt->listaTransicao->task_code = NULL;
 
     // empty queue
     if ( !(*fila) ) {
@@ -86,6 +92,82 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register
             evt->ultimaTransicao = evt->listaTransicao;
             evt->proximo = it;
             *fila = evt; // ele vira o primeiro da fila
+
+            return;
+        }
+        
+        // insert between two events, the previous and next
+        evt->ultimaTransicao = evt->listaTransicao;
+        evt->proximo = it;
+        ant->proximo = evt;
+    }
+}
+
+void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code)
+{
+    Evento* evt = NULL;
+    Evento* ant = NULL; // evento anterior
+    Evento* it = NULL;
+
+    evt = new_event_at(t, EVT_SYS_TASK);
+
+    evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
+
+    evt->listaTransicao->task_type = sys_task;
+    evt->listaTransicao->task_code = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE + 1 );
+    copy( evt->listaTransicao->task_code, code );
+
+    evt->listaTransicao->fio = NULL;
+    evt->listaTransicao->reg = NULL;
+    evt->listaTransicao->novoValor = VAL_BLANK;
+    evt->listaTransicao->proximo = NULL;
+
+    // empty queue case
+    if ( !(*fila) ) {
+        evt->ultimaTransicao = evt->listaTransicao;
+        *fila = evt;
+
+        return;
+    }
+
+    // search for the position
+    ant = NULL;
+    it = *fila;
+    while ( it && (it->quando < t) )
+    {
+        ant = it;
+        it = it->proximo;
+    }
+
+     // insert the event at the last position in queue
+    if (!it) {
+        evt->ultimaTransicao = evt->listaTransicao;
+
+        evt->proximo = it;
+        ant->proximo = evt;
+
+        return;
+    }
+
+    // an event exists at same instant, so
+    // append the new evt transi list to the existing evt transi list 
+    if (t == it->quando)
+    {
+        it->ultimaTransicao->proximo = evt->listaTransicao;
+        it->ultimaTransicao = evt->listaTransicao;
+
+        free(evt);
+
+        return;
+    }
+
+    if (t < it->quando)
+    {
+        // insert event at the beginning of the queue
+        if (ant == NULL) {
+            evt->ultimaTransicao = evt->listaTransicao;
+            evt->proximo = it;
+            *fila = evt; // it becomes the first in the queue
 
             return;
         }

@@ -7,6 +7,8 @@
 
 #define LEX_H
 
+#include <stdio.h>
+
 #if defined(_WIN32) || defined(__CYGWIN__) || defined(__vxworks)
     #define MAX_PATH_LENGTH 255
 #else
@@ -82,6 +84,7 @@ typedef enum en_token_class {
     SYM_AMPERSAND, // &
     SYM_PIPE, // |
     SYM_CIRCUMFLEX, // ^
+    SYM_DOLLAR, // $
     SYM_GRAVE_ACCENT, // `
 
     NUM_BASE_BINARY,

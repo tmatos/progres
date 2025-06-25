@@ -11,6 +11,70 @@
 #include "estruturas.h"
 #include "sinais.h"
 
+/** @brief Enum to represent Verilog system tasks.
+ */
+typedef enum {
+    // Display and Monitoring Tasks
+    TASK_DISPLAY,    // $display
+    TASK_WRITE,      // $write
+    TASK_MONITOR,    // $monitor
+    TASK_STIMULUS,   // $stb, $stw
+    TASK_FDISPLAY,   // $fdisplay
+    TASK_FWRITE,     // $fwrite
+    TASK_FMONITOR,   // $fmonitor
+    TASK_READMEMB,   // $readmemb
+    TASK_READMEMH,   // $readmemh
+    TASK_WRITEMEMB,  // $writememb
+    TASK_WRITEMEMH,  // $writememh
+
+    // Simulation Control Tasks
+    TASK_FINISH,     // $finish
+    TASK_STOP,       // $stop
+    TASK_RESET,      // $reset (deprecated)
+
+    // Time and Delay Tasks
+    TASK_TIME,       // $time
+    TASK_REALTIME,   // $realtime
+    TASK_Q_TIME,     // $q_time (deprecated)
+    TASK_SETUP,      // $setup
+    TASK_HOLD,       // $hold
+    TASK_SETUPHOLD,  // $setuphold
+    TASK_SKEW,       // $skew
+    TASK_WIDTH,      // $width
+    TASK_NOCHANGE,   // $nochange
+
+    // Logic Value Tasks
+    TASK_COUNTZEROS, // $countones (not $countzeros directly, but for counting bits)
+    TASK_ONEHOT,     // $onehot
+    TASK_ISUNKNOWN,  // $isunknown
+
+    // File I/O Tasks
+    TASK_FOPEN,      // $fopen
+    TASK_FCLOSE,     // $fclose
+    TASK_FGETC,      // $fgetc
+    TASK_UNGETC,     // $ungetc
+    TASK_FEOF,       // $feof
+    TASK_FFLUSH,     // $fflush
+    TASK_FSCANF,     // $fscanf
+    TASK_FGETS,      // $fgets
+
+    // Conversion and Utility Tasks
+    TASK_ITOR,       // $itor
+    TASK_RTOI,       // $rtoi
+    TASK_CAST,       // $cast (SystemVerilog, but common)
+    TASK_RANDOM,     // $random
+    TASK_SPRINTF,    // $sformatf (Verilog/SystemVerilog equivalent of sprintf)
+
+    // Deprecated or Less Common Tasks
+    TASK_DECAY,      // $decay (deprecated)
+    TASK_PULLUP,     // $pullup (deprecated)
+    TASK_PULLDOWN,   // $pulldown (deprecated)
+    TASK_NOOP,       // Placeholder for no specific task
+
+    TASK_UNKNOWN,
+    TASK_UNSUPPORTED
+} SystemTask;
+
 typedef struct st_transicao Transicao;
 
 /**
@@ -19,9 +83,13 @@ typedef struct st_transicao Transicao;
           Esta lista é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
  */
 struct st_transicao {
+    SystemTask task_type;
+    char* task_code;
+
     Componente fio; // Indica o componente sobre o qual o evento se origina, apenas wires
     Register* reg; // in case of a transition in register value
     ValorLogico novoValor; // Novo valor lógico a ser setado
+
     Transicao* proximo;
 };
 
@@ -61,6 +129,10 @@ typedef Evento* FilaEventos;
  * @brief Desalocar da memória a lista passada.
  */
 void delete_list_transicao(Transicao** list);
+
+/** @brief .
+ */
+void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code);
 
 /**
  * @brief Adiciona à fila um evento no tempo t que faz a transição do valor de comp para o novoValor.
