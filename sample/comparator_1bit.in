@@ -1,0 +1,5 @@
+
+// input stimulus for top module in comparator_1bit.v
+
+a { x(5), 0(5), 0(5), 1(5), 1(5), z(5), 0(5), z(5), 1(5), z(5) }
+b { x(5), 0(5), 1(5), 0(5), 1(5), 0(5), z(5), 1(5), z(5), z(5) }
