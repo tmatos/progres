@@ -24,9 +24,6 @@ int main(int argc, char* argv[])
     int arg_offset = 0;
     char* str_verilog_source;
 
-    FILE* f_wave_in = NULL;
-    FILE* f_wave_out = NULL;
-
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
     Module* circuto1 = NULL;
@@ -80,21 +77,7 @@ int main(int argc, char* argv[])
     }
 
     // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
-    f_wave_in = fopen(argv[2+arg_offset], "r");
-
-    if (!f_wave_in) {
-        if (!global_silent_mode)
-            printf("Impossibilitado de abrir o arquivo de entrada: %s\n", argv[2+arg_offset]);
-
-        exit(1);
-    }
-
-    if (!global_silent_mode)
-        printf("Abrindo o arquivo de entrada: %s\n", argv[2+arg_offset]);
-
-    sinais_entradas = carregaEntradas(f_wave_in);
-
-    fclose(f_wave_in);
+    sinais_entradas = load_inputs_from_path( argv[2 + arg_offset] );
 
     if (!sinais_entradas) {
         if (!global_silent_mode)
@@ -120,27 +103,57 @@ int main(int argc, char* argv[])
             printf("Simulacao concluida com saidas geradas.\n");
     }
 
-    free_signal_list(&sinais_entradas);
+    save_outputs_to_path(str_wave_out_filepath, sinais_saidas);
 
-    f_wave_out = fopen(str_wave_out_filepath, "w");
+    free_signal_list(&sinais_entradas);
+    free_signal_list(&sinais_saidas);
+    free_module(&circuto1);
+
+    return 0;
+}
+
+Sinais* load_inputs_from_path(const char* path)
+{
+    Sinais* sinais_entradas = NULL;
+
+    FILE* f_wave_in = fopen(path, "r");
+
+    if (!f_wave_in) {
+        if (!global_silent_mode) {
+            printf("Impossibilitado de abrir o arquivo de entrada: %s\n", path);
+        }
+
+        exit(1);
+    }
+
+    if (!global_silent_mode) {
+        printf("Abrindo o arquivo de entrada: %s\n", path);
+    }
+
+    sinais_entradas = carregaEntradas(f_wave_in);
+    fclose(f_wave_in);
+
+    return sinais_entradas;
+}
+
+void save_outputs_to_path(const char* path, Sinais* outputs)
+{
+    FILE* f_wave_out = fopen(path, "w");
 
     if (!f_wave_out) {
-        if (!global_silent_mode)
-            printf("Erro ao tentar abrir arquivo de saida '%s' para gravacao.\n",
-                   str_wave_out_filepath);
+        if (!global_silent_mode) {
+            printf("Erro ao tentar abrir arquivo de saida"
+                   " '%s' para gravacao.\n", path);
+        }
 
         exit(1);
     }
     
-    salvarSinais(sinais_saidas, f_wave_out);
+    salvarSinais(outputs, f_wave_out);
+
     fclose(f_wave_out);
     
-    if (!global_silent_mode)
-        printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
-
-    free_signal_list(&sinais_saidas);
-
-    free_module(&circuto1);
-
-    return 0;
+    if (!global_silent_mode) {
+        printf("Arquivo de saida salvo em '%s'.\n", path);
+    }
 }
