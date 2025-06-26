@@ -123,6 +123,11 @@ int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
  */
 Sinais* new_signal_list();
 
+/** @brief Free mem and set NULL to pointer.
+ *  @param list Pointer to Sinais*
+ */
+void free_signal_list(Sinais** list);
+
 /** @brief Insere um sinal em branco na struct que representa uma lista de Sinais.
  *  @param list Uma lista de sinais.
  *  @param nome String com o nome do sinal em branco.

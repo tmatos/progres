@@ -21,7 +21,6 @@ int global_silent_mode;
 
 int main(int argc, char* argv[])
 {
-    int i;
     int arg_offset = 0;
     char* str_verilog_source;
 
@@ -121,17 +120,7 @@ int main(int argc, char* argv[])
             printf("Simulacao concluida com saidas geradas.\n");
     }
 
-    // free mem (inputs)
-    if (sinais_entradas) {
-        for ( i=0 ; i < sinais_entradas->quantidade ; i++ )
-            free(sinais_entradas->lista[i].pulsos);
-        
-        if (sinais_entradas->lista)
-            free(sinais_entradas->lista);
-
-        free(sinais_entradas);
-        sinais_entradas = NULL;
-    }
+    free_signal_list(&sinais_entradas);
 
     f_wave_out = fopen(str_wave_out_filepath, "w");
 
@@ -149,17 +138,7 @@ int main(int argc, char* argv[])
     if (!global_silent_mode)
         printf("Arquivo de saida salvo em '%s'.\n", str_wave_out_filepath);
 
-    // free mem (outputs)
-    if (sinais_saidas) {
-        for ( i=0 ; i < sinais_saidas->quantidade ; i++ )
-            free(sinais_saidas->lista[i].pulsos);
-        
-        if (sinais_saidas->lista)
-            free(sinais_saidas->lista);
-
-        free(sinais_saidas);
-        sinais_saidas = NULL;
-    }
+    free_signal_list(&sinais_saidas);
 
     free_module(&circuto1);
 

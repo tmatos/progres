@@ -111,6 +111,25 @@ Sinais* new_signal_list()
     return s;
 }
 
+void free_signal_list(Sinais** list)
+{
+    int i;
+
+    if ( *list ) {
+        for ( i=0 ; i < (*list)->quantidade ; i++ )
+        {
+            free( (*list)->lista[i].pulsos );
+        }
+        
+        if ( (*list)->lista ) {
+            free( (*list)->lista );
+        }
+
+        free( *list );
+        *list = NULL;
+    }
+}
+
 int add_new_signal(Sinais* list, const char* nome)
 {
     Sinal* s;
