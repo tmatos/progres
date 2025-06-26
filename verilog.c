@@ -755,35 +755,11 @@ bad_return:
     delete_lista_token(list_param);
     delete_lista_token(tokens);
 
-    if (initial_tran_events) {
-        Evento* tmp;
-        Evento* evt_it = initial_tran_events;
-
-        while (evt_it)
-        {
-            if ( evt_it->listaTransicao )
-                delete_list_transicao( &(evt_it->listaTransicao) );
-
-            tmp = evt_it;
-            evt_it = evt_it->proximo;
-            free(tmp);
-        }
-    }
+    if (initial_tran_events)
+        delete_event_queue(&initial_tran_events);
     
-    if (initial_task_events) {
-        Evento* tmp;
-        Evento* evt_it = initial_task_events;
-
-        while (evt_it)
-        {
-            if ( evt_it->listaTransicao )
-                delete_list_transicao( &(evt_it->listaTransicao) );
-
-            tmp = evt_it;
-            evt_it = evt_it->proximo;
-            free(tmp);
-        }
-    }
+    if (initial_task_events)
+        delete_event_queue(&initial_task_events);
 
     free_module(&circuito);
     fclose(f_verilog_source);

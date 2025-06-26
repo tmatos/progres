@@ -141,6 +141,10 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* 
  */
 void insert_event(Evento **fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor);
 
+/** @brief .
+ */
+void delete_event_queue(Evento **fila);
+
 /**
  * @brief Cria um novo evento, sem transições definidas, no tempo t.
  * @param t Tempo em que ocorre o evento.

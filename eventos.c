@@ -103,6 +103,23 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register
     }
 }
 
+void delete_event_queue(Evento** queue)
+{
+    Evento* tmp;
+    Evento* evt_it = *queue;
+
+    while (evt_it)
+    {
+        if ( evt_it->listaTransicao ) {
+            delete_list_transicao( &(evt_it->listaTransicao) );
+        }
+
+        tmp = evt_it;
+        evt_it = evt_it->proximo;
+        free(tmp);
+    }
+}
+
 void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code)
 {
     Evento* evt = NULL;
