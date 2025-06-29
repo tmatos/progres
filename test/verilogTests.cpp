@@ -209,6 +209,7 @@ public:
       "./verilog_sample_src/badverilog_16.v",
       "./verilog_sample_src/badverilog_17.v",
       "./verilog_sample_src/badverilog_17a.v",
+      "./verilog_sample_src/badverilog_17b.v",
       "./verilog_sample_src/badverilog_18.v",
       "./verilog_sample_src/badverilog_19.v",
       "./verilog_sample_src/badverilog_20.v",

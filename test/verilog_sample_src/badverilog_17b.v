@@ -1,4 +1,4 @@
 
 module nome( a, b, c);
 
-input unk 
+input wire

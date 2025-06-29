@@ -242,10 +242,17 @@ Module* carregaCircuito(const char* file_path)
             || it->classe == KW_WIRE )
         {
             // usado posteriormente para saber se os identificadores serao in ou out
-            char tipo[MAX_TOKEN_SIZE];
-            copy(tipo, it->valor);
+            TokenClass token_subcase = it->classe;
 
             avanca(&it);
+            if (!it)
+                goto bad_return_unexpected_eof;
+
+            if ( (token_subcase != KW_WIRE) && (it->classe == KW_WIRE) ) {
+                avanca(&it);
+                if (!it)
+                    goto bad_return_unexpected_eof;
+            }
 
             expect_comma = 0; // nao esperando por uma virgula inicialmente
 
@@ -280,7 +287,7 @@ Module* carregaCircuito(const char* file_path)
                     }
                 }
 
-                if ( !iguais(tipo, "wire") && !identExiste(identifiers_to_be, it->valor) ) {
+                if ( (token_subcase != KW_WIRE) && !identExiste(identifiers_to_be, it->valor) ) {
                     show_error_msg("Identificador invalido",
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
@@ -288,19 +295,19 @@ Module* carregaCircuito(const char* file_path)
                     goto bad_return;
                 }
 
-                if ( iguais(tipo, "input") ) {
+                if ( token_subcase == KW_INPUT ) {
                     insereTokenString(list_input, it->valor, -1, -1);
 
                     // atribui como entrada o identificador na estrutura
                     adicionaEntrada( circuito, novoComponente(it->valor, input) );
                 }
-                else if ( iguais(tipo, "output") ) {
+                else if ( token_subcase == KW_OUTPUT ) {
                     insereTokenString(list_output, it->valor, -1, -1);
 
                     // atribui como saida o identificador na estrutura
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
-                else if ( iguais(tipo, "wire") ) {
+                else if ( token_subcase == KW_WIRE ) {
                     range_msb = 0;
                     range_lsb = 0;
 
