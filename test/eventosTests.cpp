@@ -11,7 +11,9 @@ class Testes_eventos : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_eventos );
   CPPUNIT_TEST( test_insert_event );
+  CPPUNIT_TEST( test_delete_event_queue );
   CPPUNIT_TEST( test_getTransicoesEm );
+  CPPUNIT_TEST( test_pop_event );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -19,6 +21,10 @@ public:
   void test_insert_event()
   {
     Evento* fila = NULL;
+
+    insert_event( &fila, (Tempo)1, EVT_NET_TRANSITION, NULL, NULL, VAL_0 );
+
+    CPPUNIT_ASSERT(!fila);
 
     Tempo t = (Tempo)5000;
     Componente c0 = novoComponente( (char*)"entrada_componente_0", input );
@@ -59,6 +65,37 @@ public:
     free(fila);
 
     //TODO: testar ainda mais outras possibilidades
+  }
+
+  void test_delete_event_queue()
+  {
+    Evento* q = NULL;
+
+    Tempo t = (Tempo)10;
+    ValorLogico v = VAL_1;
+    Componente c_0 = novoComponente( (char*)"in_component_0", input );
+
+    insert_event( &q, t, EVT_NET_TRANSITION, c_0, NULL, v );
+
+    t = 11;
+    v = VAL_0;
+    Componente c_1 = novoComponente( (char*)"in_component_1", input );
+
+    insert_event( &q, t, EVT_NET_TRANSITION, c_1, NULL, v );
+
+    // check list existence
+    CPPUNIT_ASSERT(q);
+    CPPUNIT_ASSERT(q->listaTransicao);
+
+    delete_event_queue(&q);
+
+    // check that func had set q to NULL
+    CPPUNIT_ASSERT(!q);
+
+    delete_event_queue(&q);
+
+    // check that is ok to call on NULL queue
+    CPPUNIT_ASSERT(!q);
   }
 
   void test_getTransicoesEm()
@@ -105,6 +142,37 @@ public:
     free(fila);
 
     // what more?
+  }
+
+  void test_pop_event()
+  {
+    Evento* q = NULL;
+
+    CPPUNIT_ASSERT( ! pop_event(NULL) );
+    CPPUNIT_ASSERT( ! pop_event(&q) );
+
+    insert_event( &q,
+                  (Tempo)10,
+                  EVT_NET_TRANSITION,
+                  novoComponente( (char*)"in_component_0", input ),
+                  NULL,
+                  VAL_0 );
+
+    insert_event( &q,
+                  (Tempo)10,
+                  EVT_NET_TRANSITION,
+                  novoComponente( (char*)"in_component_1", input ),
+                  NULL,
+                  VAL_X );
+
+    Transicao* tr = pop_event(&q);
+
+    CPPUNIT_ASSERT(tr);
+    CPPUNIT_ASSERT(tr->proximo);
+
+    tr = pop_event(&q);
+
+    CPPUNIT_ASSERT(!tr);
   }
 
 };

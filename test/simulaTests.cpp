@@ -326,7 +326,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", s.nome ) );
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)38, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)48, s.duracaoTotal );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -339,6 +339,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)13, s.pulsos[3].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
     free_module(&circuit);
   }
@@ -369,7 +375,7 @@ public:
 
     s = outputs->lista[0];
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.duracaoTotal );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -382,6 +388,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[5].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
     free_module(&circuit);
   }
@@ -412,7 +424,7 @@ public:
 
     s = outputs->lista[0];
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.duracaoTotal );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -425,6 +437,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
     free_module(&circuit);
   }

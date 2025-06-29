@@ -118,6 +118,8 @@ void delete_event_queue(Evento** queue)
         evt_it = evt_it->proximo;
         free(tmp);
     }
+
+    *queue = NULL;
 }
 
 void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code)
