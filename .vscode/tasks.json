@@ -3,21 +3,21 @@
         {
             "type": "shell",
             "label": "run make release",
-            "command": "make",
+            "command": "make clean && make",
             "args": [],
             "problemMatcher": []
         },
         {
             "type": "shell",
             "label": "run make debug",
-            "command": "make debug",
+            "command": "make clean && make debug",
             "args": [],
             "problemMatcher": []
         },
         {
             "type": "shell",
             "label": "run make coverage",
-            "command": "cd test && make clean && make coverage",
+            "command": "cd test && make clean && make coverage && make html",
             "args": [],
             "problemMatcher": [],
             "group": {

@@ -75,7 +75,8 @@ typedef enum {
     TASK_NOOP,       // Placeholder for no specific task
 
     TASK_UNKNOWN,
-    TASK_UNSUPPORTED
+    TASK_UNSUPPORTED,
+    IS_NOT_A_TASK
 } SystemTask;
 
 typedef struct st_transicao Transicao;
@@ -132,6 +133,10 @@ typedef Evento* FilaEventos;
  * @brief Desalocar da memória a lista passada.
  */
 void delete_list_transicao(Transicao** list);
+
+/** @brief Create a new event (or queue) at time 0 without a transi list.
+ */
+Evento* new_empty_event();
 
 /** @brief .
  */

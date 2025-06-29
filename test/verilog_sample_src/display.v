@@ -10,4 +10,3 @@ initial
 	$display("oi, mundo! novamente."); 
 
 endmodule
-

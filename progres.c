@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
-    Module* circuto1 = NULL;
+    Module* circuit = NULL;
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 
@@ -55,9 +55,11 @@ int main(int argc, char* argv[])
 
     str_verilog_source = argv[1 + arg_offset];
 
-    circuto1 = carregaCircuito(str_verilog_source);
+    Evento* initial_task_events = NULL;
 
-    if (circuto1) {
+    circuit = load_module(str_verilog_source, &initial_task_events);
+
+    if (circuit) {
         if (!global_silent_mode)
             printf("Circuito carregado com sucesso.\n");
     }
@@ -96,7 +98,7 @@ int main(int argc, char* argv[])
         strncat(str_wave_out_filepath, ".out", 4);
     }
 
-    sinais_saidas = simula(circuto1, sinais_entradas);
+    sinais_saidas = simula(circuit, sinais_entradas, &initial_task_events);
 
     if (sinais_saidas) {
         if (!global_silent_mode)
@@ -105,9 +107,10 @@ int main(int argc, char* argv[])
 
     save_outputs_to_path(str_wave_out_filepath, sinais_saidas);
 
+    delete_event_queue(&initial_task_events);
     free_signal_list(&sinais_entradas);
     free_signal_list(&sinais_saidas);
-    free_module(&circuto1);
+    free_module(&circuit);
 
     return 0;
 }

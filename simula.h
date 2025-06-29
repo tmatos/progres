@@ -16,7 +16,7 @@ extern "C" {
 /** @brief Função que faz a simulação do circuito com as entradas especificadas.
            Em caso de sucesso, retorna as saídas dessa simulação.
  */
-Sinais* simula(Module* circuto, Sinais* entradas);
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events);
 
 /** @brief Simulação da avaliação da porta 'buf'
  */

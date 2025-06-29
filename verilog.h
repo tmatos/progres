@@ -35,12 +35,13 @@ typedef enum en_verilog_error {
  */
 int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
 
-/** @brief Cria uma estrutura de dados representando o circuito,
-           a partir do arquivo com o codigo fonte em Verilog.
+/** @brief Cria uma estrutura de dados representando um module,
+           a partir do primeiro no arquivo com o codigo fonte em Verilog.
  *  @param file_path String com o caminho do arquivo a ser processado.
- *  @return A estrutura de dados do circuito ou NULL em caso de erro.
+ *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
+ *  @return Pointer para estrutura de dados do circuito ou NULL em caso de erro.
  */
-Module* carregaCircuito(const char* file_path);
+Module* load_module(const char* file_path, Evento** initial_task_events);
 
 /** @brief Parsing de definições de range.
  *  @param it Endereço para o iterador dos tokens.

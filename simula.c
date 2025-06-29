@@ -16,7 +16,7 @@
 #include "eventos.h"
 #include "erros.h"
 
-Sinais* simula(Module* circuto, Sinais* entradas)
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
 {
     int i;
     int j;
@@ -84,9 +84,25 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         return NULL;
     }
 
-    // Inicializacao da fila de eventos com os valores das entradas
-    fila = NULL;
+    // task ocurrences are copied into the event queue
+    Evento* evit = initial_task_events ? *initial_task_events : NULL;
+    while (evit)
+    {
+        Transicao* tranit = evit->listaTransicao;
+        while (tranit)
+        {
+            insert_task_event(&fila,
+                              evit->quando,
+                              tranit->task_type,
+                              tranit->task_code);
 
+            tranit = tranit->proximo;
+        }
+        
+        evit = evit->proximo;
+    }
+
+    // Inicializacao da fila de eventos com os valores das entradas
     for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
         t = 0;
@@ -128,12 +144,14 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         list_tr = pop_event(&fila);
         tr = list_tr;
 
-        // atualiza valores de fios e faz uma lista das
-        // portas alteradas pelas transicoes em list_tr
+        // nao sendo uma system task: atualiza valores de fios e faz
+        // uma lista das portas alteradas pelas transicoes em list_tr;
+        // senao, caso seja task: executa a mesma.
         while (tr)
         {
-            // apenas se houver mudanca de valor no fio
-            if ( tr->fio->valorDinamico != tr->novoValor )
+            // apenas tambem se houver mudanca de valor no fio
+            if ( (tr->task_type == IS_NOT_A_TASK) &&
+                 (tr->fio->valorDinamico != tr->novoValor) )
             {
                 for ( i=0 ; i < tr->fio->listaSaida->tamanho ; i++ )
                 {
@@ -154,6 +172,17 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                 }
 
                 tr->fio->valorDinamico = tr->novoValor;
+            }
+
+            switch (tr->task_type)
+            {
+            case TASK_DISPLAY:
+                if (!global_silent_mode) {
+                    printf("%s\n", tr->task_code);
+                }
+                break;
+            default:
+                break;
             }
 
             tr = tr->proximo;

@@ -27,6 +27,11 @@ Evento* new_event_at(Tempo t, EventKind k)
     return e;
 }
 
+Evento* new_empty_event()
+{
+    return new_event_at( (Tempo)0, EVT_SYS_TASK );
+}
+
 void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor)
 {
     Evento* evt = NULL;
@@ -45,7 +50,7 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register
     evt->listaTransicao->novoValor = novoValor;
     evt->listaTransicao->proximo = NULL;
 
-    evt->listaTransicao->task_type = TASK_UNKNOWN;
+    evt->listaTransicao->task_type = IS_NOT_A_TASK;
     evt->listaTransicao->task_code = NULL;
 
     // empty queue
@@ -77,7 +82,11 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register
     // um evento no instante existe, adicionar a lista de transicoes
     if (t == it->quando)
     {
-        it->ultimaTransicao->proximo = evt->listaTransicao;
+        if (it->ultimaTransicao)
+            it->ultimaTransicao->proximo = evt->listaTransicao;
+        else
+            it->listaTransicao = evt->listaTransicao;
+
         it->ultimaTransicao = evt->listaTransicao;
 
         free(evt);
@@ -107,6 +116,9 @@ void delete_event_queue(Evento** queue)
 {
     Evento* tmp;
     Evento* evt_it = *queue;
+
+    if ( (queue == NULL) || (*queue == NULL) )
+        return;
 
     while (evt_it)
     {
@@ -172,7 +184,11 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* 
     // append the new evt transi list to the existing evt transi list 
     if (t == it->quando)
     {
-        it->ultimaTransicao->proximo = evt->listaTransicao;
+        if (it->ultimaTransicao)
+            it->ultimaTransicao->proximo = evt->listaTransicao;
+        else
+            it->listaTransicao = evt->listaTransicao;
+
         it->ultimaTransicao = evt->listaTransicao;
 
         free(evt);
@@ -241,7 +257,12 @@ void delete_list_transicao(Transicao** list)
     Transicao* pt = *list;
     Transicao* pta;
 
-    while (pt) {
+    if ( (list == NULL) || (*list == NULL) ) {
+        return;
+    }
+
+    while (pt)
+    {
         pta = pt;
         pt = pt->proximo;
         free(pta);

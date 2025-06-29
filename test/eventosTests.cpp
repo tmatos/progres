@@ -10,6 +10,7 @@
 class Testes_eventos : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_eventos );
+  CPPUNIT_TEST( test_new_event_at );
   CPPUNIT_TEST( test_insert_event );
   CPPUNIT_TEST( test_delete_event_queue );
   CPPUNIT_TEST( test_getTransicoesEm );
@@ -17,6 +18,18 @@ class Testes_eventos : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  void test_new_event_at()
+  {
+    Tempo t = (Tempo) 255000111;
+    EventKind k = EVT_NET_TRANSITION;
+
+    Evento* q = new_event_at(t, k);
+
+    CPPUNIT_ASSERT(q);
+
+    free(q);
+  }
 
   void test_insert_event()
   {

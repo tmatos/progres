@@ -134,7 +134,7 @@ load_module_header_bad_return:
     return 0;
 }
 
-Module* carregaCircuito(const char* file_path)
+Module* load_module(const char* file_path, Evento** initial_task_events)
 {
     Componente in;
     Componente out;
@@ -150,7 +150,6 @@ Module* carregaCircuito(const char* file_path)
     int output_count;
 
     Evento* initial_tran_events = NULL;
-    Evento* initial_task_events = NULL;
 
     VerilogError err;
 
@@ -637,7 +636,7 @@ Module* carregaCircuito(const char* file_path)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito, &initial_task_events);
+            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito, initial_task_events);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -764,9 +763,6 @@ bad_return:
 
     if (initial_tran_events)
         delete_event_queue(&initial_tran_events);
-    
-    if (initial_task_events)
-        delete_event_queue(&initial_task_events);
 
     free_module(&circuito);
     fclose(f_verilog_source);
