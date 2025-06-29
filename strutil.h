@@ -4,8 +4,11 @@
  */
 
 #ifndef STRUTIL_H
-
 #define STRUTIL_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Faz o append de um char numa string qualquer.
  *  @param str Uma string qualquer.
@@ -47,5 +50,9 @@ size_t len(const char* str);
  *  @return Return of strcpy()
  */
 char* copy(char* dest, const char* src);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // STRUTIL_H

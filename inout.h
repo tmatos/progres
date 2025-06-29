@@ -4,8 +4,11 @@
  */
 
 #ifndef INOUT_H
-
 #define INOUT_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Mensagem a ser impressa em caso de erros no arquivo de ondas
 #define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
@@ -33,5 +36,9 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
 */
 Sinais* erroFatalArquivoCorrompido();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // INOUT_H

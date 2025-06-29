@@ -4,10 +4,13 @@
  */
 
 #ifndef ESTRUTURAS_H
-
 #define ESTRUTURAS_H
 
 #include "sinais.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Enumeração para o definir as classes de componente do circuito de acordo com suas funções.
  */
@@ -224,5 +227,9 @@ int contemComponente(ListaComponente* ls, Componente cp);
 /** @brief Retorna o componente da lista indica que possui o referido nome, se houver.
  */
 Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ESTRUTURAS_H

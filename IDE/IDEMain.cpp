@@ -12,6 +12,7 @@
 #include "SinaisDrawPane.h"
 #include "inout.h"
 #include "sinais.h"
+#include "util.h"
 
 #include <wx/msgdlg.h>
 #include <wx/aboutdlg.h>
@@ -367,7 +368,7 @@ void IDEFrame::OnMenuItemAnalisarSelected(wxCommandEvent& event)
     {
         Sinais* ondas_out = NULL;
         waveoutFilePath = waveinFilePath + _(".out");
-        ondas_out = carregaArquivoSinais( waveoutFilePath.ToStdString().c_str() );
+        ondas_out = load_signals_from_path( waveoutFilePath.ToStdString().c_str() );
 
         if (ondas_out)
         {

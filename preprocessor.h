@@ -4,10 +4,13 @@
  */
 
 #ifndef PREPROCESSOR_H
-
 #define PREPROCESSOR_H
 
 #include "lex.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_MACRO_NAME_SIZE 64
 
@@ -44,5 +47,9 @@ void remove_macro_by_name(ListMacro* list, const char* name);
  *  @return 1 if sucess, 0 otherwise.
  */
 int pre_processor(ListaToken* lst);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PREPROCESSOR_H

@@ -1,3 +1,9 @@
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
+
+ Under terms of the MIT license.
+*********************************/
 
 #ifndef SINAISDRAWPANE_H
 #define SINAISDRAWPANE_H

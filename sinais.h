@@ -4,8 +4,11 @@
  */
 
 #ifndef SINAIS_H
-
 #define SINAIS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
@@ -141,5 +144,9 @@ int add_new_signal(Sinais* list, const char* nome);
  *  @return 1 em caso de sucesso, 0 caso falhe.
  */
 int insert_signal(Sinais* list_sinal, Sinal* sinal);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SINAIS_H

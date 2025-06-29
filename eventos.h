@@ -5,11 +5,14 @@
  */
 
 #ifndef EVENTOS_H
-
 #define EVENTOS_H
 
 #include "estruturas.h"
 #include "sinais.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Enum to represent Verilog system tasks.
  */
@@ -165,5 +168,9 @@ Transicao* getTransicoesEm(Evento* fila, Tempo t);
  * @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
  */
 Transicao* pop_event(Evento **fila);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // EVENTOS_H

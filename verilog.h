@@ -4,8 +4,11 @@
  */
 
 #ifndef VERILOG_H
-
 #define VERILOG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 
@@ -87,5 +90,9 @@ int is_tristate_logic(Componente gate);
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.
  */
 int isPortaLogica(char* s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // VERILOG_H

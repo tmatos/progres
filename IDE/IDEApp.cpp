@@ -16,6 +16,8 @@
 
 IMPLEMENT_APP(IDEApp);
 
+int global_silent_mode;
+
 bool IDEApp::OnInit()
 {
     //(*AppInitialize

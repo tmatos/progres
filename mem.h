@@ -4,8 +4,11 @@
  */
 
 #ifndef MEM_H
-
 #define MEM_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Wrapper para a função malloc com verificação de erro.
  */
@@ -18,5 +21,9 @@ void* xrealloc(void* p, size_t t);
 /** @brief Wrapper para a função calloc com verificação de erro.
  */
 void* xcalloc(size_t n, size_t t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // MEM_H

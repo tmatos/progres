@@ -4,11 +4,14 @@
  */
 
 #ifndef SIMULA_H
-
 #define SIMULA_H
 
 #include "estruturas.h"
 #include "eventos.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @brief Função que faz a simulação do circuito com as entradas especificadas.
            Em caso de sucesso, retorna as saídas dessa simulação.
@@ -67,5 +70,9 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
  *         para a porta lógica (gate), no tempo t indicado. 
  */
 void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SIMULA_H

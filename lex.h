@@ -4,10 +4,13 @@
  */
 
 #ifndef LEX_H
-
 #define LEX_H
 
 #include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(_WIN32) || defined(__CYGWIN__) || defined(__vxworks)
     #define MAX_PATH_LENGTH 255
@@ -204,5 +207,9 @@ ListaToken* tokeniza(FILE *arquivo);
  *  @return Respective TokenClass value, in case of a match. Otherwise: _UNKNOWN
  */
 TokenClass get_token_class(const char* s_tok);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LEX_H
