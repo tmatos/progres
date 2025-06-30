@@ -16,8 +16,7 @@
 
 Sinais* erroFatalArquivoCorrompido()
 {
-    if (!global_silent_mode)
-        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+    print("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
 
     return NULL;
 }
@@ -42,8 +41,7 @@ Sinais* carregaEntradas(FILE* arquivo)
     it = tokens->primeiro;
 
     if (!it) {
-        if (!global_silent_mode)
-            printf("%s", MSG_ARQUIVO_ENTRADA_VAZIO);
+        print("%s", MSG_ARQUIVO_ENTRADA_VAZIO);
 
         return NULL;
     }
@@ -136,9 +134,7 @@ Sinais* carregaEntradas(FILE* arquivo)
         }
 
         if ( !avanca(&it) ) {
-            if ( !global_silent_mode ) {
-                printf("%s", MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
-            }
+            print("%s", MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
 
             break;
         }

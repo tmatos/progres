@@ -6,6 +6,8 @@
 #ifndef STRUTIL_H
 #define STRUTIL_H
 
+extern int global_silent_mode;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,6 +52,11 @@ size_t len(const char* str);
  *  @return Return of strcpy()
  */
 char* copy(char* dest, const char* src);
+
+/** @brief Wrapper to printf()
+ *  @param fmt String with the format argument
+ */
+void print(const char* fmt, ...);
 
 #ifdef __cplusplus
 }

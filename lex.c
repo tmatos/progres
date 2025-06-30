@@ -463,15 +463,15 @@ void exibeListaDeToken(ListaToken* tokens)
     if (global_silent_mode)
         return;
 
-    printf("-- LISTA DE TOKENS CAPTURADOS --\n\n");
+    print("-- LISTA DE TOKENS CAPTURADOS --\n\n");
 
     it = tokens->primeiro;
     while (it) {
-        printf("%s\t\t\t\t\t%d\n", it->valor, it->classe);
+        print("%s\t\t\t\t\t%d\n", it->valor, it->classe);
         avanca(&it);
     }
 
-    printf("\n");
+    print("\n");
 }
 
 int identExiste(ListaToken* lst, const char* str)

@@ -158,16 +158,12 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     f_verilog_source = fopen(file_path, "r");
 
     if (!f_verilog_source) {
-        if (!global_silent_mode) {
-            printf("Impossibilitado de abrir o arquivo: %s\n", file_path);
-        }
+        print("Impossibilitado de abrir o arquivo: %s\n", file_path);
 
         return NULL;
     }
     
-    if (!global_silent_mode) {
-        printf("Abrindo o arquivo de circuito: %s\n", file_path);
-    }
+    print("Abrindo o arquivo de circuito: %s\n", file_path);
 
     // lista de todos os identificadores
     ListaToken* identifiers = novaListaToken();

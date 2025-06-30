@@ -63,23 +63,19 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     }
 
     // print matches msg
-    if (!global_silent_mode) {
-        printf("----------\n"
-               "Entradas: \n"
-               "   .v = %d\n"
-               "  .in = %d\n"
-               "match = %d\n"
-               "----------\n",
-               circuto->listaFiosEntrada->tamanho,
-               entradas->quantidade,
-               validos);
-    }
+    print("----------\n"
+          "Entradas: \n"
+          "   .v = %d\n"
+          "  .in = %d\n"
+          "match = %d\n"
+          "----------\n",
+          circuto->listaFiosEntrada->tamanho,
+          entradas->quantidade,
+          validos);
 
     if (validos < circuto->listaFiosEntrada->tamanho) {
-        if (!global_silent_mode) {
-            printf("AVISO: O arquivo de entradas tem menos "
-                   "sinais de entrada que o circuito.\n");
-        }
+        print("AVISO: O arquivo de entradas tem menos "
+              "sinais de entrada que o circuito.\n");
 
         return NULL;
     }
@@ -177,9 +173,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             switch (tr->task_type)
             {
             case TASK_DISPLAY:
-                if (!global_silent_mode) {
-                    printf("%s\n", tr->task_code);
-                }
+                print("%s\n", tr->task_code);
                 break;
             default:
                 break;

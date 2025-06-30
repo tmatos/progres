@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
 
 #include "lex.h"
@@ -73,4 +74,16 @@ char* copy(char* dest, const char* src)
 {
     // TODO: restrict to a maximum length
     return strcpy(dest, src);
+}
+
+void print(const char* fmt, ...)
+{
+    if (global_silent_mode) {
+        return;
+    }
+
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
 }
