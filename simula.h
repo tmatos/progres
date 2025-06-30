@@ -50,11 +50,19 @@ ValorLogico computeNorGate(ListaComponente* inputs);
  */
 ValorLogico computeNandGate(ListaComponente* inputs);
 
-/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+/** @brief Computes the output of a tri-state buffer (bufif0 type).
+ *  This function models a buffer that is enabled when the control signal is low (0).
+ *  @param control The control signal. If VAL_1, the buffer is in high-impedance (VAL_Z).
+ *  @param data The input data signal.
+ *  @return The resulting logic value.
  */
 ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data);
 
-/** @brief Simulação da porta de 3 estados sobre suas duas entradas
+/** @brief Computes the output of a tri-state buffer (bufif1 type).
+ *  This function models a buffer that is enabled when the control signal is high (1).
+ *  @param control The control signal. If VAL_0, the buffer is in high-impedance (VAL_Z).
+ *  @param data The input data signal.
+ *  @return The resulting logic value.
  */
 ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data);
 

@@ -465,10 +465,8 @@ ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data)
         return VAL_0;
         break;
     default:
-        break;
+        return VAL_X;
     }
-
-    return VAL_X;
 }
 
 ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
@@ -500,10 +498,8 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
         return VAL_0;
         break;
     default:
-        break;
+        return VAL_X;
     }
-
-    return VAL_X;
 }
 
 void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result)

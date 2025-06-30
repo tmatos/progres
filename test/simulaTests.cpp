@@ -25,8 +25,13 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_xorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_delays_v );
+  CPPUNIT_TEST( test_simula_samplefile_display_v );
   CPPUNIT_TEST( test_simula_samplefile_tri_state_gates_v );
   CPPUNIT_TEST( test_simula_samplefile_numbers_v );
+  CPPUNIT_TEST( test_compute_buf_if0_gate );
+  CPPUNIT_TEST( test_compute_buf_if1_gate );
+  CPPUNIT_TEST( test_compute_not_if0_gate );
+  CPPUNIT_TEST( test_compute_not_if1_gate );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -40,6 +45,10 @@ public:
     outputs = simula(circ, inputs, NULL);
 
     CPPUNIT_ASSERT_EQUAL( (Sinais*)NULL, outputs );
+
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_module(&circ);
   }
 
   void test_simula_CircuitoVazio()
@@ -56,6 +65,10 @@ public:
     CPPUNIT_ASSERT(outputs);
     CPPUNIT_ASSERT_EQUAL( outputs->quantidade, 0 );
     CPPUNIT_ASSERT_EQUAL( (Sinal*)NULL, outputs->lista );
+
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_module(&circ);
   }
 
   void test_simula_CircuitoUmaEntrada()
@@ -89,6 +102,10 @@ public:
     outputs = simula(circ, inputs, NULL);
 
     CPPUNIT_ASSERT(outputs);
+
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_module(&circ);
   }
 
   void test_simula_samplefile_andgates_v()
@@ -126,6 +143,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
 
+    fclose(f_andgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -165,6 +185,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
 
+    fclose(f_orgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -204,6 +227,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
 
+    fclose(f_nandgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -243,6 +269,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
 
+    fclose(f_norgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -306,6 +335,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
 
+    fclose(f_notgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -357,6 +389,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    fclose(f_bufgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -408,6 +443,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    fclose(f_xorgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -459,6 +497,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    fclose(f_xnorgates_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -497,7 +538,36 @@ public:
     CPPUNIT_ASSERT(sim_outputs->lista);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
+    
+    fclose(f_delays_in);
+    fclose(f_delays_in_out);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_signal_list(&sim_outputs);
+    delete_event_queue(&q);
+    free_module(&circuit);
+  }
 
+  void test_simula_samplefile_display_v()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* sim_outputs = NULL;
+    Evento* q = new_empty_event();
+
+    char s_display_v[] = "./verilog_sample_src/display.v";
+
+    circuit = load_module(s_display_v, &q);
+    CPPUNIT_ASSERT(circuit);
+
+    inputs = new_signal_list();
+    CPPUNIT_ASSERT(inputs);
+
+    sim_outputs = simula(circuit, inputs, &q);
+    CPPUNIT_ASSERT(sim_outputs);
+
+    free_signal_list(&inputs);
+    free_signal_list(&sim_outputs);
     delete_event_queue(&q);
     free_module(&circuit);
   }
@@ -543,6 +613,9 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
 
+    fclose(f_in);
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
     delete_event_queue(&q);
     free_module(&circuit);
     
@@ -584,8 +657,139 @@ public:
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
 
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_signal_list(&sim_outputs);
     delete_event_queue(&q);
     free_module(&circuit);
+  }
+
+  /** @brief Single test case that covers all logic paths for compute_buf_if0_gate.
+   */
+  void test_compute_buf_if0_gate()
+  {
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if0_gate(VAL_1, VAL_H));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if0_gate(VAL_0, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if0_gate(VAL_0, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if0_gate(VAL_X, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if0_gate(VAL_L, VAL_Z));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if0_gate(VAL_X, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if0_gate(VAL_Z, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if0_gate(VAL_L, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if0_gate(VAL_H, VAL_0));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if0_gate(VAL_X, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if0_gate(VAL_Z, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if0_gate(VAL_L, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if0_gate(VAL_H, VAL_1));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_buf_if0_gate(VAL_0, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_buf_if0_gate(VAL_0, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if0_gate(VAL_0, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if0_gate(VAL_0, VAL_H));
+  }
+
+  /** @brief Single test case that covers all logic paths for compute_buf_if1_gate.
+   */
+  void test_compute_buf_if1_gate()
+  {
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_buf_if1_gate(VAL_0, VAL_H));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if1_gate(VAL_1, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if1_gate(VAL_1, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if1_gate(VAL_X, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_buf_if1_gate(VAL_L, VAL_Z));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if1_gate(VAL_X, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if1_gate(VAL_Z, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if1_gate(VAL_L, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if1_gate(VAL_H, VAL_0));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if1_gate(VAL_X, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if1_gate(VAL_Z, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if1_gate(VAL_L, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if1_gate(VAL_H, VAL_1));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_buf_if1_gate(VAL_1, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_buf_if1_gate(VAL_1, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_buf_if1_gate(VAL_1, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_buf_if1_gate(VAL_1, VAL_H));
+  }
+
+  /** @brief Single test case that covers all logic paths for compute_not_if0_gate.
+   */
+  void test_compute_not_if0_gate()
+  {
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if0_gate(VAL_1, VAL_H));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if0_gate(VAL_0, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if0_gate(VAL_0, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if0_gate(VAL_X, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if0_gate(VAL_L, VAL_Z));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if0_gate(VAL_X, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if0_gate(VAL_Z, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if0_gate(VAL_L, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if0_gate(VAL_H, VAL_0));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if0_gate(VAL_X, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if0_gate(VAL_Z, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if0_gate(VAL_L, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if0_gate(VAL_H, VAL_1));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_not_if0_gate(VAL_0, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_not_if0_gate(VAL_0, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_not_if0_gate(VAL_0, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_not_if0_gate(VAL_0, VAL_H));
+  }
+
+  /** @brief Single test case that covers all logic paths for compute_not_if1_gate.
+   */
+  void test_compute_not_if1_gate()
+  {
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_Z, compute_not_if1_gate(VAL_0, VAL_H));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if1_gate(VAL_1, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if1_gate(VAL_1, VAL_Z));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if1_gate(VAL_X, VAL_X));
+    CPPUNIT_ASSERT_EQUAL(VAL_X, compute_not_if1_gate(VAL_L, VAL_Z));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if1_gate(VAL_X, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if1_gate(VAL_Z, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if1_gate(VAL_L, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_H, compute_not_if1_gate(VAL_H, VAL_0));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if1_gate(VAL_X, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if1_gate(VAL_Z, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if1_gate(VAL_L, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_L, compute_not_if1_gate(VAL_H, VAL_1));
+
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_not_if1_gate(VAL_1, VAL_0));
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_not_if1_gate(VAL_1, VAL_1));
+    CPPUNIT_ASSERT_EQUAL(VAL_1, compute_not_if1_gate(VAL_1, VAL_L));
+    CPPUNIT_ASSERT_EQUAL(VAL_0, compute_not_if1_gate(VAL_1, VAL_H));
   }
 
   bool helper_compare_signal_lists(Sinais* list_a, Sinais* list_b)
