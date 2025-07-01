@@ -17,8 +17,18 @@
 /// Tamanho máximo permitido para o argumento de linha comando relativo ao arquivo de entrada
 #define MAX_FILE_PATH_SIZE 4096
 
+/** @brief Load the input signals from the file specified in path.
+ *  @param path Path to the input file containing the signals.
+ *  @return A pointer to a Sinais structure containing the loaded input signals.
+ *  @note The input file should be in a custom format that the program can parse.
+ */
 Sinais* load_inputs_from_path(const char* path);
 
+/** @brief Save the output signals to the specified path.
+ *  @param path Path to the output file where the signals will be saved.
+ *  @param outputs Pointer to the Sinais structure containing the output signals.
+ *  @note This function will write the output signals to a file in out custom format.
+ */
 void save_outputs_to_path(const char* path, Sinais* outputs);
 
 #endif // PROGRES_H

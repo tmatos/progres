@@ -31,19 +31,29 @@ typedef struct st_list_macro {
 } ListMacro;
 
 /** @brief Insert a new macro on the list.
+ *  @param lst Pointer to the list of macros.
+ *  @param name String with the name of the macro.
+ *  @param value String with the value of the macro.
+ *  @return void
  */
 void insert_macro(ListMacro* lst, const char* name, const char* value);
 
 /** @brief Find a macro with the given name on the list.
+ *  @param list List of macros.
+ *  @param name String with the name of the macro to find.
  *  @return Pointer to the macro, case found, NULL otherwise.
  */
 Macro* get_macro_by_name(ListMacro list, const char* name);
 
 /** @brief Remove the specified macro from the list.
+ *  @param list Pointer to the list of macros.
+ *  @param name String with the name of the macro to remove.
+ *  @return void
  */
 void remove_macro_by_name(ListMacro* list, const char* name);
 
-/** @brief Process the list of tokens.
+/** @brief Do pre-processing in the list of tokens.
+ *  @param lst Pointer to the list of tokens.
  *  @return 1 if sucess, 0 otherwise.
  */
 int pre_processor(ListaToken* lst);

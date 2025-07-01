@@ -129,50 +129,63 @@ struct st_evento {
 
 typedef Evento* FilaEventos;
 
-/**
- * @brief Desalocar da memória a lista passada.
+/** @brief Desalocar da memória a lista passada.
+ *  @param list Ponteiro para a lista de transições a ser desalocada.
+ *  @note A lista é desalocada, mas não os componentes ou registradores
+ *        que ela possa estar referenciando.
  */
 void delete_list_transicao(Transicao** list);
 
 /** @brief Create a new event (or queue) at time 0 without a transi list.
+ *         This is used to initialize the event queue, if needed.
+ *         The only event will have no transitions defined.
+ * @return Ponteiro para Evento alocado.
  */
 Evento* new_empty_event();
 
-/** @brief .
+/** @brief Insere um novo evento na fila de eventos, ordenando-o pelo tempo.
+ *         Se já houver um evento no tempo t, adiciona à lista de transições desse evento.
+ * @param fila Ponteiro para a fila de eventos.
+ * @param t Tempo em que ocorre o evento.
+ * @param sys_task Tipo de SystemTask, conforme SystemTask.
+ * @param code String com algum dado ou código associado à task em questão.
+ * @return void
  */
 void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code);
 
-/**
- * @brief Adiciona à fila um evento no tempo t que faz a transição do valor de comp para o novoValor.
-          Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
-          desse evento, a nova transição.
+/** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
+ *         comp para o novoValor. Mas, se houver já na fila evento marcado para t,
+ *         apenas adiciona à lista de transições desse evento, a nova transição.
  */
 void insert_event(Evento **fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor);
 
-/** @brief .
+/** @brief Libera completamente a fila de eventos da memória.
+ *  @param fila Ponteiro para a fila de eventos a ser liberada.
+ *  @return void
  */
 void delete_event_queue(Evento **fila);
 
-/**
- * @brief Cria um novo evento, sem transições definidas, no tempo t.
- * @param t Tempo em que ocorre o evento.
- * @param k Tipo do evento, conforme EventKind.
- * @return Ponteiro para Evento alocado.
+/** @brief Cria um novo evento, sem transições definidas, no tempo t.
+ *  @param t Tempo em que ocorre o evento.
+ *  @param k Tipo do evento, conforme EventKind.
+ *  @return Ponteiro para Evento alocado.
  */
 Evento* new_event_at(Tempo t, EventKind k);
 
-/**
- * @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
-          Se não houver evento nesse tempo t, retornará NULL.
- * @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
+/** @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
+ *         Se não houver evento nesse tempo t, retornará NULL.
+ *  @param fila Ponteiro para a fila de eventos.
+ *  @param t Tempo em que se deseja obter as transições.
+ *  @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
  */
 Transicao* getTransicoesEm(Evento* fila, Tempo t);
 
-/**
- * @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
- * @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
+/** @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
+ *  @param fila Ponteiro para a fila de eventos.
+ *  @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
+ *  @note A fila é atualizada, removendo o evento mais próximo.
  */
-Transicao* pop_event(Evento **fila);
+Transicao* pop_event(Evento** fila);
 
 #ifdef __cplusplus
 }

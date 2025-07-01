@@ -30,10 +30,13 @@ Sinais* carregaEntradas(FILE* arquivo);
            com a formatação padrão.
  *  @param sinaisSaida Conjunto dos sinais a serem salvos.
  *  @param arqSaida Arquivo a ser escrito com a representação dos sinais.
+ *  @return void
  */
 void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
+ *         Indicando que o arquivo de entrada está corrompido.
+ *  @return Um ponteiro para uma struct Sinais com valor NULL.
 */
 Sinais* erroFatalArquivoCorrompido();
 
