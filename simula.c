@@ -30,7 +30,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     Pulso* p = NULL;
 
     ListaComponente* list_changed_gates = NULL;
-    Componente gate = NULL;
+    Component* gate = NULL;
 
     ValorLogico result;
     ValorLogico valor_xor_in_a;
@@ -496,7 +496,7 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
     }
 }
 
-void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result)
+void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result)
 {
     int j;
 

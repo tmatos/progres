@@ -40,7 +40,7 @@ public:
     CPPUNIT_ASSERT(!fila);
 
     Tempo t = (Tempo)5000;
-    Componente c0 = novoComponente( (char*)"entrada_componente_0", input );
+    Component* c0 = novoComponente( (char*)"entrada_componente_0", input );
     ValorLogico v = VAL_1;
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
@@ -55,7 +55,7 @@ public:
 
     t = 11000;
     v = VAL_0;
-    Componente c1 = novoComponente( (char*)"entrada_componente_1", input );
+    Component* c1 = novoComponente( (char*)"entrada_componente_1", input );
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c1, NULL, v );
 
@@ -86,13 +86,13 @@ public:
 
     Tempo t = (Tempo)10;
     ValorLogico v = VAL_1;
-    Componente c_0 = novoComponente( (char*)"in_component_0", input );
+    Component* c_0 = novoComponente( (char*)"in_component_0", input );
 
     insert_event( &q, t, EVT_NET_TRANSITION, c_0, NULL, v );
 
     t = 11;
     v = VAL_0;
-    Componente c_1 = novoComponente( (char*)"in_component_1", input );
+    Component* c_1 = novoComponente( (char*)"in_component_1", input );
 
     insert_event( &q, t, EVT_NET_TRANSITION, c_1, NULL, v );
 
@@ -116,7 +116,7 @@ public:
     Evento* fila = NULL;
 
     Tempo t = (Tempo)5000;
-    Componente c0 = novoComponente( (char*)"wire_component_0", wire );
+    Component* c0 = novoComponente( (char*)"wire_component_0", wire );
     ValorLogico v = VAL_1;
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
@@ -131,12 +131,12 @@ public:
     CPPUNIT_ASSERT( ! getTransicoesEm(fila, (Tempo)50 ) );
     CPPUNIT_ASSERT( ! getTransicoesEm(fila, (Tempo)15000 ) );
 
-    Componente c1 = novoComponente( (char*)"wire_component_1", wire );
+    Component* c1 = novoComponente( (char*)"wire_component_1", wire );
     insert_event( &fila, (Tempo)7000, EVT_NET_TRANSITION, c1, NULL, VAL_0 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
 
-    Componente c2 = novoComponente( (char*)"wire_component_2", wire );
+    Component* c2 = novoComponente( (char*)"wire_component_2", wire );
     insert_event( &fila, (Tempo)5550, EVT_NET_TRANSITION, c2, NULL, VAL_1 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);

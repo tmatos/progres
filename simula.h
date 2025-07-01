@@ -77,7 +77,7 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
 /** @brief Cria novos eventos na fila de acordo com a saidas (result) computadas
  *         para a porta lógica (gate), no tempo t indicado. 
  */
-void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result);
+void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result);
 
 #ifdef __cplusplus
 }

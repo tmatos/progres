@@ -84,7 +84,7 @@ int is_logic_gate(const Token* t);
  *  @param gate Um Componente que representa um logic gate.
  *  @return Verdadeiro se o gate for: "bufif0", "bufif1", "notif0" ou "notif1".
  */
-int is_tristate_logic(Componente gate);
+int is_tristate_logic(Component* gate);
 
 /** @brief Retorna verdadeiro se uma string representa um logic gate em Verilog.
  *  @param s Uma string qualquer.

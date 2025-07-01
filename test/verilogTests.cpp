@@ -184,7 +184,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, circuit->listaFiosSaida->tamanho);
     CPPUNIT_ASSERT_EQUAL(2, circuit->listaWires->tamanho);
 
-    Componente x;
+    Component* x;
     x = circuit->listaFiosSaida->itens[0];
     // x (output) tem uma entrada que vem de um assign simples
     CPPUNIT_ASSERT_EQUAL(1, x->listaEntrada->tamanho);

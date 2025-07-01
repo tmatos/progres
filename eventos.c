@@ -32,7 +32,7 @@ Evento* new_empty_event()
     return new_event_at( (Tempo)0, EVT_SYS_TASK );
 }
 
-void insert_event(Evento** fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor)
+void insert_event(Evento** fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior

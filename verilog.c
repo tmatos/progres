@@ -136,10 +136,10 @@ load_module_header_bad_return:
 
 Module* load_module(const char* file_path, Evento** initial_task_events)
 {
-    Componente in;
-    Componente out;
-    Componente gate;
-    Componente net;
+    Component* in;
+    Component* out;
+    Component* gate;
+    Component* net;
     Token* it = NULL;
     Module* circuito = NULL;
     FILE* f_verilog_source;
@@ -518,7 +518,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             if ( it->classe == NUM_BASE_DECIMAL ) {
-                Componente num = novoComponente("literal_number_decimal", LITERAL_NUMBER);
+                Component* num = novoComponente("literal_number_decimal", LITERAL_NUMBER);
                 num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
                 insereComponente(gate->listaEntrada, num); // TODO: free mem later
             }
@@ -794,7 +794,7 @@ int is_logic_gate(const Token* t)
     return 0;
 }
 
-int is_tristate_logic(Componente gate)
+int is_tristate_logic(Component* gate)
 {
     int i;
 
@@ -1153,9 +1153,9 @@ load_initial_block_bad_eof:
 
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module)
 {
-    Componente in;
-    Componente out;
-    Componente gate = NULL;
+    Component* in;
+    Component* out;
+    Component* gate = NULL;
 
     Token* t = *it;
 

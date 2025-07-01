@@ -90,7 +90,7 @@ struct st_transicao {
     SystemTask task_type;
     char* task_code;
 
-    Componente fio; // Indica o componente sobre o qual o evento se origina, apenas wires
+    Component* fio; // Indica o componente sobre o qual o evento se origina, apenas wires
     Register* reg; // in case of a transition in register value
     ValorLogico novoValor; // Novo valor lógico a ser setado
 
@@ -147,7 +147,7 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* 
           Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
           desse evento, a nova transição.
  */
-void insert_event(Evento **fila, Tempo t, EventKind k, Componente comp, Register* r, ValorLogico novoValor);
+void insert_event(Evento **fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor);
 
 /** @brief .
  */
