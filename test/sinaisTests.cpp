@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "../sinais.h"
+#include "../strutil.h"
 
 class Testes_sinais : public CppUnit::TestFixture
 {
@@ -17,6 +18,7 @@ class Testes_sinais : public CppUnit::TestFixture
   CPPUNIT_TEST( test_insert_signal );
   CPPUNIT_TEST( test_get_timeunit_from_str_valid_units );
   CPPUNIT_TEST( test_get_timeunit_from_str_invalid_units );
+  CPPUNIT_TEST( test_get_str_from_timeunit );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -185,6 +187,17 @@ public:
     CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("S"));
     CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("Ms"));
     CPPUNIT_ASSERT_EQUAL((int)UN_INVALID, (int)get_timeunit_from_str("US"));
+  }
+
+  void test_get_str_from_timeunit()
+  {
+    CPPUNIT_ASSERT( iguais("s",  get_str_from_timeunit(UN_S)) );
+    CPPUNIT_ASSERT( iguais("ms", get_str_from_timeunit(UN_MS)) );
+    CPPUNIT_ASSERT( iguais("us", get_str_from_timeunit(UN_US)) );
+    CPPUNIT_ASSERT( iguais("ns", get_str_from_timeunit(UN_NS)) );
+    CPPUNIT_ASSERT( iguais("ps", get_str_from_timeunit(UN_PS)) );
+    CPPUNIT_ASSERT( iguais("fs", get_str_from_timeunit(UN_FS)) );
+    CPPUNIT_ASSERT( iguais("ns", get_str_from_timeunit(UN_INVALID)) ); // Testing default case
   }
 
 };
