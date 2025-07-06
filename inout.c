@@ -330,6 +330,10 @@ char get_char_from_logic_value(ValorLogico value)
             return 'x';
         case VAL_Z:
             return 'z';
+        case VAL_H:
+            return '1';
+        case VAL_L:
+            return '0';
         default:
             return 'x';
     }

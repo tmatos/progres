@@ -8,6 +8,9 @@
 #include "../sinais.h"
 #include "../eventos.h"
 #include "../inout.h"
+#include "../strutil.h"
+#include "../verilog.h"
+#include "../simula.h"
 
 class Testes_inout : public CppUnit::TestFixture
 {
@@ -19,6 +22,8 @@ class Testes_inout : public CppUnit::TestFixture
   CPPUNIT_TEST( test_carregaEntradas_file_notgates_in );
   CPPUNIT_TEST( test_carregaEntradas_file_badinput_XX_in );
   CPPUNIT_TEST( test_salvarSinais );
+  CPPUNIT_TEST( test_get_char_from_logic_value );
+  CPPUNIT_TEST( test_save_vcd );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -175,6 +180,64 @@ public:
     }
 
     remove("./inout_sample_files/allpulses.in.out");
+  }
+
+  void test_get_char_from_logic_value() 
+  {
+    CPPUNIT_ASSERT_EQUAL('1', get_char_from_logic_value(VAL_1));
+    CPPUNIT_ASSERT_EQUAL('0', get_char_from_logic_value(VAL_0));
+    CPPUNIT_ASSERT_EQUAL('x', get_char_from_logic_value(VAL_X));
+    CPPUNIT_ASSERT_EQUAL('z', get_char_from_logic_value(VAL_Z));
+    CPPUNIT_ASSERT_EQUAL('1', get_char_from_logic_value(VAL_H)); // High logic value
+    CPPUNIT_ASSERT_EQUAL('0', get_char_from_logic_value(VAL_L)); // Low logic value
+    CPPUNIT_ASSERT_EQUAL('x', get_char_from_logic_value(VAL_BLANK)); // Testing default case
+  }
+
+  void test_save_vcd()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* outputs = NULL;
+    Evento* q = new_empty_event();
+
+    circuit = load_module("./verilog_sample_src/bufgates.v", &q);
+    CPPUNIT_ASSERT(circuit);
+    
+    FILE* f_in = fopen("./inout_sample_files/bufgates.in", "r");
+    CPPUNIT_ASSERT(f_in);
+
+    inputs = carregaEntradas(f_in);
+    fclose(f_in);
+    CPPUNIT_ASSERT(inputs);
+    
+    outputs = simula(circuit, inputs, &q);
+    CPPUNIT_ASSERT(outputs);
+
+    FILE* file_vcd = fopen("test_output.vcd", "w");
+    CPPUNIT_ASSERT(file_vcd);
+
+    // Call the function to test
+    save_vcd(circuit, outputs, file_vcd);
+    fclose(file_vcd);
+
+    // Open the file to read and validate output
+    file_vcd = fopen("test_output.vcd", "r");
+    CPPUNIT_ASSERT(file_vcd);
+    
+    // Read and validate SOME contents of the VCD file
+    char buffer[256];
+    fgets(buffer, sizeof(buffer), file_vcd);
+    CPPUNIT_ASSERT(strcmp(buffer, "$date\n") == 0);
+
+    fclose(file_vcd);
+    
+    // TODO:_Continue with more assertions to validate the output...
+
+    // Clean up
+    remove("test_output.vcd");
+    free_signal_list(&inputs);
+    free_signal_list(&outputs);
+    free_module(&circuit);
   }
 
 };

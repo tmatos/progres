@@ -34,13 +34,21 @@ Sinais* carregaEntradas(FILE* arquivo);
  */
 void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 
-/** @brief Export VCD to file.
+/** @brief Gera um arquivo VCD (Value Change Dump) a partir do módulo e dos sinais.
+ *         O arquivo VCD é usado para registrar as mudanças de valor nos sinais
+ *         durante a simulação do módulo.
+ * @param module O módulo que contém o circuito simulado.
+ * @param sinais A lista de sinais que serão registrados no VCD.
+ * @param file O handler do arquivo onde o VCD será escrito.
+ * @return void
  */
 void save_vcd(Module* module, Sinais* sinais, FILE* file);
 
-/** @brief .
+/** @brief Converte um valor lógico para o caractere correspondente.
  *  @param value Algum dos disponíveis na enum ValorLogico.
  *  @return Um dos seguintes: '0', '1', 'x' ou 'z'.
+ *          Se o valor não for reconhecido, retorna 'x' por padrão.
+ *  @note Os valores 'H' e 'L' são tratados como '1' e '0', respectivamente.
  */
 char get_char_from_logic_value(ValorLogico value);
 
