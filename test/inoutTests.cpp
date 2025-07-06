@@ -95,6 +95,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[1].pulsos[0].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[0].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[1].pulsos[1].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->lista[0].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->lista[1].pulsos[2].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[0].pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[1].pulsos[3].valor );
   }
 
   void test_carregaEntradas_file_badinput_XX_in()

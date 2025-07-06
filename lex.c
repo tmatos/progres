@@ -12,6 +12,7 @@
 
 #include "progres.h"
 #include "erros.h"
+#include "strutil.h"
 #include "lex.h"
 #include "mem.h"
 
@@ -135,6 +136,7 @@ ListaToken* novaListaToken()
     l->primeiro = NULL;
     l->ultimo = NULL;
     l->tamanho = 0;
+    l->file[0] = '\0';
 
     return l;
 }
@@ -173,21 +175,24 @@ int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
 TokenClass get_token_class(const char* s_tok)
 {
     int i;
-    TokenClass tc;
 
-    // IMPORTANT: keep track of the count here
-    #define _QTD_CLASSES 43
+    // IMPORTANT: keep track of the count here!
+    #define _QTD_CLASSES 48
     #define _MAX_STRLEN_IN_ARRAY 13
 
     char from_str[_QTD_CLASSES][_MAX_STRLEN_IN_ARRAY] = {
-        "and", // 1
-        "or",
-        "not",
+        "and",  // 1
+        "or",   // 2
+        "not",  // 3
         "buf",
         "nand",
         "nor",
         "xor",
         "xnor",
+        "bufif0",
+        "bufif1",
+        "notif0",
+        "notif1",
         "input",
         "output",
         "wire",
@@ -204,36 +209,41 @@ TokenClass get_token_class(const char* s_tok)
         "assign",
         "=",
         ",",
-        ":",   // = 25
-        ";",
+        ":",
+        ";",     // = 30
         "(",
         ")",
         "[",
-        "]",   // = 30
-        "{",
+        "]",
+        "{",     // = 35
         "}",
         "#",
         "+",
-        "-",   // = 35
-        "*",
+        "-",
+        "*",     // = 40
         "/",
         "\%",
         "~",
-        "&",   // = 40
-        "|",
+        "&",
+        "|",     // = 45
         "^",
-        "\x60" // = _QTD_CLASSES
+        "$",
+        "\x60"   // = _QTD_CLASSES
     };
 
     TokenClass to_class[_QTD_CLASSES] = {
-        KW_AND, // 1
-        KW_OR,
-        KW_NOT,
-        KW_BUF,
-        KW_NAND,
+        KW_AND,  // 1
+        KW_OR,   // 2
+        KW_NOT,  // 3
+        KW_BUF,  // 4
+        KW_NAND, // 5
         KW_NOR,
         KW_XOR,
         KW_XNOR,
+        KW_BUFIF0,
+        KW_BUFIF1,
+        KW_NOTIF0,
+        KW_NOTIF1,
         KW_INPUT,
         KW_OUTPUT,
         KW_WIRE,
@@ -260,30 +270,32 @@ TokenClass get_token_class(const char* s_tok)
         SYM_CLOSE_BRACE,
         SYM_HASHTAG,
         SYM_PLUS,
-        SYM_MINUS,        // = 35
-        SYM_ASTERISK,
+        SYM_MINUS,
+        SYM_ASTERISK,     // = 40
         SYM_SLASH,
         SYM_PERCENT,
         SYM_TILDE,
-        SYM_AMPERSAND,    // = 40
-        SYM_PIPE,
+        SYM_AMPERSAND,
+        SYM_PIPE,         // = 45
         SYM_CIRCUMFLEX,
+        SYM_DOLLAR,
         SYM_GRAVE_ACCENT  // = _QTD_CLASSES
     };
-
-    tc = _UNKNOWN;
 
     for ( i = 0; i < _QTD_CLASSES; i++ )
     {
         if ( iguais(from_str[i], s_tok) ) {
-            tc = to_class[i];
-            break;
+            return to_class[i];
         }
+    }
+
+    if ( apenasDigitos(s_tok) ) {
+        return NUM_BASE_DECIMAL;
     }
     
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 
-    return tc;
+    return _UNKNOWN;
 }
 
 int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna)
@@ -413,19 +425,6 @@ int removeTokensPorValor(ListaToken* lst, const char* tok)
     return 1;
 }
 
-int anexa(char* str, char c)
-{
-    char tmp[2];
-    tmp[0] = c;
-    tmp[1] = '\0';
-
-    strcat(str, tmp);
-
-    // TODO: Checagens...
-
-    return 1;
-}
-
 int isSimbolo(char c)
 {
     return (c == '(' ||
@@ -464,15 +463,15 @@ void exibeListaDeToken(ListaToken* tokens)
     if (global_silent_mode)
         return;
 
-    printf("-- LISTA DE TOKENS CAPTURADOS --\n\n");
+    print("-- LISTA DE TOKENS CAPTURADOS --\n\n");
 
     it = tokens->primeiro;
     while (it) {
-        printf("%s\t\t\t\t\t%d\n", it->valor, it->classe);
+        print("%s\t\t\t\t\t%d\n", it->valor, it->classe);
         avanca(&it);
     }
 
-    printf("\n");
+    print("\n");
 }
 
 int identExiste(ListaToken* lst, const char* str)
@@ -499,11 +498,6 @@ int identExiste(ListaToken* lst, const char* str)
     }
 
     return retorno;
-}
-
-int iguais(const char* a, const char* b)
-{
-    return !strcmp(a, b);
 }
 
 Token* avanca(Token** it)
@@ -537,7 +531,7 @@ int isPalavra(Token* tk)
 
 int isIdentificador(Token* tk)
 {
-    int i;
+    unsigned int i;
     int simbol = 0;
 
     if (!tk)
@@ -547,7 +541,7 @@ int isIdentificador(Token* tk)
     if ( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
         return 0;
 
-    for (i = 1; i < len(tk->valor); ++i)
+    for ( i = 1; i < len(tk->valor); ++i )
     {
         if ( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
             simbol = 1;
@@ -707,6 +701,7 @@ ListaToken* tokeniza(FILE* arquivo)
 
         if (isSimbolo(c)) {
             // TODO: capture symbols larger than 1 char
+        symbols_capture:
             coluna++;
             insereToken(tokens, c, linha, coluna);
             goto A;
@@ -744,9 +739,7 @@ ListaToken* tokeniza(FILE* arquivo)
                 }
                 else if (isSimbolo(c)) {
                     insereTokenString(tokens, tok, linha, coluna - len(tok));
-                    coluna++;
-                    insereToken(tokens, c, linha, coluna);
-                    break;
+                    goto symbols_capture;
                 }
                 else if(isalnum(c) || c == '_') {
                     coluna++;
@@ -784,45 +777,4 @@ ListaToken* tokeniza(FILE* arquivo)
     free(tok);
 
     return tokens;
-}
-
-int apenasDigitos(const char* str)
-{
-    int i;
-
-    if (!str)
-        return 0;
-
-    for ( i=0; i < len(str); i++ )
-    {
-        if ( !isdigit(str[i]) )
-            return 0;
-    }
-
-    return 1;
-}
-
-int isNumNaturalValido(const char* str)
-{
-    if (!str)
-        return 0;
-
-    // importante nao ser um valor muito grande, esses numeros
-    if ( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
-        return 0;
-    }
-
-    return 1;
-}
-
-size_t len(const char* str)
-{
-    // TODO: restrict to a maximum length
-    return strlen(str);
-}
-
-char* copy(char* dest, const char* src)
-{
-    // TODO: restrict to a maximum length
-    return strcpy(dest, src);
 }

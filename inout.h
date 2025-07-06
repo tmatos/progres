@@ -4,8 +4,11 @@
  */
 
 #ifndef INOUT_H
-
 #define INOUT_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Mensagem a ser impressa em caso de erros no arquivo de ondas
 #define MSG_ARQUIVO_ENTRADA_CORROMPIDO "Arquivo de entrada corrompido.\n"
@@ -27,6 +30,7 @@ Sinais* carregaEntradas(FILE* arquivo);
            com a formatação padrão.
  *  @param sinaisSaida Conjunto dos sinais a serem salvos.
  *  @param arqSaida Arquivo a ser escrito com a representação dos sinais.
+ *  @return void
  */
 void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 
@@ -41,7 +45,13 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file);
 char get_char_from_logic_value(ValorLogico value);
 
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
+ *         Indicando que o arquivo de entrada está corrompido.
+ *  @return Um ponteiro para uma struct Sinais com valor NULL.
 */
 Sinais* erroFatalArquivoCorrompido();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // INOUT_H

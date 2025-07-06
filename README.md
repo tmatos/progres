@@ -1,102 +1,112 @@
 # Progres
 
-[![Build Status](https://github.com/tmatos/progres/actions/workflows/makefile.yml/badge.svg)](https://github.com/tmatos/progres/actions)
-[![codecov](https://codecov.io/gh/tmatos/progres/graph/badge.svg?token=XCUNGD1HQD)](https://codecov.io/gh/tmatos/progres)
+[![CI build](https://github.com/tmatos/progres/actions/workflows/build.yml/badge.svg)](https://github.com/tmatos/progres/actions/workflows/build.yml)
+[![CI tests](https://github.com/tmatos/progres/actions/workflows/tests.yml/badge.svg)](https://github.com/tmatos/progres/actions/workflows/tests.yml)
+[![Codacy Badge Grade](https://app.codacy.com/project/badge/Grade/8b26336f5528494cafa64eaa7ac673d6)](https://app.codacy.com/gh/tmatos/progres/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge Coverage](https://app.codacy.com/project/badge/Coverage/8b26336f5528494cafa64eaa7ac673d6)](https://app.codacy.com/gh/tmatos/progres/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+![GitHub repo size](https://img.shields.io/github/repo-size/tmatos/progres)
 
-Simulador orientado a eventos para um subset da linguagem Verilog.
+Event-driven simulator for a subset of the Verilog language.
 
-No momento, provê a simulação de circuitos combinacionais escritos em Verilog estrutural.
+Currently, provides simulation of combinational circuits written
+in structural Verilog.
 
 
-## 1. Uso
+## 1. Usage
 
-Na interface de linha de comando:
+In the command line interface:
 
 ```
-progres fonte.v [entradas.in] [saidas.out]
+progres [-s] source_file.v [inputs.in] [outputs.out]
 ```
 
-Argumentos entre colchetes são opcionais.
+Arguments inside square brackets are optional.
 
-O comando acima faz uma análise do arquivo com código-fonte Verilog fornecido.
-Na ocorrência do primeiro erro sintático, o programa é interrompido e uma mensagem
-será informada, indicando linha e coluna da ocorrência com uma possível descrição do problema.
+The above command analyzes the provided Verilog source code file.
+When the first syntactical error is found, the program will be interrupted and
+a message will be displayed, indicating the line and column of the occurrence,
+with a possible description of the problem.
 
-Exemplo de saída com erro:
+Example output with an error:
 
-`5:13 erro: Simbolo esperado nao foi encontrado...`
+`5:13 error: Expected symbol was not found...`
 
-A mensagem acima nos diz que na linha 5 e coluna 13 do arquivo `.v` fornecido,
-um simbolo esperado não foi encontrado.
-O restante do texto poderá conter algo mais específico a cada erro que venha a surgir.
+This message above tells us that on line 5 and column 13 of the provided 
+`.v` file, an expected symbol was not found. The rest of the text may contain 
+something more specific to each possible existent error.
 
-Caso o arquivo fonte esteja correto e um arquivo de entrada válido tenha sido fornecido,
-o programa tentará simular o circuito com esta entrada e gerar a saída correspondente.
+If the source file is correct and a valid input file has been provided, 
+the program will attempt to simulate the circuit with this input and 
+generate the corresponding output.
 
-Se houver sucesso na simulação, um arquivo de saída será criado conforme especificado nos
-argumentos do programa ou, se estes foram omitidos, será criado um arquivo com o mesmo 
-nome do arquivo de entrada porém com a extensão mudada para `.out`.
+If the simulation is successful, an output file will be created as specified 
+in the program arguments or, if these were omitted, a file will be created 
+with the same name as the input file and with the `.out` extension appended.
+
+`-s` Option omits all of the command line textual output messages.
 
 
-## 2. Arquivos de entrada e saída
+## 2. Input and output files
 
-Para a simulação, é necessário que o arquivo de entrada esteja no formato específico de
-nosso programa e que haja uma correspondência entre os sinais de entrada do circuito em
-Verilog e do arquivo `.in`.
+In order to do simulations, the `.in` input file should be in a very specific 
+format, defined below, and there must be an exact correspondence between the 
+input ports of the top Verilog module and the signals inside this `.in` file.
 
-Os arquivos de entrada, `.in`, e de saída, `.out`, são arquivos de texto que seguem um
-formato extremamente simples:
+The `.in` input files and the `.out` output files are all plain text files,
+which follows an extremely simple format:
 
-* Comentários de uma linha são válidos, tudo que seguir um `//` será ignorado.
+* Single line comments are valid, anything following a `//` will be ignored.
 
-* Cada sinal inicia com um identificador que o denomina. Em seguida e entre chaves, estará
-uma sequência de pulsos de valor específico ("0", "1", "z" ou "x"), com seus determinados
-tempos de duração. Sendo cada pulso separado por vírgula um do outro.
+* Each signal begins with an identifier that names it. Next, between curly 
+brackets, there will be a sequence of "pulses". Each of them having one of 
+the four possible values: `0`, `1`, `z` or `x`, along with their specific 
+duration times. Each "pulse" is separated from the other by a comma.
 
-Exemplo:
+Example:
 
 ``` 
-// Arquivo de entrada contendo dois sinas
+// Input file with two signals
 
-primeiro
+first
 {
  X(2), 0(5), 1(3)
 }
 
-segundo { 0(2),1(2),x(3),0(3) }
+second { 0(2),1(2),x(3),0(3) }
 
-// Final do arquivo de entrada
+// End of input file
 ```
 
-Neste arquivo, temos as representações dos sinas abaixo:
+In this file, we have the following signal representations:
 
 ```
-                    ▁▁▁
-   primeiro: ╳╳▁▁▁▁▁▏  
-unid. tempo: 0123456789
-               ▁▁      
-    segundo: ▁▁▏ ╳╳╳▁▁▁
-unid. tempo: 0123456789
+                  ▁▁▁
+    first: ╳╳▁▁▁▁▁▏  
+time unit: 0123456789
+             ▁▁      
+   second: ▁▁▏ ╳╳╳▁▁▁
+time unit: 0123456789
 ```
 
 
-## 3. Compilação e instalação
+## 3. Building and installing
 
-O código fonte é escrito principalmente em C e deverá compilar sob qualquer ambiente
-com suporte ao padrão C99. Um makefile é provido, portanto basta apenar utilizar:
+The source code is written primarily in C and should compile under any 
+build environment supporting the C99 standard.
+A makefile is provided, so simply use:
 
 ```
 make
 ```
 
-Para gerar o executável, que poderá ser copiado para qualquer local desejado.
+To generate the executable, which can be copied to any desired location.
 
 
-## 4. Contatos
+## 4. Contacts
 
-* Email: tiago AT tmatos.net
+* Email: tiago AT tmatos DOT net
 * Site: https://tmatos.net
 * Repo: https://github.com/tmatos/progres
 
 
-(C) 2014, 2025 Tiago Matos Santos
+(C) 2014, 2025 Tiago Matos

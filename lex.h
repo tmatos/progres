@@ -4,8 +4,19 @@
  */
 
 #ifndef LEX_H
-
 #define LEX_H
+
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__vxworks)
+    #define MAX_PATH_LENGTH 255
+#else
+    #define MAX_PATH_LENGTH 1023
+#endif
 
 #define MAX_TOKEN_SIZE 128 /// Qtde maxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 13 /// Qtde maxima de digitos num numero inteiro a ser reconhecido
@@ -49,6 +60,10 @@ typedef enum en_token_class {
     KW_WIRE,
     KW_XNOR,
     KW_XOR,
+    KW_BUFIF0,
+    KW_BUFIF1,
+    KW_NOTIF0,
+    KW_NOTIF1,
 
     SYM_AT, // @
     SYM_COMMA, // ,
@@ -72,6 +87,7 @@ typedef enum en_token_class {
     SYM_AMPERSAND, // &
     SYM_PIPE, // |
     SYM_CIRCUMFLEX, // ^
+    SYM_DOLLAR, // $
     SYM_GRAVE_ACCENT, // `
 
     NUM_BASE_BINARY,
@@ -101,6 +117,7 @@ typedef struct st_listaToken {
     Token* primeiro;
     Token* ultimo;
     int tamanho;
+    char file[MAX_PATH_LENGTH];
 } ListaToken;
 
 /** @brief Inicializa uma lista vazia, isto é, com zero elementos.
@@ -139,10 +156,6 @@ void remove_token(ListaToken* list, Token* tok);
  */
 int removeTokensPorValor(ListaToken* lst, const char* tok);
 
-/** @brief Faz o apend de um char numa string qualquer.
- */
-int anexa(char* str, char c);
-
 /** @brief Retorna verdadeiro se c for um simbolo em Verilog.
  *  @param c Um char qualquer.
  *  @return True se c for simbolo, False caso contrario.
@@ -153,10 +166,6 @@ int isSimbolo(char c);
  *  @return Void.
  */
 void exibeListaDeToken(ListaToken* tokens);
-
-/** @brief Retorna verdadeiro se duas strings são iguais.
- */
-int iguais(const char* a, const char* b);
 
 /** @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
  *  @param it Um ponteiro para um ponteiro de um Token.
@@ -193,36 +202,14 @@ int identExiste(ListaToken* lst, const char* str);
  */
 ListaToken* tokeniza(FILE *arquivo);
 
-/** @brief Verifica se uma string contém apenas dígitos (0, 1, 2, ..., 9).
- *  @param str Uma string qualquer.
- *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de qualquer outro tipo de caractere.
- */
-int apenasDigitos(const char* str);
-
-/** @brief Verifica se uma string contém um número que pode ser convertido.
-            Mais especeificamente, se é um natural menor que 10000.
- *  @param str Uma string qualquer.
- *  @return Verdadeiro se pode ser convertido.
- */
-int isNumNaturalValido(const char* str);
-
-/** @brief Wrapper to strlen()
- *  @param str A null terminated C string
- *  @return Lenght of str
- */
-unsigned long len(const char* str);
-
-/** @brief Wrapper to strcpy()
- *  @param dest Destination C string
- *  @param src Source C string
- *  @return Return of strcpy()
- */
-char* copy(char* dest, const char* src);
-
 /** @brief Get the TokenClass enum value from its respective token string.
  *  @param s_tok Token string.
  *  @return Respective TokenClass value, in case of a match. Otherwise: _UNKNOWN
  */
 TokenClass get_token_class(const char* s_tok);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LEX_H

@@ -4,15 +4,16 @@ INC_DIR = .
 OBJ_DIR = obj
 
 CC = gcc
-CFLAGS = -I$(INC_DIR) -Wall
+CFLAGS = -I$(INC_DIR) -Wall -Wextra
 
 TARGET = progres
 
-_DEPS = sinais.h erros.h estruturas.h lex.h preprocessor.h eventos.h verilog.h inout.h mem.h simula.h progres.h
-DEPS = $(patsubst %,$(INC_DIR)/%,$(_DEPS))
+SRC  = strutil.c sinais.c erros.c estruturas.c lex.c preprocessor.c
+SRC += eventos.c verilog.c inout.c mem.c simula.c progres.c
 
-_OBJ = sinais.o erros.o estruturas.o lex.o preprocessor.o eventos.o verilog.o inout.o mem.o simula.o progres.o
-OBJ = $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
+DEPS = $(patsubst %.c, $(SRC_DIR)/%.h, $(SRC))
+
+OBJ = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRC))
 
 default: makedir all
 

@@ -4,12 +4,16 @@
  */
 
 #ifndef VERILOG_H
-
 #define VERILOG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 
 #include "estruturas.h"
+#include "eventos.h"
 #include "lex.h"
 
 /** @brief Enum para tipos de error nas rotinas de parsing
@@ -32,12 +36,23 @@ typedef enum en_verilog_error {
  */
 int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module);
 
-/** @brief Cria uma estrutura de dados representando o circuito,
-           a partir do arquivo com o codigo fonte em Verilog.
- *  @param arquivo O handler do arquivo a ser processado.
- *  @return A estrutura de dados do circuito.
+/** @brief Cria uma estrutura de dados representando um module,
+           a partir do primeiro no arquivo com o codigo fonte em Verilog.
+ *  @param file_path String com o caminho do arquivo a ser processado.
+ *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
+ *  @return Pointer para estrutura de dados do circuito ou NULL em caso de erro.
  */
-Module* carregaCircuito(FILE* arquivo);
+Module* load_module(const char* file_path, Evento** initial_task_events);
+
+/** @brief Parsing de definições de range.
+ *  @param it Endereço para o iterador dos tokens.
+ *  @param module Pointer to verilog module struct.
+ *  @param list_param Params definidos.
+ *  @param range_msb Ponteiro para a variável que guarda o indice do bit mais significativo.
+ *  @param range_lsb Ponteiro para a variável que guarda o indice do bit menos significativo.
+ *  @return Código de erro do tipo VerilogError.
+ */
+VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb);
 
 /** @brief Parsing of 'reg' declaration
  */
@@ -50,16 +65,36 @@ VerilogError load_directive(Token** it, Module* module);
 
 /** @brief Parsing de blocos initial
  */
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
+VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
 
 /** @brief Parsing de 'assign'
  */
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
 
-/** @brief Retorna verdadeiro se uma string representa uma logic gate em Verilog.
+/** @brief Parsing of system tasks
+ */
+VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module);
+
+/** @brief Retorna verdadeiro se um Token representa um logic gate em Verilog.
+ *  @param t Um Token pointer qualquer.
+ *  @return Verdadeiro se t for: "and", "or", "nand", "buf", "not", "bufif0", etc.
+ */
+int is_logic_gate(const Token* t);
+
+/** @brief Retorna verdadeiro se um logic gate é de 3 estados.
+ *  @param gate Um Componente que representa um logic gate.
+ *  @return Verdadeiro se o gate for: "bufif0", "bufif1", "notif0" ou "notif1".
+ */
+int is_tristate_logic(Component* gate);
+
+/** @brief Retorna verdadeiro se uma string representa um logic gate em Verilog.
  *  @param s Uma string qualquer.
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.
  */
 int isPortaLogica(char* s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // VERILOG_H

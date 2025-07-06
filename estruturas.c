@@ -12,6 +12,7 @@
 #include "progres.h"
 #include "sinais.h"
 #include "estruturas.h"
+#include "strutil.h"
 #include "lex.h"
 #include "erros.h"
 #include "mem.h"
@@ -46,7 +47,33 @@ Module* novoCircuito()
     return circuito;
 }
 
-void adicionaEntrada(Module* circ, Componente comp)
+void free_module(Module** mod)
+{
+    if ( *mod == NULL )
+        return;
+
+    delete_list_component( &((*mod)->listaFiosEntrada) );
+    delete_list_component( &((*mod)->listaFiosSaida) );
+    delete_list_component( &((*mod)->listaPortas) );
+    delete_list_component( &((*mod)->listaWires) );
+
+    if ( (*mod)->listaParam.itens )
+        free( (*mod)->listaParam.itens );
+
+    if ( (*mod)->listaReg.itens )
+        free( (*mod)->listaReg.itens );
+
+    if ( (*mod)->sinaisEntrada )
+        free( (*mod)->sinaisEntrada );
+    
+    if ( (*mod)->sinaisSaida )
+        free( (*mod)->sinaisSaida );
+    
+    free( *mod );
+    *mod = NULL;
+}
+
+void adicionaEntrada(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
@@ -54,7 +81,7 @@ void adicionaEntrada(Module* circ, Componente comp)
     insereComponente(circ->listaFiosEntrada, comp);
 }
 
-void adicionaSaida(Module* circ, Componente comp)
+void adicionaSaida(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
@@ -62,7 +89,7 @@ void adicionaSaida(Module* circ, Componente comp)
     insereComponente(circ->listaFiosSaida, comp);
 }
 
-void adicionaWire(Module* circ, Componente comp)
+void adicionaWire(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
@@ -70,7 +97,7 @@ void adicionaWire(Module* circ, Componente comp)
     insereComponente(circ->listaWires, comp);
 }
 
-void adicionaPorta(Module* circ, Componente comp)
+void adicionaPorta(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
@@ -83,39 +110,59 @@ ListaComponente* novaListaComponente()
     return novaListaComponenteTamanho(0);
 }
 
-ListaComponente* novaListaComponenteTamanho(int tamanho)
+ListaComponente* novaListaComponenteTamanho(unsigned int size)
 {
-    int i;
-    ListaComponente *listaCp;
+    unsigned int i;
+    ListaComponente* list_comp;
 
-    listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
-    listaCp->tamanho = tamanho;
+    list_comp = (ListaComponente*) xmalloc( sizeof(ListaComponente) );
+    list_comp->tamanho = size;
 
-    if(tamanho == 0) {
-        listaCp->itens = NULL;
+    if (size == 0) {
+        list_comp->itens = NULL;
     }
     else {
-        listaCp->itens = (Componente*) xmalloc(sizeof(Componente) * tamanho);
+        list_comp->itens = (Component**) xmalloc( sizeof(Component*) * size );
 
-        for(i=0 ; i<tamanho ; i++)
-            listaCp->itens[i] = NULL;
+        for ( i = 0; i < size; i++ ) {
+            list_comp->itens[i] = NULL;
+        }
     }
 
-    return listaCp;
+    return list_comp;
 }
 
-void insereComponente(ListaComponente* ls, Componente cp)
+void delete_list_component(ListaComponente** ppl)
 {
-    if(!ls)
-        ls = novaListaComponente();
+    if ( *ppl == NULL )
+        return;
+    
+    if ( (*ppl)->itens ) {
+        int i;
 
-    if(ls->tamanho == 0) {
-        ls->tamanho++;
-        ls->itens = (Componente*) xmalloc(sizeof(Componente));
+        for ( i = 0; i < (*ppl)->tamanho; i++ )
+        {
+            if ( (*ppl)->itens[i] ) {
+                delete_componente( &((*ppl)->itens[i]) );
+            }
+        }
+
+        free( (*ppl)->itens );
+    }
+
+    free(*ppl);
+    *ppl = NULL;
+}
+
+void insereComponente(ListaComponente* ls, Component* cp)
+{
+    ls->tamanho++;
+
+    if (ls->tamanho == 1) {
+        ls->itens = (Component**) xmalloc(sizeof(Component*));
     }
     else {
-        ls->tamanho++;
-        ls->itens = (Componente*) xrealloc( ls->itens, sizeof(Componente) * ls->tamanho );
+        ls->itens = (Component**) xrealloc( ls->itens, sizeof(Component*) * ls->tamanho );
     }
 
     ls->itens[ls->tamanho - 1] = cp;
@@ -190,7 +237,7 @@ Param* get_param_by_name(ListaParam list, const char* name)
     return NULL;
 }
 
-int contemComponente(ListaComponente* ls, Componente cp)
+int contemComponente(ListaComponente* ls, Component* cp)
 {
     int i;
 
@@ -206,26 +253,53 @@ int contemComponente(ListaComponente* ls, Componente cp)
     return 0;
 }
 
-Componente novoComponente(const char* nome, t_operador porta)
+Component* novoComponente(const char* nome, t_operador porta)
 {
-    Componente c = (Componente) xmalloc(sizeof(struct st_componente));
+    Component* c = (Component*) xmalloc( sizeof(Component) );
 
     copy(c->nome, nome);
     c->tipo.operador = porta;
     c->tipo.atraso = 0; // atraso default eh zero
 
-    c->listaEntrada = novaListaComponente();
+    c->listaEntrada = NULL;
     c->sinalEntrada = NULL;
-
-    c->listaSaida = novaListaComponente();
+    c->listaSaida = NULL;
     c->sinalSaida = NULL;
+
+    if (porta != LITERAL_NUMBER) {
+        c->listaEntrada = novaListaComponente();
+        c->listaSaida = novaListaComponente();
+    }
 
     c->valorDinamico = VAL_X;
 
     return c;
 }
 
-Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
+void delete_componente(Component** c)
+{
+    if ( !(*c) )
+        return;
+
+    if ( (*c)->listaEntrada ) {
+        if ( (*c)->listaEntrada->itens ) {
+            free( (*c)->listaEntrada->itens );
+        }
+        free( (*c)->listaEntrada );
+    }
+
+    if ( (*c)->listaSaida ) {
+        if ( (*c)->listaSaida->itens ) {
+            free( (*c)->listaSaida->itens );
+        }
+        free( (*c)->listaSaida );
+    }
+
+    free(*c);
+    *c = NULL;
+}
+
+Component* getComponenteItemPorNome(ListaComponente* ls, const char* nome)
 {
     int i;
 
@@ -241,7 +315,7 @@ Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
     return NULL;
 }
 
-Componente getPortaPorNome(Module* circ, const char* nome)
+Component* getPortaPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -249,7 +323,7 @@ Componente getPortaPorNome(Module* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaPortas, nome);
 }
 
-Componente getWirePorNome(Module* circ, const char* nome)
+Component* getWirePorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -257,7 +331,7 @@ Componente getWirePorNome(Module* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaWires, nome);
 }
 
-Componente getInputPorNome(Module* circ, const char* nome)
+Component* getInputPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
@@ -265,7 +339,7 @@ Componente getInputPorNome(Module* circ, const char* nome)
     return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
 }
 
-Componente getOutputPorNome(Module* circ, const char* nome)
+Component* getOutputPorNome(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;

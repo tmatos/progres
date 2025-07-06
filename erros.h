@@ -4,10 +4,13 @@
  */
 
 #ifndef ERROS_H
-
 #define ERROS_H
 
 extern int global_silent_mode;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MSG_ERROR_LEX_UNEXPECTED_SYMBOL "Simbolo nao esperado"
 #define MSG_ERROR_LEX_INVALID_CHAR "Caractere nao permitido"
@@ -50,5 +53,9 @@ void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok
  *  @return void (program error code: -1)
  */
 void fatal_error_no_memory();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ERROS_H

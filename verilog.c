@@ -15,12 +15,14 @@
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "eventos.h"
+#include "strutil.h"
 #include "lex.h"
 #include "preprocessor.h"
 
 int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module)
 {
-    int virgula = 0;
+    int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
 
     Token* t = *it;
 
@@ -57,15 +59,15 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, 
     }
 
     if (t->classe == SYM_OPEN_BRACKET) {
-        // devemos agora ler os argumentos do modulo
+        // devemos agora ler os argumentos do module
         avanca(&t);
 
-        virgula = 0; // nao esperando por virgula, por enquanto
+        expect_comma = 0; // nao esperando por virgula, por enquanto
 
         while (1)
         {
             if (!t) {
-                if (virgula) {
+                if (expect_comma) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ",", NULL);
                 }
@@ -82,36 +84,33 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, 
                 break;
             }
 
-            if (virgula) {
+            if (expect_comma) {
                 if (t->classe == SYM_COMMA) {
-                    virgula = 0;
+                    expect_comma = 0;
                     avanca(&t);
                     continue;
                     // TODO: bug de virgula a mais...
                 }
-                else {
-                    show_error_msg("Simbolo esperado nao foi encontrado",
-                                   t->linha, t->coluna, ",' ou ')", t->valor);
-                    goto load_module_header_bad_return;
-                }
+
+                show_error_msg("Simbolo esperado nao foi encontrado",
+                               t->linha, t->coluna, ",' ou ')", t->valor);
+                goto load_module_header_bad_return;
             }
 
-            if (isIdentificador(t)) {
-                if ( identExiste(identifiers, t->valor) ) {
-                    show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
-                    goto load_module_header_bad_return;
-                }
-                else {
-                    insereTokenString(identifiers, t->valor, -1, -1);
-                    insereTokenString(livres, t->valor, -1, -1);
-                    virgula = 1;
-                }
-            }
-            else {
+            if ( !isIdentificador(t) ) {
                 show_error_msg("Identificador nao foi encontrado",
                                t->linha, t->coluna, "um identificador", t->valor);
                 goto load_module_header_bad_return;
             }
+
+            if ( identExiste(identifiers, t->valor) ) {
+                show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+                goto load_module_header_bad_return;
+            }
+
+            insereTokenString(identifiers, t->valor, -1, -1);
+            insereTokenString(livres, t->valor, -1, -1);
+            expect_comma = 1;
 
             avanca(&t);
         }
@@ -136,39 +135,61 @@ load_module_header_bad_return:
     return 0;
 }
 
-Module* carregaCircuito(FILE* arquivo)
+Module* load_module(const char* file_path, Evento** initial_task_events)
 {
-    Componente in;
-    Componente out;
-    Componente gate;
+    Component* in;
+    Component* out;
+    Component* gate;
+    Component* net;
     Token* it = NULL;
     Module* circuito = NULL;
+    FILE* f_verilog_source;
 
-    int virgula = 0; // um flag para indicar se estamos esperando por uma virgula
+    int range_msb;
+    int range_lsb;
+    int input_count;
+    int output_count;
+
+    Evento* initial_tran_events = NULL;
+
+    VerilogError err;
+
+    int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
+
+    f_verilog_source = fopen(file_path, "r");
+
+    if (!f_verilog_source) {
+        print("Impossibilitado de abrir o arquivo: %s\n", file_path);
+
+        return NULL;
+    }
+    
+    print("Abrindo o arquivo de circuito: %s\n", file_path);
 
     // lista de todos os identificadores
-    ListaToken* identificadores = novaListaToken();
+    ListaToken* identifiers = novaListaToken();
 
     // lista de identificadores de entrada ou saida ainda nao definidos como tal
-    ListaToken* identificLivre = novaListaToken();
+    ListaToken* identifiers_to_be = novaListaToken();
 
     // lista de todos os identificadores das entradas
-    ListaToken* listaInput = novaListaToken();
+    ListaToken* list_input = novaListaToken();
 
     // lista de todos os identificadores das saidas
-    ListaToken* listaOutput = novaListaToken();
+    ListaToken* list_output = novaListaToken();
 
     // lista de todos os identificadores de wire
-    ListaToken* listaWire = novaListaToken();
+    ListaToken* list_wire = novaListaToken();
 
     // list for params
     ListaToken* list_param = novaListaToken();
 
-    ListaToken* tokens = tokeniza(arquivo);
-
+    ListaToken* tokens = tokeniza(f_verilog_source);
 
     if (!tokens)
         goto bad_return;
+
+    copy(tokens->file, file_path);
 
     // pre-processing pass to handle compiler directives, returns 1 if ok
     if (!pre_processor(tokens))
@@ -201,7 +222,7 @@ Module* carregaCircuito(FILE* arquivo)
         goto before_module;
     }
 
-    if ( !load_module_header(&it, identificadores, identificLivre, circuito) )
+    if ( !load_module_header(&it, identifiers, identifiers_to_be, circuito) )
         goto bad_return;
 
     if (!avanca(&it))
@@ -217,17 +238,24 @@ Module* carregaCircuito(FILE* arquivo)
             || it->classe == KW_WIRE )
         {
             // usado posteriormente para saber se os identificadores serao in ou out
-            char tipo[MAX_TOKEN_SIZE];
-            copy(tipo, it->valor);
+            TokenClass token_subcase = it->classe;
 
             avanca(&it);
+            if (!it)
+                goto bad_return_unexpected_eof;
 
-            virgula = 0; // nao esperando por uma virgula inicialmente
+            if ( (token_subcase != KW_WIRE) && (it->classe == KW_WIRE) ) {
+                avanca(&it);
+                if (!it)
+                    goto bad_return_unexpected_eof;
+            }
+
+            expect_comma = 0; // nao esperando por uma virgula inicialmente
 
             while (1)
             {
                 if (!it) {
-                    if (virgula) {
+                    if (expect_comma) {
                         show_error_msg("Final do arquivo nao esperado",
                                        -1, -1, ",", NULL);
                     }
@@ -242,9 +270,9 @@ Module* carregaCircuito(FILE* arquivo)
                 if (it->classe == SYM_SEMICOLON)
                     break;
 
-                if (virgula) {
+                if (expect_comma) {
                     if (it->classe == SYM_COMMA) {
-                        virgula = 0;
+                        expect_comma = 0;
                         avanca(&it);
                         continue; // ainda permite uma virgula a mais...
                     }
@@ -255,7 +283,7 @@ Module* carregaCircuito(FILE* arquivo)
                     }
                 }
 
-                if ( !iguais(tipo, "wire") && !identExiste(identificLivre, it->valor) ) {
+                if ( (token_subcase != KW_WIRE) && !identExiste(identifiers_to_be, it->valor) ) {
                     show_error_msg("Identificador invalido",
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
@@ -263,49 +291,65 @@ Module* carregaCircuito(FILE* arquivo)
                     goto bad_return;
                 }
 
-                if ( iguais(tipo, "input") ) {
-                    insereTokenString(listaInput, it->valor, -1, -1);
+                if ( token_subcase == KW_INPUT ) {
+                    insereTokenString(list_input, it->valor, -1, -1);
 
                     // atribui como entrada o identificador na estrutura
                     adicionaEntrada( circuito, novoComponente(it->valor, input) );
                 }
-                else if ( iguais(tipo, "output") ) {
-                    insereTokenString(listaOutput, it->valor, -1, -1);
+                else if ( token_subcase == KW_OUTPUT ) {
+                    insereTokenString(list_output, it->valor, -1, -1);
 
                     // atribui como saida o identificador na estrutura
                     adicionaSaida( circuito, novoComponente(it->valor, output) );
                 }
-                else if( iguais(tipo, "wire") ) {
+                else if ( token_subcase == KW_WIRE ) {
+                    range_msb = 0;
+                    range_lsb = 0;
 
-                    if( isIdentificador(it) ) {
-                        if( identExiste(identificadores, it->valor) ) {
-                            show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
-                            goto bad_return;
-                        }
-                        else {
-                            insereTokenString(identificadores, it->valor, -1, -1);
-                            insereTokenString(listaWire, it->valor, -1, -1);
-
-                            // atribui como wire o identificador na estrutura
-                            adicionaWire(circuito, novoComponente(it->valor, wire));
-                        }
+                    err = load_range(&it, circuito, list_param, &range_msb, &range_lsb);
+                    switch (err)
+                    {
+                    case ERROR_VERILOG_BAD_EOF:
+                        goto bad_return_unexpected_eof;
+                        break;
+                    case ERROR_VERILOG_BAD_TOKEN:
+                        goto bad_return;
+                        break;
+                    default:
+                        // no error
+                        break;
                     }
-                    else {
+
+                    if ( !isIdentificador(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
                                        it->linha, it->coluna, "um identificador", it->valor);
                         goto bad_return;
                     }
+
+                    if ( identExiste(identifiers, it->valor) ) {
+                        show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                        goto bad_return;
+                    }
+
+                    insereTokenString(identifiers, it->valor, -1, -1);
+                    insereTokenString(list_wire, it->valor, -1, -1);
+
+                    // atribui como wire o identificador na estrutura
+                    net = novoComponente(it->valor, wire);
+                    net->size = (range_msb - range_lsb + 1);
+                    adicionaWire(circuito, net);
                 }
 
-                removeTokensPorValor(identificLivre, it->valor);
+                removeTokensPorValor(identifiers_to_be, it->valor);
 
-                virgula = 1;
+                expect_comma = 1;
 
                 avanca(&it);
             }
         }
         else if (it->classe == KW_REG) {
-            VerilogError err = load_reg(&it, identificadores, list_param, circuito);
+            VerilogError err = load_reg(&it, identifiers, list_param, circuito);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -319,7 +363,7 @@ Module* carregaCircuito(FILE* arquivo)
                 break;
             }
         }
-        else if( isPortaLogica(it->valor) ) {
+        else if (is_logic_gate(it)) {
             gate = NULL;
             
             switch (it->classe)
@@ -347,23 +391,36 @@ Module* carregaCircuito(FILE* arquivo)
                 break;
             case KW_BUF:
                 gate = novoComponente("Buffer", op_buf);
+                break;
+            case KW_BUFIF0:
+                gate = novoComponente("BufIf0", OP_BUF_IF0);
+                break;
+            case KW_BUFIF1:
+                gate = novoComponente("BufIf0", OP_BUF_IF1);
+                break;
+            case KW_NOTIF0:
+                gate = novoComponente("NotIf0", OP_NOT_IF0);
+                break;
+            case KW_NOTIF1:
+                gate = novoComponente("NotIf0", OP_NOT_IF1);
+                break;
             default:
                 break;
             }
 
-            if(!avanca(&it)) {
+            if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1,
                                "(', identificador ou '#", NULL);
                 goto bad_return;
             }
 
-            if( isIdentificador(it) ) {  
-                if( identExiste(identificadores, it->valor) ) {
+            if (isIdentificador(it)) {  
+                if (identExiste(identifiers, it->valor)) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     goto bad_return;
                 }
 
-                insereTokenString(identificadores, it->valor, -1, -1);
+                insereTokenString(identifiers, it->valor, -1, -1);
                 copy(gate->nome, it->valor);
 
                 avanca(&it);
@@ -376,16 +433,16 @@ Module* carregaCircuito(FILE* arquivo)
             }
 
             if (it->classe == SYM_HASHTAG) {
-                if(!avanca(&it)) {
+                if (!avanca(&it)) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, "um numero inteiro nao negativo", NULL);
                     goto bad_return;
                 }
                 else if ( !isNumNaturalValido(it->valor) ) {
-                    char esperado[100];
-                    sprintf(esperado,
-                            "um numero inteiro nao negativo e com ate %d digitos",
-                            MAX_DIGITOS_NUM);
+                    char esperado[67];
+                    snprintf(esperado, 67,
+                             "um numero inteiro nao negativo e com ate %d digitos",
+                             MAX_DIGITOS_NUM);
                     show_error_msg("Numero valido nao foi encontrado",
                                    it->linha, it->coluna, esperado, it->valor);
                     goto bad_return;
@@ -407,19 +464,23 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if(!avanca(&it)) {
+            if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
                                -1, -1, "identificador para wire ou output", NULL);
                 goto bad_return;
             }
 
-            if( identExiste(listaWire, it->valor) ) {
+            output_count = 0;
+
+        //gate_outputs: // Label para a parte onde ha leitura de saidas da porta logica
+
+            if (identExiste(list_wire, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaSaida, out);
                 insereComponente(out->listaEntrada, gate);
             }
-            else if( identExiste(listaOutput, it->valor) ) {
+            else if (identExiste(list_output, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
                 out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaSaida, out);
@@ -432,38 +493,49 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
+            output_count++;
+
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ",", NULL);
                 goto bad_return;
             }
 
-            if( it->classe != SYM_COMMA ) {
+            if (it->classe != SYM_COMMA) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ",", it->valor);
                 goto bad_return;
             }
 
-            gate_inputs: // Label para a parte do codigo onde ha leitura de entradas da porta logica
+            // TODO: read possible multiple outputs for 'buf' as well 'not' gates
+
+            input_count = 0;
+
+        gate_inputs: // Label para a parte onde ha leitura de entradas da porta logica
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
-                               -1, -1, "um identificador", NULL);
+                               -1, -1, "um identificador ou numero", NULL);
                 goto bad_return;
             }
 
-            if( identExiste(listaWire, it->valor) ) {
+            if ( it->classe == NUM_BASE_DECIMAL ) {
+                Component* num = novoComponente("literal_number_decimal", LITERAL_NUMBER);
+                num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
+                insereComponente(gate->listaEntrada, num); // TODO: free mem later
+            }
+            else if (identExiste(list_wire, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaWires, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(listaInput, it->valor) ) {
+            else if (identExiste(list_input, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
                 insereComponente(gate->listaEntrada, in);
                 insereComponente(in->listaSaida, gate);
             }
-            else if( identExiste(listaOutput, it->valor) ) {
+            else if (identExiste(list_output, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
                 in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
                 insereComponente(gate->listaEntrada, in);
@@ -472,13 +544,15 @@ Module* carregaCircuito(FILE* arquivo)
             else {
                 show_error_msg("Entrada da porta logica invalida",
                                it->linha, it->coluna,
-                               "uma entrada valida (tipos: input, output ou wire)",
+                               "uma entrada valida (tipo net ou numero literal)",
                                it->valor);
                 goto bad_return;
             }
 
+            input_count++;
+
             if (!avanca(&it)) {
-                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
+                if ( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -490,22 +564,23 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( it->classe != SYM_CLOSE_BRACKET ) {
-                if( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
+            if (it->classe != SYM_CLOSE_BRACKET) {
+                if ( (gate->tipo.operador == op_not) ||
+                     (gate->tipo.operador == op_buf) || 
+                     (is_tristate_logic(gate) && input_count == 2) ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
                     goto bad_return;
                 }
-                else {
-                    if( it->classe == SYM_COMMA ) {
-                        goto gate_inputs;
-                    }
-                    else {
-                        show_error_msg("Simbolo esperado nao foi encontrado",
-                                       it->linha, it->coluna, ")' ou ',", it->valor);
-                        goto bad_return;
-                    }
+                
+                if (it->classe == SYM_COMMA) {
+                    // keep reading all the gate inputs
+                    goto gate_inputs;
                 }
+                
+                show_error_msg("Simbolo esperado nao foi encontrado",
+                               it->linha, it->coluna, ")' ou ',", it->valor);
+                goto bad_return;
             }
 
             if (!avanca(&it)) {
@@ -513,7 +588,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            if( it->classe != SYM_SEMICOLON ) {
+            if (it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->linha, it->coluna, ";", it->valor);
                 goto bad_return;
@@ -522,26 +597,28 @@ Module* carregaCircuito(FILE* arquivo)
             // finalmente, inserimos a gate na lista de portas logicas do circuito
             adicionaPorta(circuito, gate);
         }
-        else if( it->classe == KW_ENDMODULE ) {
+        else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
 
             // nao deve haver mais nada alem do endmodule
-            if(it) {
+            if (it) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "nenhum codigo a mais", it->valor);
                 goto bad_return;
             }
-            else {
-                // Liberar a memoria alocada no inicio da funcao
-                delete_lista_token(identificadores);
-                delete_lista_token(identificLivre);
-                delete_lista_token(listaInput);
-                delete_lista_token(listaOutput);
-                delete_lista_token(listaWire);
-                delete_lista_token(list_param);
-                delete_lista_token(tokens);
-                return circuito;
-            }
+            
+            // Liberar a memoria alocada no inicio da funcao
+            delete_lista_token(identifiers);
+            delete_lista_token(identifiers_to_be);
+            delete_lista_token(list_input);
+            delete_lista_token(list_output);
+            delete_lista_token(list_wire);
+            delete_lista_token(list_param);
+            delete_lista_token(tokens);
+
+            fclose(f_verilog_source);
+
+            return circuito;
         }
         else if (it->classe == SYM_GRAVE_ACCENT) {
             VerilogError err = load_directive(&it, circuito);
@@ -556,7 +633,7 @@ Module* carregaCircuito(FILE* arquivo)
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            VerilogError err = load_initial_block(&it, identificadores, list_param, circuito);
+            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito, initial_task_events);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -583,7 +660,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
     
-            if (identExiste(identificadores, it->valor)) {
+            if (identExiste(identifiers, it->valor)) {
                 show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                 goto bad_return;
             }
@@ -595,7 +672,7 @@ Module* carregaCircuito(FILE* arquivo)
                 goto bad_return;
             }
 
-            insereTokenString(identificadores, it->valor, -1, -1);
+            insereTokenString(identifiers, it->valor, -1, -1);
             insereTokenString(list_param, it->valor, -1, -1);
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
@@ -643,7 +720,7 @@ Module* carregaCircuito(FILE* arquivo)
             addParam(circuito, param);
         }
         else if (it->classe == KW_ASSIGN) {
-            VerilogError err = load_assign(&it, listaWire, listaInput, listaOutput, circuito);
+            VerilogError err = load_assign(&it, list_wire, list_input, list_output, circuito);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -663,7 +740,7 @@ Module* carregaCircuito(FILE* arquivo)
             goto bad_return;
         }
 
-        if(!avanca(&it))
+        if (!avanca(&it))
             goto bad_return_unexpected_eof;
             
     }
@@ -673,15 +750,69 @@ bad_return_unexpected_eof:
 
 bad_return:
     // free mem allocated in the head of this func
-    delete_lista_token(identificadores);
-    delete_lista_token(identificLivre);
-    delete_lista_token(listaInput);
-    delete_lista_token(listaOutput);
-    delete_lista_token(listaWire);
+    delete_lista_token(identifiers);
+    delete_lista_token(identifiers_to_be);
+    delete_lista_token(list_input);
+    delete_lista_token(list_output);
+    delete_lista_token(list_wire);
     delete_lista_token(list_param);
     delete_lista_token(tokens);
 
+    if (initial_tran_events)
+        delete_event_queue(&initial_tran_events);
+
+    free_module(&circuito);
+    fclose(f_verilog_source);
+
     return NULL;
+}
+
+int is_logic_gate(const Token* t)
+{
+    int i;
+
+    TokenClass g[13] = {
+        KW_AND,    // 0
+        KW_OR,     // 1
+        KW_NOT,    // 2
+        KW_BUF,    // 3
+        KW_NAND,   // 4
+        KW_NOR,    // 5
+        KW_XOR,    // 7
+        KW_XNOR,   // 8
+        KW_BUFIF0, // 9
+        KW_BUFIF1, // 10
+        KW_NOTIF0, // 11
+        KW_NOTIF1, // 12
+    };
+
+    for ( i = 0; i < 13; i++ )
+    {
+        if (t->classe == g[i])
+            return 1;
+    }
+    
+    return 0;
+}
+
+int is_tristate_logic(Component* gate)
+{
+    int i;
+
+    t_operador op[4] = {
+        OP_BUF_IF0, // 0
+        OP_BUF_IF1, // 1
+        OP_NOT_IF0, // 2
+        OP_NOT_IF1, // 3
+    };
+
+    for ( i = 0; i < 4; i++ )
+    {
+        if (gate->tipo.operador == op[i])
+            return 1;
+    }
+    
+    return 0;
 }
 
 int isPortaLogica(char* s)
@@ -702,6 +833,7 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     int is_signed;
     int range_msb;
     int range_lsb;
+    VerilogError err;
 
     Token* t = *it;
 
@@ -722,65 +854,19 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     range_msb = 0;
     range_lsb = 0;
 
-    // optional range specification
-    // range ::= [ msb_constant_expression : lsb_constant_expression ]
-    // TODO: calculate the expressions  
-    if (t->classe == SYM_OPEN_SQUAREBRACKET) {
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
+    err = load_range(&t, module, list_param, &range_msb, &range_lsb);
 
-        if (isNumNaturalValido(t->valor)) {
-            range_msb = strtol(t->valor, NULL, 10);
-        }
-        else if (identExiste(list_param, t->valor)) {
-            range_msb = get_param_by_name(module->listaParam, t->valor)->value;
-        }
-        else {
-            show_error_msg("Numero para bit mais significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
-            goto load_reg_bad_token;
-        }
-        
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (t->classe != SYM_COLON) {
-            show_error_msg("Simbolo inesperado",
-                           t->linha, t->coluna, ":", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (isNumNaturalValido(t->valor)) {
-            range_lsb = strtol(t->valor, NULL, 10);
-        }
-        else if (identExiste(list_param, t->valor)) {
-            range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
-        }
-        else {
-            show_error_msg("Numero para bit menos significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
-
-        if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
-            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
-            goto load_reg_bad_token;
-        }
-
-        if ( range_msb < range_lsb ) {
-            show_error_msg("Range invalido",
-                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
-            goto load_reg_bad_token;
-        }
-
-        if (!avanca(&t))
-            goto load_reg_bad_eof;
+    switch (err)
+    {
+    case ERROR_VERILOG_BAD_EOF:
+        goto load_reg_bad_eof;
+        break;
+    case ERROR_VERILOG_BAD_TOKEN:
+        goto load_reg_bad_token;
+        break;
+    default:
+        // no error
+        break;
     }
 
     if (!isIdentificador(t)) {
@@ -817,6 +903,82 @@ load_reg_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_reg_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb)
+{
+    Token* t = *it;
+    
+    // optional range specification
+    // range ::= [ msb_constant_expression : lsb_constant_expression ]
+    // TODO: calculate the expressions
+    if (t->classe == SYM_OPEN_SQUAREBRACKET) {
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            *range_msb = strtol(t->valor, NULL, 10);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            *range_msb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit mais significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_range_bad_token;
+        }
+        
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (t->classe != SYM_COLON) {
+            show_error_msg("Simbolo inesperado",
+                           t->linha, t->coluna, ":", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (isNumNaturalValido(t->valor)) {
+            *range_lsb = strtol(t->valor, NULL, 10);
+        }
+        else if (identExiste(list_param, t->valor)) {
+            *range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
+        }
+        else {
+            show_error_msg("Numero para bit menos significativo nao foi encontrado",
+                           t->linha, t->coluna, "algum numero", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+
+        if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
+            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
+            goto load_range_bad_token;
+        }
+
+        if ( *range_msb < *range_lsb ) {
+            show_error_msg("Range invalido",
+                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
+            goto load_range_bad_token;
+        }
+
+        if (!avanca(&t))
+            goto load_range_bad_eof;
+    }
+
+//load_range_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_range_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_range_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
@@ -902,13 +1064,31 @@ load_directive_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 }
 
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
+VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
 {
     Token* t = *it;
     Register* left_reg = NULL;
 
     if (!avanca(&t))
         goto load_initial_block_bad_eof;
+
+    // systask handling
+    if (t->classe == SYM_DOLLAR) {
+        VerilogError err = load_systask(&t, initial_task_events, module);
+        switch (err)
+        {
+        case ERROR_VERILOG_BAD_EOF:
+            goto load_initial_block_bad_eof;
+            break;
+        case ERROR_VERILOG_BAD_TOKEN:
+            goto load_initial_block_bad_token;
+            break;
+        default:
+            // no error
+            goto load_initial_block_sucess;
+            break;
+        }
+    }
 
     // treat a single statement attrib, for now
 
@@ -961,7 +1141,7 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
         goto load_initial_block_bad_token;
     }
 
-//load_initial_block_sucess:
+load_initial_block_sucess:
     *it = t;
     return NO_ERROR;
 
@@ -974,9 +1154,9 @@ load_initial_block_bad_eof:
 
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module)
 {
-    Componente in;
-    Componente out;
-    Componente gate;
+    Component* in;
+    Component* out;
+    Component* gate = NULL;
 
     Token* t = *it;
 
@@ -1026,9 +1206,9 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
     if (!avanca(&t))
         goto load_assign_bad_eof;
 
-    // simplest expression is another net
-
-    // negation (~) is also simple, but, for now, is not assign anymore
+    // simplest expression is another net,
+    // logic synthesis, in this case, creates a buf.
+    // negation (~) is also simple, it creates a not.
 
     if ( t->classe == SYM_TILDE ) {
         gate->tipo.operador = op_not;
@@ -1085,9 +1265,102 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
     return NO_ERROR;
 
 load_assign_bad_token:
+    delete_componente(&gate);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_assign_bad_eof:
+    delete_componente(&gate);
     return ERROR_VERILOG_BAD_EOF;
+}
 
+VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module)
+{
+    int count = 0; // task arg counter
+
+    Token* t = *it;
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if ( !isIdentificador(t) ) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "o nome de uma task", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !iguais(t->valor, "display") ) {
+        show_error_msg("Task invalida ou nao suportada",
+                        t->linha, t->coluna, "o nome de uma task suportada", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if (t->classe != SYM_OPEN_BRACKET) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "(", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    // read arguments
+
+    char str[MAX_TOKEN_SIZE];
+    str[0] = '\0';
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    // first arg SHOULD be a string
+
+    copy(str, t->valor);
+
+    // there may be zero to n more args
+
+systask_args_load:
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+
+    if (t->classe == SYM_CLOSE_BRACKET) {
+        if ( !avanca(&t) )
+            goto load_systask_bad_eof;
+
+        if (t->classe != SYM_SEMICOLON) {
+            show_error_msg("Token inesperado foi encontrado",
+                            t->linha, t->coluna, ";", t->valor);
+            goto load_systask_bad_token;
+        }
+
+        goto load_systask_sucess;
+    }
+
+    if (t->classe != SYM_COMMA) {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, ", ou )", t->valor);
+        goto load_systask_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_systask_bad_eof;
+    
+    // check arg validity and save to some stack
+    // if (t->class == ???)
+
+    count++;
+
+    goto systask_args_load;
+
+load_systask_sucess:
+
+    insert_task_event(initial_task_events, (Tempo)0, TASK_DISPLAY, str);
+
+    *it = t;
+    return NO_ERROR;
+
+load_systask_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_systask_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
 }

@@ -11,33 +11,36 @@
 #include "verilog.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "strutil.h"
 #include "lex.h"
 #include "eventos.h"
 #include "erros.h"
 
-Sinais* simula(Module* circuto, Sinais* entradas)
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
 {
     int i;
     int j;
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
     Tempo t;
 
-    Transicao* listaTr = NULL;
-    Transicao* itTr = NULL;
+    Transicao* list_tr = NULL;
+    Transicao* tr = NULL; // iterator
 
     Evento* fila = NULL;
     Pulso* p = NULL;
 
-    ListaComponente* portasAlteradas = NULL;
-    Componente gate = NULL;
+    ListaComponente* list_changed_gates = NULL;
+    Component* gate = NULL;
 
     ValorLogico result;
     ValorLogico valor_xor_in_a;
     ValorLogico valor_xor_in_b;
     ValorLogico valor_xnor_in_a;
     ValorLogico valor_xnor_in_b;
+    ValorLogico valor_control;
+    ValorLogico valor_data;
 
-    Sinais* saidas = novaSinais();
+    Sinais* saidas = new_signal_list();
 
     if (!circuto || !entradas) {
         return NULL;
@@ -60,25 +63,42 @@ Sinais* simula(Module* circuto, Sinais* entradas)
     }
 
     // print matches msg
-    if (!global_silent_mode) {
-        printf("\nENTRADAS:\n  .v = %d\n .in = %d\n batem = %d\n\n",
-               circuto->listaFiosEntrada->tamanho,
-               entradas->quantidade,
-               validos);
-    }
+    print("----------\n"
+          "Entradas: \n"
+          "   .v = %d\n"
+          "  .in = %d\n"
+          "match = %d\n"
+          "----------\n",
+          circuto->listaFiosEntrada->tamanho,
+          entradas->quantidade,
+          validos);
 
     if (validos < circuto->listaFiosEntrada->tamanho) {
-        if (!global_silent_mode) {
-            printf("AVISO: O arquivo de entradas tem menos "
-                   "sinais de entrada que o circuito.\n");
-        }
+        print("AVISO: O arquivo de entradas tem menos "
+              "sinais de entrada que o circuito.\n");
 
         return NULL;
     }
 
-    // Inicializacao da fila de eventos com os valores das entradas
-    fila = NULL;
+    // task ocurrences are copied into the event queue
+    Evento* evit = initial_task_events ? *initial_task_events : NULL;
+    while (evit)
+    {
+        Transicao* tranit = evit->listaTransicao;
+        while (tranit)
+        {
+            insert_task_event(&fila,
+                              evit->quando,
+                              tranit->task_type,
+                              tranit->task_code);
 
+            tranit = tranit->proximo;
+        }
+        
+        evit = evit->proximo;
+    }
+
+    // Inicializacao da fila de eventos com os valores das entradas
     for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
     {
         t = 0;
@@ -86,18 +106,22 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
         while (p->valor != VAL_BLANK)
         {
-            insereEvento(&fila,
+            insert_event(&fila,
                          t,
+                         EVT_NET_TRANSITION,
                          circuto->listaFiosEntrada->itens[i],
+                         NULL,
                          p->valor);
 
             t = t + p->tempo * circuto->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
-        insereEvento(&fila,
+        insert_event(&fila,
                      t,
+                     EVT_NET_TRANSITION,
                      circuto->listaFiosEntrada->itens[i],
+                     NULL,
                      VAL_X); // este sinal fica ate infitito
     }
 
@@ -109,50 +133,67 @@ Sinais* simula(Module* circuto, Sinais* entradas)
 
     while (fila)
     {
-        portasAlteradas = novaListaComponente();
+        list_changed_gates = novaListaComponente();
 
         t = fila->quando;
 
-        listaTr = popEvento(&fila);
-        itTr = listaTr;
+        list_tr = pop_event(&fila);
+        tr = list_tr;
 
-        // atualiza valores de fios e faz uma lista das
-        // portas alteradas pelas transicoes em listaTr
-        while (itTr)
+        // nao sendo uma system task: atualiza valores de fios e faz
+        // uma lista das portas alteradas pelas transicoes em list_tr;
+        // senao, caso seja task: executa a mesma.
+        while (tr)
         {
-            // apenas se houver mudanca de valor no fio
-            if ( itTr->fio->valorDinamico != itTr->novoValor )
+            // apenas tambem se houver mudanca de valor no fio
+            if ( (tr->task_type == IS_NOT_A_TASK) &&
+                 (tr->fio->valorDinamico != tr->novoValor) )
             {
-                for ( i=0 ; i < itTr->fio->listaSaida->tamanho ; i++ )
+                for ( i=0 ; i < tr->fio->listaSaida->tamanho ; i++ )
                 {
-                    if ( !contemComponente(portasAlteradas,
-                                           itTr->fio->listaSaida->itens[i]) ) {
-                        insereComponente(portasAlteradas,
-                                         itTr->fio->listaSaida->itens[i]);
+                    if ( !contemComponente(list_changed_gates,
+                                           tr->fio->listaSaida->itens[i]) ) {
+                        insereComponente(list_changed_gates,
+                                         tr->fio->listaSaida->itens[i]);
                     }
                 }
 
-                if (itTr->fio->tipo.operador == output) {
-                    if ( !(itTr->fio->sinalSaida) ) {
-                        itTr->fio->sinalSaida = novoSinal( itTr->fio->nome );
+                if (tr->fio->tipo.operador == output) {
+                    if ( !(tr->fio->sinalSaida) ) {
+                        tr->fio->sinalSaida = new_signal( tr->fio->nome );
                     }
-                    addPulso(itTr->fio->sinalSaida,
-                             itTr->fio->valorDinamico,
-                             t - itTr->fio->sinalSaida->duracaoTotal);
+                    add_new_pulse(tr->fio->sinalSaida,
+                                  tr->fio->valorDinamico,
+                                  t - tr->fio->sinalSaida->duracaoTotal);
                 }
 
-                itTr->fio->valorDinamico = itTr->novoValor;
+                tr->fio->valorDinamico = tr->novoValor;
             }
 
-            itTr = itTr->proximo;
+            switch (tr->task_type)
+            {
+            case TASK_DISPLAY:
+                print("%s\n", tr->task_code);
+                break;
+            default:
+                break;
+            }
+
+            tr = tr->proximo;
         }
 
-        // popEvento() nao liberou mem da lista de transicoes, fazemos isso aqui
-        delete_list_transicao(&listaTr);
+        // pop_event() nao liberou mem da lista de transicoes, fazemos isso aqui
+        delete_list_transicao(&list_tr);
 
-        for ( i=0 ; i < portasAlteradas->tamanho ; i++ )
+        for ( i=0 ; i < list_changed_gates->tamanho ; i++ )
         {
-            gate = portasAlteradas->itens[i];
+            gate = list_changed_gates->itens[i];
+
+            // be prepared, in case of 3 stage logic gates
+            if (gate->listaEntrada->tamanho == 2) {
+                valor_data = gate->listaEntrada->itens[0]->valorDinamico;
+                valor_control =gate->listaEntrada->itens[1]->valorDinamico;
+            }
 
             switch (gate->tipo.operador)
             {
@@ -184,6 +225,18 @@ Sinais* simula(Module* circuto, Sinais* entradas)
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
                 result = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
                 break;
+            case OP_BUF_IF0:
+                result = compute_buf_if0_gate(valor_data, valor_control);
+                break;
+            case OP_BUF_IF1:
+                result = compute_buf_if1_gate(valor_data, valor_control);
+                break;
+            case OP_NOT_IF0:
+                result = compute_not_if0_gate(valor_data, valor_control);
+                break;
+            case OP_NOT_IF1:
+                result = compute_not_if1_gate(valor_data, valor_control);
+                break;
             case assign:
                 // TODO: implement expression evaluation and specific data structures
                 result = gate->listaEntrada->itens[0]->valorDinamico;
@@ -196,17 +249,17 @@ Sinais* simula(Module* circuto, Sinais* entradas)
         }
 
         // free mem
-        if(portasAlteradas->tamanho != 0)
-            free(portasAlteradas->itens);
-        free(portasAlteradas);
-        portasAlteradas = NULL;
+        if(list_changed_gates->tamanho != 0)
+            free(list_changed_gates->itens);
+        free(list_changed_gates);
+        list_changed_gates = NULL;
     }
 
     // copia as saidas da simulacao do ciruito para o retorno da funcao
     for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
     {
-        addSinalPronto(saidas,
-                       circuto->listaFiosSaida->itens[i]->sinalSaida);
+        insert_signal(saidas,
+                      circuto->listaFiosSaida->itens[i]->sinalSaida);
     }
 
     return saidas;
@@ -343,16 +396,118 @@ ValorLogico computeNandGate(ListaComponente* inputs)
     return out;
 }
 
-void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Componente gate, ValorLogico result)
+ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_1)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_0 && data == VAL_0 )
+        return VAL_L;
+
+    if ( control != VAL_0 && data == VAL_1 )
+        return VAL_H;
+    
+    return data;
+}
+
+ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_0)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_1 && data == VAL_0 )
+        return VAL_L;
+
+    if ( control != VAL_1 && data == VAL_1 )
+        return VAL_H;
+    
+    return data;
+}
+
+ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_1)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_0 && data == VAL_0 )
+        return VAL_H;
+
+    if ( control != VAL_0 && data == VAL_1 )
+        return VAL_L;
+
+    switch (data)
+    {
+    case VAL_0:
+        return VAL_1;
+        break;
+    case VAL_1:
+        return VAL_0;
+        break;
+    case VAL_L:
+        return VAL_1;
+        break;
+    case VAL_H:
+        return VAL_0;
+        break;
+    default:
+        return VAL_X;
+    }
+}
+
+ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
+{
+    if (control == VAL_0)
+        return VAL_Z;
+
+    if ( data == VAL_X || data == VAL_Z )
+        return VAL_X;
+
+    if ( control != VAL_1 && data == VAL_0 )
+        return VAL_H;
+
+    if ( control != VAL_1 && data == VAL_1 )
+        return VAL_L;
+
+    switch (data)
+    {
+    case VAL_0:
+        return VAL_1;
+        break;
+    case VAL_1:
+        return VAL_0;
+        break;
+    case VAL_L:
+        return VAL_1;
+        break;
+    case VAL_H:
+        return VAL_0;
+        break;
+    default:
+        return VAL_X;
+    }
+}
+
+void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result)
 {
     int j;
 
     // cria eventos relativos as saidas da porta
     for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
-        insereEvento(fila,
+        insert_event(fila,
                      t + gate->tipo.atraso * timescale /* * (circuto->timescale_unit/UN_FS) */,
+                     EVT_NET_TRANSITION,
                      gate->listaSaida->itens[j],
+                     NULL,
                      result);
     }
 }

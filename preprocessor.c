@@ -10,6 +10,7 @@
 
 #include "mem.h"
 #include "erros.h"
+#include "strutil.h"
 #include "lex.h"
 #include "estruturas.h"
 #include "preprocessor.h"
