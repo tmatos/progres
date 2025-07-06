@@ -109,9 +109,13 @@ typedef struct st_list_reg {
     Register** itens;
 } ListaReg;
 
+#define MAX_MODULE_NAME 1024
+
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
  */
 typedef struct st_module {
+    char name[MAX_MODULE_NAME];
+
     ListaComponente* listaFiosEntrada;
     Sinais* sinaisEntrada;
 
@@ -252,7 +256,14 @@ ListaComponente* novaListaComponente();
  *  @param size Tamanho a ser pré alocado para itens.
  *  @return Um ponteiro para a lista de componentes alocada.
  */
-ListaComponente* novaListaComponenteTamanho(int size);
+ListaComponente* novaListaComponenteTamanho(unsigned int size);
+
+/** @brief Libera completamente uma lista de componentes da memória.
+ *  @param ppl Ponteiro para um ponteiro da struct ListaComponente.
+ *  @return void
+ *  @note A lista de componentes e todos os componentes contidos nela são liberados.
+ */
+void delete_list_component(ListaComponente** ppl);
 
 /** @brief Insere o componente na lista de componentes.
  *  @param ls Ponteiro para a lista de componentes.

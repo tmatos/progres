@@ -31,9 +31,10 @@ typedef enum en_verilog_error {
  *  @param it Endereço para o iterador dos tokens do código fonte.
  *  @param identifiers Lista de tokens contendo os identificadores já detectados.
  *  @param livres Lista de identificadores de entrada ou saida ainda nao definidos como tal.
+ *  @param module Ponteiro para a struct do module a ser escrito.
  *  @return 0 em caso de falha, 1 em caso de sucesso.
  */
-int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres);
+int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module);
 
 /** @brief Cria uma estrutura de dados representando um module,
            a partir do primeiro no arquivo com o codigo fonte em Verilog.

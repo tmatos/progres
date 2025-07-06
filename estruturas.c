@@ -42,67 +42,20 @@ Module* novoCircuito()
     circuito->timescale_precision_number = (Tempo) 1;
     circuito->timescale_precision_unit = UN_NS;
 
+    copy(circuito->name, "");
+
     return circuito;
 }
 
 void free_module(Module** mod)
 {
-    int i;
-
     if ( *mod == NULL )
         return;
 
-    if ( (*mod)->listaFiosEntrada->itens ) {
-        for ( i = 0; i < (*mod)->listaFiosEntrada->tamanho; i++)
-        {
-            if ( (*mod)->listaFiosEntrada->itens[i] ) {
-                free( (*mod)->listaFiosEntrada->itens[i] );
-                (*mod)->listaFiosEntrada->itens[i] = NULL;
-            }
-        }
-        
-        free( (*mod)->listaFiosEntrada->itens );
-    }
-    free( (*mod)->listaFiosEntrada );
-
-    if ( (*mod)->listaFiosSaida->itens ) {
-        for ( i = 0; i < (*mod)->listaFiosSaida->tamanho; i++)
-        {
-            if ( (*mod)->listaFiosSaida->itens[i] ) {
-                free( (*mod)->listaFiosSaida->itens[i] );
-                (*mod)->listaFiosSaida->itens[i] = NULL;
-            }
-        }
-
-        free( (*mod)->listaFiosSaida->itens );
-    }
-    free( (*mod)->listaFiosSaida );
-
-    if ( (*mod)->listaPortas->itens ) {
-        for ( i = 0; i < (*mod)->listaPortas->tamanho; i++)
-        {
-            if ( (*mod)->listaPortas->itens[i] ) {
-                free( (*mod)->listaPortas->itens[i] );
-                (*mod)->listaPortas->itens[i] = NULL;
-            }
-        }
-
-        free( (*mod)->listaPortas->itens );
-    }
-    free( (*mod)->listaPortas );
-
-    if ( (*mod)->listaWires->itens ) {
-        for ( i = 0; i < (*mod)->listaWires->tamanho; i++)
-        {
-            if ( (*mod)->listaWires->itens[i] ) {
-                free( (*mod)->listaWires->itens[i] );
-                (*mod)->listaWires->itens[i] = NULL;
-            }
-        }
-
-        free( (*mod)->listaWires->itens );
-    }
-    free( (*mod)->listaWires );
+    delete_list_component( &((*mod)->listaFiosEntrada) );
+    delete_list_component( &((*mod)->listaFiosSaida) );
+    delete_list_component( &((*mod)->listaPortas) );
+    delete_list_component( &((*mod)->listaWires) );
 
     if ( (*mod)->listaParam.itens )
         free( (*mod)->listaParam.itens );
@@ -117,6 +70,7 @@ void free_module(Module** mod)
         free( (*mod)->sinaisSaida );
     
     free( *mod );
+    *mod = NULL;
 }
 
 void adicionaEntrada(Module* circ, Component* comp)
@@ -156,9 +110,9 @@ ListaComponente* novaListaComponente()
     return novaListaComponenteTamanho(0);
 }
 
-ListaComponente* novaListaComponenteTamanho(int size)
+ListaComponente* novaListaComponenteTamanho(unsigned int size)
 {
-    int i;
+    unsigned int i;
     ListaComponente* list_comp;
 
     list_comp = (ListaComponente*) xmalloc( sizeof(ListaComponente) );
@@ -176,6 +130,28 @@ ListaComponente* novaListaComponenteTamanho(int size)
     }
 
     return list_comp;
+}
+
+void delete_list_component(ListaComponente** ppl)
+{
+    if ( *ppl == NULL )
+        return;
+    
+    if ( (*ppl)->itens ) {
+        int i;
+
+        for ( i = 0; i < (*ppl)->tamanho; i++ )
+        {
+            if ( (*ppl)->itens[i] ) {
+                delete_componente( &((*ppl)->itens[i]) );
+            }
+        }
+
+        free( (*ppl)->itens );
+    }
+
+    free(*ppl);
+    *ppl = NULL;
 }
 
 void insereComponente(ListaComponente* ls, Component* cp)
@@ -320,6 +296,7 @@ void delete_componente(Component** c)
     }
 
     free(*c);
+    *c = NULL;
 }
 
 Component* getComponenteItemPorNome(ListaComponente* ls, const char* nome)
