@@ -224,6 +224,27 @@ invalid_timeunit:
     return UN_INVALID;
 }
 
+const char* get_str_from_timeunit(UnidTempo unit)
+{
+    switch (unit)
+    {
+    case UN_S:
+        return "s";
+    case UN_MS:
+        return "ms";
+    case UN_US:
+        return "us";
+    case UN_NS:
+        return "ns";
+    case UN_PS:
+        return "ps";
+    case UN_FS:
+        return "fs";
+    default:
+        return "ns";
+    }
+}
+
 ValorLogico long_to_logicvalue(long n)
 {
     // Check the least significant bit of n

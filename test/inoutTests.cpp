@@ -6,6 +6,7 @@
 #include <string>
 
 #include "../sinais.h"
+#include "../eventos.h"
 #include "../inout.h"
 
 class Testes_inout : public CppUnit::TestFixture

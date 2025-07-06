@@ -20,7 +20,7 @@
 #include "lex.h"
 #include "preprocessor.h"
 
-int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
+int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module)
 {
     int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
 
@@ -44,6 +44,7 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres)
     else {
         // senao, adicione-o a lista de identifiers
         insereTokenString(identifiers, t->valor, -1, -1);
+        copy(module->name, t->valor);
     }
 
     if (!avanca(&t)) {
@@ -221,7 +222,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
         goto before_module;
     }
 
-    if ( !load_module_header(&it, identifiers, identifiers_to_be) )
+    if ( !load_module_header(&it, identifiers, identifiers_to_be, circuito) )
         goto bad_return;
 
     if (!avanca(&it))

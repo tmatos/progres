@@ -98,6 +98,22 @@ int main(int argc, char* argv[])
 
     save_outputs_to_path(str_wave_out_filepath, sinais_saidas);
 
+    // export of VCD file
+    strcat(str_wave_out_filepath, ".vcd");
+    FILE* f_wave_out = fopen(str_wave_out_filepath, "w");
+
+    if (!f_wave_out) {
+        print("Erro ao tentar abrir arquivo VCD de saida '%s' para gravacao.\n",
+                str_wave_out_filepath);
+    }
+    else {
+        save_vcd(circuit, sinais_saidas, f_wave_out);
+        fclose(f_wave_out);
+    }
+    
+    print("Arquivo VCD tambem salvo, em '%s'.\n", str_wave_out_filepath);
+
+
     delete_event_queue(&initial_task_events);
     free_signal_list(&sinais_entradas);
     free_signal_list(&sinais_saidas);

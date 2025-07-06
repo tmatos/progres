@@ -34,6 +34,16 @@ Sinais* carregaEntradas(FILE* arquivo);
  */
 void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
 
+/** @brief Export VCD to file.
+ */
+void save_vcd(Module* module, Sinais* sinais, FILE* file);
+
+/** @brief .
+ *  @param value Algum dos disponíveis na enum ValorLogico.
+ *  @return Um dos seguintes: '0', '1', 'x' ou 'z'.
+ */
+char get_char_from_logic_value(ValorLogico value);
+
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
  *         Indicando que o arquivo de entrada está corrompido.
  *  @return Um ponteiro para uma struct Sinais com valor NULL.
