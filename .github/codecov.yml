@@ -1,0 +1,3 @@
+comment: false  # Disable the Codecov comments in pull requests
+
+github_checks: false  # Disable the GitHub checks completely
