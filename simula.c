@@ -5,6 +5,7 @@
  Under terms of the MIT license.
 *********************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "simula.h"
@@ -40,6 +41,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     ValorLogico valor_control;
     ValorLogico valor_data;
 
+    FILE* f_dump = NULL;
     Sinais* saidas = new_signal_list();
 
     if (!circuto || !entradas) {
@@ -175,6 +177,10 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             case TASK_DISPLAY:
                 print("%s\n", tr->task_code);
                 break;
+            case TASK_DUMPFILE:
+                set_dumpfile(&f_dump, tr->task_code);
+                // TODO: set more flags for dumpfile
+                break;
             default:
                 break;
             }
@@ -249,17 +255,22 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
         }
 
         // free mem
-        if(list_changed_gates->tamanho != 0)
+        if (list_changed_gates->tamanho != 0)
             free(list_changed_gates->itens);
         free(list_changed_gates);
         list_changed_gates = NULL;
     }
 
     // copia as saidas da simulacao do ciruito para o retorno da funcao
-    for( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
+    for ( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
     {
         insert_signal(saidas,
                       circuto->listaFiosSaida->itens[i]->sinalSaida);
+    }
+
+    if (f_dump) {
+        fclose(f_dump);
+        f_dump = NULL;
     }
 
     return saidas;
@@ -509,5 +520,20 @@ void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component*
                      gate->listaSaida->itens[j],
                      NULL,
                      result);
+    }
+}
+
+
+void set_dumpfile(FILE** pp_file, const char* s_path)
+{
+    if (*pp_file) {
+        fclose(*pp_file);
+        *pp_file = NULL;
+    }
+
+    *pp_file = fopen(s_path, "w");
+
+    if ( *pp_file == NULL ) {
+        print("erro: nao foi possivel abrir o arquivo '%s' para escrita.", s_path);
     }
 }

@@ -26,6 +26,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_delays_v );
   CPPUNIT_TEST( test_simula_samplefile_display_v );
+  CPPUNIT_TEST( test_simula_samplefile_dumpfile_v );
   CPPUNIT_TEST( test_simula_samplefile_tri_state_gates_v );
   CPPUNIT_TEST( test_simula_samplefile_numbers_v );
   CPPUNIT_TEST( test_compute_buf_if0_gate );
@@ -565,6 +566,39 @@ public:
 
     sim_outputs = simula(circuit, inputs, &q);
     CPPUNIT_ASSERT(sim_outputs);
+
+    free_signal_list(&inputs);
+    free_signal_list(&sim_outputs);
+    delete_event_queue(&q);
+    free_module(&circuit);
+  }
+
+  void test_simula_samplefile_dumpfile_v()
+  {
+    Module* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* sim_outputs = NULL;
+    Evento* q = new_empty_event();
+
+    char s_dumpfile_v[] = "./verilog_sample_src/dumpfile.v";
+    char s_dumpfile_vcd[] = "./dumpfile.vcd";
+
+    inputs = new_signal_list();
+    CPPUNIT_ASSERT(inputs);
+
+    circuit = load_module(s_dumpfile_v, &q);
+    CPPUNIT_ASSERT(circuit);
+    CPPUNIT_ASSERT(q->listaTransicao);
+    CPPUNIT_ASSERT_EQUAL(TASK_DUMPFILE, q->listaTransicao->task_type);
+
+    sim_outputs = simula(circuit, inputs, &q);
+    CPPUNIT_ASSERT(sim_outputs);
+
+    FILE* f_dumpfile_vcd = fopen(s_dumpfile_vcd, "r");
+    CPPUNIT_ASSERT(f_dumpfile_vcd);
+
+    fclose(f_dumpfile_vcd);
+    remove(s_dumpfile_vcd);
 
     free_signal_list(&inputs);
     free_signal_list(&sim_outputs);

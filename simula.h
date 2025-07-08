@@ -6,6 +6,8 @@
 #ifndef SIMULA_H
 #define SIMULA_H
 
+#include <stdio.h>
+
 #include "estruturas.h"
 #include "eventos.h"
 
@@ -115,6 +117,13 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
  *                entrada para cada uma de suas saídas conectadas, nos eventos futuro.
  */
 void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result);
+
+/** @brief Set the dump file for simulation output.
+ *  @param pp_file Pointer to a file pointer where the dump file will be set.
+ *  @param s_path String with a path to the dump file.
+ *  @return void
+ */
+void set_dumpfile(FILE** pp_file, const char* s_path);
 
 #ifdef __cplusplus
 }

@@ -292,6 +292,10 @@ TokenClass get_token_class(const char* s_tok)
     if ( apenasDigitos(s_tok) ) {
         return NUM_BASE_DECIMAL;
     }
+
+    if ( s_tok[0] == '"' && s_tok[len(s_tok) - 1] == '"' ) {
+        return STRING;
+    }
     
     // TODO: Preencher classe do token para todas elas, nao apenas estas acima
 

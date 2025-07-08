@@ -1276,6 +1276,7 @@ load_assign_bad_eof:
 VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module)
 {
     int count = 0; // task arg counter
+    SystemTask task = TASK_UNKNOWN;
 
     Token* t = *it;
 
@@ -1288,9 +1289,16 @@ VerilogError load_systask(Token** it, Evento** initial_task_events, Module* modu
         goto load_systask_bad_token;
     }
 
-    if ( !iguais(t->valor, "display") ) {
+    if ( iguais(t->valor, "display") ) {
+        task = TASK_DISPLAY;
+    }
+    else if ( iguais(t->valor, "dumpfile") ) {
+        task = TASK_DUMPFILE;
+    }
+    else {
         show_error_msg("Task invalida ou nao suportada",
-                        t->linha, t->coluna, "o nome de uma task suportada", t->valor);
+                       t->linha, t->coluna,
+                       "o nome de uma task suportada", t->valor);
         goto load_systask_bad_token;
     }
 
@@ -1313,9 +1321,17 @@ VerilogError load_systask(Token** it, Evento** initial_task_events, Module* modu
 
     // first arg SHOULD be a string
 
-    copy(str, t->valor);
+    if ( t->classe != STRING ) {
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, "uma string", t->valor);
+        goto load_systask_bad_token;
+    }
 
-    // there may be zero to n more args
+    copy(str, t->valor + 1); // remove the first quote
+    str[len(t->valor) - 2] = '\0'; // remove the last quote
+
+    // for Sdisplay: there may be zero to n more args
+    // for $dumpfile: there are no more args
 
 systask_args_load:
 
@@ -1333,6 +1349,12 @@ systask_args_load:
         }
 
         goto load_systask_sucess;
+    }
+
+    if ( task == TASK_DUMPFILE ) {
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, ");", t->valor);
+        goto load_systask_bad_token;
     }
 
     if (t->classe != SYM_COMMA) {
@@ -1353,7 +1375,7 @@ systask_args_load:
 
 load_systask_sucess:
 
-    insert_task_event(initial_task_events, (Tempo)0, TASK_DISPLAY, str);
+    insert_task_event(initial_task_events, (Tempo)0, task, str);
 
     *it = t;
     return NO_ERROR;

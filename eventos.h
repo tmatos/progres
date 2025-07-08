@@ -35,6 +35,10 @@ typedef enum {
     TASK_STOP,       // $stop
     TASK_RESET,      // $reset (deprecated)
 
+    // Dumping and Logging Tasks
+    TASK_DUMPFILE,   // $dumpfile
+    TASK_DUMPVARS,   // $dumpvars
+
     // Time and Delay Tasks
     TASK_TIME,       // $time
     TASK_REALTIME,   // $realtime
