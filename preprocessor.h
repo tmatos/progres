@@ -7,6 +7,7 @@
 #define PREPROCESSOR_H
 
 #include "lex.h"
+#include "verilog.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +58,28 @@ void remove_macro_by_name(ListMacro* list, const char* name);
  *  @return 1 if sucess, 0 otherwise.
  */
 int pre_processor(ListaToken* lst);
+
+/** @brief Process the `define` directive.
+ *  @param list_tok Pointer to the list of tokens of the source.
+ *  @param p_tok_it Pointer to the current token iterator.
+ *  @param list_macro Pointer to the list of macros.
+ *  @return VerilogError indicating success or type of failure.
+ */
+VerilogError preproc_define(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+
+/** @brief Process the `undef` directive.
+ *  @param list_tok Pointer to the list of tokens of the source.
+ *  @param p_tok_it Pointer to the current token iterator.
+ *  @param list_macro Pointer to the list of macros.
+ *  @return VerilogError indicating success or type of failure.
+ */
+VerilogError preproc_undef(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+
+/** @brief Process the `timescale` directive.
+ *  @param p_tok_it Pointer to the current token iterator.
+ *  @return VerilogError indicating success or type of failure.
+ */
+VerilogError preproc_timescale(Token** p_tok_it);
 
 #ifdef __cplusplus
 }

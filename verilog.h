@@ -23,6 +23,7 @@ typedef enum en_verilog_error {
     ERROR_VERILOG_BAD_TOKEN,
     ERROR_VERILOG_BAD_EOF,
     ERROR_VERILOG_BAD_EXPRESSION,
+    ERROR_VERILOG_UNDECLARED_MACRO,
     NO_ERROR = 10
 } VerilogError;
 
