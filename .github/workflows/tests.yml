@@ -31,14 +31,14 @@ jobs:
         name: coverage
         path: test/coverage.txt
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 #v4.6.0
       with:
         directory: test
         file: coverage.txt
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     - name: Upload coverage reports to Codacy
-      uses: codacy/codacy-coverage-reporter-action@v1.3.0
+      uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 #v1.3.0
       with:
         project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
         coverage-reports: test/coverage.txt
