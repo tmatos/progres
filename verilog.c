@@ -1066,13 +1066,13 @@ load_directive_bad_token:
 
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
 {
-    Token* t = *it;
-    Register* left_reg = NULL;
-    
+    VerilogError err;
     int is_single_statement = 1;
+    Token* t = *it;
 
-    if ( !avanca(&t) )
+    if ( !avanca(&t) ) {
         goto load_initial_block_bad_eof;
+    }
 
     if ( t->classe == KW_BEGIN ) {
         is_single_statement = 0;
@@ -1095,63 +1095,34 @@ initial_block_loop:
         goto load_initial_block_sucess;
     }
 
-    // systask handling
     if ( t->classe == SYM_DOLLAR ) {
-        VerilogError err = load_systask(&t, initial_task_events, module);
-        switch (err)
-        {
-        case ERROR_VERILOG_BAD_EOF:
-            goto load_initial_block_bad_eof;
-            break;
-        case ERROR_VERILOG_BAD_TOKEN:
-            goto load_initial_block_bad_token;
-            break;
-        default:
-            // no error
-            goto initial_block_expect_semicolon;
-        }
-    }
-
-    // treat a single statement attrib, for now
-
-    if ( !identExiste(identifiers, t->valor) ) {
-        show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
-                       t->linha, t->coluna, "apenas uma atribuicao", t->valor);
-        goto load_initial_block_bad_token;
-    }
-
-    // waiting for a reg, for now
-    left_reg = get_reg_by_name(module->listaReg, t->valor);
-
-    if ( !left_reg ) {
-        show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
-                       t->linha, t->coluna, "um registrador", t->valor);
-        goto load_initial_block_bad_token;
-    }
-
-    if ( !avanca(&t) )
-        goto load_initial_block_bad_eof;
-    
-    if ( t->classe != SYM_EQ ) {
-        show_error_msg("Token inesperado foi encontrado", t->linha, t->coluna, "=", t->valor);
-        goto load_initial_block_bad_token;
-    }
-
-    if ( !avanca(&t) )
-        goto load_initial_block_bad_eof;
-
-    // agora ele espera um literal ou parametro
-    if ( isNumNaturalValido(t->valor) ) {
-        left_reg->value = strtol(t->valor, NULL, 10);
-    }
-    else if ( identExiste(list_param, t->valor) ) {
-        Param* p = get_param_by_name(module->listaParam, t->valor);
-        left_reg->value = p->value;
+        // systask handling
+        err = load_systask(&t, initial_task_events);
     }
     else {
-        show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, "um numero ou parametro", t->valor);
+        // try to treat a single statement attribution, for now
+
+        if ( !identExiste(identifiers, t->valor) ) {
+            show_error_msg("Nota, o initial ainda nao foi devidamente implementado",
+                           t->linha, t->coluna, "apenas uma atribuicao", t->valor);
+
+            goto load_initial_block_bad_token;
+        }
+
+        err = load_reg_attribution(&t, list_param, module);
+    }
+
+    switch (err)
+    {
+    case ERROR_VERILOG_BAD_EOF:
+        goto load_initial_block_bad_eof;
+        break;
+    case ERROR_VERILOG_BAD_TOKEN:
         goto load_initial_block_bad_token;
+        break;
+    default:
+        // no error
+        goto initial_block_expect_semicolon;
     }
 
 initial_block_expect_semicolon:
@@ -1171,7 +1142,7 @@ initial_block_expect_semicolon:
         }
 
         goto initial_block_loop;
-    }   
+    }
 
 load_initial_block_sucess:
     *it = t;
@@ -1181,6 +1152,60 @@ load_initial_block_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_initial_block_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
+}
+
+VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* module)
+{
+    Register* left_reg = NULL;
+    Param* p = NULL;
+    
+    Token* t = *it;
+
+    // waiting for a reg, for now
+    left_reg = get_reg_by_name(module->listaReg, t->valor);
+
+    if ( !left_reg ) {
+        show_error_msg("Comando sem suporte dentro do bloco initial",
+                       t->linha, t->coluna, "um registrador", t->valor);
+        goto load_reg_attribution_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_reg_attribution_bad_eof;
+    
+    if ( t->classe != SYM_EQ ) {
+        show_error_msg("Token inesperado foi encontrado", t->linha, t->coluna, "=", t->valor);
+        goto load_reg_attribution_bad_token;
+    }
+
+    if ( !avanca(&t) )
+        goto load_reg_attribution_bad_eof;
+
+    // agora ele espera um literal ou parametro
+    if ( isNumNaturalValido(t->valor) ) {
+        left_reg->value = strtol(t->valor, NULL, 10);
+    }
+    else if ( identExiste(list_param, t->valor) ) {
+        p = get_param_by_name(module->listaParam, t->valor);
+        left_reg->value = p->value;
+    }
+    else {
+        show_error_msg("Token inesperado foi encontrado",
+                        t->linha, t->coluna, "um numero ou parametro", t->valor);
+        goto load_reg_attribution_bad_token;
+    }
+
+    // TODO: create atribution event and add it to apropriate queue
+
+//load_reg_attribution_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_reg_attribution_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_reg_attribution_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
@@ -1305,7 +1330,7 @@ load_assign_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module)
+VerilogError load_systask(Token** it, Evento** initial_task_events)
 {
     int count = 0; // task arg counter
     SystemTask task = TASK_UNKNOWN;

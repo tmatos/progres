@@ -55,26 +55,62 @@ Module* load_module(const char* file_path, Evento** initial_task_events);
  */
 VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb);
 
-/** @brief Parsing of 'reg' declaration
+/**
+ * @brief Parsing of 'reg' declarations.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param identifiers Pointer to a list of tokens made of all identifiers related to nets.
+ * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
+ * @param module Pointer to the Verilog module struct.
+ * @return Error code of type VerilogError.
  */
 VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
 
-/** @brief Parsing das diretivas, algumas que não foram tratadas no pre-processamento.
- *  @return Código de erro do tipo VerilogError.
+/**
+ * @brief Parsing das diretivas, algumas que não foram tratadas no pre-processamento.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param module Pointer to the Verilog module struct.
+ * @return Error code of type VerilogError.
  */
 VerilogError load_directive(Token** it, Module* module);
 
-/** @brief Parsing de blocos initial
+/**
+ * @brief Parsing of initial blocks.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param identifiers Pointer to a list of tokens made of all identifiers related to nets.
+ * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
+ * @param module Pointer to the Verilog module struct.
+ * @param initial_task_events Pointer to a queue of events for system tasks.
+ * @return Error code of type VerilogError.
  */
 VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
 
-/** @brief Parsing de 'assign'
+/**
+ * @brief Parsing of register attributions inside of initial blocks.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
+ * @param module Pointer to the Verilog module struct.
+ * @return Error code of type VerilogError.
+ */
+VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* module);
+
+/**
+ * @brief Parsing of assigns.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param list_wire Pointer to a list of tokens made of identifiers related to declared wire nets.
+ * @param list_in Pointer to a list of tokens made of identifiers related to declared input ports.
+ * @param list_out Pointer to a list of tokens made of identifiers related to declared output ports.
+ * @param module Pointer to the Verilog module struct.
+ * @return Error code of type VerilogError.
  */
 VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
 
-/** @brief Parsing of system tasks
+/**
+ * @brief Parsing of system tasks.
+ * @param it Pointer to a token iterator (wich is also a pointer).
+ * @param initial_task_events Pointer to a queue of events for systasks.
+ * @return Error code of type VerilogError.
  */
-VerilogError load_systask(Token** it, Evento** initial_task_events, Module* module);
+VerilogError load_systask(Token** it, Evento** initial_task_events);
 
 /** @brief Retorna verdadeiro se um Token representa um logic gate em Verilog.
  *  @param t Um Token pointer qualquer.
