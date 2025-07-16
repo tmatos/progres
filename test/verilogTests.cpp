@@ -21,6 +21,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_load_module_localparam_test_v );
   CPPUNIT_TEST( test_load_module_named_gates_test_v );
   CPPUNIT_TEST( test_load_module_initial_single_test_v );
+  CPPUNIT_TEST( test_load_module_initial_block_test_v );
   CPPUNIT_TEST( test_load_module_display_v );
   CPPUNIT_TEST( test_load_module_assigns_v );
   CPPUNIT_TEST( test_load_module_tri_state_gates_v );
@@ -159,6 +160,25 @@ public:
 
     delete_event_queue(&q);
     free_module(&circuit);
+  }
+
+  void test_load_module_initial_block_test_v()
+  {
+    Evento* q = new_empty_event();
+    Module* mod = load_module("./verilog_sample_src/initial_block_test.v", &q);
+
+    const int expected_param_value = 1;
+    const int expected_liter_value = 0;
+
+    CPPUNIT_ASSERT( mod );
+    CPPUNIT_ASSERT_EQUAL( 1, mod->listaParam.total );
+    CPPUNIT_ASSERT_EQUAL( expected_param_value, mod->listaParam.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( 2, mod->listaReg.total );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_param_value, mod->listaReg.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_liter_value, mod->listaReg.itens[1]->value );
+
+    delete_event_queue(&q);
+    free_module(&mod);
   }
 
   void test_load_module_display_v()
@@ -320,7 +340,13 @@ public:
       "./verilog_sample_src/badverilog_87h.v",
       "./verilog_sample_src/badverilog_87i.v",
       "./verilog_sample_src/badverilog_87j.v",
-      "./verilog_sample_src/badverilog_87k.v"
+      "./verilog_sample_src/badverilog_87k.v",
+      "./verilog_sample_src/badverilog_88.v",
+      "./verilog_sample_src/badverilog_88a.v",
+      "./verilog_sample_src/badverilog_88b.v",
+      "./verilog_sample_src/badverilog_88c.v",
+      "./verilog_sample_src/badverilog_88d.v",
+      "./verilog_sample_src/badverilog_88e.v"
     };
 
     Evento* q = new_empty_event();

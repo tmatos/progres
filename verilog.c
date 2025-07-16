@@ -1068,12 +1068,35 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
 {
     Token* t = *it;
     Register* left_reg = NULL;
+    
+    int is_single_statement = 1;
 
-    if (!avanca(&t))
+    if ( !avanca(&t) )
         goto load_initial_block_bad_eof;
 
+    if ( t->classe == KW_BEGIN ) {
+        is_single_statement = 0;
+
+        if ( !avanca(&t) ) {
+            goto load_initial_block_bad_eof;
+        }
+    }
+
+initial_block_loop:
+
+    if ( t->classe == KW_END ) {
+        if ( is_single_statement ) {
+            show_error_msg("Palavra chave 'end' sem o 'begin' correspondente",
+                           t->linha, t->coluna, NULL, t->valor);
+
+            goto load_initial_block_bad_token;
+        }
+
+        goto load_initial_block_sucess;
+    }
+
     // systask handling
-    if (t->classe == SYM_DOLLAR) {
+    if ( t->classe == SYM_DOLLAR ) {
         VerilogError err = load_systask(&t, initial_task_events, module);
         switch (err)
         {
@@ -1085,14 +1108,13 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
             break;
         default:
             // no error
-            goto load_initial_block_sucess;
-            break;
+            goto initial_block_expect_semicolon;
         }
     }
 
     // treat a single statement attrib, for now
 
-    if (!identExiste(identifiers, t->valor)) {
+    if ( !identExiste(identifiers, t->valor) ) {
         show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
                        t->linha, t->coluna, "apenas uma atribuicao", t->valor);
         goto load_initial_block_bad_token;
@@ -1101,28 +1123,28 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
     // waiting for a reg, for now
     left_reg = get_reg_by_name(module->listaReg, t->valor);
 
-    if (!left_reg) {
+    if ( !left_reg ) {
         show_error_msg("Infelizmente, o initial ainda nao foi devidamente implementado",
-                        t->linha, t->coluna, "um registrador", t->valor);
+                       t->linha, t->coluna, "um registrador", t->valor);
         goto load_initial_block_bad_token;
     }
 
-    if (!avanca(&t))
+    if ( !avanca(&t) )
         goto load_initial_block_bad_eof;
     
-    if (t->classe != SYM_EQ) {
+    if ( t->classe != SYM_EQ ) {
         show_error_msg("Token inesperado foi encontrado", t->linha, t->coluna, "=", t->valor);
         goto load_initial_block_bad_token;
     }
 
-    if (!avanca(&t))
+    if ( !avanca(&t) )
         goto load_initial_block_bad_eof;
 
     // agora ele espera um literal ou parametro
-    if (isNumNaturalValido(t->valor)) {
+    if ( isNumNaturalValido(t->valor) ) {
         left_reg->value = strtol(t->valor, NULL, 10);
     }
-    else if (identExiste(list_param, t->valor)) {
+    else if ( identExiste(list_param, t->valor) ) {
         Param* p = get_param_by_name(module->listaParam, t->valor);
         left_reg->value = p->value;
     }
@@ -1132,14 +1154,24 @@ VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken*
         goto load_initial_block_bad_token;
     }
 
-    if (!avanca(&t))
+initial_block_expect_semicolon:
+
+    if ( !avanca(&t) )
         goto load_initial_block_bad_eof;
 
-    if (t->classe != SYM_SEMICOLON) {
+    if ( t->classe != SYM_SEMICOLON ) {
         show_error_msg("Token inesperado foi encontrado",
                         t->linha, t->coluna, ";", t->valor);
         goto load_initial_block_bad_token;
     }
+
+    if ( !is_single_statement ) {
+        if ( !avanca(&t) ) {
+            goto load_initial_block_bad_eof;
+        }
+
+        goto initial_block_loop;
+    }   
 
 load_initial_block_sucess:
     *it = t;
@@ -1339,15 +1371,6 @@ systask_args_load:
         goto load_systask_bad_eof;
 
     if (t->classe == SYM_CLOSE_BRACKET) {
-        if ( !avanca(&t) )
-            goto load_systask_bad_eof;
-
-        if (t->classe != SYM_SEMICOLON) {
-            show_error_msg("Token inesperado foi encontrado",
-                            t->linha, t->coluna, ";", t->valor);
-            goto load_systask_bad_token;
-        }
-
         goto load_systask_sucess;
     }
 

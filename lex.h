@@ -167,14 +167,22 @@ int isSimbolo(char c);
  */
 void exibeListaDeToken(ListaToken* tokens);
 
-/** @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
- *  @param it Um ponteiro para um ponteiro de um Token.
- *  @return O endereço do próximo token, que já estará atualizado no iterador.
- *          Este pode ser NULL, que indica o final da lista.
- *          Caso o argumento passado seja NULL ou a derreferenciação deste argumento
- *          também o seja, será retornado NULL.
+/**
+ * @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
+ * @param it Um ponteiro para um ponteiro de um Token.
+ * @return O endereço do próximo token, que já estará atualizado no iterador.
+ *         Este pode ser NULL, que indica o final da lista.
+ *         Caso o argumento passado seja NULL ou a derreferenciação deste argumento
+ *         também o seja, será retornado NULL.
  */
 Token* avanca(Token** it);
+
+/** 
+ * @brief Retrocede o iterador de token para o anterior da lista encadeada respectiva.
+ * @param it Um ponteiro para um ponteiro de um Token.
+ * @return O endereço do token anterior, que já estará atualizado no iterador.
+*/
+Token* backtrack(Token** it);
 
 /** @brief Verifica se um token é uma palavra reservada em Verilog.
  *  @param tk Um objeto Token.

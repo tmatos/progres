@@ -506,15 +506,22 @@ int identExiste(ListaToken* lst, const char* str)
 
 Token* avanca(Token** it)
 {
-    if (!it)
+    if ( !it || !*it )
         return NULL;
 
-    if (*it) {
-        *it = (*it)->seguinte;
-        return *it;
-    }
+    *it = (*it)->seguinte;
 
-    return NULL;
+    return *it;
+}
+
+Token* backtrack(Token** it)
+{
+    if ( !it || !*it )
+        return NULL;
+
+    *it = (*it)->anterior;
+
+    return *it;
 }
 
 int isPalavra(Token* tk)
