@@ -346,7 +346,10 @@ public:
       "./verilog_sample_src/badverilog_88b.v",
       "./verilog_sample_src/badverilog_88c.v",
       "./verilog_sample_src/badverilog_88d.v",
-      "./verilog_sample_src/badverilog_88e.v"
+      "./verilog_sample_src/badverilog_88e.v",
+      "./verilog_sample_src/badverilog_88f.v",
+      "./verilog_sample_src/badverilog_88g.v",
+      "./verilog_sample_src/badverilog_88h.v"
     };
 
     Evento* q = new_empty_event();

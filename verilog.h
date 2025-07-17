@@ -75,14 +75,14 @@ VerilogError load_directive(Token** it, Module* module);
 
 /**
  * @brief Parsing of initial blocks.
- * @param it Pointer to a token iterator (which is also a pointer).
+ * @param pit Pointer to a token iterator (which is also a pointer).
  * @param identifiers Pointer to a list of tokens made of all identifiers related to nets.
  * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
  * @param module Pointer to the Verilog module struct.
  * @param initial_task_events Pointer to a queue of events for system tasks.
  * @return Error code of type VerilogError.
  */
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
+VerilogError load_initial_block(Token** pit, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
 
 /**
  * @brief Parsing of register attributions inside of initial blocks.
@@ -106,11 +106,12 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
 
 /**
  * @brief Parsing of system tasks.
- * @param it Pointer to a token iterator (wich is also a pointer).
+ * @param pit Pointer to a token iterator (wich is also a pointer).
  * @param initial_task_events Pointer to a queue of events for systasks.
+ * @param t Time when the systask ocurs in the simulation.
  * @return Error code of type VerilogError.
  */
-VerilogError load_systask(Token** it, Evento** initial_task_events);
+VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t);
 
 /** @brief Retorna verdadeiro se um Token representa um logic gate em Verilog.
  *  @param t Um Token pointer qualquer.

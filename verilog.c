@@ -1064,52 +1064,84 @@ load_directive_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 }
 
-VerilogError load_initial_block(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
+VerilogError load_initial_block(Token** pit, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
 {
     VerilogError err;
     int is_single_statement = 1;
-    Token* t = *it;
+    Tempo t = 0;
+    Token* it = *pit;
 
-    if ( !avanca(&t) ) {
+    if ( !avanca(&it) ) {
         goto load_initial_block_bad_eof;
     }
 
-    if ( t->classe == KW_BEGIN ) {
+    if ( it->classe == KW_BEGIN ) {
         is_single_statement = 0;
 
-        if ( !avanca(&t) ) {
+        if ( !avanca(&it) ) {
             goto load_initial_block_bad_eof;
         }
     }
 
 initial_block_loop:
 
-    if ( t->classe == KW_END ) {
+    if ( it->classe == KW_END ) {
         if ( is_single_statement ) {
             show_error_msg("Palavra chave 'end' sem o 'begin' correspondente",
-                           t->linha, t->coluna, NULL, t->valor);
-
+                           it->linha,
+                           it->coluna,
+                           NULL,
+                           it->valor);
             goto load_initial_block_bad_token;
         }
 
         goto load_initial_block_sucess;
     }
 
-    if ( t->classe == SYM_DOLLAR ) {
+    // delay readings
+    if ( it->classe == SYM_HASHTAG ) {
+        if ( !avanca(&it) ) {
+            goto load_initial_block_bad_eof;
+        }
+
+        if ( !isNumNaturalValido(it->valor) ) {
+            show_error_msg("Token inesperado foi encontrado",
+                           it->linha,
+                           it->coluna,
+                           "um numero inteiro nao negativo",
+                           it->valor);
+            goto load_initial_block_bad_token;
+        }
+
+        Tempo delay = strtol(it->valor, NULL, 10);
+
+        // update next event time
+        t = t + delay;
+
+        if ( !avanca(&it) ) {
+            goto load_initial_block_bad_eof;
+        }
+
+        goto initial_block_loop;
+    }
+
+    if ( it->classe == SYM_DOLLAR ) {
         // systask handling
-        err = load_systask(&t, initial_task_events);
+        err = load_systask(&it, initial_task_events, t);
     }
     else {
         // try to treat a single statement attribution, for now
 
-        if ( !identExiste(identifiers, t->valor) ) {
+        if ( !identExiste(identifiers, it->valor) ) {
             show_error_msg("Nota, o initial ainda nao foi devidamente implementado",
-                           t->linha, t->coluna, "apenas uma atribuicao", t->valor);
-
+                           it->linha,
+                           it->coluna,
+                           "apenas uma atribuicao",
+                           it->valor);
             goto load_initial_block_bad_token;
         }
 
-        err = load_reg_attribution(&t, list_param, module);
+        err = load_reg_attribution(&it, list_param, module);
     }
 
     switch (err)
@@ -1127,17 +1159,19 @@ initial_block_loop:
 
 initial_block_expect_semicolon:
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_initial_block_bad_eof;
 
-    if ( t->classe != SYM_SEMICOLON ) {
+    if ( it->classe != SYM_SEMICOLON ) {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, ";", t->valor);
+                        it->linha, it->coluna,
+                        ";",
+                        it->valor);
         goto load_initial_block_bad_token;
     }
 
     if ( !is_single_statement ) {
-        if ( !avanca(&t) ) {
+        if ( !avanca(&it) ) {
             goto load_initial_block_bad_eof;
         }
 
@@ -1145,7 +1179,7 @@ initial_block_expect_semicolon:
     }
 
 load_initial_block_sucess:
-    *it = t;
+    *pit = it;
     return NO_ERROR;
 
 load_initial_block_bad_token:
@@ -1330,41 +1364,49 @@ load_assign_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_systask(Token** it, Evento** initial_task_events)
+VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 {
     int count = 0; // task arg counter
     SystemTask task = TASK_UNKNOWN;
 
-    Token* t = *it;
+    Token* it = *pit;
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
-    if ( !isIdentificador(t) ) {
+    if ( !isIdentificador(it) ) {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, "o nome de uma task", t->valor);
+                       it->linha,
+                       it->coluna,
+                       "o nome de uma task",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
-    if ( iguais(t->valor, "display") ) {
+    if ( iguais(it->valor, "display") ) {
         task = TASK_DISPLAY;
     }
-    else if ( iguais(t->valor, "dumpfile") ) {
+    else if ( iguais(it->valor, "dumpfile") ) {
         task = TASK_DUMPFILE;
     }
     else {
         show_error_msg("Task invalida ou nao suportada",
-                       t->linha, t->coluna,
-                       "o nome de uma task suportada", t->valor);
+                       it->linha,
+                       it->coluna,
+                       "o nome de uma task suportada",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
-    if (t->classe != SYM_OPEN_BRACKET) {
+    if (it->classe != SYM_OPEN_BRACKET) {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, "(", t->valor);
+                       it->linha,
+                       it->coluna,
+                       "(",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
@@ -1373,59 +1415,67 @@ VerilogError load_systask(Token** it, Evento** initial_task_events)
     char str[MAX_TOKEN_SIZE];
     str[0] = '\0';
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
     // first arg SHOULD be a string
 
-    if ( t->classe != STRING ) {
+    if ( it->classe != STRING ) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, "uma string", t->valor);
+                       it->linha,
+                       it->coluna,
+                       "uma string",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
-    copy(str, t->valor + 1); // remove the first quote
-    str[len(t->valor) - 2] = '\0'; // remove the last quote
+    copy(str, it->valor + 1); // remove the first quote
+    str[len(it->valor) - 2] = '\0'; // remove the last quote
 
     // for Sdisplay: there may be zero to n more args
     // for $dumpfile: there are no more args
 
 systask_args_load:
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
-    if (t->classe == SYM_CLOSE_BRACKET) {
+    if ( it->classe == SYM_CLOSE_BRACKET ) {
         goto load_systask_sucess;
     }
 
     if ( task == TASK_DUMPFILE ) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, ");", t->valor);
+                       it->linha,
+                       it->coluna,
+                       ");",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
-    if (t->classe != SYM_COMMA) {
+    if ( it->classe != SYM_COMMA ) {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, ", ou )", t->valor);
+                       it->linha,
+                       it->coluna,
+                       ", ou )",
+                       it->valor);
         goto load_systask_bad_token;
     }
 
-    if ( !avanca(&t) )
+    if ( !avanca(&it) )
         goto load_systask_bad_eof;
     
-    // check arg validity and save to some stack
-    // if (t->class == ???)
+    // TODO: check arg validity and save to some stack
+    // if (it->class == ???)
 
     count++;
 
     goto systask_args_load;
 
 load_systask_sucess:
+    insert_task_event(initial_task_events, t, task, str);
+    *pit = it;
 
-    insert_task_event(initial_task_events, (Tempo)0, task, str);
-
-    *it = t;
     return NO_ERROR;
 
 load_systask_bad_token:
