@@ -845,9 +845,9 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     if (t->classe == KW_SIGNED) {
         is_signed = 1;
         
-        avanca(&t);
-        if (!t)
+        if (!avanca(&t)) {
             goto load_reg_bad_eof;
+        }
     }
 
     // range specification
@@ -869,6 +869,8 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
         break;
     }
 
+load_reg_identifier_list:
+
     if (!isIdentificador(t)) {
         show_error_msg("Identificador nao foi encontrado",
                        t->linha, t->coluna, "um identificador", t->valor);
@@ -889,9 +891,16 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
     if (!avanca(&t))
         goto load_reg_bad_eof;
 
+    if (t->classe == SYM_COMMA) {
+        if (!avanca(&t)) {
+            goto load_reg_bad_eof;
+        }
+        goto load_reg_identifier_list;
+    }
+
     if (t->classe != SYM_SEMICOLON) {
         show_error_msg("Simbolo esperado nao foi encontrado",
-                       t->linha, t->coluna, ";", t->valor);
+                       t->linha, t->coluna, ",' ou ';", t->valor);
         goto load_reg_bad_token;
     }
 

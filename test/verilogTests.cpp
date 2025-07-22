@@ -96,14 +96,22 @@ public:
       {"rbx", 32, 0},
       {"r_flag", 20, 0},
       {"r_extra_flag", 3, 0},
-      {"number_signed", 64, 1}
+      {"number_signed", 64, 1},
+      {"r_0", 1, 0},
+      {"r_1", 1, 0},
+      {"r_2", 1, 0},
+      {"r_3", 1, 0},
+      {"r_4", 1, 0},
+      {"r_5", 1, 0},
+      {"r_6", 1, 0},
+      {"r_7", 1, 0}
     };
 
     Evento* q = new_empty_event();
     Module* circuit = load_module("./verilog_sample_src/reg.v", &q);
 
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT( circuit->listaReg.total == 12 );
+    CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), circuit->listaReg.total );
 
     for ( int i=0 ; i < circuit->listaReg.total ; i++ )
     {
@@ -281,6 +289,7 @@ public:
       "./verilog_sample_src/badverilog_44.v",
       "./verilog_sample_src/badverilog_45.v",
       "./verilog_sample_src/badverilog_46.v",
+      "./verilog_sample_src/badverilog_46a.v",
       "./verilog_sample_src/badverilog_47.v",
       "./verilog_sample_src/badverilog_48.v",
       "./verilog_sample_src/badverilog_49.v",
