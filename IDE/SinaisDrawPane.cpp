@@ -13,6 +13,7 @@
 
 #include "SinaisDrawPane.h"
 #include "EdicaoDeSinal.h"
+#include "estruturas.h"
 #include "sinais.h"
 #include "inout.h"
 #include "util.h"

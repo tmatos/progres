@@ -30,51 +30,51 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events);
  *  @param input Valor lógico de entrada.
  *  @return O valor lógico resultante da operação BUF.
  */
-ValorLogico computeBufGate(ValorLogico input);
+ValorLogico compute_buf_gate(ValorLogico input);
 
 /** @brief Simulação da avaliação da porta 'not'.
  *  @param input Valor lógico de entrada.
  *  @return O valor lógico resultante da operação NOT.
  */
-ValorLogico computeNotGate(ValorLogico input);
+ValorLogico compute_not_gate(ValorLogico input);
 
 /** @brief Simulação da avaliação da porta 'xor'.
  *  @param a Primeiro valor lógico de entrada.
  *  @param b Segundo valor lógico de entrada.
  *  @return O valor lógico resultante da operação XOR.
  */
-ValorLogico computeXorGate(ValorLogico a, ValorLogico b);
+ValorLogico compute_xor_gate(ValorLogico a, ValorLogico b);
 
 /** @brief Simulação da avaliação da porta 'xnor'.
  *  @param a Primeiro valor lógico de entrada.
  *  @param b Segundo valor lógico de entrada.
  *  @return O valor lógico resultante da operação XNOR.
  */
-ValorLogico computeXnorGate(ValorLogico a, ValorLogico b);
+ValorLogico compute_xnor_gate(ValorLogico a, ValorLogico b);
 
 /** @brief Simulação da avaliação da porta 'or' sobre todas as n entradas.
  *  @param inputs Lista de componentes que representam as entradas da porta OR.
  *  @return O valor lógico resultante da operação OR.
  */
-ValorLogico computeOrGate(ListaComponente* inputs);
+ValorLogico compute_or_gate(ListComponent* inputs);
 
 /** @brief Simulação da avaliação da porta 'and' sobre todas as n entradas.
  *  @param inputs Lista de componentes que representam as entradas da porta AND.
  *  @return O valor lógico resultante da operação AND.
  */
-ValorLogico computeAndGate(ListaComponente* inputs);
+ValorLogico compute_and_gate(ListComponent* inputs);
 
 /** @brief Simulação da avaliação da porta 'nor' sobre todas as n entradas.
  *  @param inputs Lista de componentes que representam as entradas da porta NOR.
  *  @return O valor lógico resultante da operação NOR.
  */
-ValorLogico computeNorGate(ListaComponente* inputs);
+ValorLogico compute_nor_gate(ListComponent* inputs);
 
 /** @brief Simulação da avaliação da porta 'nand' sobre todas as n entradas.
  *  @param inputs Lista de componentes que representam as entradas da porta NAND.
  *  @return O valor lógico resultante da operação NAND.
  */
-ValorLogico computeNandGate(ListaComponente* inputs);
+ValorLogico compute_nand_gate(ListComponent* inputs);
 
 /** @brief Computes the output of a tri-state buffer (bufif0 type).
  *  This function models a buffer that is enabled when the control signal is low (0).
@@ -116,7 +116,7 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
  *  @param result Valor lógico resultante da operação ocorrida em gate que servirá de
  *                entrada para cada uma de suas saídas conectadas, nos eventos futuro.
  */
-void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result);
+void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result);
 
 /** @brief Set the dump file for simulation output.
  *  @param pp_file Pointer to a file pointer where the dump file will be set.

@@ -60,7 +60,7 @@ typedef struct st_list_param {
     Param** itens;
 } ListaParam;
 
-typedef struct st_componente_list ListaComponente;
+typedef struct st_componente_list ListComponent;
 
 #define MAX_COMPONENT_NAME_SIZE 32 // tamanho máximo do nome de um componente
 
@@ -71,10 +71,10 @@ typedef struct st_component {
     char nome[MAX_COMPONENT_NAME_SIZE];
     t_tipo tipo;
 
-    ListaComponente* listaEntrada;
+    ListComponent* listaEntrada;
     Sinal* sinalEntrada;
 
-    ListaComponente* listaSaida;
+    ListComponent* listaSaida;
     Sinal* sinalSaida;
 
     ValorLogico valorDinamico; // in case of a net type (or literal number)
@@ -116,14 +116,14 @@ typedef struct st_list_reg {
 typedef struct st_module {
     char name[MAX_MODULE_NAME];
 
-    ListaComponente* listaFiosEntrada;
+    ListComponent* listaFiosEntrada;
     Sinais* sinaisEntrada;
 
-    ListaComponente* listaFiosSaida;
+    ListComponent* listaFiosSaida;
     Sinais* sinaisSaida;
 
-    ListaComponente* listaWires;
-    ListaComponente* listaPortas;
+    ListComponent* listaWires;
+    ListComponent* listaPortas;
 
     ListaReg listaReg;
     ListaParam listaParam;
@@ -134,10 +134,10 @@ typedef struct st_module {
     UnidTempo timescale_precision_unit;
 } Module;
 
-/** @brief Inicialização de uma estrutura de circuito.
+/** @brief Alocação e inicialização de uma struct Module.
  *  @return Um ponteiro para a struct Module alocada e pre-inicializada.
  */
-Module* novoCircuito();
+Module* new_module();
 
 /** @brief Dealocate all the memory of a Module structure.
  *  @param mod Pointer to a pointer of Module type.
@@ -152,7 +152,7 @@ void free_module(Module** mod);
  *  @param is_signed Verdadeiro caso seja com sinal.
  *  @return void
  */
-void addRegister(Module* circ, const char* name, unsigned int size, int is_signed);
+void add_register(Module* circ, const char* name, unsigned int size, int is_signed);
 
 /** @brief Obter um Register de uma lista usando o nome como chave.
  *  @param list Uma struct 'ListaReg'.
@@ -167,7 +167,7 @@ Register* get_reg_by_name(ListaReg list, const char* name);
  *  @param param Ponteiro para a struct 'Param' a ser inserida.
  *  @return void
  */
-void addParam(Module* circ, Param* param);
+void add_param(Module* circ, Param* param);
 
 /** @brief Obter um Param de uma lista usando o nome como chave.
  *  @param list Uma struct 'ListaParam'.
@@ -182,63 +182,63 @@ Param* get_param_by_name(ListaParam list, const char* name);
  *  @param comp Ponteiro para um Component, já inicializado, que representa a entrada.
  *  @return void
  */
-void adicionaEntrada(Module* circ, Component* comp);
+void add_input(Module* circ, Component* comp);
 
 /** @brief Adiciona a saída representada por comp à lista de fios de saída do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param comp Ponteiro para um Component, já inicializado, que representa a saída.
  *  @return void
  */
-void adicionaSaida(Module* circ, Component* comp);
+void add_output(Module* circ, Component* comp);
 
 /** @brief Adiciona o fio representada por comp à lista de fios (wires) do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param comp Ponteiro para um Component, já inicializado, que representa o wire.
  *  @return void
  */
-void adicionaWire(Module* circ, Component* comp);
+void add_wire(Module* circ, Component* comp);
 
 /** @brief Adiciona a porta lógica representada por comp à lista de portas do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param comp Ponteiro para um Component, já inicializado, que representa a porta lógica.
  *  @return void
  */
-void adicionaPorta(Module* circ, Component* comp);
+void add_gate(Module* circ, Component* comp);
 
-/** @brief Retorna a porta que tem o nome indicado, se houver na lista de portas do circuito.
+/** @brief Retorna a porta lógica que tem o nome indicado, se houver na lista de portas do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
- *  @param nome String com o nome da porta a ser buscado.
+ *  @param nome String com o nome da porta lógica a ser buscado.
  *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Component* getPortaPorNome(Module* circ, const char* nome);
+Component* get_gate_by_name(Module* circ, const char* nome);
 
 /** @brief Retorna o wire que tem o nome indicado, se houver.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param nome String com o nome do wire a ser buscado.
  *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Component* getWirePorNome(Module* circ, const char* nome);
+Component* get_wire_by_name(Module* circ, const char* nome);
 
 /** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param nome String com o nome da entrada a ser buscado.
  *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Component* getInputPorNome(Module* circ, const char* nome);
+Component* get_input_by_name(Module* circ, const char* nome);
 
 /** @brief Retorna a saída que tem o nome indicado, se houver na lista de fios de saída do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
  *  @param nome String com o nome da saída a ser buscado.
  *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Component* getOutputPorNome(Module* circ, const char* nome);
+Component* get_output_by_name(Module* circ, const char* nome);
 
 /** @brief Inicialização de uma estrutura de componente.
  *  @param nome String com nome do componente a ser criado.
  *  @param porta Tipo do Component a ser criado, segundo a enum t_operador.
  *  @return Um ponteiro para a struct Component alocada e pre-inicializada.
  */
-Component* novoComponente(const char* nome, t_operador porta);
+Component* new_component(const char* nome, t_operador porta);
 
 /** @brief Libera completamente um Componente da memória.
  *  @param c Ponteiro para um ponteiro da strcut Componente.
@@ -250,20 +250,20 @@ void delete_componente(Component** c);
 /** @brief Inicializa a estrutura de lista de componentes vazia.
  *  @return Um ponteiro para a lista de componentes alocada.
  */
-ListaComponente* novaListaComponente();
+ListComponent* new_list_component();
 
 /** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado para itens.
  *  @param size Tamanho a ser pré alocado para itens.
  *  @return Um ponteiro para a lista de componentes alocada.
  */
-ListaComponente* novaListaComponenteTamanho(unsigned int size);
+ListComponent* new_list_component_of_size(unsigned int size);
 
 /** @brief Libera completamente uma lista de componentes da memória.
- *  @param ppl Ponteiro para um ponteiro da struct ListaComponente.
+ *  @param ppl Ponteiro para um ponteiro da struct ListComponent.
  *  @return void
  *  @note A lista de componentes e todos os componentes contidos nela são liberados.
  */
-void delete_list_component(ListaComponente** ppl);
+void delete_list_component(ListComponent** ppl);
 
 /** @brief Insere o componente na lista de componentes.
  *  @param ls Ponteiro para a lista de componentes.
@@ -271,21 +271,21 @@ void delete_list_component(ListaComponente** ppl);
  *  @return void
  *  @note A cada nova inserção a lista é realocada para aumentar o tamanho do array de itens.
  */
-void insereComponente(ListaComponente* ls, Component* cp);
+void insert_component(ListComponent* ls, Component* cp);
 
 /** @brief Retorna verdadeiro se o componente indicado está contido na lista.
  *  @param ls Ponteiro para a lista de componentes.
  *  @param cp Ponteiro para o componente a ser verificado.
  *  @return 1 se o componente estiver na lista, 0 caso contrário.
  */
-int contemComponente(ListaComponente* ls, Component* cp);
+int has_component_by_pointer(ListComponent* ls, Component* cp);
 
 /** @brief Retorna o componente da lista indicada que possui o referido nome, se houver.
  *  @param ls Ponteiro para a lista de componentes.
  *  @param nome Nome do componente a ser buscado.
  *  @return Um ponteiro para o componente encontrado, ou NULL se não houver.
  */
-Component* getComponenteItemPorNome(ListaComponente* ls, const char* nome);
+Component* get_component_by_name(ListComponent* ls, const char* nome);
 
 #ifdef __cplusplus
 }

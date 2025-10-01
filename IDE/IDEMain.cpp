@@ -10,6 +10,7 @@
 #include "IDEMain.h"
 #include "IDEConfig.h"
 #include "SinaisDrawPane.h"
+#include "estruturas.h"
 #include "inout.h"
 #include "sinais.h"
 #include "util.h"

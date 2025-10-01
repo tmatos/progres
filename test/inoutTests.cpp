@@ -15,34 +15,34 @@
 class Testes_inout : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_inout );
-  CPPUNIT_TEST( test_carregaEntradas_emptyFile );
-  CPPUNIT_TEST( test_carregaEntradas_empty_signal );
-  CPPUNIT_TEST( test_carregaEntradas_oneInputFile );
-  CPPUNIT_TEST( test_carregaEntradas_twoInputFile );
-  CPPUNIT_TEST( test_carregaEntradas_file_notgates_in );
-  CPPUNIT_TEST( test_carregaEntradas_file_badinput_XX_in );
-  CPPUNIT_TEST( test_salvarSinais );
+  CPPUNIT_TEST( test_load_input_signals_emptyFile );
+  CPPUNIT_TEST( test_load_input_signals_empty_signal );
+  CPPUNIT_TEST( test_load_input_signals_oneInputFile );
+  CPPUNIT_TEST( test_load_input_signals_twoInputFile );
+  CPPUNIT_TEST( test_load_input_signals_file_notgates_in );
+  CPPUNIT_TEST( test_load_input_signals_file_badinput_XX_in );
+  CPPUNIT_TEST( test_save_signals );
   CPPUNIT_TEST( test_get_char_from_logic_value );
   CPPUNIT_TEST( test_save_vcd );
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void test_carregaEntradas_emptyFile()
+  void test_load_input_signals_emptyFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/empty.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = carregaEntradas(file_inputs);
+    Sinais* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( !inputs );
     fclose(file_inputs);
   }
 
-  void test_carregaEntradas_empty_signal()
+  void test_load_input_signals_empty_signal()
   {
     FILE* file_inputs = fopen("./inout_sample_files/empty_signal.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = carregaEntradas(file_inputs);
+    Sinais* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
 
@@ -50,12 +50,12 @@ public:
     fclose(file_inputs);
   }
 
-  void test_carregaEntradas_oneInputFile()
+  void test_load_input_signals_oneInputFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/one.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = carregaEntradas(file_inputs);
+    Sinais* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
     fclose(file_inputs);
 
@@ -65,12 +65,12 @@ public:
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
   }
 
-  void test_carregaEntradas_twoInputFile()
+  void test_load_input_signals_twoInputFile()
   {
     FILE* file_inputs = fopen("./inout_sample_files/two.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = carregaEntradas(file_inputs);
+    Sinais* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
     CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
@@ -82,12 +82,12 @@ public:
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].duracaoTotal );
   }
 
-  void test_carregaEntradas_file_notgates_in()
+  void test_load_input_signals_file_notgates_in()
   {
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
     CPPUNIT_ASSERT( f_notgates_in );
 
-    Sinais* inputs = carregaEntradas(f_notgates_in);
+    Sinais* inputs = load_input_signals(f_notgates_in);
     CPPUNIT_ASSERT( inputs );
     CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
@@ -108,7 +108,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[1].pulsos[3].valor );
   }
 
-  void test_carregaEntradas_file_badinput_XX_in()
+  void test_load_input_signals_file_badinput_XX_in()
   {
     std::list<std::string> list_bad_files = {
       "./inout_sample_files/badinput_0.in",
@@ -134,31 +134,31 @@ public:
     {
       fp = fopen( path.c_str(), "r");
       CPPUNIT_ASSERT( fp );
-      Sinais* inputs = carregaEntradas(fp);
+      Sinais* inputs = load_input_signals(fp);
       CPPUNIT_ASSERT( !inputs );
       fclose(fp);
     }
   }
 
-  void test_salvarSinais()
+  void test_save_signals()
   {
     FILE* fp = fopen("./inout_sample_files/allpulses.in", "r");
     CPPUNIT_ASSERT( fp );
 
-    Sinais* inputs = carregaEntradas(fp);
+    Sinais* inputs = load_input_signals(fp);
     CPPUNIT_ASSERT( inputs );
     fclose(fp);
 
     FILE* fp_out = fopen("./inout_sample_files/allpulses.in.out", "w");
     CPPUNIT_ASSERT( fp_out );
 
-    salvarSinais(inputs, fp_out);
+    save_signals(inputs, fp_out);
     fclose(fp_out);
 
     fp = fopen("./inout_sample_files/allpulses.in.out", "r");
     CPPUNIT_ASSERT( fp );
 
-    Sinais* outputs = carregaEntradas(fp);
+    Sinais* outputs = load_input_signals(fp);
     CPPUNIT_ASSERT( outputs );
     fclose(fp);
 
@@ -206,7 +206,7 @@ public:
     FILE* f_in = fopen("./inout_sample_files/bufgates.in", "r");
     CPPUNIT_ASSERT(f_in);
 
-    inputs = carregaEntradas(f_in);
+    inputs = load_input_signals(f_in);
     fclose(f_in);
     CPPUNIT_ASSERT(inputs);
     

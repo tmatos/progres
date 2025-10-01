@@ -11,7 +11,7 @@ LFLAGS=`wx-config --libs`
 TARGET=ide
 
 _OBJ = IDEMain.o IDEApp.o IDEConfig.o EdicaoDeSinal.o SinaisDrawPane.o util.o
-_OBJ += inout.o lex.o mem.o sinais.o strutil.o erros.o
+_OBJ += inout.o lex.o mem.o sinais.o strutil.o erros.o eventos.o
 OBJ = $(patsubst %, $(OBJ_DIR)/%, $(_OBJ))
 
 default: makedir all

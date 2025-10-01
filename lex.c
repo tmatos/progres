@@ -129,9 +129,9 @@ char arrayPalavrasReservadas[][NUM_RESERV_KEYWORDS] = {
     "xor",
 };
 
-ListaToken* novaListaToken()
+ListToken* new_list_token()
 {
-    ListaToken* l = (ListaToken*) xmalloc(sizeof(ListaToken));
+    ListToken* l = (ListToken*) xmalloc(sizeof(ListToken));
 
     l->primeiro = NULL;
     l->ultimo = NULL;
@@ -141,7 +141,7 @@ ListaToken* novaListaToken()
     return l;
 }
 
-void delete_lista_token(ListaToken* list)
+void delete_lista_token(ListToken* list)
 {
     if(!list)
         return;
@@ -163,13 +163,13 @@ void delete_lista_token(ListaToken* list)
     free(list);
 }
 
-int insereToken(ListaToken* lista, char tok, int p_linha, int p_coluna)
+int insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna)
 {
     char s[2];
     s[0] = tok;
     s[1] = '\0';
 
-    return insereTokenString(lista, s, p_linha, p_coluna);
+    return insert_token_of_string(lista, s, p_linha, p_coluna);
 }
 
 TokenClass get_token_class(const char* s_tok)
@@ -289,7 +289,7 @@ TokenClass get_token_class(const char* s_tok)
         }
     }
 
-    if ( apenasDigitos(s_tok) ) {
+    if ( has_only_digits(s_tok) ) {
         return NUM_BASE_DECIMAL;
     }
 
@@ -302,7 +302,7 @@ TokenClass get_token_class(const char* s_tok)
     return _UNKNOWN;
 }
 
-int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_coluna)
+int insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna)
 {
     Token* newtok = (Token*) xmalloc(sizeof(Token));
 
@@ -330,7 +330,7 @@ int insereTokenString(ListaToken* lista, const char* tok, int p_linha, int p_col
     return 1;
 }
 
-void remove_token(ListaToken* list, Token* tok)
+void remove_token(ListToken* list, Token* tok)
 {
     Token* it = list->primeiro;
     
@@ -368,7 +368,7 @@ void remove_token(ListaToken* list, Token* tok)
     }
 }
 
-int removeTokensPorValor(ListaToken* lst, const char* tok)
+int remove_tokens_by_value(ListToken* lst, const char* tok)
 {
     Token* tmp = NULL;
     Token* anterior = NULL;
@@ -429,7 +429,7 @@ int removeTokensPorValor(ListaToken* lst, const char* tok)
     return 1;
 }
 
-int isSimbolo(char c)
+int is_symbol(char c)
 {
     return (c == '(' ||
             c == ')' ||
@@ -460,7 +460,7 @@ int isSimbolo(char c)
             c == '\'');
 }
 
-void exibeListaDeToken(ListaToken* tokens)
+void show_token_list(ListToken* tokens)
 {
     Token* it = NULL;
 
@@ -478,7 +478,7 @@ void exibeListaDeToken(ListaToken* tokens)
     print("\n");
 }
 
-int identExiste(ListaToken* lst, const char* str)
+int has_item_of_string_value(ListToken* lst, const char* str)
 {
     Token* it = NULL;
 
@@ -524,7 +524,7 @@ Token* backtrack(Token** it)
     return *it;
 }
 
-int isPalavra(Token* tk)
+int is_reserverd_word(Token* tk)
 {
     int i;
 
@@ -540,7 +540,7 @@ int isPalavra(Token* tk)
     return 0;
 }
 
-int isIdentificador(Token* tk)
+int is_allowed_identifier(Token* tk)
 {
     unsigned int i;
     int simbol = 0;
@@ -563,13 +563,13 @@ int isIdentificador(Token* tk)
     if (simbol) // se contem algo a mais que letras ou numeros, nao eh identificador valido
         return 0;
 
-    if (isPalavra(tk)) // palavra reservada nao pode ser identificador
+    if (is_reserverd_word(tk)) // palavra reservada nao pode ser identificador
         return 0;
 
     return 1;
 }
 
-ListaToken* tokeniza(FILE* arquivo)
+ListToken* tokeniza(FILE* arquivo)
 {
     int linha = 1; // contador para linha corrente do arquivo
     int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
@@ -579,7 +579,7 @@ ListaToken* tokeniza(FILE* arquivo)
     char c = '\0'; // usado para leitura de um caraceter
     char* tok; // usado para a leitura de uma string que representa um token
 
-    ListaToken* tokens = novaListaToken();
+    ListToken* tokens = new_list_token();
 
     tok = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE );
 
@@ -669,7 +669,7 @@ ListaToken* tokeniza(FILE* arquivo)
             }
             else {
                 // recognize SYM_SLASH
-                insereToken(tokens, '/', linha, coluna);
+                insert_token_of_char(tokens, '/', linha, coluna);
                 goto A_1;
             }
         }
@@ -684,7 +684,7 @@ ListaToken* tokeniza(FILE* arquivo)
             {
                 // S: captura de strings literais
                 if (c == EOF) {
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     goto encerrar;
                 }
 
@@ -698,7 +698,7 @@ ListaToken* tokeniza(FILE* arquivo)
                 anexa(tok, c);
 
                 if (c == '"') {
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     break;
                 }
 
@@ -710,11 +710,11 @@ ListaToken* tokeniza(FILE* arquivo)
 
         // B: a parte B do automato
 
-        if (isSimbolo(c)) {
+        if (is_symbol(c)) {
             // TODO: capture symbols larger than 1 char
         symbols_capture:
             coluna++;
-            insereToken(tokens, c, linha, coluna);
+            insert_token_of_char(tokens, c, linha, coluna);
             goto A;
         }
 
@@ -741,15 +741,15 @@ ListaToken* tokeniza(FILE* arquivo)
                     else {
                         coluna++;
                     }
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     break;
                 }
                 else if (c == '/') {
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     goto comentarios;
                 }
-                else if (isSimbolo(c)) {
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                else if (is_symbol(c)) {
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     goto symbols_capture;
                 }
                 else if(isalnum(c) || c == '_') {
@@ -767,7 +767,7 @@ ListaToken* tokeniza(FILE* arquivo)
                     goto P;
                 }
                 else if (c == EOF) {
-                    insereTokenString(tokens, tok, linha, coluna - len(tok));
+                    insert_token_of_string(tokens, tok, linha, coluna - len(tok));
                     goto encerrar;
                 }
                 else {
@@ -783,7 +783,7 @@ ListaToken* tokeniza(FILE* arquivo)
         }
     }
 
-    //exibeListaDeToken(tokens);
+    //show_token_list(tokens);
 
     free(tok);
 

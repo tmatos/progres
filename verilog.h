@@ -35,7 +35,7 @@ typedef enum en_verilog_error {
  *  @param module Ponteiro para a struct do module a ser escrito.
  *  @return 0 em caso de falha, 1 em caso de sucesso.
  */
-int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module);
+int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Module* module);
 
 /** @brief Cria uma estrutura de dados representando um module,
            a partir do primeiro no arquivo com o codigo fonte em Verilog.
@@ -53,7 +53,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events);
  *  @param range_lsb Ponteiro para a variável que guarda o indice do bit menos significativo.
  *  @return Código de erro do tipo VerilogError.
  */
-VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb);
+VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* range_msb, int* range_lsb);
 
 /**
  * @brief Parsing of 'reg' declarations.
@@ -63,7 +63,7 @@ VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int*
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module);
+VerilogError load_reg(Token** it, ListToken* identifiers, ListToken* list_param, Module* module);
 
 /**
  * @brief Parsing das diretivas, algumas que não foram tratadas no pre-processamento.
@@ -82,7 +82,7 @@ VerilogError load_directive(Token** it, Module* module);
  * @param initial_task_events Pointer to a queue of events for system tasks.
  * @return Error code of type VerilogError.
  */
-VerilogError load_initial_block(Token** pit, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events);
+VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* list_param, Module* module, Evento** initial_task_events);
 
 /**
  * @brief Parsing of register attributions inside of initial blocks.
@@ -91,7 +91,7 @@ VerilogError load_initial_block(Token** pit, ListaToken* identifiers, ListaToken
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* module);
+VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module);
 
 /**
  * @brief Parsing of assigns.
@@ -102,7 +102,7 @@ VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* mo
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module);
+VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module);
 
 /**
  * @brief Parsing of system tasks.
@@ -123,13 +123,13 @@ int is_logic_gate(const Token* t);
  *  @param gate Um Componente que representa um logic gate.
  *  @return Verdadeiro se o gate for: "bufif0", "bufif1", "notif0" ou "notif1".
  */
-int is_tristate_logic(Component* gate);
+int is_tristate_logic(const Component* gate);
 
 /** @brief Retorna verdadeiro se uma string representa um logic gate em Verilog.
  *  @param s Uma string qualquer.
  *  @return Verdadeiro se s for igual a "and", "or", "nand", e etc.
  */
-int isPortaLogica(char* s);
+int is_string_logic_gate(const char* s);
 
 #ifdef __cplusplus
 }

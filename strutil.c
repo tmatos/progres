@@ -34,7 +34,7 @@ int iguais(const char* a, const char* b)
     return !strcmp(a, b);
 }
 
-int apenasDigitos(const char* str)
+int has_only_digits(const char* str)
 {
     unsigned int i;
 
@@ -51,13 +51,13 @@ int apenasDigitos(const char* str)
     return 1;
 }
 
-int isNumNaturalValido(const char* str)
+int is_valid_natural_number(const char* str)
 {
     if (!str)
         return 0;
 
     // importante nao ser um valor muito grande, esses numeros
-    if ( !apenasDigitos(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
+    if ( !has_only_digits(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
         return 0;
     }
 

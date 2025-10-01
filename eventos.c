@@ -214,7 +214,7 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* 
     }
 }
 
-Transicao* getTransicoesEm(Evento* fila, Tempo t)
+Transicao* get_transitions_at_time(Evento* fila, Tempo t)
 {
     Evento* it = fila; // iterador de evento
     

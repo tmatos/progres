@@ -7,10 +7,11 @@
 
 #include <cstdio>
 
-#include "util.h"
+#include "estruturas.h"
 #include "sinais.h"
+#include "util.h"
 
-extern "C" Sinais* carregaEntradas(FILE* arquivo);
+extern "C" Sinais* load_input_signals(FILE* file);
 
 Sinais* load_signals_from_path(const char* path)
 {
@@ -26,7 +27,7 @@ Sinais* load_signals_from_path(const char* path)
 
     printf("Abrindo o arquivo de sinais: %s\n", path);
 
-    Sinais* waves = carregaEntradas(waveFile);
+    Sinais* waves = load_input_signals(waveFile);
 
     fclose(waveFile);
 

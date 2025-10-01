@@ -54,7 +54,7 @@ public:
 
   void test_simula_CircuitoVazio()
   {
-    Module *circ = novoCircuito();
+    Module *circ = new_module();
     Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
 
@@ -74,7 +74,7 @@ public:
 
   void test_simula_CircuitoUmaEntrada()
   {
-    Module *circ = novoCircuito();
+    Module *circ = new_module();
     Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
 
@@ -84,17 +84,17 @@ public:
     CPPUNIT_ASSERT(inputs);
 
     add_new_signal( inputs, str_nome_entrada_1 );
-    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)20 );    // 0
+    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)20 );  // 0
     add_new_pulse( &(inputs->lista[0]), VAL_0, (Tempo)50 );  // 1
-    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)105 );   // 2
+    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)105 ); // 2
 
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
     CPPUNIT_ASSERT( inputs->lista[0].pulsos );
 
-    Component* cp_in_wire = novoComponente(str_nome_entrada_1, wire);
+    Component* cp_in_wire = new_component(str_nome_entrada_1, wire);
 
-    adicionaEntrada(circ, cp_in_wire);
+    add_input(circ, cp_in_wire);
 
     CPPUNIT_ASSERT_EQUAL( 1, circ->listaFiosEntrada->tamanho );
     CPPUNIT_ASSERT( circ->listaFiosEntrada->itens );
@@ -123,7 +123,7 @@ public:
     circuit = load_module(s_andgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_andgates_in);
+    inputs = load_input_signals(f_andgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -165,7 +165,7 @@ public:
     circuit = load_module(s_orgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_orgates_in);
+    inputs = load_input_signals(f_orgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -207,7 +207,7 @@ public:
     circuit = load_module(s_nandgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_nandgates_in);
+    inputs = load_input_signals(f_nandgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -249,7 +249,7 @@ public:
     circuit = load_module(s_norgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_norgates_in);
+    inputs = load_input_signals(f_norgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -292,7 +292,7 @@ public:
     circuit = load_module(s_notgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_notgates_in);
+    inputs = load_input_signals(f_notgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -358,7 +358,7 @@ public:
     circuit = load_module(s_bufgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_bufgates_in);
+    inputs = load_input_signals(f_bufgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -412,7 +412,7 @@ public:
     circuit = load_module(s_xorgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_xorgates_in);
+    inputs = load_input_signals(f_xorgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -466,7 +466,7 @@ public:
     circuit = load_module(s_xnorgates_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_xnorgates_in);
+    inputs = load_input_signals(f_xnorgates_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -523,10 +523,10 @@ public:
     circuit = load_module(s_delays_v, &q);
     CPPUNIT_ASSERT(circuit);
 
-    inputs = carregaEntradas(f_delays_in);
+    inputs = load_input_signals(f_delays_in);
     CPPUNIT_ASSERT(inputs);
 
-    outputs = carregaEntradas(f_delays_in_out);
+    outputs = load_input_signals(f_delays_in_out);
     CPPUNIT_ASSERT(outputs);
 
     CPPUNIT_ASSERT_EQUAL(8, outputs->quantidade);
@@ -621,7 +621,7 @@ public:
     circuit = load_module(s_v, &q);
     CPPUNIT_ASSERT( circuit );
 
-    inputs = carregaEntradas(f_in);
+    inputs = load_input_signals(f_in);
     CPPUNIT_ASSERT( inputs );
 
     outputs = simula(circuit, inputs, &q);
@@ -674,12 +674,12 @@ public:
     circuit = load_module(s_v, &q);
     CPPUNIT_ASSERT(circuit);
 
-    inputs = carregaEntradas(f_in);
+    inputs = load_input_signals(f_in);
     CPPUNIT_ASSERT(inputs);
     CPPUNIT_ASSERT_EQUAL(1, inputs->quantidade);
     CPPUNIT_ASSERT(inputs->lista);
 
-    outputs = carregaEntradas(f_out);
+    outputs = load_input_signals(f_out);
     CPPUNIT_ASSERT(outputs);
     CPPUNIT_ASSERT_EQUAL(2, outputs->quantidade);
     CPPUNIT_ASSERT(outputs->lista);

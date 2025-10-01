@@ -13,7 +13,7 @@
 class Testes_verilog : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_verilog );
-  CPPUNIT_TEST( test_isPortaLogica );
+  CPPUNIT_TEST( test_is_string_logic_gate );
   CPPUNIT_TEST( test_load_module_fileEmpty );
   CPPUNIT_TEST( test_load_module_fileTop_module );
   CPPUNIT_TEST( test_load_module_fileTudo_module );
@@ -31,22 +31,22 @@ class Testes_verilog : public CppUnit::TestFixture
 
 public:
 
-  void test_isPortaLogica()
+  void test_is_string_logic_gate()
   {
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"and") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"or") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"xor") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"nand") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"nor") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"xnor") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"not") );
-    CPPUNIT_ASSERT( isPortaLogica( (char*)"buf") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)"a") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)"aa") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)"n") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)"nn") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)"") );
-    CPPUNIT_ASSERT( ! isPortaLogica( (char*)" ") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"and") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"or") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"xor") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"nand") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"nor") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"xnor") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"not") );
+    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"buf") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"a") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"aa") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"n") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"nn") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"") );
+    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)" ") );
   }
 
   void test_load_module_fileEmpty()

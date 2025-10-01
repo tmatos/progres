@@ -30,7 +30,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     Evento* fila = NULL;
     Pulso* p = NULL;
 
-    ListaComponente* list_changed_gates = NULL;
+    ListComponent* list_changed_gates = NULL;
     Component* gate = NULL;
 
     ValorLogico result;
@@ -135,7 +135,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
 
     while (fila)
     {
-        list_changed_gates = novaListaComponente();
+        list_changed_gates = new_list_component();
 
         t = fila->quando;
 
@@ -153,9 +153,9 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             {
                 for ( i=0 ; i < tr->fio->listaSaida->tamanho ; i++ )
                 {
-                    if ( !contemComponente(list_changed_gates,
-                                           tr->fio->listaSaida->itens[i]) ) {
-                        insereComponente(list_changed_gates,
+                    if ( !has_component_by_pointer(list_changed_gates,
+                                                   tr->fio->listaSaida->itens[i]) ) {
+                        insert_component(list_changed_gates,
                                          tr->fio->listaSaida->itens[i]);
                     }
                 }
@@ -204,32 +204,32 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             switch (gate->tipo.operador)
             {
             case op_not:
-                result = computeNotGate(gate->listaEntrada->itens[0]->valorDinamico);
+                result = compute_not_gate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
             case op_buf:
-                result = computeBufGate(gate->listaEntrada->itens[0]->valorDinamico);
+                result = compute_buf_gate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
             case op_and:
-                result = computeAndGate(gate->listaEntrada);
+                result = compute_and_gate(gate->listaEntrada);
                 break;
             case op_or:
-                result = computeOrGate(gate->listaEntrada);
+                result = compute_or_gate(gate->listaEntrada);
                 break;
             case op_xor:
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-                result = computeXorGate(valor_xor_in_a, valor_xor_in_b);
+                result = compute_xor_gate(valor_xor_in_a, valor_xor_in_b);
                 break;
             case op_nand:
-                result = computeNandGate(gate->listaEntrada);
+                result = compute_nand_gate(gate->listaEntrada);
                 break;
             case op_nor:
-                result = computeNorGate(gate->listaEntrada);
+                result = compute_nor_gate(gate->listaEntrada);
                 break;
             case op_xnor:
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
-                result = computeXnorGate(valor_xnor_in_a, valor_xnor_in_b);
+                result = compute_xnor_gate(valor_xnor_in_a, valor_xnor_in_b);
                 break;
             case OP_BUF_IF0:
                 result = compute_buf_if0_gate(valor_data, valor_control);
@@ -251,7 +251,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                 break;
             }
 
-            createEventsFromOutputs(&fila, t, circuto->timescale_number, gate, result);
+            create_events_from_outputs(&fila, t, circuto->timescale_number, gate, result);
         }
 
         // free mem
@@ -277,7 +277,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
 }
 
 // IEEE Std 1364-2005, Table 7-4
-ValorLogico computeNotGate(ValorLogico input)
+ValorLogico compute_not_gate(ValorLogico input)
 {
     if (input == VAL_0)
         return VAL_1;
@@ -289,7 +289,7 @@ ValorLogico computeNotGate(ValorLogico input)
 }
 
 // IEEE Std 1364-2005, Table 7-4
-ValorLogico computeBufGate(ValorLogico input)
+ValorLogico compute_buf_gate(ValorLogico input)
 {
     if (input == VAL_Z)
         return VAL_X;
@@ -298,7 +298,7 @@ ValorLogico computeBufGate(ValorLogico input)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico computeXorGate(ValorLogico a, ValorLogico b)
+ValorLogico compute_xor_gate(ValorLogico a, ValorLogico b)
 {
     if (a == VAL_X || b == VAL_X)
         return VAL_X;
@@ -313,7 +313,7 @@ ValorLogico computeXorGate(ValorLogico a, ValorLogico b)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
+ValorLogico compute_xnor_gate(ValorLogico a, ValorLogico b)
 {
     if (a == VAL_X || b == VAL_X)
         return VAL_X;
@@ -328,7 +328,7 @@ ValorLogico computeXnorGate(ValorLogico a, ValorLogico b)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico computeOrGate(ListaComponente* inputs)
+ValorLogico compute_or_gate(ListComponent* inputs)
 {
     int i;
     ValorLogico input_at_i;
@@ -355,7 +355,7 @@ ValorLogico computeOrGate(ListaComponente* inputs)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico computeAndGate(ListaComponente* inputs)
+ValorLogico compute_and_gate(ListComponent* inputs)
 {
     int i;
     ValorLogico input_at_i;
@@ -381,10 +381,10 @@ ValorLogico computeAndGate(ListaComponente* inputs)
     return out;
 }
 
-ValorLogico computeNorGate(ListaComponente* inputs)
+ValorLogico compute_nor_gate(ListComponent* inputs)
 {
     ValorLogico out;
-    out = computeOrGate(inputs);
+    out = compute_or_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -394,10 +394,10 @@ ValorLogico computeNorGate(ListaComponente* inputs)
     return out;
 }
 
-ValorLogico computeNandGate(ListaComponente* inputs)
+ValorLogico compute_nand_gate(ListComponent* inputs)
 {
     ValorLogico out;
-    out  = computeAndGate(inputs);
+    out  = compute_and_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -507,7 +507,7 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
     }
 }
 
-void createEventsFromOutputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result)
+void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result)
 {
     int j;
 

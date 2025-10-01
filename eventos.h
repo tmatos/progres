@@ -182,7 +182,7 @@ Evento* new_event_at(Tempo t, EventKind k);
  *  @param t Tempo em que se deseja obter as transições.
  *  @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
  */
-Transicao* getTransicoesEm(Evento* fila, Tempo t);
+Transicao* get_transitions_at_time(Evento* fila, Tempo t);
 
 /** @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
  *  @param fila Ponteiro para a fila de eventos.

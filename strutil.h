@@ -31,14 +31,14 @@ int iguais(const char* a, const char* b);
  *  @return Verdadeiro se há apenas dígitos, falso na ocorrência de
  *          qualquer outro tipo de caractere.
  */
-int apenasDigitos(const char* str);
+int has_only_digits(const char* str);
 
 /** @brief Verifica se uma string contém um número que pode ser convertido.
            Mais especeificamente, se é um natural menor que 10000.
  *  @param str Uma string qualquer.
  *  @return Verdadeiro se pode ser convertido.
  */
-int isNumNaturalValido(const char* str);
+int is_valid_natural_number(const char* str);
 
 /** @brief Wrapper to strlen()
  *  @param str A null terminated C string

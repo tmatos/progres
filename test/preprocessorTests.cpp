@@ -118,10 +118,10 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_define.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListaToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokeniza(fp);
     CPPUNIT_ASSERT(list_tok);
 
-    //exibeListaDeToken(list_tok);
+    //show_token_list(list_tok);
 
     CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->valor, "VER") );
     CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->anterior->valor, "\x60") );
@@ -130,7 +130,7 @@ public:
 
     int ret = pre_processor(list_tok);
 
-    //exibeListaDeToken(list_tok);
+    //show_token_list(list_tok);
 
     CPPUNIT_ASSERT_EQUAL(1, ret);
 
@@ -147,7 +147,7 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_undef.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListaToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokeniza(fp);
     CPPUNIT_ASSERT(list_tok);
 
     int n_tok_in = list_tok->tamanho;
@@ -167,7 +167,7 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_directives.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListaToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokeniza(fp);
     CPPUNIT_ASSERT(list_tok);
 
     int ret = pre_processor(list_tok);
@@ -192,7 +192,7 @@ public:
 
     FILE* fp = NULL;
 
-    ListaToken* list_tok = NULL;
+    ListToken* list_tok = NULL;
 
     for ( std::string path : list_bad_files )
     {

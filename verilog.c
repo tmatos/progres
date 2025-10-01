@@ -20,7 +20,7 @@
 #include "lex.h"
 #include "preprocessor.h"
 
-int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, Module* module)
+int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Module* module)
 {
     int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
 
@@ -36,14 +36,14 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, 
         show_error_msg("Final do arquivo nao esperado", -1, -1, "um identificador", NULL);
         goto load_module_header_bad_return;
     }
-    else if (!isIdentificador(t)) {
+    else if (!is_allowed_identifier(t)) {
         show_error_msg("Identificador nao encontrado",
                        t->linha, t->coluna,"identificador valido", t->valor);
         goto load_module_header_bad_return;
     }
     else {
         // senao, adicione-o a lista de identifiers
-        insereTokenString(identifiers, t->valor, -1, -1);
+        insert_token_of_string(identifiers, t->valor, -1, -1);
         copy(module->name, t->valor);
     }
 
@@ -97,19 +97,19 @@ int load_module_header(Token** it, ListaToken* identifiers, ListaToken* livres, 
                 goto load_module_header_bad_return;
             }
 
-            if ( !isIdentificador(t) ) {
+            if ( !is_allowed_identifier(t) ) {
                 show_error_msg("Identificador nao foi encontrado",
                                t->linha, t->coluna, "um identificador", t->valor);
                 goto load_module_header_bad_return;
             }
 
-            if ( identExiste(identifiers, t->valor) ) {
+            if ( has_item_of_string_value(identifiers, t->valor) ) {
                 show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
                 goto load_module_header_bad_return;
             }
 
-            insereTokenString(identifiers, t->valor, -1, -1);
-            insereTokenString(livres, t->valor, -1, -1);
+            insert_token_of_string(identifiers, t->valor, -1, -1);
+            insert_token_of_string(livres, t->valor, -1, -1);
             expect_comma = 1;
 
             avanca(&t);
@@ -167,24 +167,24 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     print("Abrindo o arquivo de circuito: %s\n", file_path);
 
     // lista de todos os identificadores
-    ListaToken* identifiers = novaListaToken();
+    ListToken* identifiers = new_list_token();
 
     // lista de identificadores de entrada ou saida ainda nao definidos como tal
-    ListaToken* identifiers_to_be = novaListaToken();
+    ListToken* identifiers_to_be = new_list_token();
 
     // lista de todos os identificadores das entradas
-    ListaToken* list_input = novaListaToken();
+    ListToken* list_input = new_list_token();
 
     // lista de todos os identificadores das saidas
-    ListaToken* list_output = novaListaToken();
+    ListToken* list_output = new_list_token();
 
     // lista de todos os identificadores de wire
-    ListaToken* list_wire = novaListaToken();
+    ListToken* list_wire = new_list_token();
 
     // list for params
-    ListaToken* list_param = novaListaToken();
+    ListToken* list_param = new_list_token();
 
-    ListaToken* tokens = tokeniza(f_verilog_source);
+    ListToken* tokens = tokeniza(f_verilog_source);
 
     if (!tokens)
         goto bad_return;
@@ -195,7 +195,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     if (!pre_processor(tokens))
         goto bad_return;
 
-    circuito = novoCircuito();
+    circuito = new_module();
 
     it = tokens->primeiro;
 
@@ -283,7 +283,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                     }
                 }
 
-                if ( (token_subcase != KW_WIRE) && !identExiste(identifiers_to_be, it->valor) ) {
+                if ( (token_subcase != KW_WIRE) && !has_item_of_string_value(identifiers_to_be, it->valor) ) {
                     show_error_msg("Identificador invalido",
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
@@ -292,16 +292,16 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                 }
 
                 if ( token_subcase == KW_INPUT ) {
-                    insereTokenString(list_input, it->valor, -1, -1);
+                    insert_token_of_string(list_input, it->valor, -1, -1);
 
                     // atribui como entrada o identificador na estrutura
-                    adicionaEntrada( circuito, novoComponente(it->valor, input) );
+                    add_input( circuito, new_component(it->valor, input) );
                 }
                 else if ( token_subcase == KW_OUTPUT ) {
-                    insereTokenString(list_output, it->valor, -1, -1);
+                    insert_token_of_string(list_output, it->valor, -1, -1);
 
                     // atribui como saida o identificador na estrutura
-                    adicionaSaida( circuito, novoComponente(it->valor, output) );
+                    add_output( circuito, new_component(it->valor, output) );
                 }
                 else if ( token_subcase == KW_WIRE ) {
                     range_msb = 0;
@@ -321,27 +321,27 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                         break;
                     }
 
-                    if ( !isIdentificador(it) ) {
+                    if ( !is_allowed_identifier(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
                                        it->linha, it->coluna, "um identificador", it->valor);
                         goto bad_return;
                     }
 
-                    if ( identExiste(identifiers, it->valor) ) {
+                    if ( has_item_of_string_value(identifiers, it->valor) ) {
                         show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                         goto bad_return;
                     }
 
-                    insereTokenString(identifiers, it->valor, -1, -1);
-                    insereTokenString(list_wire, it->valor, -1, -1);
+                    insert_token_of_string(identifiers, it->valor, -1, -1);
+                    insert_token_of_string(list_wire, it->valor, -1, -1);
 
                     // atribui como wire o identificador na estrutura
-                    net = novoComponente(it->valor, wire);
+                    net = new_component(it->valor, wire);
                     net->size = (range_msb - range_lsb + 1);
-                    adicionaWire(circuito, net);
+                    add_wire(circuito, net);
                 }
 
-                removeTokensPorValor(identifiers_to_be, it->valor);
+                remove_tokens_by_value(identifiers_to_be, it->valor);
 
                 expect_comma = 1;
 
@@ -369,40 +369,40 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             switch (it->classe)
             {
             case KW_AND:
-                gate = novoComponente("PortaAND", op_and);
+                gate = new_component("PortaAND", op_and);
                 break;
             case KW_OR:
-                gate = novoComponente("PortaOR", op_or);
+                gate = new_component("PortaOR", op_or);
                 break;
             case KW_XOR:
-                gate = novoComponente("PortaXOR", op_xor);
+                gate = new_component("PortaXOR", op_xor);
                 break;
             case KW_NAND:
-                gate = novoComponente("PortaNAND", op_nand);
+                gate = new_component("PortaNAND", op_nand);
                 break;
             case KW_NOR:
-                gate = novoComponente("PortaNOR", op_nor);
+                gate = new_component("PortaNOR", op_nor);
                 break;
             case KW_XNOR:
-                gate = novoComponente("PortaXNOR", op_xnor);
+                gate = new_component("PortaXNOR", op_xnor);
                 break;
             case KW_NOT:
-                gate = novoComponente("PortaNOT", op_not);
+                gate = new_component("PortaNOT", op_not);
                 break;
             case KW_BUF:
-                gate = novoComponente("Buffer", op_buf);
+                gate = new_component("Buffer", op_buf);
                 break;
             case KW_BUFIF0:
-                gate = novoComponente("BufIf0", OP_BUF_IF0);
+                gate = new_component("BufIf0", OP_BUF_IF0);
                 break;
             case KW_BUFIF1:
-                gate = novoComponente("BufIf0", OP_BUF_IF1);
+                gate = new_component("BufIf0", OP_BUF_IF1);
                 break;
             case KW_NOTIF0:
-                gate = novoComponente("NotIf0", OP_NOT_IF0);
+                gate = new_component("NotIf0", OP_NOT_IF0);
                 break;
             case KW_NOTIF1:
-                gate = novoComponente("NotIf0", OP_NOT_IF1);
+                gate = new_component("NotIf0", OP_NOT_IF1);
                 break;
             default:
                 break;
@@ -414,13 +414,13 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                 goto bad_return;
             }
 
-            if (isIdentificador(it)) {  
-                if (identExiste(identifiers, it->valor)) {
+            if (is_allowed_identifier(it)) {  
+                if (has_item_of_string_value(identifiers, it->valor)) {
                     show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                     goto bad_return;
                 }
 
-                insereTokenString(identifiers, it->valor, -1, -1);
+                insert_token_of_string(identifiers, it->valor, -1, -1);
                 copy(gate->nome, it->valor);
 
                 avanca(&it);
@@ -438,7 +438,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                                    -1, -1, "um numero inteiro nao negativo", NULL);
                     goto bad_return;
                 }
-                else if ( !isNumNaturalValido(it->valor) ) {
+                else if ( !is_valid_natural_number(it->valor) ) {
                     char esperado[67];
                     snprintf(esperado, 67,
                              "um numero inteiro nao negativo e com ate %d digitos",
@@ -474,17 +474,17 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
 
         //gate_outputs: // Label para a parte onde ha leitura de saidas da porta logica
 
-            if (identExiste(list_wire, it->valor)) {
+            if (has_item_of_string_value(list_wire, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = getComponenteItemPorNome(circuito->listaWires, it->valor);
-                insereComponente(gate->listaSaida, out);
-                insereComponente(out->listaEntrada, gate);
+                out = get_component_by_name(circuito->listaWires, it->valor);
+                insert_component(gate->listaSaida, out);
+                insert_component(out->listaEntrada, gate);
             }
-            else if (identExiste(list_output, it->valor)) {
+            else if (has_item_of_string_value(list_output, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
-                insereComponente(gate->listaSaida, out);
-                insereComponente(out->listaEntrada, gate);
+                out = get_component_by_name(circuito->listaFiosSaida, it->valor);
+                insert_component(gate->listaSaida, out);
+                insert_component(out->listaEntrada, gate);
             }
             else {
                 show_error_msg("Fio ou saida nao foi encontrado",
@@ -519,27 +519,27 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             if ( it->classe == NUM_BASE_DECIMAL ) {
-                Component* num = novoComponente("literal_number_decimal", LITERAL_NUMBER);
+                Component* num = new_component("literal_number_decimal", LITERAL_NUMBER);
                 num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
-                insereComponente(gate->listaEntrada, num); // TODO: free mem later
+                insert_component(gate->listaEntrada, num); // TODO: free mem later
             }
-            else if (identExiste(list_wire, it->valor)) {
+            else if (has_item_of_string_value(list_wire, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = getComponenteItemPorNome(circuito->listaWires, it->valor);
-                insereComponente(gate->listaEntrada, in);
-                insereComponente(in->listaSaida, gate);
+                in = get_component_by_name(circuito->listaWires, it->valor);
+                insert_component(gate->listaEntrada, in);
+                insert_component(in->listaSaida, gate);
             }
-            else if (identExiste(list_input, it->valor)) {
+            else if (has_item_of_string_value(list_input, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = getComponenteItemPorNome(circuito->listaFiosEntrada, it->valor);
-                insereComponente(gate->listaEntrada, in);
-                insereComponente(in->listaSaida, gate);
+                in = get_component_by_name(circuito->listaFiosEntrada, it->valor);
+                insert_component(gate->listaEntrada, in);
+                insert_component(in->listaSaida, gate);
             }
-            else if (identExiste(list_output, it->valor)) {
+            else if (has_item_of_string_value(list_output, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = getComponenteItemPorNome(circuito->listaFiosSaida, it->valor);
-                insereComponente(gate->listaEntrada, in);
-                insereComponente(in->listaSaida, gate);
+                in = get_component_by_name(circuito->listaFiosSaida, it->valor);
+                insert_component(gate->listaEntrada, in);
+                insert_component(in->listaSaida, gate);
             }
             else {
                 show_error_msg("Entrada da porta logica invalida",
@@ -595,7 +595,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             // finalmente, inserimos a gate na lista de portas logicas do circuito
-            adicionaPorta(circuito, gate);
+            add_gate(circuito, gate);
         }
         else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
@@ -654,13 +654,13 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                 goto bad_return;
             }
 
-            if (!isIdentificador(it)) {
+            if (!is_allowed_identifier(it)) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "um identificador", it->valor);
                 goto bad_return;
             }
     
-            if (identExiste(identifiers, it->valor)) {
+            if (has_item_of_string_value(identifiers, it->valor)) {
                 show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
                 goto bad_return;
             }
@@ -672,8 +672,8 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                 goto bad_return;
             }
 
-            insereTokenString(identifiers, it->valor, -1, -1);
-            insereTokenString(list_param, it->valor, -1, -1);
+            insert_token_of_string(identifiers, it->valor, -1, -1);
+            insert_token_of_string(list_param, it->valor, -1, -1);
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
             param->is_local = 1;
@@ -697,7 +697,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             // TODO: implement for all number types and notations
-            if( !isNumNaturalValido(it->valor) ) {
+            if( !is_valid_natural_number(it->valor) ) {
                 show_error_msg("Token inesperado foi encontrado",
                                it->linha, it->coluna, "um numero", it->valor);
                 goto bad_return;
@@ -717,7 +717,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             // include the param in the circuit struct
-            addParam(circuito, param);
+            add_param(circuito, param);
         }
         else if (it->classe == KW_ASSIGN) {
             VerilogError err = load_assign(&it, list_wire, list_input, list_output, circuito);
@@ -795,7 +795,7 @@ int is_logic_gate(const Token* t)
     return 0;
 }
 
-int is_tristate_logic(Component* gate)
+int is_tristate_logic(const Component* gate)
 {
     int i;
 
@@ -815,7 +815,7 @@ int is_tristate_logic(Component* gate)
     return 0;
 }
 
-int isPortaLogica(char* s)
+int is_string_logic_gate(const char* s)
 {
     return ( iguais(s, "and")
             || iguais(s, "or")
@@ -828,7 +828,7 @@ int isPortaLogica(char* s)
     );
 }
 
-VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_param, Module* module)
+VerilogError load_reg(Token** it, ListToken* identifiers, ListToken* list_param, Module* module)
 {
     int is_signed;
     int range_msb;
@@ -871,22 +871,22 @@ VerilogError load_reg(Token** it, ListaToken* identifiers, ListaToken* list_para
 
 load_reg_identifier_list:
 
-    if (!isIdentificador(t)) {
+    if (!is_allowed_identifier(t)) {
         show_error_msg("Identificador nao foi encontrado",
                        t->linha, t->coluna, "um identificador", t->valor);
         goto load_reg_bad_token;
     }
 
     // verificar se pode utilizar este identificador
-    if (identExiste(identifiers, t->valor)) {
+    if (has_item_of_string_value(identifiers, t->valor)) {
         show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
         goto load_reg_bad_token;
     }
     
     // adicionar na lista de identificadores usados
-    insereTokenString(identifiers, t->valor, -1, -1);
+    insert_token_of_string(identifiers, t->valor, -1, -1);
 
-    addRegister(module, t->valor, (range_msb - range_lsb + 1), is_signed);
+    add_register(module, t->valor, (range_msb - range_lsb + 1), is_signed);
 
     if (!avanca(&t))
         goto load_reg_bad_eof;
@@ -915,7 +915,7 @@ load_reg_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int* range_msb, int* range_lsb)
+VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* range_msb, int* range_lsb)
 {
     Token* t = *it;
     
@@ -926,10 +926,10 @@ VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int*
         if (!avanca(&t))
             goto load_range_bad_eof;
 
-        if (isNumNaturalValido(t->valor)) {
+        if (is_valid_natural_number(t->valor)) {
             *range_msb = strtol(t->valor, NULL, 10);
         }
-        else if (identExiste(list_param, t->valor)) {
+        else if (has_item_of_string_value(list_param, t->valor)) {
             *range_msb = get_param_by_name(module->listaParam, t->valor)->value;
         }
         else {
@@ -950,10 +950,10 @@ VerilogError load_range(Token** it, Module* module, ListaToken* list_param, int*
         if (!avanca(&t))
             goto load_range_bad_eof;
 
-        if (isNumNaturalValido(t->valor)) {
+        if (is_valid_natural_number(t->valor)) {
             *range_lsb = strtol(t->valor, NULL, 10);
         }
-        else if (identExiste(list_param, t->valor)) {
+        else if (has_item_of_string_value(list_param, t->valor)) {
             *range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
         }
         else {
@@ -1015,7 +1015,7 @@ VerilogError load_directive(Token** it, Module* module)
 
         // [time_unit] / time_precision
         // [number] unit / number unit
-        if (!isNumNaturalValido(t->valor))
+        if (!is_valid_natural_number(t->valor))
             goto load_directive_bad_number;
         
         module->timescale_number = (Tempo) strtol(t->valor, NULL, 10);
@@ -1041,7 +1041,7 @@ VerilogError load_directive(Token** it, Module* module)
 
         // time_unit / [time_precision]
         // number unit / [number] unit
-        if (!isNumNaturalValido(t->valor))
+        if (!is_valid_natural_number(t->valor))
             goto load_directive_bad_number;
         
         module->timescale_precision_number = (Tempo) strtol(t->valor, NULL, 10);
@@ -1073,7 +1073,7 @@ load_directive_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 }
 
-VerilogError load_initial_block(Token** pit, ListaToken* identifiers, ListaToken* list_param, Module* module, Evento** initial_task_events)
+VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* list_param, Module* module, Evento** initial_task_events)
 {
     VerilogError err;
     int is_single_statement = 1;
@@ -1113,7 +1113,7 @@ initial_block_loop:
             goto load_initial_block_bad_eof;
         }
 
-        if ( !isNumNaturalValido(it->valor) ) {
+        if ( !is_valid_natural_number(it->valor) ) {
             show_error_msg("Token inesperado foi encontrado",
                            it->linha,
                            it->coluna,
@@ -1141,7 +1141,7 @@ initial_block_loop:
     else {
         // try to treat a single statement attribution, for now
 
-        if ( !identExiste(identifiers, it->valor) ) {
+        if ( !has_item_of_string_value(identifiers, it->valor) ) {
             show_error_msg("Nota, o initial ainda nao foi devidamente implementado",
                            it->linha,
                            it->coluna,
@@ -1198,7 +1198,7 @@ load_initial_block_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* module)
+VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module)
 {
     Register* left_reg = NULL;
     Param* p = NULL;
@@ -1226,10 +1226,10 @@ VerilogError load_reg_attribution(Token** it, ListaToken* list_param, Module* mo
         goto load_reg_attribution_bad_eof;
 
     // agora ele espera um literal ou parametro
-    if ( isNumNaturalValido(t->valor) ) {
+    if ( is_valid_natural_number(t->valor) ) {
         left_reg->value = strtol(t->valor, NULL, 10);
     }
-    else if ( identExiste(list_param, t->valor) ) {
+    else if ( has_item_of_string_value(list_param, t->valor) ) {
         p = get_param_by_name(module->listaParam, t->valor);
         left_reg->value = p->value;
     }
@@ -1252,7 +1252,7 @@ load_reg_attribution_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in, ListaToken* list_out, Module* module)
+VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module)
 {
     Component* in;
     Component* out;
@@ -1263,27 +1263,27 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
     if (!avanca(&t))
         goto load_assign_bad_eof;
 
-    if (!isIdentificador(t)) {
+    if (!is_allowed_identifier(t)) {
         show_error_msg("Token inesperado foi encontrado",
                        t->linha, t->coluna, "um identificador", t->valor);
         goto load_assign_bad_token;
     }
 
-    gate = novoComponente("assign", assign);
+    gate = new_component("assign", assign);
 
     // TODO: check for impossible cases
     
-    if (identExiste(list_wire, t->valor)) {
+    if (has_item_of_string_value(list_wire, t->valor)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = getComponenteItemPorNome(module->listaWires, t->valor);
-        insereComponente(gate->listaSaida, out);
-        insereComponente(out->listaEntrada, gate);
+        out = get_component_by_name(module->listaWires, t->valor);
+        insert_component(gate->listaSaida, out);
+        insert_component(out->listaEntrada, gate);
     }
-    else if (identExiste(list_out, t->valor)) {
+    else if (has_item_of_string_value(list_out, t->valor)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = getComponenteItemPorNome(module->listaFiosSaida, t->valor);
-        insereComponente(gate->listaSaida, out);
-        insereComponente(out->listaEntrada, gate);
+        out = get_component_by_name(module->listaFiosSaida, t->valor);
+        insert_component(gate->listaSaida, out);
+        insert_component(out->listaEntrada, gate);
     }
     else {
         show_error_msg("Identificador previamente declarado nao foi encontrado",
@@ -1317,29 +1317,29 @@ VerilogError load_assign(Token** it, ListaToken* list_wire, ListaToken* list_in,
             goto load_assign_bad_eof;
     }
 
-    if ( !isIdentificador(t) ) {
+    if ( !is_allowed_identifier(t) ) {
         show_error_msg("Token inesperado foi encontrado",
                         t->linha, t->coluna, "algum identificador", t->valor);
         goto load_assign_bad_token;
     }
 
-    if ( identExiste(list_wire, t->valor) ) {
+    if ( has_item_of_string_value(list_wire, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = getComponenteItemPorNome(module->listaWires, t->valor);
-        insereComponente(gate->listaEntrada, in);
-        insereComponente(in->listaSaida, gate);
+        in = get_component_by_name(module->listaWires, t->valor);
+        insert_component(gate->listaEntrada, in);
+        insert_component(in->listaSaida, gate);
     }
-    else if ( identExiste(list_in, t->valor) ) {
+    else if ( has_item_of_string_value(list_in, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = getComponenteItemPorNome(module->listaFiosEntrada, t->valor);
-        insereComponente(gate->listaEntrada, in);
-        insereComponente(in->listaSaida, gate);
+        in = get_component_by_name(module->listaFiosEntrada, t->valor);
+        insert_component(gate->listaEntrada, in);
+        insert_component(in->listaSaida, gate);
     }
-    else if( identExiste(list_out, t->valor) ) {
+    else if( has_item_of_string_value(list_out, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = getComponenteItemPorNome(module->listaFiosSaida, t->valor);
-        insereComponente(gate->listaEntrada, in);
-        insereComponente(in->listaSaida, gate);
+        in = get_component_by_name(module->listaFiosSaida, t->valor);
+        insert_component(gate->listaEntrada, in);
+        insert_component(in->listaSaida, gate);
     }
     else {
         show_error_msg("Este identificador nao consta como alguma net declarada",
@@ -1383,7 +1383,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
-    if ( !isIdentificador(it) ) {
+    if ( !is_allowed_identifier(it) ) {
         show_error_msg("Token inesperado foi encontrado",
                        it->linha,
                        it->coluna,

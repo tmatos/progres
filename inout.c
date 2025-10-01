@@ -18,14 +18,14 @@
 #include "inout.h"
 #include "erros.h"
 
-Sinais* erroFatalArquivoCorrompido()
+Sinais* show_fatal_error_corrupt_file()
 {
     print("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
 
     return NULL;
 }
 
-Sinais* carregaEntradas(FILE* arquivo)
+Sinais* load_input_signals(FILE* file)
 {
     int index; // for indexing the array in the input signal list
     Token* it; // token iterator
@@ -35,9 +35,9 @@ Sinais* carregaEntradas(FILE* arquivo)
     Sinais* list_input = new_signal_list();
 
     // token list to keep the names of read input identifiers
-    ListaToken* list_used_identifiers = novaListaToken();
+    ListToken* list_used_identifiers = new_list_token();
 
-    ListaToken* tokens = tokeniza(arquivo);
+    ListToken* tokens = tokeniza(file);
 
     if (!tokens)
         return NULL;
@@ -55,31 +55,31 @@ Sinais* carregaEntradas(FILE* arquivo)
     // loop to read the set of all signal in the file
     while (1)
     {
-        if ( isSimbolo(it->valor[0]) )
-            return erroFatalArquivoCorrompido();
+        if ( is_symbol(it->valor[0]) )
+            return show_fatal_error_corrupt_file();
 
         // TODO: check signal name duplication errors
 
-        insereTokenString(list_used_identifiers,
-                          it->valor,
-                          it->linha,
-                          it->coluna);
+        insert_token_of_string(list_used_identifiers,
+                               it->valor,
+                               it->linha,
+                               it->coluna);
 
         add_new_signal(list_input, it->valor);
 
         index++;
 
         if ( !avanca(&it) )
-            return erroFatalArquivoCorrompido();
+            return show_fatal_error_corrupt_file();
 
         if ( !iguais(it->valor, "{") )
-            return erroFatalArquivoCorrompido();
+            return show_fatal_error_corrupt_file();
 
         // loop to read one signal
         while (1)
         {
             if ( !avanca(&it) )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             logic_value = VAL_BLANK;
 
@@ -99,20 +99,20 @@ Sinais* carregaEntradas(FILE* arquivo)
                 break;
             }
             else {
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
             }
 
             if ( !avanca(&it) )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             if ( !iguais(it->valor, "(") )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             if ( !avanca(&it) )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
-            if ( !isNumNaturalValido(it->valor) )
-                return erroFatalArquivoCorrompido();
+            if ( !is_valid_natural_number(it->valor) )
+                return show_fatal_error_corrupt_file();
             
             time_length = strtol(it->valor, NULL, 10);
 
@@ -121,13 +121,13 @@ Sinais* carregaEntradas(FILE* arquivo)
                            time_length );
 
             if ( !avanca(&it) )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             if ( !iguais(it->valor, ")") )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             if ( !avanca(&it) )
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
 
             if ( iguais(it->valor, ",") ) {
                 continue;
@@ -150,22 +150,22 @@ Sinais* carregaEntradas(FILE* arquivo)
     return list_input;
 }
 
-void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
+void save_signals(Sinais* signals, FILE* file)
 {
     int si; // indexador dos sinais na lista de sinais de entrada
     Sinal* it_signal = NULL; // Iterador para os sinais num conjunto de entrada ou saida
     Pulso* it = NULL; // Iterador para os pulsos em um Sinal
 
-    if ( !sinaisSaida || !arqSaida ) {
+    if ( !signals || !file ) {
         return;
     }
 
     si = 0;
-    it_signal = sinaisSaida->lista;
+    it_signal = signals->lista;
 
-    while ( si < sinaisSaida->quantidade )
+    while ( si < signals->quantidade )
     {
-        fprintf(arqSaida, "%s {", it_signal[si].nome);
+        fprintf(file, "%s {", it_signal[si].nome);
 
         it = it_signal[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
 
@@ -173,27 +173,27 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
         {
             // Insere virgula apenas se nao eh a primeira iteracao
             if ( it != it_signal[si].pulsos )
-                fprintf(arqSaida, ", ");
+                fprintf(file, ", ");
 
             switch (it->valor)
             {
             case VAL_1:
-                fprintf(arqSaida, "1(%llu)", it->tempo);
+                fprintf(file, "1(%llu)", it->tempo);
                 break;
             case VAL_0:
-                fprintf(arqSaida, "0(%llu)", it->tempo);
+                fprintf(file, "0(%llu)", it->tempo);
                 break;
             case VAL_X:
-                fprintf(arqSaida, "x(%llu)", it->tempo);
+                fprintf(file, "x(%llu)", it->tempo);
                 break;
             case VAL_Z:
-                fprintf(arqSaida, "z(%llu)", it->tempo);
+                fprintf(file, "z(%llu)", it->tempo);
                 break;
             case VAL_H:
-                fprintf(arqSaida, "1(%llu)", it->tempo);
+                fprintf(file, "1(%llu)", it->tempo);
                 break;
             case VAL_L:
-                fprintf(arqSaida, "0(%llu)", it->tempo);
+                fprintf(file, "0(%llu)", it->tempo);
                 break;
             case VAL_BLANK:
                 break;
@@ -202,7 +202,7 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
             it++;
         }
 
-        fprintf(arqSaida, "}\n");
+        fprintf(file, "}\n");
 
         si++;
     }

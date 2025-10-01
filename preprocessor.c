@@ -89,7 +89,7 @@ void remove_macro_by_name(ListMacro* list, const char* name)
     list->total--;
 }
 
-int pre_processor(ListaToken* lst)
+int pre_processor(ListToken* lst)
 {
     Token* it;
     Macro* macro;
@@ -150,7 +150,7 @@ int pre_processor(ListaToken* lst)
             // TODO
 
         }
-        else if (isIdentificador(it)) {
+        else if (is_allowed_identifier(it)) {
             macro = get_macro_by_name(list_macro, it->valor);
 
             if (!macro)
@@ -187,7 +187,7 @@ pre_processor_error_undeclared_macro:
     return 0;
 }
 
-VerilogError preproc_define(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
+VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
 {
     Token* temp;
 
@@ -199,7 +199,7 @@ VerilogError preproc_define(ListaToken* list_tok, Token** p_tok_it, ListMacro* l
     if ( !avanca(&it) )
         goto preproc_define_error_bad_eof;
 
-    if ( !isIdentificador(it) ) {
+    if ( !is_allowed_identifier(it) ) {
         show_error_msg("Token inesperado", it->linha, it->coluna,
                        "identificador", it->valor);
         goto preproc_define_error_bad_token;
@@ -250,7 +250,7 @@ preproc_define_error_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError preproc_undef(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
+VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
 {   
     Token* temp;
     Macro* macro = NULL;
@@ -260,7 +260,7 @@ VerilogError preproc_undef(ListaToken* list_tok, Token** p_tok_it, ListMacro* li
     if ( !avanca(&it) )
         goto preproc_undef_error_bad_eof;
 
-    if ( !isIdentificador(it) ) {
+    if ( !is_allowed_identifier(it) ) {
         show_error_msg("Token inesperado", it->linha, it->coluna,
                        "identificador", it->valor);
         goto preproc_undef_error_bad_token;

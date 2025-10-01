@@ -21,18 +21,18 @@ extern "C" {
 
 /** @brief Cria uma estrutura de dados representando todos os sinas de entrada
            lidos partir do arquivo de entrada correspondente (extensão *.in).
- *  @param arquivo O handler do arquivo de entrada com sinais a ser processado.
+ *  @param file O handler do arquivo de entrada com sinais a ser processado.
  *  @return A estrutura de dados contendo todos os sinais lidos do arquivo.
  */
-Sinais* carregaEntradas(FILE* arquivo);
+Sinais* load_input_signals(FILE* file);
 
 /** @brief Salva todos os sinais contidos no conjunto para o arquivo de saída
            com a formatação padrão.
- *  @param sinaisSaida Conjunto dos sinais a serem salvos.
- *  @param arqSaida Arquivo a ser escrito com a representação dos sinais.
+ *  @param signals Conjunto dos sinais a serem salvos.
+ *  @param file Arquivo a ser escrito com a representação dos sinais.
  *  @return void
  */
-void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida);
+void save_signals(Sinais* signals, FILE* file);
 
 /** @brief Gera um arquivo VCD (Value Change Dump) a partir do módulo e dos sinais.
  *         O arquivo VCD é usado para registrar as mudanças de valor nos sinais
@@ -56,7 +56,7 @@ char get_char_from_logic_value(ValorLogico value);
  *         Indicando que o arquivo de entrada está corrompido.
  *  @return Um ponteiro para uma struct Sinais com valor NULL.
 */
-Sinais* erroFatalArquivoCorrompido();
+Sinais* show_fatal_error_corrupt_file();
 
 #ifdef __cplusplus
 }

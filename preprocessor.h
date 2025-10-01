@@ -57,7 +57,7 @@ void remove_macro_by_name(ListMacro* list, const char* name);
  *  @param lst Pointer to the list of tokens.
  *  @return 1 if sucess, 0 otherwise.
  */
-int pre_processor(ListaToken* lst);
+int pre_processor(ListToken* lst);
 
 /** @brief Process the `define` directive.
  *  @param list_tok Pointer to the list of tokens of the source.
@@ -65,7 +65,7 @@ int pre_processor(ListaToken* lst);
  *  @param list_macro Pointer to the list of macros.
  *  @return VerilogError indicating success or type of failure.
  */
-VerilogError preproc_define(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
 
 /** @brief Process the `undef` directive.
  *  @param list_tok Pointer to the list of tokens of the source.
@@ -73,7 +73,7 @@ VerilogError preproc_define(ListaToken* list_tok, Token** p_tok_it, ListMacro* l
  *  @param list_macro Pointer to the list of macros.
  *  @return VerilogError indicating success or type of failure.
  */
-VerilogError preproc_undef(ListaToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
 
 /** @brief Process the `timescale` directive.
  *  @param p_tok_it Pointer to the current token iterator.

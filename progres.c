@@ -135,7 +135,7 @@ Sinais* load_inputs_from_path(const char* path)
 
     print("Abrindo o arquivo de entrada: %s\n", path);
 
-    sinais_entradas = carregaEntradas(f_wave_in);
+    sinais_entradas = load_input_signals(f_wave_in);
 
     fclose(f_wave_in);
 
@@ -151,7 +151,7 @@ void save_outputs_to_path(const char* path, Sinais* outputs)
         exit(1);
     }
     
-    salvarSinais(outputs, f_wave_out);
+    save_signals(outputs, f_wave_out);
     fclose(f_wave_out);
     
     print("Arquivo de saida salvo em '%s'.\n", path);
