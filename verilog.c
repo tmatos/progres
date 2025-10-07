@@ -295,13 +295,13 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                     insert_token_of_string(list_input, it->valor, -1, -1);
 
                     // atribui como entrada o identificador na estrutura
-                    add_input( circuito, new_component(it->valor, input) );
+                    add_input( circuito, new_component(it->valor, ROLE_INPUT) );
                 }
                 else if ( token_subcase == KW_OUTPUT ) {
                     insert_token_of_string(list_output, it->valor, -1, -1);
 
                     // atribui como saida o identificador na estrutura
-                    add_output( circuito, new_component(it->valor, output) );
+                    add_output( circuito, new_component(it->valor, ROLE_OUTPUT) );
                 }
                 else if ( token_subcase == KW_WIRE ) {
                     range_msb = 0;
@@ -336,7 +336,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                     insert_token_of_string(list_wire, it->valor, -1, -1);
 
                     // atribui como wire o identificador na estrutura
-                    net = new_component(it->valor, wire);
+                    net = new_component(it->valor, ROLE_WIRE);
                     net->size = (range_msb - range_lsb + 1);
                     add_wire(circuito, net);
                 }
@@ -369,40 +369,40 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             switch (it->classe)
             {
             case KW_AND:
-                gate = new_component("PortaAND", op_and);
+                gate = new_component("PortaAND", ROLE_AND);
                 break;
             case KW_OR:
-                gate = new_component("PortaOR", op_or);
+                gate = new_component("PortaOR", ROLE_OR);
                 break;
             case KW_XOR:
-                gate = new_component("PortaXOR", op_xor);
+                gate = new_component("PortaXOR", ROLE_XOR);
                 break;
             case KW_NAND:
-                gate = new_component("PortaNAND", op_nand);
+                gate = new_component("PortaNAND", ROLE_NAND);
                 break;
             case KW_NOR:
-                gate = new_component("PortaNOR", op_nor);
+                gate = new_component("PortaNOR", ROLE_NOR);
                 break;
             case KW_XNOR:
-                gate = new_component("PortaXNOR", op_xnor);
+                gate = new_component("PortaXNOR", ROLE_XNOR);
                 break;
             case KW_NOT:
-                gate = new_component("PortaNOT", op_not);
+                gate = new_component("PortaNOT", ROLE_NOT);
                 break;
             case KW_BUF:
-                gate = new_component("Buffer", op_buf);
+                gate = new_component("Buffer", ROLE_BUF);
                 break;
             case KW_BUFIF0:
-                gate = new_component("BufIf0", OP_BUF_IF0);
+                gate = new_component("BufIf0", ROLE_BUF_IF0);
                 break;
             case KW_BUFIF1:
-                gate = new_component("BufIf0", OP_BUF_IF1);
+                gate = new_component("BufIf0", ROLE_BUF_IF1);
                 break;
             case KW_NOTIF0:
-                gate = new_component("NotIf0", OP_NOT_IF0);
+                gate = new_component("NotIf0", ROLE_NOT_IF0);
                 break;
             case KW_NOTIF1:
-                gate = new_component("NotIf0", OP_NOT_IF1);
+                gate = new_component("NotIf0", ROLE_NOT_IF1);
                 break;
             default:
                 break;
@@ -519,7 +519,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             if ( it->classe == NUM_BASE_DECIMAL ) {
-                Component* num = new_component("literal_number_decimal", LITERAL_NUMBER);
+                Component* num = new_component("literal_number_decimal", ROLE_LITERAL_NUMBER);
                 num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
                 insert_component(gate->listaEntrada, num); // TODO: free mem later
             }
@@ -552,7 +552,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             input_count++;
 
             if (!avanca(&it)) {
-                if ( gate->tipo.operador == op_not || gate->tipo.operador == op_buf ) {
+                if ( gate->tipo.operador == ROLE_NOT || gate->tipo.operador == ROLE_BUF ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -565,8 +565,8 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             if (it->classe != SYM_CLOSE_BRACKET) {
-                if ( (gate->tipo.operador == op_not) ||
-                     (gate->tipo.operador == op_buf) || 
+                if ( (gate->tipo.operador == ROLE_NOT) ||
+                     (gate->tipo.operador == ROLE_BUF) || 
                      (is_tristate_logic(gate) && input_count == 2) ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
@@ -800,10 +800,10 @@ int is_tristate_logic(const Component* gate)
     int i;
 
     t_operador op[4] = {
-        OP_BUF_IF0, // 0
-        OP_BUF_IF1, // 1
-        OP_NOT_IF0, // 2
-        OP_NOT_IF1, // 3
+        ROLE_BUF_IF0, // 0
+        ROLE_BUF_IF1, // 1
+        ROLE_NOT_IF0, // 2
+        ROLE_NOT_IF1, // 3
     };
 
     for ( i = 0; i < 4; i++ )
@@ -1269,7 +1269,7 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
         goto load_assign_bad_token;
     }
 
-    gate = new_component("assign", assign);
+    gate = new_component("assign", ROLE_ASSIGN);
 
     // TODO: check for impossible cases
     
@@ -1311,7 +1311,7 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     // negation (~) is also simple, it creates a not.
 
     if ( t->classe == SYM_TILDE ) {
-        gate->tipo.operador = op_not;
+        gate->tipo.operador = ROLE_NOT;
 
         if (!avanca(&t))
             goto load_assign_bad_eof;

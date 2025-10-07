@@ -216,7 +216,7 @@ public:
     x = circuit->listaFiosSaida->itens[0];
     // x (output) tem uma entrada que vem de um assign simples
     CPPUNIT_ASSERT_EQUAL(1, x->listaEntrada->tamanho);
-    CPPUNIT_ASSERT_EQUAL(assign, x->listaEntrada->itens[0]->tipo.operador);
+    CPPUNIT_ASSERT_EQUAL(ROLE_ASSIGN, x->listaEntrada->itens[0]->tipo.operador);
 
     // TODO: more inspections
 

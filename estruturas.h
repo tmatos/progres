@@ -12,26 +12,27 @@
 extern "C" {
 #endif
 
-/** @brief Enumeração para o definir as classes de componente do circuito de acordo com suas funções.
+/** @brief Enumeração para possibilitar a distinção ou definição das classes de
+ *  componentes do circuito de acordo com seus papéis (roles) ou funções.
  */
 typedef enum en_operador {
-    op_and,
-    op_or,
-    op_xor,
-    op_nand,
-    op_nor,
-    op_xnor,
-    op_not,
-    op_buf,
-    OP_BUF_IF0,
-    OP_BUF_IF1,
-    OP_NOT_IF0,
-    OP_NOT_IF1,
-    LITERAL_NUMBER,
-    wire,
-    output,
-    input,
-    assign
+    ROLE_AND,
+    ROLE_OR,
+    ROLE_XOR,
+    ROLE_NAND,
+    ROLE_NOR,
+    ROLE_XNOR,
+    ROLE_NOT,
+    ROLE_BUF,
+    ROLE_BUF_IF0,
+    ROLE_BUF_IF1,
+    ROLE_NOT_IF0,
+    ROLE_NOT_IF1,
+    ROLE_LITERAL_NUMBER,
+    ROLE_WIRE,
+    ROLE_OUTPUT,
+    ROLE_INPUT,
+    ROLE_ASSIGN
 } t_operador;
 
 /** @brief Estrutura que define a porta. Qual sua função logica e seu delay.

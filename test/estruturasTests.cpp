@@ -26,10 +26,10 @@ public:
   void test_new_component()
   {
     char nome[] = "entrada_0"; 
-    Component* c0 = new_component( (char*)nome, input );
+    Component* c0 = new_component( (char*)nome, ROLE_INPUT );
     CPPUNIT_ASSERT(c0);
     CPPUNIT_ASSERT( !strcmp( (char*)(c0->nome), (char*)nome ) );
-    CPPUNIT_ASSERT_EQUAL( c0->tipo.operador, input );
+    CPPUNIT_ASSERT_EQUAL( c0->tipo.operador, ROLE_INPUT );
     CPPUNIT_ASSERT_EQUAL( c0->valorDinamico, VAL_X );
     CPPUNIT_ASSERT( c0->listaEntrada );
     CPPUNIT_ASSERT( c0->listaSaida );
@@ -77,8 +77,8 @@ public:
   {
     char str_c0[] = "entrada_0";
     char str_c1[] = "entrada_1"; 
-    Component* c0 = new_component( (char*)str_c0, input );
-    Component* c1 = new_component( (char*)str_c1, input );
+    Component* c0 = new_component( (char*)str_c0, ROLE_INPUT );
+    Component* c1 = new_component( (char*)str_c1, ROLE_INPUT );
 
     ListComponent* list = new_list_component();
 
@@ -113,10 +113,10 @@ public:
     char str_wire[] = "fio_01"; 
     char str_in[] = "entrada_01";
     char str_out[] = "saida_01"; 
-    Component* c_porta = new_component( (char*)str_porta, op_and );
-    Component* c_wire = new_component( (char*)str_wire, wire );
-    Component* c_in = new_component( (char*)str_in, input );
-    Component* c_out = new_component( (char*)str_out, output );
+    Component* c_porta = new_component( (char*)str_porta, ROLE_AND );
+    Component* c_wire = new_component( (char*)str_wire, ROLE_WIRE );
+    Component* c_in = new_component( (char*)str_in, ROLE_INPUT );
+    Component* c_out = new_component( (char*)str_out, ROLE_OUTPUT );
 
     insert_component(circ->listaPortas, c_porta);
     insert_component(circ->listaWires, c_wire);

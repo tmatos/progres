@@ -266,7 +266,7 @@ Component* new_component(const char* nome, t_operador porta)
     c->listaSaida = NULL;
     c->sinalSaida = NULL;
 
-    if (porta != LITERAL_NUMBER) {
+    if (porta != ROLE_LITERAL_NUMBER) {
         c->listaEntrada = new_list_component();
         c->listaSaida = new_list_component();
     }

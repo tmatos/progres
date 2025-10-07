@@ -21,14 +21,6 @@ extern "C" {
 #define MAX_TOKEN_SIZE 128 /// Qtde maxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 13 /// Qtde maxima de digitos num numero inteiro a ser reconhecido
 
-/** @brief .
- */
-typedef enum en_keyword {
-    kw_module,
-    kw_endmodule
-    // nao sei se isso vai ficar mesmo
-} KeywordId;
-
 /** @brief Enumeracao para a classe do token detectado.
  */
 typedef enum en_token_class {

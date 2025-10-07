@@ -160,7 +160,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                     }
                 }
 
-                if (tr->fio->tipo.operador == output) {
+                if (tr->fio->tipo.operador == ROLE_OUTPUT) {
                     if ( !(tr->fio->sinalSaida) ) {
                         tr->fio->sinalSaida = new_signal( tr->fio->nome );
                     }
@@ -203,47 +203,47 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
 
             switch (gate->tipo.operador)
             {
-            case op_not:
+            case ROLE_NOT:
                 result = compute_not_gate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
-            case op_buf:
+            case ROLE_BUF:
                 result = compute_buf_gate(gate->listaEntrada->itens[0]->valorDinamico);
                 break;
-            case op_and:
+            case ROLE_AND:
                 result = compute_and_gate(gate->listaEntrada);
                 break;
-            case op_or:
+            case ROLE_OR:
                 result = compute_or_gate(gate->listaEntrada);
                 break;
-            case op_xor:
+            case ROLE_XOR:
                 valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
                 result = compute_xor_gate(valor_xor_in_a, valor_xor_in_b);
                 break;
-            case op_nand:
+            case ROLE_NAND:
                 result = compute_nand_gate(gate->listaEntrada);
                 break;
-            case op_nor:
+            case ROLE_NOR:
                 result = compute_nor_gate(gate->listaEntrada);
                 break;
-            case op_xnor:
+            case ROLE_XNOR:
                 valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
                 valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
                 result = compute_xnor_gate(valor_xnor_in_a, valor_xnor_in_b);
                 break;
-            case OP_BUF_IF0:
+            case ROLE_BUF_IF0:
                 result = compute_buf_if0_gate(valor_data, valor_control);
                 break;
-            case OP_BUF_IF1:
+            case ROLE_BUF_IF1:
                 result = compute_buf_if1_gate(valor_data, valor_control);
                 break;
-            case OP_NOT_IF0:
+            case ROLE_NOT_IF0:
                 result = compute_not_if0_gate(valor_data, valor_control);
                 break;
-            case OP_NOT_IF1:
+            case ROLE_NOT_IF1:
                 result = compute_not_if1_gate(valor_data, valor_control);
                 break;
-            case assign:
+            case ROLE_ASSIGN:
                 // TODO: implement expression evaluation and specific data structures
                 result = gate->listaEntrada->itens[0]->valorDinamico;
                 break;

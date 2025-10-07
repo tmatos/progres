@@ -92,7 +92,7 @@ public:
     CPPUNIT_ASSERT( inputs->lista );
     CPPUNIT_ASSERT( inputs->lista[0].pulsos );
 
-    Component* cp_in_wire = new_component(str_nome_entrada_1, wire);
+    Component* cp_in_wire = new_component(str_nome_entrada_1, ROLE_WIRE);
 
     add_input(circ, cp_in_wire);
 
