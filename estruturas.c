@@ -253,20 +253,20 @@ int has_component_by_pointer(ListComponent* ls, Component* cp)
     return 0;
 }
 
-Component* new_component(const char* nome, t_operador porta)
+Component* new_component(const char* nome, Role role)
 {
     Component* c = (Component*) xmalloc( sizeof(Component) );
 
     copy(c->nome, nome);
-    c->tipo.operador = porta;
-    c->tipo.atraso = 0; // atraso default eh zero
+    c->atributos.role = role;
+    c->atributos.delay = 0; // atraso default eh zero
 
     c->listaEntrada = NULL;
     c->sinalEntrada = NULL;
     c->listaSaida = NULL;
     c->sinalSaida = NULL;
 
-    if (porta != ROLE_LITERAL_NUMBER) {
+    if (role != ROLE_LITERAL_NUMBER) {
         c->listaEntrada = new_list_component();
         c->listaSaida = new_list_component();
     }

@@ -160,7 +160,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                     }
                 }
 
-                if (tr->fio->tipo.operador == ROLE_OUTPUT) {
+                if (tr->fio->atributos.role == ROLE_OUTPUT) {
                     if ( !(tr->fio->sinalSaida) ) {
                         tr->fio->sinalSaida = new_signal( tr->fio->nome );
                     }
@@ -201,7 +201,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                 valor_control =gate->listaEntrada->itens[1]->valorDinamico;
             }
 
-            switch (gate->tipo.operador)
+            switch (gate->atributos.role)
             {
             case ROLE_NOT:
                 result = compute_not_gate(gate->listaEntrada->itens[0]->valorDinamico);
@@ -515,7 +515,7 @@ void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Compone
     for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
     {
         insert_event(fila,
-                     t + gate->tipo.atraso * timescale /* * (circuto->timescale_unit/UN_FS) */,
+                     t + gate->atributos.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,
                      EVT_NET_TRANSITION,
                      gate->listaSaida->itens[j],
                      NULL,

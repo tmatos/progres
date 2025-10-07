@@ -448,8 +448,8 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
                     goto bad_return;
                 }
                 else {
-                    // Guardar o atraso dessa gate
-                    gate->tipo.atraso = strtol(it->valor, NULL, 10); //FIXME: tipo errado!
+                    // Guardar o delay dessa gate
+                    gate->atributos.delay = strtol(it->valor, NULL, 10); //FIXME: tipo errado!
                 }
 
                 if (!avanca(&it)) {
@@ -552,7 +552,7 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             input_count++;
 
             if (!avanca(&it)) {
-                if ( gate->tipo.operador == ROLE_NOT || gate->tipo.operador == ROLE_BUF ) {
+                if ( gate->atributos.role == ROLE_NOT || gate->atributos.role == ROLE_BUF ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -565,8 +565,8 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
             }
 
             if (it->classe != SYM_CLOSE_BRACKET) {
-                if ( (gate->tipo.operador == ROLE_NOT) ||
-                     (gate->tipo.operador == ROLE_BUF) || 
+                if ( (gate->atributos.role == ROLE_NOT) ||
+                     (gate->atributos.role == ROLE_BUF) || 
                      (is_tristate_logic(gate) && input_count == 2) ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
                                    it->linha, it->coluna, ")", it->valor);
@@ -799,7 +799,7 @@ int is_tristate_logic(const Component* gate)
 {
     int i;
 
-    t_operador op[4] = {
+    Role op[4] = {
         ROLE_BUF_IF0, // 0
         ROLE_BUF_IF1, // 1
         ROLE_NOT_IF0, // 2
@@ -808,7 +808,7 @@ int is_tristate_logic(const Component* gate)
 
     for ( i = 0; i < 4; i++ )
     {
-        if (gate->tipo.operador == op[i])
+        if (gate->atributos.role == op[i])
             return 1;
     }
     
@@ -1311,7 +1311,7 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     // negation (~) is also simple, it creates a not.
 
     if ( t->classe == SYM_TILDE ) {
-        gate->tipo.operador = ROLE_NOT;
+        gate->atributos.role = ROLE_NOT;
 
         if (!avanca(&t))
             goto load_assign_bad_eof;

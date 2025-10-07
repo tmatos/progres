@@ -29,7 +29,7 @@ public:
     Component* c0 = new_component( (char*)nome, ROLE_INPUT );
     CPPUNIT_ASSERT(c0);
     CPPUNIT_ASSERT( !strcmp( (char*)(c0->nome), (char*)nome ) );
-    CPPUNIT_ASSERT_EQUAL( c0->tipo.operador, ROLE_INPUT );
+    CPPUNIT_ASSERT_EQUAL( c0->atributos.role, ROLE_INPUT );
     CPPUNIT_ASSERT_EQUAL( c0->valorDinamico, VAL_X );
     CPPUNIT_ASSERT( c0->listaEntrada );
     CPPUNIT_ASSERT( c0->listaSaida );

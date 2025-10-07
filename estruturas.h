@@ -15,7 +15,7 @@ extern "C" {
 /** @brief Enumeração para possibilitar a distinção ou definição das classes de
  *  componentes do circuito de acordo com seus papéis (roles) ou funções.
  */
-typedef enum en_operador {
+typedef enum en_role {
     ROLE_AND,
     ROLE_OR,
     ROLE_XOR,
@@ -33,14 +33,15 @@ typedef enum en_operador {
     ROLE_OUTPUT,
     ROLE_INPUT,
     ROLE_ASSIGN
-} t_operador;
+} Role;
 
-/** @brief Estrutura que define a porta. Qual sua função logica e seu delay.
+/** @brief Struct que permite definir alguns atributos de um componente do circuito.
+ *  Como: qual seu papel/função e qual seu delay (caso seja pertinente e exista).
  */
-typedef struct st_tipo {
-    t_operador operador;
-    Tempo atraso;
-} t_tipo;
+typedef struct st_atributos {
+    Role role;
+    Tempo delay;
+} Atributos;
 
 #define MAX_PARAM_NAME_SIZE 64 // tamanho máximo do nome de um parâmetro
 
@@ -70,7 +71,7 @@ typedef struct st_componente_list ListComponent;
  */
 typedef struct st_component {
     char nome[MAX_COMPONENT_NAME_SIZE];
-    t_tipo tipo;
+    Atributos atributos;
 
     ListComponent* listaEntrada;
     Sinal* sinalEntrada;
@@ -234,12 +235,12 @@ Component* get_input_by_name(Module* circ, const char* nome);
  */
 Component* get_output_by_name(Module* circ, const char* nome);
 
-/** @brief Inicialização de uma estrutura de componente.
- *  @param nome String com nome do componente a ser criado.
- *  @param porta Tipo do Component a ser criado, segundo a enum t_operador.
+/** @brief Inicialização da struct de um componente do circuito.
+ *  @param nome String com nome do Component a ser criado.
+ *  @param role Papel do Component a ser criado, segundo a enum Role.
  *  @return Um ponteiro para a struct Component alocada e pre-inicializada.
  */
-Component* new_component(const char* nome, t_operador porta);
+Component* new_component(const char* nome, Role role);
 
 /** @brief Libera completamente um Componente da memória.
  *  @param c Ponteiro para um ponteiro da strcut Componente.
