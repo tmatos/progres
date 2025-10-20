@@ -22,6 +22,7 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_is_reserverd_word );
   CPPUNIT_TEST( test_has_only_digits_outro );
   CPPUNIT_TEST( test_is_valid_natural_number );
+  CPPUNIT_TEST( test_get_token_class );
   CPPUNIT_TEST( test_tokeniza_operators_v );
   CPPUNIT_TEST( test_tokeniza_top_v );
   CPPUNIT_TEST( test_tokeniza_tudo_v );
@@ -299,6 +300,88 @@ public:
     }
 
     CPPUNIT_ASSERT( ! is_valid_natural_number((char*)NULL) );
+  }
+
+  void test_get_token_class()
+  {
+    std::vector<std::tuple<std::string, TokenClass>> pairs = {
+      {"module", KW_MODULE},
+      {"endmodule", KW_ENDMODULE},
+      {"input", KW_INPUT},
+      {"output", KW_OUTPUT},
+      {"wire", KW_WIRE},
+      {"reg", KW_REG},
+      {"signed", KW_SIGNED},
+      {"assign", KW_ASSIGN},
+      {"begin", KW_BEGIN},
+      {"end", KW_END},
+      {"initial", KW_INITIAL},
+      {"parameter", KW_PARAMETER},
+      {"defparam", KW_DEFPARAM},
+      {"localparam", KW_LOCALPARAM},
+      {"buf", KW_BUF},
+      {"not", KW_NOT},
+      {"and", KW_AND},
+      {"nand", KW_NAND},
+      {"or", KW_OR},
+      {"nor", KW_NOR},
+      {"xor", KW_XOR},
+      {"xnor", KW_XNOR},
+      {"bufif0", KW_BUFIF0},
+      {"bufif1", KW_BUFIF1},
+      {"notif0", KW_NOTIF0},
+      {"notif1", KW_NOTIF1},
+      {"=", SYM_EQ},
+      {",", SYM_COMMA},
+      {":", SYM_COLON},
+      {";", SYM_SEMICOLON},
+      {"(", SYM_OPEN_BRACKET},
+      {")", SYM_CLOSE_BRACKET},
+      {"[", SYM_OPEN_SQUAREBRACKET},
+      {"]", SYM_CLOSE_SQUAREBRACKET},
+      {"{", SYM_OPEN_BRACE},
+      {"}", SYM_CLOSE_BRACE},
+      {"+", SYM_PLUS},
+      {"-", SYM_MINUS},
+      {"*", SYM_ASTERISK},
+      {"/", SYM_SLASH},
+      {"%", SYM_PERCENT},
+      {"~", SYM_TILDE},
+      {"&", SYM_AMPERSAND},
+      {"|", SYM_PIPE},
+      {"^", SYM_CIRCUMFLEX},
+      {"$", SYM_DOLLAR},
+      {"**", SYM_DOUBLE_ASTERISK},
+      {">", SYM_GREATER_THAN},
+      {">=", SYM_GREATER_OR_EQUAL},
+      {"<", SYM_LESS_THAN},
+      {"<=", SYM_LESS_OR_EQUAL},
+      {"&&", SYM_DOUBLE_AMPERSAND},
+      {"||", SYM_DOUBLE_PIPE},
+      {"==", SYM_DOUBLE_EQ},
+      {"!=", SYM_EXCLAMATION_EQ},
+      {"^~", SYM_CIRCUMFLEX_TILDE},
+      {"~^", SYM_TILDE_CIRCUMFLEX},
+      {"~&", SYM_TILDE_AMPERSAND},
+      {"~|", SYM_TILDE_PIPE},
+      {"<<", SYM_DOUBLE_LESS_THAN},
+      {">>", SYM_DOUBLE_GREATER_THAN},
+      {"?:", SYM_QUESTION_COLON},
+      {"`", SYM_GRAVE_ACCENT},
+      {"123456", NUM_BASE_DECIMAL},
+      {"\"This is a string\"", STRING},
+      {"!unknown_token!", _UNKNOWN}
+    };
+
+    for ( auto p : pairs )
+    {
+      std::string str = std::get<0>(p);
+      TokenClass tc_expected = std::get<1>(p);
+      
+      TokenClass tc_returned = get_token_class(str.c_str());
+
+      CPPUNIT_ASSERT_EQUAL( tc_expected, tc_returned );
+    }
   }
 
   void test_tokeniza_operators_v()
