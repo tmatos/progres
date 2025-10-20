@@ -16,12 +16,13 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_new_list_token );
   CPPUNIT_TEST( test_insert_token_of_string );
   CPPUNIT_TEST( test_remove_tokens_by_value );
-  CPPUNIT_TEST( test_is_symbol );
+  CPPUNIT_TEST( test_is_single_char_symbol );
   CPPUNIT_TEST( test_is_allowed_identifier );
   CPPUNIT_TEST( test_has_item_of_string_value );
   CPPUNIT_TEST( test_is_reserverd_word );
   CPPUNIT_TEST( test_has_only_digits_outro );
   CPPUNIT_TEST( test_is_valid_natural_number );
+  CPPUNIT_TEST( test_tokeniza_operators_v );
   CPPUNIT_TEST( test_tokeniza_top_v );
   CPPUNIT_TEST( test_tokeniza_tudo_v );
   CPPUNIT_TEST( test_tokeniza_multiline_v );
@@ -155,20 +156,20 @@ public:
     CPPUNIT_ASSERT( ! has_only_digits(NULL) );
   }
 
-  void test_is_symbol()
+  void test_is_single_char_symbol()
   {
     int n = 26;
     char simbolos[n] = "(),;:{}[]?=<>~&|!+-*/#@$\"\'";
 
     for( int i=0 ; i<n ; i++ ) {
-      CPPUNIT_ASSERT( is_symbol(simbolos[i]) );
+      CPPUNIT_ASSERT( is_single_char_symbol(simbolos[i]) );
     }
 
-    CPPUNIT_ASSERT( ! is_symbol('5') );
-    CPPUNIT_ASSERT( ! is_symbol('b') );
-    CPPUNIT_ASSERT( ! is_symbol('B') );
-    CPPUNIT_ASSERT( ! is_symbol('_') );
-    CPPUNIT_ASSERT( ! is_symbol(' ') );
+    CPPUNIT_ASSERT( ! is_single_char_symbol('5') );
+    CPPUNIT_ASSERT( ! is_single_char_symbol('b') );
+    CPPUNIT_ASSERT( ! is_single_char_symbol('B') );
+    CPPUNIT_ASSERT( ! is_single_char_symbol('_') );
+    CPPUNIT_ASSERT( ! is_single_char_symbol(' ') );
   }
 
   void test_is_allowed_identifier()
@@ -298,6 +299,52 @@ public:
     }
 
     CPPUNIT_ASSERT( ! is_valid_natural_number((char*)NULL) );
+  }
+
+  void test_tokeniza_operators_v()
+  {
+    std::list<std::string> tokens_esperados = {
+      "=",
+      ",",
+      ":",
+      ";",
+      "(",
+      ")",
+      "[",
+      "]",
+      "{",
+      "}",
+      "#",
+      "+",
+      "-",
+      "*",
+      "/",
+      "%",
+      "~",
+      "&",
+      "|",
+      "^",
+      "$",
+      "**",
+      ">",
+      ">=",
+      "<",
+      "<=",
+      "&&",
+      "||",
+      "==",
+      "!",
+      "!=",
+      "^~",
+      "~^",
+      "~&",
+      "~|",
+      "<<",
+      ">>",
+      "?:",
+      "`" };
+    
+    helper_test_tokeniza("./verilog_sample_src/operators.v", tokens_esperados);
   }
 
   void test_tokeniza_top_v()
