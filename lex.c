@@ -778,6 +778,15 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                 goto start_state;
             }
             else if (c == '<') {
+                c = fgetc(arquivo);
+                if (c == '<') {
+                    insert_token_of_string(tokens, "<<<", linha, coluna);
+                    coluna += 3;
+                    goto start_state;
+                }
+                else {
+                    ungetc(c, arquivo);
+                }
                 insert_token_of_string(tokens, "<<", linha, coluna);
                 coluna += 2;
                 goto start_state;
@@ -791,6 +800,15 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                 goto start_state;
             }
             else if (c == '>') {
+                c = fgetc(arquivo);
+                if (c == '>') {
+                    insert_token_of_string(tokens, ">>>", linha, coluna);
+                    coluna += 3;
+                    goto start_state;
+                }
+                else {
+                    ungetc(c, arquivo);
+                }
                 insert_token_of_string(tokens, ">>", linha, coluna);
                 coluna += 2;
                 goto start_state;
@@ -815,6 +833,15 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
         case '=':
             c = fgetc(arquivo);
             if (c == '=') {
+                c = fgetc(arquivo);
+                if (c == '=') {
+                    insert_token_of_string(tokens, "===", linha, coluna);
+                    coluna += 3;
+                    goto start_state;
+                }
+                else {
+                    ungetc(c, arquivo);
+                }
                 insert_token_of_string(tokens, "==", linha, coluna);
                 coluna += 2;
                 goto start_state;
@@ -823,6 +850,15 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
         case '!':
             c = fgetc(arquivo);
             if (c == '=') {
+                c = fgetc(arquivo);
+                if (c == '=') {
+                    insert_token_of_string(tokens, "!==", linha, coluna);
+                    coluna += 3;
+                    goto start_state;
+                }
+                else {
+                    ungetc(c, arquivo);
+                }
                 insert_token_of_string(tokens, "!=", linha, coluna);
                 coluna += 2;
                 goto start_state;

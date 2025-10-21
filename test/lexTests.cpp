@@ -368,6 +368,10 @@ public:
       {">>", SYM_DOUBLE_GREATER_THAN},
       {"?:", SYM_QUESTION_COLON},
       {"`", SYM_GRAVE_ACCENT},
+      {"===", SYM_TRIPLE_EQ},
+      {"!==", SYM_EXCLAMATION_DOUBLE_EQ},
+      {"<<<", SYM_TRIPLE_LESS_THAN},
+      {">>>", SYM_TRIPLE_GREATER_THAN},
       {"123456", NUM_BASE_DECIMAL},
       {"\"This is a string\"", STRING},
       {"!unknown_token!", _UNKNOWN}
@@ -425,6 +429,18 @@ public:
       "<<",
       ">>",
       "?:",
+      "===",
+      "!==",
+      "<<<",
+      ">>>",
+      "==",
+      "+",
+      "!=",
+      "+",
+      ">>",
+      "~",
+      "<<",
+      "~",
       "`" };
     
     helper_test_tokeniza("./verilog_sample_src/operators.v", tokens_esperados);
