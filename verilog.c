@@ -1313,9 +1313,11 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     if ( t->classe == SYM_TILDE ) {
         gate->atributos.role = ROLE_NOT;
 
-        if (!avanca(&t))
-            goto load_assign_bad_eof;
+    if (!avanca(&t))
+        goto load_assign_bad_eof;
     }
+
+load_assign_identifiers:
 
     if ( !is_allowed_identifier(t) ) {
         show_error_msg("Token inesperado foi encontrado",
@@ -1354,13 +1356,25 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     if (!avanca(&t))
         goto load_assign_bad_eof;
 
-    if (t->classe != SYM_SEMICOLON) {
+    if (t->classe == SYM_SEMICOLON)
+        goto load_assign_sucess;
+
+    if ( gate->atributos.role == ROLE_NOT ||
+         gate->atributos.role == ROLE_AND ||
+         t->classe != SYM_AMPERSAND ) {
         show_error_msg("Token inesperado foi encontrado",
                        t->linha, t->coluna, ";", t->valor);
         goto load_assign_bad_token;
     }
 
-//load_assign_sucess:
+    gate->atributos.role = ROLE_AND;
+
+    if (!avanca(&t))
+        goto load_assign_bad_eof;
+
+    goto load_assign_identifiers;
+
+load_assign_sucess:
     *it = t;
     return NO_ERROR;
 
