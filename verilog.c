@@ -1360,14 +1360,18 @@ load_assign_identifiers:
         goto load_assign_sucess;
 
     if ( gate->atributos.role == ROLE_NOT ||
-         gate->atributos.role == ROLE_AND ||
-         t->classe != SYM_AMPERSAND ) {
+         (t->classe != SYM_AMPERSAND && t->classe != SYM_PIPE) || 
+         (gate->atributos.role == ROLE_AND && t->classe != SYM_AMPERSAND) ||
+         (gate->atributos.role == ROLE_OR && t->classe != SYM_PIPE) ) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, ";", t->valor);
+                       t->linha, t->coluna, NULL, t->valor);
         goto load_assign_bad_token;
     }
 
-    gate->atributos.role = ROLE_AND;
+    if (t->classe == SYM_AMPERSAND)
+        gate->atributos.role = ROLE_AND;
+    else
+        gate->atributos.role = ROLE_OR;
 
     if (!avanca(&t))
         goto load_assign_bad_eof;

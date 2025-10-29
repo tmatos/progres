@@ -9,7 +9,7 @@
 Event-driven simulator for a subset of the Verilog language.
 
 Currently, provides simulation of combinational circuits written
-in structural Verilog.
+in structural Verilog and some dataflow constructs.
 
 
 ## 1. Usage
