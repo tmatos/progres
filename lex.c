@@ -177,7 +177,7 @@ TokenClass get_token_class(const char* s_tok)
     int i;
 
     // IMPORTANT: keep track of the count here!
-    #define _QTD_CLASSES 69
+    #define _QTD_CLASSES 71
     #define _MAX_STRLEN_IN_ARRAY 13
 
     char from_str[_QTD_CLASSES][_MAX_STRLEN_IN_ARRAY] = {
@@ -249,6 +249,8 @@ TokenClass get_token_class(const char* s_tok)
         ">>",
         ">>>",
         "?:",
+        "{{",
+        "}}",
         "\x60"   // = _QTD_CLASSES
     };
 
@@ -317,10 +319,12 @@ TokenClass get_token_class(const char* s_tok)
         SYM_TILDE_AMPERSAND,
         SYM_TILDE_PIPE,
         SYM_DOUBLE_LESS_THAN,
-        SYM_TRIPLE_LESS_THAN,      // = 65   
+        SYM_TRIPLE_LESS_THAN,      // = 65
         SYM_DOUBLE_GREATER_THAN,
-        SYM_TRIPLE_GREATER_THAN, 
+        SYM_TRIPLE_GREATER_THAN,
         SYM_QUESTION_COLON,
+        SYM_DOUBLE_OPEN_BRACE,
+        SYM_DOUBLE_CLOSE_BRACE,    // = 70
 
         SYM_GRAVE_ACCENT  // = _QTD_CLASSES
     };
@@ -894,6 +898,22 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
             c = fgetc(arquivo);
             if (c == ':') {
                 insert_token_of_string(tokens, "?:", linha, coluna);
+                coluna += 2;
+                goto start_state;
+            }
+            break;
+        case '{':
+            c = fgetc(arquivo);
+            if (c == '{') {
+                insert_token_of_string(tokens, "{{", linha, coluna);
+                coluna += 2;
+                goto start_state;
+            }
+            break;
+        case '}':
+            c = fgetc(arquivo);
+            if (c == '}') {
+                insert_token_of_string(tokens, "}}", linha, coluna);
                 coluna += 2;
                 goto start_state;
             }

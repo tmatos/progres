@@ -70,6 +70,8 @@ typedef enum en_token_class {
     SYM_CLOSE_SQUAREBRACKET, // ]
     SYM_OPEN_BRACE, // {
     SYM_CLOSE_BRACE, // }
+    SYM_DOUBLE_OPEN_BRACE, // {{
+    SYM_DOUBLE_CLOSE_BRACE, // }}
     SYM_PLUS, // +
     SYM_MINUS, // -
     SYM_ASTERISK, // *
