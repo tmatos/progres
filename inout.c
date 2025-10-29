@@ -55,7 +55,7 @@ Sinais* load_input_signals(FILE* file)
     // loop to read the set of all signal in the file
     while (1)
     {
-        if ( is_symbol(it->valor[0]) )
+        if ( is_single_char_symbol(it->valor[0]) )
             return show_fatal_error_corrupt_file();
 
         // TODO: check signal name duplication errors

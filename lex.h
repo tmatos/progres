@@ -24,7 +24,7 @@ extern "C" {
 /** @brief Enumeracao para a classe do token detectado.
  */
 typedef enum en_token_class {
-    KW_ALWAYS,
+    KW_ALWAYS = 0,
     KW_AND,
     KW_ASSIGN,
     KW_BEGIN,
@@ -70,6 +70,8 @@ typedef enum en_token_class {
     SYM_CLOSE_SQUAREBRACKET, // ]
     SYM_OPEN_BRACE, // {
     SYM_CLOSE_BRACE, // }
+    SYM_DOUBLE_OPEN_BRACE, // {{
+    SYM_DOUBLE_CLOSE_BRACE, // }}
     SYM_PLUS, // +
     SYM_MINUS, // -
     SYM_ASTERISK, // *
@@ -81,6 +83,27 @@ typedef enum en_token_class {
     SYM_CIRCUMFLEX, // ^
     SYM_DOLLAR, // $
     SYM_GRAVE_ACCENT, // `
+    SYM_DOUBLE_ASTERISK, // **
+    SYM_GREATER_THAN, // >
+    SYM_GREATER_OR_EQUAL, // >=
+    SYM_LESS_THAN, // <
+    SYM_LESS_OR_EQUAL, // <=
+    SYM_DOUBLE_AMPERSAND, // &&
+    SYM_DOUBLE_PIPE, // ||
+    SYM_DOUBLE_EQ, // ==
+    SYM_TRIPLE_EQ, // ===
+    SYM_EXCLAMATION, // !
+    SYM_EXCLAMATION_EQ, // !=
+    SYM_EXCLAMATION_DOUBLE_EQ, // !==
+    SYM_CIRCUMFLEX_TILDE, // ^~
+    SYM_TILDE_CIRCUMFLEX, // ~^
+    SYM_TILDE_AMPERSAND, // ~&
+    SYM_TILDE_PIPE, // ~|
+    SYM_DOUBLE_LESS_THAN, // <<
+    SYM_TRIPLE_LESS_THAN, // <<<
+    SYM_DOUBLE_GREATER_THAN, // >>
+    SYM_TRIPLE_GREATER_THAN, // >>>
+    SYM_QUESTION_COLON, // ?:
 
     NUM_BASE_BINARY,
     NUM_BASE_DECIMAL,
@@ -91,6 +114,15 @@ typedef enum en_token_class {
     IDENTIFIER,
     _UNKNOWN
 } TokenClass;
+
+/** @brief Struct for pairs that represents the mapping between
+ *         token strings and their respective TokenClass.
+ */
+typedef struct st_pair_string_tokenclass
+{
+    char token_string[MAX_TOKEN_SIZE];
+    TokenClass token_class;
+} PairStringTokenClass;
 
 /** @brief Tipo basico para o elemento que representa um token.
  */
@@ -158,7 +190,7 @@ int remove_tokens_by_value(ListToken* lst, const char* tok);
  *  @param c Um char qualquer.
  *  @return True se c for simbolo, False caso contrario.
  */
-int is_symbol(char c);
+int is_single_char_symbol(char c);
 
 /** @brief Imprime na tela os tokens dessa lista, um por linha.
  *  @return Void.

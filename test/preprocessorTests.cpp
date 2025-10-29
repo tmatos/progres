@@ -157,7 +157,7 @@ public:
 
     int n_tok_out = list_tok->tamanho;
 
-    CPPUNIT_ASSERT_EQUAL(n_tok_out + (5 + 7), n_tok_in);
+    CPPUNIT_ASSERT_EQUAL(n_tok_out + (4+4+3+1), n_tok_in);
 
     CPPUNIT_ASSERT( !strcmp(list_tok->primeiro->valor, "module") );
   }
