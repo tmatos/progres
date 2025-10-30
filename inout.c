@@ -271,7 +271,7 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
             insert_event(&fila,
                          t,
                          EVT_NET_TRANSITION,
-                         module->listaFiosSaida->itens[i], // !! caution!
+                         module->list_output_net->itens[i], // !! caution!
                          NULL,
                          p->valor);
 
@@ -283,7 +283,7 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
         insert_event(&fila,
                      t,
                      EVT_NET_TRANSITION,
-                     module->listaFiosSaida->itens[i], // !! caution!
+                     module->list_output_net->itens[i], // !! caution!
                      NULL,
                      VAL_X);
     }
@@ -299,16 +299,16 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
 
         while (it)
         {
-            it->fio->valorDinamico = it->novoValor;
+            it->fio->dynamic_value = it->novoValor;
             it = it->proximo;
         }
 
         // #time
         fprintf(file, "#%llu\n", t);
 
-        for ( i=0 ; i < module->listaFiosSaida->tamanho ; i++ )
+        for ( i=0 ; i < module->list_output_net->tamanho ; i++ )
         {
-            v = module->listaFiosSaida->itens[i]->valorDinamico;
+            v = module->list_output_net->itens[i]->dynamic_value;
             fprintf(file, "%c", get_char_from_logic_value(v));
             fprintf(file, "%c\n", (char) (s + i));
         }

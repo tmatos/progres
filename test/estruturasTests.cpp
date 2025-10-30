@@ -30,9 +30,9 @@ public:
     CPPUNIT_ASSERT(c0);
     CPPUNIT_ASSERT( !strcmp( (char*)(c0->nome), (char*)nome ) );
     CPPUNIT_ASSERT_EQUAL( c0->atributos.role, ROLE_INPUT );
-    CPPUNIT_ASSERT_EQUAL( c0->valorDinamico, VAL_X );
-    CPPUNIT_ASSERT( c0->listaEntrada );
-    CPPUNIT_ASSERT( c0->listaSaida );
+    CPPUNIT_ASSERT_EQUAL( c0->dynamic_value, VAL_X );
+    CPPUNIT_ASSERT( c0->list_input );
+    CPPUNIT_ASSERT( c0->list_output );
   }
 
   void test_new_list_component()
@@ -56,21 +56,21 @@ public:
     Module* circ = new_module();
     CPPUNIT_ASSERT(circ);
 
-    CPPUNIT_ASSERT(circ->listaFiosEntrada);
-    CPPUNIT_ASSERT_EQUAL(circ->listaFiosEntrada->tamanho, 0);
-    CPPUNIT_ASSERT(!circ->listaFiosEntrada->itens);
+    CPPUNIT_ASSERT(circ->list_input_net);
+    CPPUNIT_ASSERT_EQUAL(circ->list_input_net->tamanho, 0);
+    CPPUNIT_ASSERT(!circ->list_input_net->itens);
 
-    CPPUNIT_ASSERT(circ->listaFiosSaida);
-    CPPUNIT_ASSERT_EQUAL(circ->listaFiosSaida->tamanho, 0);
-    CPPUNIT_ASSERT(!circ->listaFiosSaida->itens);
+    CPPUNIT_ASSERT(circ->list_output_net);
+    CPPUNIT_ASSERT_EQUAL(circ->list_output_net->tamanho, 0);
+    CPPUNIT_ASSERT(!circ->list_output_net->itens);
 
-    CPPUNIT_ASSERT(circ->listaWires);
-    CPPUNIT_ASSERT_EQUAL(circ->listaWires->tamanho, 0);
-    CPPUNIT_ASSERT(!circ->listaWires->itens);
+    CPPUNIT_ASSERT(circ->list_wire_net);
+    CPPUNIT_ASSERT_EQUAL(circ->list_wire_net->tamanho, 0);
+    CPPUNIT_ASSERT(!circ->list_wire_net->itens);
 
-    CPPUNIT_ASSERT(circ->listaPortas);
-    CPPUNIT_ASSERT_EQUAL(circ->listaPortas->tamanho, 0);
-    CPPUNIT_ASSERT(!circ->listaPortas->itens);
+    CPPUNIT_ASSERT(circ->list_logic_gate);
+    CPPUNIT_ASSERT_EQUAL(circ->list_logic_gate->tamanho, 0);
+    CPPUNIT_ASSERT(!circ->list_logic_gate->itens);
   }
 
   void test_insert_component()
@@ -118,10 +118,10 @@ public:
     Component* c_in = new_component( (char*)str_in, ROLE_INPUT );
     Component* c_out = new_component( (char*)str_out, ROLE_OUTPUT );
 
-    insert_component(circ->listaPortas, c_porta);
-    insert_component(circ->listaWires, c_wire);
-    insert_component(circ->listaFiosEntrada, c_in);
-    insert_component(circ->listaFiosSaida, c_out);
+    insert_component(circ->list_logic_gate, c_porta);
+    insert_component(circ->list_wire_net, c_wire);
+    insert_component(circ->list_input_net, c_in);
+    insert_component(circ->list_output_net, c_out);
 
     CPPUNIT_ASSERT( get_gate_by_name(circ, str_porta) );
     CPPUNIT_ASSERT( get_wire_by_name(circ, str_wire) );
@@ -142,7 +142,7 @@ public:
     Module* circ = new_module();
     CPPUNIT_ASSERT(circ);
 
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, str_param_name) );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, str_param_name) );
 
     Param p;
     p.is_local = 0;
@@ -151,12 +151,12 @@ public:
 
     add_param(circ, &p);
 
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, NULL) );
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "") );
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "algum") );
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->listaParam, "ALGUM") );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, NULL) );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, "") );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, "algum") );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, "ALGUM") );
 
-    Param* r = get_param_by_name(circ->listaParam, str_param_name);
+    Param* r = get_param_by_name(circ->list_param, str_param_name);
 
     CPPUNIT_ASSERT( r );
     CPPUNIT_ASSERT( !strcmp(str_param_name, r->name) );
@@ -170,16 +170,16 @@ public:
     Module* circ = new_module();
     CPPUNIT_ASSERT(circ);
 
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, str_reg_name) );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, str_reg_name) );
 
     add_register(circ, str_reg_name, 32, 0);
 
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, NULL) );
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "") );
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "algum") );
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->listaReg, "ALGUM") );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, NULL) );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "") );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "algum") );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "ALGUM") );
 
-    Register* r = get_reg_by_name(circ->listaReg, str_reg_name);
+    Register* r = get_reg_by_name(circ->list_register, str_reg_name);
 
     CPPUNIT_ASSERT( r );
     CPPUNIT_ASSERT( !strcmp(str_reg_name, r->name) );

@@ -111,16 +111,16 @@ public:
     Module* circuit = load_module("./verilog_sample_src/reg.v", &q);
 
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), circuit->listaReg.total );
+    CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), circuit->list_register.total );
 
-    for ( int i=0 ; i < circuit->listaReg.total ; i++ )
+    for ( int i=0 ; i < circuit->list_register.total ; i++ )
     {
       std::string name = std::get<0>(regs_info[i]);
       unsigned size = std::get<1>(regs_info[i]);
       int is_signed = std::get<2>(regs_info[i]);
-      CPPUNIT_ASSERT( !strcmp(name.c_str(), circuit->listaReg.itens[i]->name) );
-      CPPUNIT_ASSERT_EQUAL( size, circuit->listaReg.itens[i]->size );
-      CPPUNIT_ASSERT_EQUAL( is_signed, circuit->listaReg.itens[i]->is_signed );
+      CPPUNIT_ASSERT( !strcmp(name.c_str(), circuit->list_register.itens[i]->name) );
+      CPPUNIT_ASSERT_EQUAL( size, circuit->list_register.itens[i]->size );
+      CPPUNIT_ASSERT_EQUAL( is_signed, circuit->list_register.itens[i]->is_signed );
     }
 
     delete_event_queue(&q);
@@ -133,11 +133,11 @@ public:
     Module* circuit = load_module("./verilog_sample_src/localparam_test.v", &q);
 
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT( circuit->listaParam.total == 2 );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaParam.itens[0]->name, "VER_NUM") );
-    CPPUNIT_ASSERT_EQUAL( circuit->listaParam.itens[0]->value, 123 );
-    CPPUNIT_ASSERT( !strcmp(circuit->listaParam.itens[1]->name, "_AUTHOR_ID") );
-    CPPUNIT_ASSERT_EQUAL( circuit->listaParam.itens[1]->value, 1 );
+    CPPUNIT_ASSERT( circuit->list_param.total == 2 );
+    CPPUNIT_ASSERT( !strcmp(circuit->list_param.itens[0]->name, "VER_NUM") );
+    CPPUNIT_ASSERT_EQUAL( circuit->list_param.itens[0]->value, 123 );
+    CPPUNIT_ASSERT( !strcmp(circuit->list_param.itens[1]->name, "_AUTHOR_ID") );
+    CPPUNIT_ASSERT_EQUAL( circuit->list_param.itens[1]->value, 1 );
 
     delete_event_queue(&q);
     free_module(&circuit);
@@ -160,11 +160,11 @@ public:
     Module* circuit = load_module("./verilog_sample_src/initial_single_test.v", &q);
 
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL( 1, circuit->listaParam.total );
-    CPPUNIT_ASSERT_EQUAL( 0, circuit->listaParam.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( 2, circuit->listaReg.total );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)0, circuit->listaReg.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)1, circuit->listaReg.itens[1]->value );
+    CPPUNIT_ASSERT_EQUAL( 1, circuit->list_param.total );
+    CPPUNIT_ASSERT_EQUAL( 0, circuit->list_param.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( 2, circuit->list_register.total );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)0, circuit->list_register.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)1, circuit->list_register.itens[1]->value );
 
     delete_event_queue(&q);
     free_module(&circuit);
@@ -179,11 +179,11 @@ public:
     const int expected_liter_value = 0;
 
     CPPUNIT_ASSERT( mod );
-    CPPUNIT_ASSERT_EQUAL( 1, mod->listaParam.total );
-    CPPUNIT_ASSERT_EQUAL( expected_param_value, mod->listaParam.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( 2, mod->listaReg.total );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_param_value, mod->listaReg.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_liter_value, mod->listaReg.itens[1]->value );
+    CPPUNIT_ASSERT_EQUAL( 1, mod->list_param.total );
+    CPPUNIT_ASSERT_EQUAL( expected_param_value, mod->list_param.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( 2, mod->list_register.total );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_param_value, mod->list_register.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)expected_liter_value, mod->list_register.itens[1]->value );
 
     delete_event_queue(&q);
     free_module(&mod);
@@ -208,15 +208,15 @@ public:
     Module* circuit = load_module("./verilog_sample_src/assigns.v", &q);
 
     CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL(1, circuit->listaFiosEntrada->tamanho);
-    CPPUNIT_ASSERT_EQUAL(2, circuit->listaFiosSaida->tamanho);
-    CPPUNIT_ASSERT_EQUAL(2, circuit->listaWires->tamanho);
+    CPPUNIT_ASSERT_EQUAL(1, circuit->list_input_net->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, circuit->list_output_net->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, circuit->list_wire_net->tamanho);
 
     Component* x;
-    x = circuit->listaFiosSaida->itens[0];
+    x = circuit->list_output_net->itens[0];
     // x (output) tem uma entrada que vem de um assign simples
-    CPPUNIT_ASSERT_EQUAL(1, x->listaEntrada->tamanho);
-    CPPUNIT_ASSERT_EQUAL(ROLE_ASSIGN, x->listaEntrada->itens[0]->atributos.role);
+    CPPUNIT_ASSERT_EQUAL(1, x->list_input->tamanho);
+    CPPUNIT_ASSERT_EQUAL(ROLE_ASSIGN, x->list_input->itens[0]->atributos.role);
 
     // TODO: more inspections
 

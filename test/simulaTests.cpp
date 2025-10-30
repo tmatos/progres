@@ -96,9 +96,9 @@ public:
 
     add_input(circ, cp_in_wire);
 
-    CPPUNIT_ASSERT_EQUAL( 1, circ->listaFiosEntrada->tamanho );
-    CPPUNIT_ASSERT( circ->listaFiosEntrada->itens );
-    CPPUNIT_ASSERT( ! strcmp(str_nome_entrada_1, circ->listaFiosEntrada->itens[0]->nome) );
+    CPPUNIT_ASSERT_EQUAL( 1, circ->list_input_net->tamanho );
+    CPPUNIT_ASSERT( circ->list_input_net->itens );
+    CPPUNIT_ASSERT( ! strcmp(str_nome_entrada_1, circ->list_input_net->itens[0]->nome) );
 
     outputs = simula(circ, inputs, NULL);
 

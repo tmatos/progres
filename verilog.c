@@ -476,15 +476,15 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
 
             if (has_item_of_string_value(list_wire, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->listaWires, it->valor);
-                insert_component(gate->listaSaida, out);
-                insert_component(out->listaEntrada, gate);
+                out = get_component_by_name(circuito->list_wire_net, it->valor);
+                insert_component(gate->list_output, out);
+                insert_component(out->list_input, gate);
             }
             else if (has_item_of_string_value(list_output, it->valor)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->listaFiosSaida, it->valor);
-                insert_component(gate->listaSaida, out);
-                insert_component(out->listaEntrada, gate);
+                out = get_component_by_name(circuito->list_output_net, it->valor);
+                insert_component(gate->list_output, out);
+                insert_component(out->list_input, gate);
             }
             else {
                 show_error_msg("Fio ou saida nao foi encontrado",
@@ -520,26 +520,26 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
 
             if ( it->classe == NUM_BASE_DECIMAL ) {
                 Component* num = new_component("literal_number_decimal", ROLE_LITERAL_NUMBER);
-                num->valorDinamico = long_to_logicvalue(strtol(it->valor, NULL, 10));
-                insert_component(gate->listaEntrada, num); // TODO: free mem later
+                num->dynamic_value = long_to_logicvalue(strtol(it->valor, NULL, 10));
+                insert_component(gate->list_input, num); // TODO: free mem later
             }
             else if (has_item_of_string_value(list_wire, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->listaWires, it->valor);
-                insert_component(gate->listaEntrada, in);
-                insert_component(in->listaSaida, gate);
+                in = get_component_by_name(circuito->list_wire_net, it->valor);
+                insert_component(gate->list_input, in);
+                insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_input, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->listaFiosEntrada, it->valor);
-                insert_component(gate->listaEntrada, in);
-                insert_component(in->listaSaida, gate);
+                in = get_component_by_name(circuito->list_input_net, it->valor);
+                insert_component(gate->list_input, in);
+                insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_output, it->valor)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->listaFiosSaida, it->valor);
-                insert_component(gate->listaEntrada, in);
-                insert_component(in->listaSaida, gate);
+                in = get_component_by_name(circuito->list_output_net, it->valor);
+                insert_component(gate->list_input, in);
+                insert_component(in->list_output, gate);
             }
             else {
                 show_error_msg("Entrada da porta logica invalida",
@@ -930,7 +930,7 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
             *range_msb = strtol(t->valor, NULL, 10);
         }
         else if (has_item_of_string_value(list_param, t->valor)) {
-            *range_msb = get_param_by_name(module->listaParam, t->valor)->value;
+            *range_msb = get_param_by_name(module->list_param, t->valor)->value;
         }
         else {
             show_error_msg("Numero para bit mais significativo nao foi encontrado",
@@ -954,7 +954,7 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
             *range_lsb = strtol(t->valor, NULL, 10);
         }
         else if (has_item_of_string_value(list_param, t->valor)) {
-            *range_lsb = get_param_by_name(module->listaParam, t->valor)->value;
+            *range_lsb = get_param_by_name(module->list_param, t->valor)->value;
         }
         else {
             show_error_msg("Numero para bit menos significativo nao foi encontrado",
@@ -1206,7 +1206,7 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
     Token* t = *it;
 
     // waiting for a reg, for now
-    left_reg = get_reg_by_name(module->listaReg, t->valor);
+    left_reg = get_reg_by_name(module->list_register, t->valor);
 
     if ( !left_reg ) {
         show_error_msg("Comando sem suporte dentro do bloco initial",
@@ -1230,7 +1230,7 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
         left_reg->value = strtol(t->valor, NULL, 10);
     }
     else if ( has_item_of_string_value(list_param, t->valor) ) {
-        p = get_param_by_name(module->listaParam, t->valor);
+        p = get_param_by_name(module->list_param, t->valor);
         left_reg->value = p->value;
     }
     else {
@@ -1275,15 +1275,15 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     
     if (has_item_of_string_value(list_wire, t->valor)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = get_component_by_name(module->listaWires, t->valor);
-        insert_component(gate->listaSaida, out);
-        insert_component(out->listaEntrada, gate);
+        out = get_component_by_name(module->list_wire_net, t->valor);
+        insert_component(gate->list_output, out);
+        insert_component(out->list_input, gate);
     }
     else if (has_item_of_string_value(list_out, t->valor)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = get_component_by_name(module->listaFiosSaida, t->valor);
-        insert_component(gate->listaSaida, out);
-        insert_component(out->listaEntrada, gate);
+        out = get_component_by_name(module->list_output_net, t->valor);
+        insert_component(gate->list_output, out);
+        insert_component(out->list_input, gate);
     }
     else {
         show_error_msg("Identificador previamente declarado nao foi encontrado",
@@ -1327,21 +1327,21 @@ load_assign_identifiers:
 
     if ( has_item_of_string_value(list_wire, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->listaWires, t->valor);
-        insert_component(gate->listaEntrada, in);
-        insert_component(in->listaSaida, gate);
+        in = get_component_by_name(module->list_wire_net, t->valor);
+        insert_component(gate->list_input, in);
+        insert_component(in->list_output, gate);
     }
     else if ( has_item_of_string_value(list_in, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->listaFiosEntrada, t->valor);
-        insert_component(gate->listaEntrada, in);
-        insert_component(in->listaSaida, gate);
+        in = get_component_by_name(module->list_input_net, t->valor);
+        insert_component(gate->list_input, in);
+        insert_component(in->list_output, gate);
     }
     else if( has_item_of_string_value(list_out, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->listaFiosSaida, t->valor);
-        insert_component(gate->listaEntrada, in);
-        insert_component(in->listaSaida, gate);
+        in = get_component_by_name(module->list_output_net, t->valor);
+        insert_component(gate->list_input, in);
+        insert_component(in->list_output, gate);
     }
     else {
         show_error_msg("Este identificador nao consta como alguma net declarada",

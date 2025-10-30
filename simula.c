@@ -51,13 +51,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     validos = 0;
 
     // Validacao da correspencia das entradas entre os arquivos '.v' e '.in'
-    for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    for ( i=0 ; i < circuto->list_input_net->tamanho ; i++ )
     {
         for ( j=0 ; j < entradas->quantidade ; j++ )
         {
-            if ( iguais(circuto->listaFiosEntrada->itens[i]->nome,
+            if ( iguais(circuto->list_input_net->itens[i]->nome,
                         entradas->lista[j].nome) ) {
-                circuto->listaFiosEntrada->itens[i]->sinalEntrada = &(entradas->lista[j]);
+                circuto->list_input_net->itens[i]->input_signal = &(entradas->lista[j]);
                 validos++;
                 break;
             }
@@ -71,11 +71,11 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
           "  .in = %d\n"
           "match = %d\n"
           "----------\n",
-          circuto->listaFiosEntrada->tamanho,
+          circuto->list_input_net->tamanho,
           entradas->quantidade,
           validos);
 
-    if (validos < circuto->listaFiosEntrada->tamanho) {
+    if (validos < circuto->list_input_net->tamanho) {
         print("AVISO: O arquivo de entradas tem menos "
               "sinais de entrada que o circuito.\n");
 
@@ -101,17 +101,17 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     }
 
     // Inicializacao da fila de eventos com os valores das entradas
-    for ( i=0 ; i < circuto->listaFiosEntrada->tamanho ; i++ )
+    for ( i=0 ; i < circuto->list_input_net->tamanho ; i++ )
     {
         t = 0;
 
-        p = circuto->listaFiosEntrada->itens[i]->sinalEntrada->pulsos;
+        p = circuto->list_input_net->itens[i]->input_signal->pulsos;
         while (p->valor != VAL_BLANK)
         {
             insert_event(&fila,
                          t,
                          EVT_NET_TRANSITION,
-                         circuto->listaFiosEntrada->itens[i],
+                         circuto->list_input_net->itens[i],
                          NULL,
                          p->valor);
 
@@ -122,13 +122,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
         insert_event(&fila,
                      t,
                      EVT_NET_TRANSITION,
-                     circuto->listaFiosEntrada->itens[i],
+                     circuto->list_input_net->itens[i],
                      NULL,
                      VAL_X); // este sinal fica ate infitito
     }
 
     // ATENCAO: Sabemos que todos os componentes sao
-    // inicializados com o valorDinamico em X.
+    // inicializados com o dynamic_value em X.
 
     // A partir daqui, ocorre a simulacao propriamente dita:
     t = 0;
@@ -149,27 +149,27 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
         {
             // apenas tambem se houver mudanca de valor no fio
             if ( (tr->task_type == IS_NOT_A_TASK) &&
-                 (tr->fio->valorDinamico != tr->novoValor) )
+                 (tr->fio->dynamic_value != tr->novoValor) )
             {
-                for ( i=0 ; i < tr->fio->listaSaida->tamanho ; i++ )
+                for ( i=0 ; i < tr->fio->list_output->tamanho ; i++ )
                 {
                     if ( !has_component_by_pointer(list_changed_gates,
-                                                   tr->fio->listaSaida->itens[i]) ) {
+                                                   tr->fio->list_output->itens[i]) ) {
                         insert_component(list_changed_gates,
-                                         tr->fio->listaSaida->itens[i]);
+                                         tr->fio->list_output->itens[i]);
                     }
                 }
 
                 if (tr->fio->atributos.role == ROLE_OUTPUT) {
-                    if ( !(tr->fio->sinalSaida) ) {
-                        tr->fio->sinalSaida = new_signal( tr->fio->nome );
+                    if ( !(tr->fio->output_signal) ) {
+                        tr->fio->output_signal = new_signal( tr->fio->nome );
                     }
-                    add_new_pulse(tr->fio->sinalSaida,
-                                  tr->fio->valorDinamico,
-                                  t - tr->fio->sinalSaida->duracaoTotal);
+                    add_new_pulse(tr->fio->output_signal,
+                                  tr->fio->dynamic_value,
+                                  t - tr->fio->output_signal->duracaoTotal);
                 }
 
-                tr->fio->valorDinamico = tr->novoValor;
+                tr->fio->dynamic_value = tr->novoValor;
             }
 
             switch (tr->task_type)
@@ -196,39 +196,39 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             gate = list_changed_gates->itens[i];
 
             // be prepared, in case of 3 stage logic gates
-            if (gate->listaEntrada->tamanho == 2) {
-                valor_data = gate->listaEntrada->itens[0]->valorDinamico;
-                valor_control =gate->listaEntrada->itens[1]->valorDinamico;
+            if (gate->list_input->tamanho == 2) {
+                valor_data = gate->list_input->itens[0]->dynamic_value;
+                valor_control =gate->list_input->itens[1]->dynamic_value;
             }
 
             switch (gate->atributos.role)
             {
             case ROLE_NOT:
-                result = compute_not_gate(gate->listaEntrada->itens[0]->valorDinamico);
+                result = compute_not_gate(gate->list_input->itens[0]->dynamic_value);
                 break;
             case ROLE_BUF:
-                result = compute_buf_gate(gate->listaEntrada->itens[0]->valorDinamico);
+                result = compute_buf_gate(gate->list_input->itens[0]->dynamic_value);
                 break;
             case ROLE_AND:
-                result = compute_and_gate(gate->listaEntrada);
+                result = compute_and_gate(gate->list_input);
                 break;
             case ROLE_OR:
-                result = compute_or_gate(gate->listaEntrada);
+                result = compute_or_gate(gate->list_input);
                 break;
             case ROLE_XOR:
-                valor_xor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
-                valor_xor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
+                valor_xor_in_a = gate->list_input->itens[0]->dynamic_value;
+                valor_xor_in_b = gate->list_input->itens[1]->dynamic_value;
                 result = compute_xor_gate(valor_xor_in_a, valor_xor_in_b);
                 break;
             case ROLE_NAND:
-                result = compute_nand_gate(gate->listaEntrada);
+                result = compute_nand_gate(gate->list_input);
                 break;
             case ROLE_NOR:
-                result = compute_nor_gate(gate->listaEntrada);
+                result = compute_nor_gate(gate->list_input);
                 break;
             case ROLE_XNOR:
-                valor_xnor_in_a = gate->listaEntrada->itens[0]->valorDinamico;
-                valor_xnor_in_b = gate->listaEntrada->itens[1]->valorDinamico;
+                valor_xnor_in_a = gate->list_input->itens[0]->dynamic_value;
+                valor_xnor_in_b = gate->list_input->itens[1]->dynamic_value;
                 result = compute_xnor_gate(valor_xnor_in_a, valor_xnor_in_b);
                 break;
             case ROLE_BUF_IF0:
@@ -245,7 +245,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                 break;
             case ROLE_ASSIGN:
                 // TODO: implement expression evaluation and specific data structures
-                result = gate->listaEntrada->itens[0]->valorDinamico;
+                result = gate->list_input->itens[0]->dynamic_value;
                 break;
             default:
                 break;
@@ -262,10 +262,10 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     }
 
     // copia as saidas da simulacao do ciruito para o retorno da funcao
-    for ( i=0 ; i < circuto->listaFiosSaida->tamanho ; i++ )
+    for ( i=0 ; i < circuto->list_output_net->tamanho ; i++ )
     {
         insert_signal(saidas,
-                      circuto->listaFiosSaida->itens[i]->sinalSaida);
+                      circuto->list_output_net->itens[i]->output_signal);
     }
 
     if (f_dump) {
@@ -339,7 +339,7 @@ ValorLogico compute_or_gate(ListComponent* inputs)
     // computa o valor da operacao or sobre todas as entradas
     for ( i=0 ; i < inputs->tamanho ; i++ )
     {
-        input_at_i = inputs->itens[i]->valorDinamico;
+        input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_1) {
             out = VAL_1;
@@ -366,7 +366,7 @@ ValorLogico compute_and_gate(ListComponent* inputs)
     // computa o valor da operacao and sobre todas as entradas
     for ( i=0 ; i < inputs->tamanho ; i++ )
     {
-        input_at_i = inputs->itens[i]->valorDinamico;
+        input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_0) {
             out = VAL_0;
@@ -512,12 +512,12 @@ void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Compone
     int j;
 
     // cria eventos relativos as saidas da porta
-    for ( j=0 ; j < gate->listaSaida->tamanho ; j++ )
+    for ( j=0 ; j < gate->list_output->tamanho ; j++ )
     {
         insert_event(fila,
                      t + gate->atributos.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,
                      EVT_NET_TRANSITION,
-                     gate->listaSaida->itens[j],
+                     gate->list_output->itens[j],
                      NULL,
                      result);
     }

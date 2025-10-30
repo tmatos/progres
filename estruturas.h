@@ -60,7 +60,7 @@ typedef struct st_param {
 typedef struct st_list_param {
     int total;
     Param** itens;
-} ListaParam;
+} ListParam;
 
 typedef struct st_componente_list ListComponent;
 
@@ -73,13 +73,13 @@ typedef struct st_component {
     char nome[MAX_COMPONENT_NAME_SIZE];
     Atributos atributos;
 
-    ListComponent* listaEntrada;
-    Sinal* sinalEntrada;
+    ListComponent* list_input;
+    Sinal* input_signal;
 
-    ListComponent* listaSaida;
-    Sinal* sinalSaida;
+    ListComponent* list_output;
+    Sinal* output_signal;
 
-    ValorLogico valorDinamico; // in case of a net type (or literal number)
+    ValorLogico dynamic_value; // in case of a net type (or literal number)
     unsigned int size; // size in bits
 } Component;
 
@@ -106,10 +106,10 @@ typedef struct st_reg {
 /** @brief Estrutura para a lista de registradores de um module.
  *  @note A lista de registradores é constituída de um array de ponteiros para Register, e não uma array de Register.
  */
-typedef struct st_list_reg {
+typedef struct st_list_register {
     int total;
     Register** itens;
-} ListaReg;
+} ListRegister;
 
 #define MAX_MODULE_NAME 1024
 
@@ -118,17 +118,17 @@ typedef struct st_list_reg {
 typedef struct st_module {
     char name[MAX_MODULE_NAME];
 
-    ListComponent* listaFiosEntrada;
-    Sinais* sinaisEntrada;
+    ListComponent* list_input_net;
+    Sinais* sinais_input;
 
-    ListComponent* listaFiosSaida;
-    Sinais* sinaisSaida;
+    ListComponent* list_output_net;
+    Sinais* sinais_output;
 
-    ListComponent* listaWires;
-    ListComponent* listaPortas;
+    ListComponent* list_wire_net;
+    ListComponent* list_logic_gate;
 
-    ListaReg listaReg;
-    ListaParam listaParam;
+    ListRegister list_register;
+    ListParam list_param;
 
     Tempo timescale_number;
     UnidTempo timescale_unit;
@@ -157,12 +157,12 @@ void free_module(Module** mod);
 void add_register(Module* circ, const char* name, unsigned int size, int is_signed);
 
 /** @brief Obter um Register de uma lista usando o nome como chave.
- *  @param list Uma struct 'ListaReg'.
+ *  @param list Uma struct 'ListRegister'.
  *  @param name String com o nome dado ao registrador. 
  *  @return Um ponteiro para a struct 'Register' correspondente, caso encontrado.
  *          NULL, caso nao seja encontrada uma correspondencia.
  */
-Register* get_reg_by_name(ListaReg list, const char* name);
+Register* get_reg_by_name(ListRegister list, const char* name);
 
 /** @brief Inserir um parametro novo no circuito.
  *  @param circ Ponteiro para o circuito.
@@ -172,12 +172,12 @@ Register* get_reg_by_name(ListaReg list, const char* name);
 void add_param(Module* circ, Param* param);
 
 /** @brief Obter um Param de uma lista usando o nome como chave.
- *  @param list Uma struct 'ListaParam'.
+ *  @param list Uma struct 'ListParam'.
  *  @param name String com o nome dado ao param. 
  *  @return Um ponteiro para a struct 'Param' correspondente, caso encontrado.
  *          NULL, caso nao seja encontrada uma correspondencia.
  */
-Param* get_param_by_name(ListaParam list, const char* name);
+Param* get_param_by_name(ListParam list, const char* name);
 
 /** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito.
  *  @param circ Ponteiro para um Module, já inicializado.
