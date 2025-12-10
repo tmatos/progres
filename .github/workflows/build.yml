@@ -30,11 +30,7 @@ jobs:
 
     - name: Generate configure
       if: runner.os == 'Linux' || runner.os == 'macOS'
-      run: |
-        aclocal
-        autoheader 
-        automake
-        autoconf
+      run: autoreconf --install
     
     - name: Build target
       run: |
