@@ -5,12 +5,13 @@
 CC = g++
 CPPC = g++
 
-SRCDIR = ..
-IDIR = ..
+SRCDIR = ../src
+IDIR = ../src
 ODIR = obj
 TDIR = .
 
 CFLAGS = -I$(IDIR) --coverage -g -O0
+CPPFLAGS = -I$(IDIR)
 LIBS = -lcppunit
 
 TARGET = progrestest
@@ -23,13 +24,13 @@ SRCTEST = $(shell find $(TDIR) -name '*.cpp')
 OBJTEST = $(patsubst $(TDIR)/%.cpp, $(ODIR)/%.o, $(SRCTEST))
 
 $(ODIR)/%.o: $(TDIR)/%.cpp
-	$(CPPC) -c -o $@ $< $(LIBS)
+	$(CPPC) -c -o $@ $< $(CPPFLAGS) $(LIBS)
 
 # Obs.: main() function is in `progres.c`
 SRC = $(shell find $(SRCDIR) -maxdepth 1 -type f \( -iname '*.c' ! -iname 'progres.c' \))
 OBJ = $(patsubst $(SRCDIR)/%.c, $(ODIR)/%.o, $(SRC))
 
-$(ODIR)/%.o: $(SRCDIR)/%.c $(IDIR)/%.h
+$(ODIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJ) $(OBJTEST)

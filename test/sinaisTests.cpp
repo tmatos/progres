@@ -3,8 +3,8 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
-#include "../sinais.h"
-#include "../strutil.h"
+#include "sinais.h"
+#include "strutil.h"
 
 class Testes_sinais : public CppUnit::TestFixture
 {

@@ -3,7 +3,7 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
-#include "../erros.h"
+#include "erros.h"
 
 class Testes_erros : public CppUnit::TestFixture
 {

@@ -5,12 +5,12 @@
 #include <list>
 #include <string>
 
-#include "../sinais.h"
-#include "../eventos.h"
-#include "../inout.h"
-#include "../strutil.h"
-#include "../verilog.h"
-#include "../simula.h"
+#include "sinais.h"
+#include "eventos.h"
+#include "inout.h"
+#include "strutil.h"
+#include "verilog.h"
+#include "simula.h"
 
 class Testes_inout : public CppUnit::TestFixture
 {

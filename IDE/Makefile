@@ -1,6 +1,6 @@
 
 OBJ_DIR=obj
-C_DIR=..
+C_DIR=../src
 
 CC=gcc
 CXX=g++

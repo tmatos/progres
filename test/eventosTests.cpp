@@ -3,9 +3,9 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
-#include "../estruturas.h"
-#include "../sinais.h"
-#include "../eventos.h"
+#include "estruturas.h"
+#include "sinais.h"
+#include "eventos.h"
 
 class Testes_eventos : public CppUnit::TestFixture
 {

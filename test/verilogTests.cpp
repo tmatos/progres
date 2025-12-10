@@ -8,7 +8,7 @@
 #include <vector>
 #include <tuple>
 
-#include "../verilog.h"
+#include "verilog.h"
 
 class Testes_verilog : public CppUnit::TestFixture
 {

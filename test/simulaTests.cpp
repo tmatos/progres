@@ -3,12 +3,12 @@
 #include <cppunit/TextOutputter.h>
 #include <cstring>
 
-#include "../estruturas.h"
-#include "../sinais.h"
-#include "../eventos.h"
-#include "../verilog.h"
-#include "../inout.h"
-#include "../simula.h"
+#include "estruturas.h"
+#include "sinais.h"
+#include "eventos.h"
+#include "verilog.h"
+#include "inout.h"
+#include "simula.h"
 
 class Testes_simula : public CppUnit::TestFixture
 {

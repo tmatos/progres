@@ -1,7 +1,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SRC_DIR = .
+SRC_DIR = src
 INC_DIR = .
 OBJ_DIR = obj
 
@@ -10,22 +10,19 @@ CFLAGS = -I$(INC_DIR) -Wall -Wextra
 
 TARGET = progres
 
-SRC  = strutil.c sinais.c erros.c estruturas.c lex.c preprocessor.c
-SRC += eventos.c verilog.c inout.c mem.c simula.c progres.c
+SRC = $(shell find $(SRC_DIR) -name '*.c') 
 
-DEPS = $(patsubst %.c, $(SRC_DIR)/%.h, $(SRC))
-
-OBJ = $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRC))
+OBJ = $(patsubst $(SRC)/%.c, $(OBJ_DIR)/%.o, $(SRC))
 
 default: makedir all
 
 debug: CFLAGS += -gdwarf-4 -g3
 debug: default
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(TARGET): $(OBJ) 
+$(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 .PHONY: makedir
