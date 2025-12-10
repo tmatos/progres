@@ -7,8 +7,8 @@
 #include <vector>
 #include <tuple>
 
-#include "../lex.h"
-#include "../preprocessor.h"
+#include "lex.h"
+#include "preprocessor.h"
 
 class Testes_preprocessor : public CppUnit::TestFixture
 {

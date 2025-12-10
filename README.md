@@ -92,14 +92,16 @@ time unit: 0123456789
 ## 3. Building and installing
 
 The source code is written primarily in C and should compile under any 
-build environment supporting the C99 standard.
-A makefile is provided, so simply use:
+modern build environment with `make` and a C99 compliant compiler.
+A configure script is provided to generate the Makefile, so simply use:
 
 ```
+./configure
 make
 ```
 
-To generate the executable, which can be copied to any desired location.
+To build the executable, which may be copied to any desired location in
+your filesystem. For now, this file is self-sufficient.
 
 
 ## 4. Contacts

@@ -5,8 +5,8 @@
 #include <list>
 #include <string>
 
-#include "../strutil.h"
-#include "../lex.h"
+#include "strutil.h"
+#include "lex.h"
 
 class Testes_lex : public CppUnit::TestFixture
 {

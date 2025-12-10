@@ -52,6 +52,10 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file);
  */
 char get_char_from_logic_value(ValorLogico value);
 
+/** @brief Export VCD to file.
+ */
+void save_vcd(Module* module, Sinais* sinais, FILE* file);
+
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
  *         Indicando que o arquivo de entrada está corrompido.
  *  @return Um ponteiro para uma struct Sinais com valor NULL.
