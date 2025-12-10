@@ -23,7 +23,10 @@ jobs:
 
     - name: Install automake (in case of macOS)
       if: runner.os == 'macOS'
-      run: brew update && brew install m4 autoconf automake libtool
+      run: |
+        brew update
+        brew upgrade
+        brew install m4 autoconf automake libtool
 
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -34,8 +37,10 @@ jobs:
     
     - name: Build target
       run: |
+        chmod +x configure
         ./configure
-        make 
+        make
+      shell: bash
     
     - name: Archive executables
       uses: actions/upload-artifact@v4
