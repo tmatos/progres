@@ -35,12 +35,12 @@ jobs:
         autoheader 
         automake
         autoconf
-      
+    
     - name: Build target
-      run |
+      run: |
         ./configure
         make 
-
+    
     - name: Archive executables
       uses: actions/upload-artifact@v4
       with:
