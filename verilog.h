@@ -105,6 +105,18 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
 VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module);
 
 /**
+ * @brief Parsing of expressions.
+ * @param it Pointer to a token iterator (which is also a pointer).
+ * @param list_wire Pointer to a list of tokens made of identifiers related to declared wire nets.
+ * @param list_in Pointer to a list of tokens made of identifiers related to declared input ports.
+ * @param list_out Pointer to a list of tokens made of identifiers related to declared output ports.
+ * @param module Pointer to the Verilog module struct.
+ * @param gate Pointer to the component struct representing the gate wich will represent the whole expression.
+ * @return Error code of type VerilogError.
+ */
+VerilogError load_expression(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module, Component* gate);
+
+/**
  * @brief Parsing of system tasks.
  * @param pit Pointer to a token iterator (wich is also a pointer).
  * @param initial_task_events Pointer to a queue of events for systasks.

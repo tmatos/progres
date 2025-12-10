@@ -1391,6 +1391,28 @@ load_assign_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
+VerilogError load_expression(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module, Component* gate)
+{
+    Token* t = *it;
+
+    if (!avanca(&t))
+        goto load_exp_bad_eof;
+
+    // TODO
+    // ...
+    // ...
+
+load_exp_sucess:
+    *it = t;
+    return NO_ERROR;
+
+load_exp_bad_token:
+    return ERROR_VERILOG_BAD_TOKEN;
+
+load_exp_bad_eof:
+    return ERROR_VERILOG_BAD_EOF;
+}
+
 VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 {
     int count = 0; // task arg counter
