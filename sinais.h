@@ -4,20 +4,34 @@
  */
 
 #ifndef SINAIS_H
-
 #define SINAIS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_NOME_SINAL 50 /// Tamanho máximo permitido para o nome de um sinal.
 
-/** @brief Valor lógico de um pulso. Aqui, VAL_BLANK serve para indicar o fim de uma "string" de pulsos.
+/** @brief Enum para representação dos valores lógicos utilizados nas simulações.
+ *         Aqui, VAL_BLANK serve unicamente para indicar o final de um array de pulsos.
+ *         De forma semelhante ao que acontece com '0x00' para strings em C.
  */
 typedef enum en_logic_value {
     VAL_0 = 0,
     VAL_1 = 1,
     VAL_X = 2,
     VAL_Z = 3,
+    VAL_L = 4,
+    VAL_H = 5,
     VAL_BLANK
 } ValorLogico;
+
+/** @brief Convert from a long integer to a one bit logic value of type ValorLogico.
+ *         It takes the least significant bit of n to define the value.
+ *  @param n A number of type long integer.
+ *  @return Either VAL_0 or VAL_1, from enum ValorLogico.
+ */
+ValorLogico long_to_logicvalue(long n);
 
 /** @brief Unidades de tempo disponíveis para a duração de um pulso.
            Na ordem: segundo, milisegundo, microsegundo, nanosegundo, picosegundo e femtosegundo.
@@ -49,6 +63,12 @@ typedef enum en_un_tempo {
  */
 UnidTempo get_timeunit_from_str(const char* str);
 
+/** @brief Retorna a string que representa unidade de tempo.
+ *  @param unit Unidade de tempo, da enum UnidTempo.
+ *  @return Uma string constant com valor: "s", "ms", "us", "ns", "ps" ou "fs".
+ */
+const char* get_str_from_timeunit(UnidTempo unit);
+
 /** @brief O tipo das variáveis usadas na representação do tempo.
  */
 typedef unsigned long long int Tempo;
@@ -79,36 +99,60 @@ typedef struct st_sinais {
 } Sinais;
 
 /** @brief Inicializa um sinal vazio com o respectivo nome indicado.
+ *  @param nome String com o nome do sinal a ser criado.
+ *  @return Ponteiro para o sinal recém criado.
  */
-Sinal* novoSinal(const char* nome);
+Sinal* new_signal(const char* nome);
 
 /** @brief Muda a string contendo o nome do sinal dentro de s para a indicada por nome.
+ *  @param s Sinal que terá o nome modificado.
+ *  @param nome String contendo o novo nome do sinal.
  */
-int setSinalNome(Sinal* s, const char* nome);
+int set_signal_name(Sinal* s, const char* nome);
 
 /** @brief Define o pulso p indicado com sendo nulo.
  *         Isto é, seu valor conterá VAL_BLANK e terá tempo zero.
+ *  @param p Ponteiro para o pulso a ser afetado. 
  */
-int setPulsoNulo(Pulso* p);
+int set_pulse_blank(Pulso* p);
 
 /** @brief Adiciona ao sinal, mais especificamente ao vetor de pulsos do objeto Sinal,
            mais um pulso de valor e duração indicados.
            é como se fosse um append, aqui fazemos uso de realloc.
+    @param s Ponteiro para um sinal.
+    @param valor Valor lógico do pulso a ser adicionado.
+    @param duracao Duracao, em unidade adimensional, de tempo do pulso a ser inserido.
+    @return 1 em caso de sucesso, 0 caso falhe.
  */
-int addPulso(Sinal* s, ValorLogico valor, Tempo duracao);
+int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
 
 /** @brief Inicializa um nova estrutura Sinas vazia e retorna seu endereço de memória.
            Vazia significa que os elementos primeiro e ultimo apontam para NULL
            e o número de elementos é zero.
  */
-Sinais* novaSinais();
+Sinais* new_signal_list();
 
-/** @brief Insere um sinal em branco na estrutura Sinais.
+/** @brief Free mem and set NULL to pointer.
+ *  @param list Pointer to Sinais*
  */
-int addSinal(Sinais* s, const char* nome);
+void free_signal_list(Sinais** list);
 
-/** @brief Copia um sinal para a estrutura Sinais.
+/** @brief Insere um sinal em branco na struct que representa uma lista de Sinais.
+ *  @param list Uma lista de sinais.
+ *  @param nome String com o nome do sinal em branco.
+ *  @return 1 em caso de sucesso
  */
-int addSinalPronto(Sinais* ls, Sinal* sinal);
+int add_new_signal(Sinais* list, const char* nome);
+
+/** @brief Copia um sinal para a struct que representa uma lista de sinais.
+ *  @param list_sinal Uma lista de sinais.
+ *  @param sinal O sinal a ser copiado.
+ *  @return 1 em caso de sucesso, 0 caso falhe.
+ */
+int insert_signal(Sinais* list_sinal, Sinal* sinal);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SINAIS_H

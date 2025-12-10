@@ -1,4 +1,5 @@
 sample/*.out
+sample/*.vcd
 obj/
 progres
 test/*.o
@@ -8,6 +9,7 @@ test/coverage.txt
 *.gcda
 generated-docs/
 .vscode/settings.json
+IDE/ide
 IDE/IDE.layout
 benchmarks/
 test/cov_reports/

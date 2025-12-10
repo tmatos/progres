@@ -1,3 +1,9 @@
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
+
+ Under terms of the MIT license.
+*********************************/
 
 #include <wx/wx.h>
 #include <wx/textfile.h>
@@ -19,21 +25,62 @@ BEGIN_EVENT_TABLE(EdicaoDeSinal,wxDialog)
     //(*EventTable(EdicaoDeSinal)
     //*)
 
+// keyboard input
+EVT_KEY_DOWN(EdicaoDeSinal::keyPressed)
+
 EVT_CLOSE(EdicaoDeSinal::OnClose)
 
 END_EVENT_TABLE()
 
-EdicaoDeSinal::EdicaoDeSinal(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
+void EdicaoDeSinal::keyPressed(wxKeyEvent& event)
+{
+    switch ( event.GetKeyCode() )
+    {
+        case WXK_ESCAPE:
+            closeFile();
+            break;
+        default:
+            break;
+    }
+
+    event.Skip();
+}
+
+EdicaoDeSinal::EdicaoDeSinal(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size)
 {
     //(*Initialize(EdicaoDeSinal)
-    Create(parent, id, _("Arquivo de entrada"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("id"));
+    Create(parent,
+           id,
+           _("Arquivo de entrada"),
+           wxDefaultPosition,
+           wxDefaultSize,
+           wxDEFAULT_DIALOG_STYLE,
+           _T("id"));
+
     SetClientSize(wxSize(590,366));
     Move(wxDefaultPosition);
-    txtWaveIn = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxPoint(8,8), wxSize(576,320), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-    btnSalvar = new wxButton(this, idBtn_Salvar, _("Salvar"), wxPoint(480,336), wxSize(104,23), 0, wxDefaultValidator, _T("idBtn_Salvar"));
+
+    txtWaveIn = new wxTextCtrl(this,
+                               ID_TEXTCTRL1,
+                               wxEmptyString,
+                               wxPoint(8,8),
+                               wxSize(576,320),
+                               wxTE_MULTILINE,
+                               wxDefaultValidator,
+                               _T("ID_TEXTCTRL1"));
+    btnSalvar = new wxButton(this,
+                             idBtn_Salvar,
+                             _("Salvar"),
+                             wxPoint(480,336),
+                             wxSize(104,23),
+                             0,
+                             wxDefaultValidator,
+                             _T("idBtn_Salvar"));
 
     Connect(idBtn_Salvar,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EdicaoDeSinal::OnbtnSalvarClick);
     //*)
+
+    txtWaveIn->SetFocus();
 }
 
 EdicaoDeSinal::~EdicaoDeSinal()
@@ -71,6 +118,11 @@ void EdicaoDeSinal::OnbtnSalvarClick(wxCommandEvent& event)
 }
 
 void EdicaoDeSinal::OnClose(wxCloseEvent& event)
+{
+    closeFile();
+}
+
+void EdicaoDeSinal::closeFile()
 {
     SinaisDrawPane* pai = (SinaisDrawPane*) this->GetParent();
     pai->estaEmEdicao = false;

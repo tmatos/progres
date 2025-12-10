@@ -7,180 +7,202 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "progres.h"
 #include "estruturas.h"
 #include "sinais.h"
+#include "eventos.h"
+#include "strutil.h"
 #include "lex.h"
 #include "inout.h"
 #include "erros.h"
 
-Sinais* erroFatalArquivoCorrompido()
+Sinais* show_fatal_error_corrupt_file()
 {
-    if (!global_silent_mode)
-        printf("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
+    print("%s", MSG_ARQUIVO_ENTRADA_CORROMPIDO);
 
     return NULL;
 }
 
-Sinais* carregaEntradas(FILE* arquivo)
+Sinais* load_input_signals(FILE* file)
 {
-    int indice = -1; // indexador do vetor de sinais de entrada
-    ValorLogico valorLogico;
-    Tempo duracao;
-    Sinais* entradas = novaSinais();
-    Token* it = NULL;
+    int index; // for indexing the array in the input signal list
+    Token* it; // token iterator
+    ValorLogico logic_value;
+    Tempo time_length;
 
-    ListaToken* nomesUsados = novaListaToken(); // nomes de entrada ja lidos
+    Sinais* list_input = new_signal_list();
 
-    ListaToken* tokens = tokeniza(arquivo);
+    // token list to keep the names of read input identifiers
+    ListToken* list_used_identifiers = new_list_token();
 
-    if(!tokens)
+    ListToken* tokens = tokeniza(file);
+
+    if (!tokens)
         return NULL;
 
     it = tokens->primeiro;
 
-    if(!it) {
-        if (!global_silent_mode)
-            printf("%s", MSG_ARQUIVO_ENTRADA_VAZIO);
+    if (!it) {
+        print("%s", MSG_ARQUIVO_ENTRADA_VAZIO);
 
         return NULL;
     }
 
-    // loop para o conjunto de sinais
+    index = -1;
+
+    // loop to read the set of all signal in the file
     while (1)
     {
-        if ( isSimbolo(it->valor[0]) )
-            return erroFatalArquivoCorrompido();
+        if ( is_single_char_symbol(it->valor[0]) )
+            return show_fatal_error_corrupt_file();
 
         // TODO: check signal name duplication errors
 
-        insereTokenString(nomesUsados, it->valor, it->linha, it->coluna);
+        insert_token_of_string(list_used_identifiers,
+                               it->valor,
+                               it->linha,
+                               it->coluna);
 
-        addSinal(entradas, it->valor);
-        indice++;
+        add_new_signal(list_input, it->valor);
 
-        if (!avanca(&it))
-            return erroFatalArquivoCorrompido();
+        index++;
+
+        if ( !avanca(&it) )
+            return show_fatal_error_corrupt_file();
 
         if ( !iguais(it->valor, "{") )
-            return erroFatalArquivoCorrompido();
+            return show_fatal_error_corrupt_file();
 
-        // loop para um sinal
+        // loop to read one signal
         while (1)
         {
-            if (!avanca(&it))
-                return erroFatalArquivoCorrompido();
+            if ( !avanca(&it) )
+                return show_fatal_error_corrupt_file();
 
-            valorLogico = VAL_BLANK;
+            logic_value = VAL_BLANK;
 
-            if( iguais(it->valor, "0") ) {
-                valorLogico = VAL_0;
+            if ( iguais(it->valor, "0") ) {
+                logic_value = VAL_0;
             }
-            else if( iguais(it->valor, "1") ) {
-                valorLogico = VAL_1;
+            else if ( iguais(it->valor, "1") ) {
+                logic_value = VAL_1;
             }
-            else if( iguais(it->valor, "x") || iguais(it->valor, "X") ) {
-                valorLogico = VAL_X;
+            else if ( iguais(it->valor, "x") || iguais(it->valor, "X") ) {
+                logic_value = VAL_X;
             }
-            else if( iguais(it->valor, "}") ) {
+            else if ( iguais(it->valor, "z") || iguais(it->valor, "Z") ) {
+                logic_value = VAL_Z;
+            }
+            else if ( iguais(it->valor, "}") ) {
                 break;
             }
             else {
-                return erroFatalArquivoCorrompido();
+                return show_fatal_error_corrupt_file();
             }
 
-            if(!avanca(&it))
-                return erroFatalArquivoCorrompido();
+            if ( !avanca(&it) )
+                return show_fatal_error_corrupt_file();
 
-            if( !iguais(it->valor, "(") )
-                return erroFatalArquivoCorrompido();
+            if ( !iguais(it->valor, "(") )
+                return show_fatal_error_corrupt_file();
 
-            if(!avanca(&it))
-                return erroFatalArquivoCorrompido();
+            if ( !avanca(&it) )
+                return show_fatal_error_corrupt_file();
 
-            if( !isNumNaturalValido(it->valor) )
-                return erroFatalArquivoCorrompido();
+            if ( !is_valid_natural_number(it->valor) )
+                return show_fatal_error_corrupt_file();
             
-            duracao = strtol(it->valor, NULL, 10);
-            addPulso((entradas->lista + indice), valorLogico, duracao);
+            time_length = strtol(it->valor, NULL, 10);
 
-            if(!avanca(&it))
-                return erroFatalArquivoCorrompido();
+            add_new_pulse( (list_input->lista + index),
+                           logic_value,
+                           time_length );
 
-            if( !iguais(it->valor, ")") )
-                return erroFatalArquivoCorrompido();
+            if ( !avanca(&it) )
+                return show_fatal_error_corrupt_file();
 
-            if(!avanca(&it))
-                return erroFatalArquivoCorrompido();
+            if ( !iguais(it->valor, ")") )
+                return show_fatal_error_corrupt_file();
 
-            if( iguais(it->valor, ",") )
+            if ( !avanca(&it) )
+                return show_fatal_error_corrupt_file();
+
+            if ( iguais(it->valor, ",") ) {
                 continue;
-            else if( iguais(it->valor, "}") )
+            }
+            else if ( iguais(it->valor, "}") ) {
                 break;
-             
+            }             
         }
 
-        if(!avanca(&it)) {
-            if (!global_silent_mode)
-                printf("%s", MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
+        if ( !avanca(&it) ) {
+            print("%s", MSG_ARQUIVO_ENTRADA_LIDO_COMPLETO);
 
             break;
         }
     }
 
-    delete_lista_token(nomesUsados);
+    delete_lista_token(list_used_identifiers);
     delete_lista_token(tokens);
 
-    return entradas;
+    return list_input;
 }
 
-void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
+void save_signals(Sinais* signals, FILE* file)
 {
     int si; // indexador dos sinais na lista de sinais de entrada
-    Sinal* itSinais = NULL; // Iterador para os sinais num conjunto de entrada ou saida
+    Sinal* it_signal = NULL; // Iterador para os sinais num conjunto de entrada ou saida
     Pulso* it = NULL; // Iterador para os pulsos em um Sinal
 
-    if(!sinaisSaida || !arqSaida)
+    if ( !signals || !file ) {
         return;
+    }
 
     si = 0;
-    itSinais = sinaisSaida->lista;
+    it_signal = signals->lista;
 
-    while( si < sinaisSaida->quantidade )
+    while ( si < signals->quantidade )
     {
-        fprintf(arqSaida, "%s {", itSinais[si].nome);
+        fprintf(file, "%s {", it_signal[si].nome);
 
-        it = itSinais[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
+        it = it_signal[si].pulsos; // Aqui, o indice 0 indica qual dos sinais na lista
 
-        while( it->valor != VAL_BLANK )
+        while ( it->valor != VAL_BLANK )
         {
             // Insere virgula apenas se nao eh a primeira iteracao
-            if( it != itSinais[si].pulsos )
-                fprintf(arqSaida, ", ");
+            if ( it != it_signal[si].pulsos )
+                fprintf(file, ", ");
 
-            switch(it->valor)
+            switch (it->valor)
             {
-                case VAL_1:
-                    fprintf(arqSaida, "1(%llu)", it->tempo);
-                    break;
-                case VAL_0:
-                    fprintf(arqSaida, "0(%llu)", it->tempo);
-                    break;
-                case VAL_X:
-                    fprintf(arqSaida, "x(%llu)", it->tempo);
-                    break;
-                case VAL_Z:
-                    fprintf(arqSaida, "z(%llu)", it->tempo);
-                    break;
-                case VAL_BLANK:
-                    break;
+            case VAL_1:
+                fprintf(file, "1(%llu)", it->tempo);
+                break;
+            case VAL_0:
+                fprintf(file, "0(%llu)", it->tempo);
+                break;
+            case VAL_X:
+                fprintf(file, "x(%llu)", it->tempo);
+                break;
+            case VAL_Z:
+                fprintf(file, "z(%llu)", it->tempo);
+                break;
+            case VAL_H:
+                fprintf(file, "1(%llu)", it->tempo);
+                break;
+            case VAL_L:
+                fprintf(file, "0(%llu)", it->tempo);
+                break;
+            case VAL_BLANK:
+                break;
             }
 
             it++;
         }
 
-        fprintf(arqSaida, "}\n");
+        fprintf(file, "}\n");
 
         si++;
     }
@@ -189,65 +211,130 @@ void salvarSinais(Sinais* sinaisSaida, FILE* arqSaida)
 void save_vcd(Module* module, Sinais* sinais, FILE* file)
 {
     int i;
-    char s;
-    Tempo t;
+    char s = '%';
 
+    time_t epoch = time(NULL);
+    struct tm* dt = localtime(&epoch);
     fprintf(file, "$date\n");
-    fprintf(file, "  \n");
+    fprintf(file, "  %04d/%02d/%02d", (dt->tm_year + 1900), (dt->tm_mon + 1), dt->tm_mday);
+    fprintf(file, " - %02d:%02d\n", dt->tm_hour, dt->tm_min);
     fprintf(file, "$end\n");
+
     fprintf(file, "$version\n");
     fprintf(file, "  progres %s\n", _PROGRES_VERSION);
     fprintf(file, "$end\n");
-    fprintf(file, "$comment\n  $end\n");
-    fprintf(file, "$timescale ");
-    fprintf(file, "%llu ns ", module->timescale_number); // TODO
-    fprintf(file, "$end\n");
-    fprintf(file, "$scope module %s ", "nome"); // TODO
+    fprintf(file, "$comment\n");
+    fprintf(file, "  \n"); // ?
     fprintf(file, "$end\n");
 
-    s = '#';
+    fprintf(file, "$timescale ");
+    fprintf(file, "%llu", module->timescale_number);
+    fprintf(file, "%s ", get_str_from_timeunit(module->timescale_unit));
+    fprintf(file, "$end\n");
+
+    fprintf(file, "$scope module %s ", module->name);
+    fprintf(file, "$end\n");
+
     for ( i=0; i < sinais->quantidade; i++ )
     {
-        fprintf(file, "$var %s 1 ", "wire"); // TODO
-        fprintf(file, "%c ", s);
+        fprintf(file, "$var %s 1 ", "wire"); // TODO: number of bits
+        fprintf(file, "%c ", (s + i));
         fprintf(file, "%s $end\n", sinais->lista[i].nome);
-        s++;
     }
 
     fprintf(file, "$upscope $end\n");
     fprintf(file, "$enddefinitions $end\n");
-    fprintf(file, "$dumpvars\n");
 
-    s = '#';
+    fprintf(file, "$dumpvars\n");
     for ( i=0; i < sinais->quantidade; i++ )
     {
-        switch (sinais->lista[i].pulsos->valor)
+        fprintf(file, "%c", get_char_from_logic_value(sinais->lista[i].pulsos->valor));
+        fprintf(file, "%c\n", (s + i));
+    }
+    fprintf(file, "$end\n");
+
+    Evento* fila = NULL;
+    Tempo t = 0;
+    
+    Transicao* list_tran = NULL;
+    Transicao* it = NULL;
+    Pulso* p;
+    ValorLogico v;
+
+    for ( i=0 ; i < sinais->quantidade ; i++ )
+    {
+        t = 0;
+        p = sinais->lista[i].pulsos;
+
+        while (p->valor != VAL_BLANK)
         {
-            case VAL_1:
-                fprintf(file, "1%c\n", s);
-                break;
-            case VAL_0:
-                fprintf(file, "0%c\n", s);
-                break;
-            case VAL_X:
-                fprintf(file, "x%c\n",s);
-                break;
-            case VAL_Z:
-                fprintf(file, "z%c\n", s);
-                break;
-            case VAL_BLANK:
-                break;
+            insert_event(&fila,
+                         t,
+                         EVT_NET_TRANSITION,
+                         module->list_output_net->itens[i], // !! caution!
+                         NULL,
+                         p->valor);
+
+            t += p->tempo * module->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
+
+            p++;
+        }
+
+        insert_event(&fila,
+                     t,
+                     EVT_NET_TRANSITION,
+                     module->list_output_net->itens[i], // !! caution!
+                     NULL,
+                     VAL_X);
+    }
+
+    t = 0;
+
+    while (fila)
+    {
+        t = fila->quando;
+
+        list_tran = pop_event(&fila);
+        it = list_tran;
+
+        while (it)
+        {
+            it->fio->dynamic_value = it->novoValor;
+            it = it->proximo;
+        }
+
+        // #time
+        fprintf(file, "#%llu\n", t);
+
+        for ( i=0 ; i < module->list_output_net->tamanho ; i++ )
+        {
+            v = module->list_output_net->itens[i]->dynamic_value;
+            fprintf(file, "%c", get_char_from_logic_value(v));
+            fprintf(file, "%c\n", (char) (s + i));
         }
     }
 
-    fprintf(file, "$end\n");
-    
-    t = 0;
+    // final line
+    fprintf(file, "#%llu\n", (Tempo) (t+1));
+}
 
-    fprintf(file, "#%llu\n", t);
-
-    // pegar a menor:
-    //sinais->lista[i].duracaoTotal
-
-    // TODO
+char get_char_from_logic_value(ValorLogico value)
+{
+    switch (value)
+    {
+        case VAL_1:
+            return '1';
+        case VAL_0:
+            return '0';
+        case VAL_X:
+            return 'x';
+        case VAL_Z:
+            return 'z';
+        case VAL_H:
+            return '1';
+        case VAL_L:
+            return '0';
+        default:
+            return 'x';
+    }
 }

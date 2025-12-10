@@ -1,9 +1,9 @@
-/*
- Progres - Simulador de circuitos combinacionais em Verilog
- (C) 2014, 2015 Tiago Matos Santos
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
 
- Under the terms of the MIT license.
-*/
+ Under terms of the MIT license.
+*********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,114 +12,163 @@
 #include "progres.h"
 #include "sinais.h"
 #include "estruturas.h"
+#include "strutil.h"
 #include "lex.h"
 #include "erros.h"
 #include "mem.h"
 
-Module* novoCircuito()
+Module* new_module()
 {
     Module *circuito = (Module*) xmalloc(sizeof(Module));
 
-    circuito->listaFiosEntrada = novaListaComponente();
-    circuito->sinaisEntrada = NULL;
+    circuito->list_input_net = new_list_component();
+    circuito->sinais_input = NULL;
 
-    circuito->listaFiosSaida = novaListaComponente();
-    circuito->sinaisSaida = NULL;
+    circuito->list_output_net = new_list_component();
+    circuito->sinais_output = NULL;
 
-    circuito->listaWires = novaListaComponente();
+    circuito->list_wire_net = new_list_component();
 
-    circuito->listaPortas = novaListaComponente();
+    circuito->list_logic_gate = new_list_component();
 
-    circuito->listaReg.total = 0;
-    circuito->listaReg.itens = NULL;
+    circuito->list_register.total = 0;
+    circuito->list_register.itens = NULL;
 
-    circuito->listaParam.total = 0;
-    circuito->listaParam.itens = NULL;
+    circuito->list_param.total = 0;
+    circuito->list_param.itens = NULL;
 
     circuito->timescale_number = (Tempo) 1;
     circuito->timescale_unit = UN_NS;
     circuito->timescale_precision_number = (Tempo) 1;
     circuito->timescale_precision_unit = UN_NS;
 
+    copy(circuito->name, "");
+
     return circuito;
 }
 
-void adicionaEntrada(Module* circ, Componente comp)
+void free_module(Module** mod)
+{
+    if ( *mod == NULL )
+        return;
+
+    delete_list_component( &((*mod)->list_input_net) );
+    delete_list_component( &((*mod)->list_output_net) );
+    delete_list_component( &((*mod)->list_logic_gate) );
+    delete_list_component( &((*mod)->list_wire_net) );
+
+    if ( (*mod)->list_param.itens )
+        free( (*mod)->list_param.itens );
+
+    if ( (*mod)->list_register.itens )
+        free( (*mod)->list_register.itens );
+
+    if ( (*mod)->sinais_input )
+        free( (*mod)->sinais_input );
+    
+    if ( (*mod)->sinais_output )
+        free( (*mod)->sinais_output );
+    
+    free( *mod );
+    *mod = NULL;
+}
+
+void add_input(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
 
-    insereComponente(circ->listaFiosEntrada, comp);
+    insert_component(circ->list_input_net, comp);
 }
 
-void adicionaSaida(Module* circ, Componente comp)
+void add_output(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
 
-    insereComponente(circ->listaFiosSaida, comp);
+    insert_component(circ->list_output_net, comp);
 }
 
-void adicionaWire(Module* circ, Componente comp)
+void add_wire(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
 
-    insereComponente(circ->listaWires, comp);
+    insert_component(circ->list_wire_net, comp);
 }
 
-void adicionaPorta(Module* circ, Componente comp)
+void add_gate(Module* circ, Component* comp)
 {
     if(!circ || !comp)
         return;
 
-    insereComponente(circ->listaPortas, comp);
+    insert_component(circ->list_logic_gate, comp);
 }
 
-ListaComponente* novaListaComponente()
+ListComponent* new_list_component()
 {
-    return novaListaComponenteTamanho(0);
+    return new_list_component_of_size(0);
 }
 
-ListaComponente* novaListaComponenteTamanho(int tamanho)
+ListComponent* new_list_component_of_size(unsigned int size)
 {
-    int i;
-    ListaComponente *listaCp;
+    unsigned int i;
+    ListComponent* list_comp;
 
-    listaCp = (ListaComponente*) xmalloc(sizeof(ListaComponente));
-    listaCp->tamanho = tamanho;
+    list_comp = (ListComponent*) xmalloc( sizeof(ListComponent) );
+    list_comp->tamanho = size;
 
-    if(tamanho == 0) {
-        listaCp->itens = NULL;
+    if (size == 0) {
+        list_comp->itens = NULL;
     }
     else {
-        listaCp->itens = (Componente*) xmalloc(sizeof(Componente) * tamanho);
+        list_comp->itens = (Component**) xmalloc( sizeof(Component*) * size );
 
-        for(i=0 ; i<tamanho ; i++)
-            listaCp->itens[i] = NULL;
+        for ( i = 0; i < size; i++ ) {
+            list_comp->itens[i] = NULL;
+        }
     }
 
-    return listaCp;
+    return list_comp;
 }
 
-void insereComponente(ListaComponente* ls, Componente cp)
+void delete_list_component(ListComponent** ppl)
 {
-    if(!ls)
-        ls = novaListaComponente();
+    if ( *ppl == NULL )
+        return;
+    
+    if ( (*ppl)->itens ) {
+        int i;
 
-    if(ls->tamanho == 0) {
-        ls->tamanho++;
-        ls->itens = (Componente*) xmalloc(sizeof(Componente));
+        for ( i = 0; i < (*ppl)->tamanho; i++ )
+        {
+            if ( (*ppl)->itens[i] ) {
+                delete_componente( &((*ppl)->itens[i]) );
+            }
+        }
+
+        free( (*ppl)->itens );
+    }
+
+    free(*ppl);
+    *ppl = NULL;
+}
+
+void insert_component(ListComponent* ls, Component* cp)
+{
+    ls->tamanho++;
+
+    if (ls->tamanho == 1) {
+        ls->itens = (Component**) xmalloc(sizeof(Component*));
     }
     else {
-        ls->tamanho++;
-        ls->itens = (Componente*) xrealloc( ls->itens, sizeof(Componente) * ls->tamanho );
+        ls->itens = (Component**) xrealloc( ls->itens, sizeof(Component*) * ls->tamanho );
     }
 
     ls->itens[ls->tamanho - 1] = cp;
 }
 
-void addRegister(Module* circ, const char* name, unsigned int size, int is_signed)
+void add_register(Module* circ, const char* name, unsigned int size, int is_signed)
 {
     Register* reg = (Register*) xmalloc(sizeof(Register));
 
@@ -128,20 +177,20 @@ void addRegister(Module* circ, const char* name, unsigned int size, int is_signe
     reg->is_signed = is_signed;
     reg->value = (unsigned int) VAL_0;
 
-    if(circ->listaReg.total == 0) {
-        circ->listaReg.total++;
-        circ->listaReg.itens = (Register**) xmalloc(sizeof(Register*));
+    if(circ->list_register.total == 0) {
+        circ->list_register.total++;
+        circ->list_register.itens = (Register**) xmalloc(sizeof(Register*));
     }
     else {
-        circ->listaReg.total++;
-        circ->listaReg.itens = (Register**) xrealloc(circ->listaReg.itens,
-                                                     sizeof(Register*) * circ->listaReg.total);
+        circ->list_register.total++;
+        circ->list_register.itens = (Register**) xrealloc(circ->list_register.itens,
+                                                     sizeof(Register*) * circ->list_register.total);
     }
 
-    circ->listaReg.itens[circ->listaReg.total - 1] = reg;
+    circ->list_register.itens[circ->list_register.total - 1] = reg;
 }
 
-Register* get_reg_by_name(ListaReg list, const char* name)
+Register* get_reg_by_name(ListRegister list, const char* name)
 {
     int i;
 
@@ -157,22 +206,22 @@ Register* get_reg_by_name(ListaReg list, const char* name)
     return NULL;
 }
 
-void addParam(Module* circ, Param* param)
+void add_param(Module* circ, Param* param)
 {
-    if(circ->listaParam.total == 0) {
-        circ->listaParam.total++;
-        circ->listaParam.itens = (Param**) xmalloc(sizeof(Param*));
+    if(circ->list_param.total == 0) {
+        circ->list_param.total++;
+        circ->list_param.itens = (Param**) xmalloc(sizeof(Param*));
     }
     else {
-        circ->listaParam.total++;
-        circ->listaParam.itens = (Param**) xrealloc(circ->listaParam.itens,
-                                                     sizeof(Param*) * circ->listaParam.total);
+        circ->list_param.total++;
+        circ->list_param.itens = (Param**) xrealloc(circ->list_param.itens,
+                                                     sizeof(Param*) * circ->list_param.total);
     }
 
-    circ->listaParam.itens[circ->listaParam.total - 1] = param;
+    circ->list_param.itens[circ->list_param.total - 1] = param;
 }
 
-Param* get_param_by_name(ListaParam list, const char* name)
+Param* get_param_by_name(ListParam list, const char* name)
 {
     int i;
 
@@ -188,7 +237,7 @@ Param* get_param_by_name(ListaParam list, const char* name)
     return NULL;
 }
 
-int contemComponente(ListaComponente* ls, Componente cp)
+int has_component_by_pointer(ListComponent* ls, Component* cp)
 {
     int i;
 
@@ -204,26 +253,53 @@ int contemComponente(ListaComponente* ls, Componente cp)
     return 0;
 }
 
-Componente novoComponente(const char* nome, t_operador porta)
+Component* new_component(const char* nome, Role role)
 {
-    Componente c = (Componente) xmalloc(sizeof(struct st_componente));
+    Component* c = (Component*) xmalloc( sizeof(Component) );
 
     copy(c->nome, nome);
-    c->tipo.operador = porta;
-    c->tipo.atraso = 0; // atraso default eh zero
+    c->atributos.role = role;
+    c->atributos.delay = 0; // atraso default eh zero
 
-    c->listaEntrada = novaListaComponente();
-    c->sinalEntrada = NULL;
+    c->list_input = NULL;
+    c->input_signal = NULL;
+    c->list_output = NULL;
+    c->output_signal = NULL;
 
-    c->listaSaida = novaListaComponente();
-    c->sinalSaida = NULL;
+    if (role != ROLE_LITERAL_NUMBER) {
+        c->list_input = new_list_component();
+        c->list_output = new_list_component();
+    }
 
-    c->valorDinamico = VAL_X;
+    c->dynamic_value = VAL_X;
 
     return c;
 }
 
-Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
+void delete_componente(Component** c)
+{
+    if ( !(*c) )
+        return;
+
+    if ( (*c)->list_input ) {
+        if ( (*c)->list_input->itens ) {
+            free( (*c)->list_input->itens );
+        }
+        free( (*c)->list_input );
+    }
+
+    if ( (*c)->list_output ) {
+        if ( (*c)->list_output->itens ) {
+            free( (*c)->list_output->itens );
+        }
+        free( (*c)->list_output );
+    }
+
+    free(*c);
+    *c = NULL;
+}
+
+Component* get_component_by_name(ListComponent* ls, const char* nome)
 {
     int i;
 
@@ -239,34 +315,34 @@ Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome)
     return NULL;
 }
 
-Componente getPortaPorNome(Module* circ, const char* nome)
+Component* get_gate_by_name(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
 
-    return getComponenteItemPorNome(circ->listaPortas, nome);
+    return get_component_by_name(circ->list_logic_gate, nome);
 }
 
-Componente getWirePorNome(Module* circ, const char* nome)
+Component* get_wire_by_name(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
 
-    return getComponenteItemPorNome(circ->listaWires, nome);
+    return get_component_by_name(circ->list_wire_net, nome);
 }
 
-Componente getInputPorNome(Module* circ, const char* nome)
+Component* get_input_by_name(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
 
-    return getComponenteItemPorNome(circ->listaFiosEntrada, nome);
+    return get_component_by_name(circ->list_input_net, nome);
 }
 
-Componente getOutputPorNome(Module* circ, const char* nome)
+Component* get_output_by_name(Module* circ, const char* nome)
 {
     if(!circ || !nome)
         return NULL;
 
-    return getComponenteItemPorNome(circ->listaFiosSaida, nome);
+    return get_component_by_name(circ->list_output_net, nome);
 }

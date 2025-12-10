@@ -5,11 +5,83 @@
  */
 
 #ifndef EVENTOS_H
-
 #define EVENTOS_H
 
 #include "estruturas.h"
 #include "sinais.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** @brief Enum to represent Verilog system tasks.
+ */
+typedef enum {
+    // Display and Monitoring Tasks
+    TASK_DISPLAY,    // $display
+    TASK_WRITE,      // $write
+    TASK_MONITOR,    // $monitor
+    TASK_STIMULUS,   // $stb, $stw
+    TASK_FDISPLAY,   // $fdisplay
+    TASK_FWRITE,     // $fwrite
+    TASK_FMONITOR,   // $fmonitor
+    TASK_READMEMB,   // $readmemb
+    TASK_READMEMH,   // $readmemh
+    TASK_WRITEMEMB,  // $writememb
+    TASK_WRITEMEMH,  // $writememh
+
+    // Simulation Control Tasks
+    TASK_FINISH,     // $finish
+    TASK_STOP,       // $stop
+    TASK_RESET,      // $reset (deprecated)
+
+    // Dumping and Logging Tasks
+    TASK_DUMPFILE,   // $dumpfile
+    TASK_DUMPVARS,   // $dumpvars
+
+    // Time and Delay Tasks
+    TASK_TIME,       // $time
+    TASK_REALTIME,   // $realtime
+    TASK_Q_TIME,     // $q_time (deprecated)
+    TASK_SETUP,      // $setup
+    TASK_HOLD,       // $hold
+    TASK_SETUPHOLD,  // $setuphold
+    TASK_SKEW,       // $skew
+    TASK_WIDTH,      // $width
+    TASK_NOCHANGE,   // $nochange
+
+    // Logic Value Tasks
+    TASK_COUNTZEROS, // $countones (not $countzeros directly, but for counting bits)
+    TASK_ONEHOT,     // $onehot
+    TASK_ISUNKNOWN,  // $isunknown
+
+    // File I/O Tasks
+    TASK_FOPEN,      // $fopen
+    TASK_FCLOSE,     // $fclose
+    TASK_FGETC,      // $fgetc
+    TASK_UNGETC,     // $ungetc
+    TASK_FEOF,       // $feof
+    TASK_FFLUSH,     // $fflush
+    TASK_FSCANF,     // $fscanf
+    TASK_FGETS,      // $fgets
+
+    // Conversion and Utility Tasks
+    TASK_ITOR,       // $itor
+    TASK_RTOI,       // $rtoi
+    TASK_CAST,       // $cast (SystemVerilog, but common)
+    TASK_RANDOM,     // $random
+    TASK_SPRINTF,    // $sformatf (Verilog/SystemVerilog equivalent of sprintf)
+
+    // Deprecated or Less Common Tasks
+    TASK_DECAY,      // $decay (deprecated)
+    TASK_PULLUP,     // $pullup (deprecated)
+    TASK_PULLDOWN,   // $pulldown (deprecated)
+    TASK_NOOP,       // Placeholder for no specific task
+
+    TASK_UNKNOWN,
+    TASK_UNSUPPORTED,
+    IS_NOT_A_TASK
+} SystemTask;
 
 typedef struct st_transicao Transicao;
 
@@ -19,12 +91,27 @@ typedef struct st_transicao Transicao;
           Esta lista é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
  */
 struct st_transicao {
-    Componente fio; // Indica o componente sobre o qual o evento se origina, apenas fios
+    SystemTask task_type;
+    char* task_code;
+
+    Component* fio; // Indica o componente sobre o qual o evento se origina, apenas wires
+    Register* reg; // in case of a transition in register value
     ValorLogico novoValor; // Novo valor lógico a ser setado
+
     Transicao* proximo;
 };
 
 typedef Transicao* ListTransicao;
+
+/**
+ * @brief Enum para identificação dos tipos de evento que podem ocorrer na simulação.
+ */
+typedef enum en_event_kind
+{
+    EVT_NET_TRANSITION,
+    EVT_REG_ATTRIBUTION,
+    EVT_SYS_TASK,
+} EventKind;
 
 typedef struct st_evento Evento;
 
@@ -35,43 +122,77 @@ typedef struct st_evento Evento;
  */
 struct st_evento {
     Tempo quando; // Indica o instante de ocorrência do evento
+
+    EventKind kind;
+
     Transicao* listaTransicao;
     Transicao* ultimaTransicao;
+
     Evento* proximo;
 };
 
 typedef Evento* FilaEventos;
 
-/**
- * @brief Desalocar da memória a lista passada.
+/** @brief Desalocar da memória a lista passada.
+ *  @param list Ponteiro para a lista de transições a ser desalocada.
+ *  @note A lista é desalocada, mas não os componentes ou registradores
+ *        que ela possa estar referenciando.
  */
 void delete_list_transicao(Transicao** list);
 
-/**
- * @brief Adiciona à fila um evento no tempo t que faz a transição do valor de comp para o novoValor.
-          Mas se houver já na fila evento marcado para t, apenas adiciona à lista de transições
-          desse evento, a nova transição.
- */
-void insereEvento(Evento **fila, Tempo t, Componente comp, ValorLogico novoValor);
-
-/**
- * @brief Cria um novo evento, sem transições definidas, no tempo t.
- * @param t Tempo em que ocorre o evento.
+/** @brief Create a new event (or queue) at time 0 without a transi list.
+ *         This is used to initialize the event queue, if needed.
+ *         The only event will have no transitions defined.
  * @return Ponteiro para Evento alocado.
  */
-Evento* new_evento_at(Tempo t);
+Evento* new_empty_event();
 
-/**
- * @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
-          Se não houver evento nesse tempo t, retornará NULL.
- * @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
+/** @brief Insere um novo evento na fila de eventos, ordenando-o pelo tempo.
+ *         Se já houver um evento no tempo t, adiciona à lista de transições desse evento.
+ * @param fila Ponteiro para a fila de eventos.
+ * @param t Tempo em que ocorre o evento.
+ * @param sys_task Tipo de SystemTask, conforme SystemTask.
+ * @param code String com algum dado ou código associado à task em questão.
+ * @return void
  */
-Transicao* getTransicoesEm(Evento* fila, Tempo t);
+void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code);
 
-/**
- * @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
- * @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
+/** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
+ *         comp para o novoValor. Mas, se houver já na fila evento marcado para t,
+ *         apenas adiciona à lista de transições desse evento, a nova transição.
  */
-Transicao* popEvento(Evento **fila);
+void insert_event(Evento **fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor);
+
+/** @brief Libera completamente a fila de eventos da memória.
+ *  @param fila Ponteiro para a fila de eventos a ser liberada.
+ *  @return void
+ */
+void delete_event_queue(Evento **fila);
+
+/** @brief Cria um novo evento, sem transições definidas, no tempo t.
+ *  @param t Tempo em que ocorre o evento.
+ *  @param k Tipo do evento, conforme EventKind.
+ *  @return Ponteiro para Evento alocado.
+ */
+Evento* new_event_at(Tempo t, EventKind k);
+
+/** @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
+ *         Se não houver evento nesse tempo t, retornará NULL.
+ *  @param fila Ponteiro para a fila de eventos.
+ *  @param t Tempo em que se deseja obter as transições.
+ *  @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
+ */
+Transicao* get_transitions_at_time(Evento* fila, Tempo t);
+
+/** @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
+ *  @param fila Ponteiro para a fila de eventos.
+ *  @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
+ *  @note A fila é atualizada, removendo o evento mais próximo.
+ */
+Transicao* pop_event(Evento** fila);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // EVENTOS_H

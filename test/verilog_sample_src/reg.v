@@ -28,4 +28,8 @@ reg [EXTRA_FLAGS_END:EXTRA_FLAGS_START] r_extra_flag;
 
 reg signed [63:0] number_signed;
 
+reg r_0, r_1, r_2, r_3, r_4, r_5, r_6, r_7;
+
+// There are 20 registers in this module
+
 endmodule

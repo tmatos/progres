@@ -4,38 +4,49 @@
  */
 
 #ifndef ESTRUTURAS_H
-
 #define ESTRUTURAS_H
 
 #include "sinais.h"
 
-/** @brief Enumeração para o definir as classes de componente do circuito de acordo com suas funções.
- */
-typedef enum en_operador {
-    op_and,
-    op_or,
-    op_xor,
-    op_nand,
-    op_nor,
-    op_xnor,
-    op_not,
-    op_buf,
-    wire,
-    output,
-    input,
-    assign
-} t_operador;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/** @brief Estrutura que define a porta. Qual sua função logica e seu delay.
+/** @brief Enumeração para possibilitar a distinção ou definição das classes de
+ *  componentes do circuito de acordo com seus papéis (roles) ou funções.
  */
-typedef struct st_tipo {
-    t_operador operador;
-    Tempo atraso;
-} t_tipo;
+typedef enum en_role {
+    ROLE_AND,
+    ROLE_OR,
+    ROLE_XOR,
+    ROLE_NAND,
+    ROLE_NOR,
+    ROLE_XNOR,
+    ROLE_NOT,
+    ROLE_BUF,
+    ROLE_BUF_IF0,
+    ROLE_BUF_IF1,
+    ROLE_NOT_IF0,
+    ROLE_NOT_IF1,
+    ROLE_LITERAL_NUMBER,
+    ROLE_WIRE,
+    ROLE_OUTPUT,
+    ROLE_INPUT,
+    ROLE_ASSIGN
+} Role;
 
-#define MAX_PARAM_NAME_SIZE 64
+/** @brief Struct que permite definir alguns atributos de um componente do circuito.
+ *  Como: qual seu papel/função e qual seu delay (caso seja pertinente e exista).
+ */
+typedef struct st_atributos {
+    Role role;
+    Tempo delay;
+} Atributos;
+
+#define MAX_PARAM_NAME_SIZE 64 // tamanho máximo do nome de um parâmetro
 
 /** @brief Estrutura para parametros.
+ *  @note Cada parâmetro tem um nome, um valor e uma flag que indica se é local ou não.
  */
 typedef struct st_param {
     char name[MAX_PARAM_NAME_SIZE];
@@ -44,44 +55,46 @@ typedef struct st_param {
 } Param;
 
 /** @brief Estrutura para a lista de parametros de um module.
+ *  @note A lista de parametros é constituída de um array de ponteiros para Param, e não uma array de Param.
  */
 typedef struct st_list_param {
     int total;
     Param** itens;
-} ListaParam;
+} ListParam;
 
-typedef struct st_componente_list ListaComponente;
+typedef struct st_componente_list ListComponent;
 
-typedef struct st_componente * Componente;
+#define MAX_COMPONENT_NAME_SIZE 32 // tamanho máximo do nome de um componente
 
-#define MAX_COMPONENTE_NAME_SIZE 32
-
-/** @brief Estrutura que representa um componente do circuito (uma porta lógica)
+/** @brief Estrutura que representa um componente do circuito (ex.: uma porta lógica).
+ *  @note Esta estrutura é genérica, podendo ser uma porta lógica, um wire, uma entrada ou uma saída.
  */
-struct st_componente {
-    char nome[MAX_COMPONENTE_NAME_SIZE];
-    t_tipo tipo;
+typedef struct st_component {
+    char nome[MAX_COMPONENT_NAME_SIZE];
+    Atributos atributos;
 
-    ListaComponente* listaEntrada;
-    Sinal* sinalEntrada;
+    ListComponent* list_input;
+    Sinal* input_signal;
 
-    ListaComponente* listaSaida;
-    Sinal* sinalSaida;
+    ListComponent* list_output;
+    Sinal* output_signal;
 
-    ValorLogico valorDinamico; // fio
-};
+    ValorLogico dynamic_value; // in case of a net type (or literal number)
+    unsigned int size; // size in bits
+} Component;
 
 /** @brief Estrutura que representa uma lista de componentes.
-           Na verdade ela guarda o total e um array de ponteiros para as portas.
+    @note Na realidade, ela guarda o total e um array de ponteiros para as portas.
  */
 struct st_componente_list {
     int tamanho;
-    Componente* itens;
+    Component** itens;
 };
 
-#define MAX_REGISTER_NAME_SIZE 32
+#define MAX_REGISTER_NAME_SIZE 32 // tamanho máximo do nome de um registrador
 
 /** @brief Representação de um registrador.
+ *  @note Esta estrutura guarda o nome, tamanho, se é com sinal e o valor armazenado.
  */
 typedef struct st_reg {
     char name[MAX_REGISTER_NAME_SIZE];
@@ -91,28 +104,31 @@ typedef struct st_reg {
 } Register;
 
 /** @brief Estrutura para a lista de registradores de um module.
+ *  @note A lista de registradores é constituída de um array de ponteiros para Register, e não uma array de Register.
  */
-typedef struct st_list_reg {
+typedef struct st_list_register {
     int total;
     Register** itens;
-} ListaReg;
+} ListRegister;
+
+#define MAX_MODULE_NAME 1024
 
 /** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
  */
 typedef struct st_module {
-    ListaComponente* listaFiosEntrada;
-    Sinais* sinaisEntrada;
+    char name[MAX_MODULE_NAME];
 
-    ListaComponente* listaFiosSaida;
-    Sinais* sinaisSaida;
+    ListComponent* list_input_net;
+    Sinais* sinais_input;
 
-    ListaComponente* listaWires;
+    ListComponent* list_output_net;
+    Sinais* sinais_output;
 
-    ListaComponente* listaPortas;
+    ListComponent* list_wire_net;
+    ListComponent* list_logic_gate;
 
-    ListaReg listaReg;
-
-    ListaParam listaParam;
+    ListRegister list_register;
+    ListParam list_param;
 
     Tempo timescale_number;
     UnidTempo timescale_unit;
@@ -120,9 +136,16 @@ typedef struct st_module {
     UnidTempo timescale_precision_unit;
 } Module;
 
-/** @brief Inicialização de uma estrutura de circuito.
+/** @brief Alocação e inicialização de uma struct Module.
+ *  @return Um ponteiro para a struct Module alocada e pre-inicializada.
  */
-Module* novoCircuito();
+Module* new_module();
+
+/** @brief Dealocate all the memory of a Module structure.
+ *  @param mod Pointer to a pointer of Module type.
+ *  @return void
+ */
+void free_module(Module** mod);
 
 /** @brief Inserir um registrador novo no circuito.
  *  @param circ Ponteiro para o circuito.
@@ -131,83 +154,143 @@ Module* novoCircuito();
  *  @param is_signed Verdadeiro caso seja com sinal.
  *  @return void
  */
-void addRegister(Module* circ, const char* name, unsigned int size, int is_signed);
+void add_register(Module* circ, const char* name, unsigned int size, int is_signed);
 
 /** @brief Obter um Register de uma lista usando o nome como chave.
- *  @param list Uma struct 'ListaReg'.
+ *  @param list Uma struct 'ListRegister'.
  *  @param name String com o nome dado ao registrador. 
  *  @return Um ponteiro para a struct 'Register' correspondente, caso encontrado.
  *          NULL, caso nao seja encontrada uma correspondencia.
  */
-Register* get_reg_by_name(ListaReg list, const char* name);
+Register* get_reg_by_name(ListRegister list, const char* name);
 
 /** @brief Inserir um parametro novo no circuito.
+ *  @param circ Ponteiro para o circuito.
+ *  @param param Ponteiro para a struct 'Param' a ser inserida.
+ *  @return void
  */
-void addParam(Module* circ, Param* param);
+void add_param(Module* circ, Param* param);
 
 /** @brief Obter um Param de uma lista usando o nome como chave.
- *  @param list Uma struct 'ListaParam'.
+ *  @param list Uma struct 'ListParam'.
  *  @param name String com o nome dado ao param. 
  *  @return Um ponteiro para a struct 'Param' correspondente, caso encontrado.
  *          NULL, caso nao seja encontrada uma correspondencia.
  */
-Param* get_param_by_name(ListaParam list, const char* name);
+Param* get_param_by_name(ListParam list, const char* name);
 
-/** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito
+/** @brief Adiciona a entrada representada por comp à lista de fios de entrada do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param comp Ponteiro para um Component, já inicializado, que representa a entrada.
+ *  @return void
  */
-void adicionaEntrada(Module* circ, Componente comp);
+void add_input(Module* circ, Component* comp);
 
-/** @brief Adiciona a saída representada por comp à lista de fios de saída do circuito
+/** @brief Adiciona a saída representada por comp à lista de fios de saída do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param comp Ponteiro para um Component, já inicializado, que representa a saída.
+ *  @return void
  */
-void adicionaSaida(Module* circ, Componente comp);
+void add_output(Module* circ, Component* comp);
 
-/** @brief Adiciona o fio representada por comp à lista de fios (wires) do circuito
+/** @brief Adiciona o fio representada por comp à lista de fios (wires) do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param comp Ponteiro para um Component, já inicializado, que representa o wire.
+ *  @return void
  */
-void adicionaWire(Module* circ, Componente comp);
+void add_wire(Module* circ, Component* comp);
 
-/** @brief Adiciona a porta lógica representada por comp à lista de portas do circuito
+/** @brief Adiciona a porta lógica representada por comp à lista de portas do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param comp Ponteiro para um Component, já inicializado, que representa a porta lógica.
+ *  @return void
  */
-void adicionaPorta(Module* circ, Componente comp);
+void add_gate(Module* circ, Component* comp);
 
-/** @brief Retorna a porta que tem o nome indicado, se houver na lista de portas do circuito
+/** @brief Retorna a porta lógica que tem o nome indicado, se houver na lista de portas do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param nome String com o nome da porta lógica a ser buscado.
+ *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Componente getPortaPorNome(Module* circ, const char* nome);
+Component* get_gate_by_name(Module* circ, const char* nome);
 
 /** @brief Retorna o wire que tem o nome indicado, se houver.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param nome String com o nome do wire a ser buscado.
+ *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Componente getWirePorNome(Module* circ, const char* nome);
+Component* get_wire_by_name(Module* circ, const char* nome);
 
-/** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito
+/** @brief Retorna a entrada que tem o nome indicado, se houver na lista de fios de entrada do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param nome String com o nome da entrada a ser buscado.
+ *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Componente getInputPorNome(Module* circ, const char* nome);
+Component* get_input_by_name(Module* circ, const char* nome);
 
-/** @brief Retorna a saída que tem o nome indicado, se houver na lista de fios de saída do circuito
+/** @brief Retorna a saída que tem o nome indicado, se houver na lista de fios de saída do circuito.
+ *  @param circ Ponteiro para um Module, já inicializado.
+ *  @param nome String com o nome da saída a ser buscado.
+ *  @return Um ponteiro para a struct Component correspondente, caso encontrado, ou NULL se não houver.
  */
-Componente getOutputPorNome(Module* circ, const char* nome);
+Component* get_output_by_name(Module* circ, const char* nome);
 
-/** @brief Inicialização de uma estrutura de componente.
- *  @return Um tipo Componente que é um ponteiro para a struc.
+/** @brief Inicialização da struct de um componente do circuito.
+ *  @param nome String com nome do Component a ser criado.
+ *  @param role Papel do Component a ser criado, segundo a enum Role.
+ *  @return Um ponteiro para a struct Component alocada e pre-inicializada.
  */
-Componente novoComponente(const char* nome, t_operador porta);
+Component* new_component(const char* nome, Role role);
+
+/** @brief Libera completamente um Componente da memória.
+ *  @param c Ponteiro para um ponteiro da strcut Componente.
+ *  @return void
+ *  @note A lista de entradas e saídas do componente também é liberada.
+ */
+void delete_componente(Component** c);
 
 /** @brief Inicializa a estrutura de lista de componentes vazia.
+ *  @return Um ponteiro para a lista de componentes alocada.
  */
-ListaComponente* novaListaComponente();
+ListComponent* new_list_component();
 
-/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado.
+/** @brief Inicializa a estrutura de lista de componentes com o tamanho indicado para itens.
+ *  @param size Tamanho a ser pré alocado para itens.
+ *  @return Um ponteiro para a lista de componentes alocada.
  */
-ListaComponente* novaListaComponenteTamanho(int tamanho);
+ListComponent* new_list_component_of_size(unsigned int size);
+
+/** @brief Libera completamente uma lista de componentes da memória.
+ *  @param ppl Ponteiro para um ponteiro da struct ListComponent.
+ *  @return void
+ *  @note A lista de componentes e todos os componentes contidos nela são liberados.
+ */
+void delete_list_component(ListComponent** ppl);
 
 /** @brief Insere o componente na lista de componentes.
+ *  @param ls Ponteiro para a lista de componentes.
+ *  @param cp Ponteiro para o componente a ser inserido.
+ *  @return void
+ *  @note A cada nova inserção a lista é realocada para aumentar o tamanho do array de itens.
  */
-void insereComponente(ListaComponente* ls, Componente cp);
+void insert_component(ListComponent* ls, Component* cp);
 
 /** @brief Retorna verdadeiro se o componente indicado está contido na lista.
+ *  @param ls Ponteiro para a lista de componentes.
+ *  @param cp Ponteiro para o componente a ser verificado.
+ *  @return 1 se o componente estiver na lista, 0 caso contrário.
  */
-int contemComponente(ListaComponente* ls, Componente cp);
+int has_component_by_pointer(ListComponent* ls, Component* cp);
 
-/** @brief Retorna o componente da lista indica que possui o referido nome, se houver.
+/** @brief Retorna o componente da lista indicada que possui o referido nome, se houver.
+ *  @param ls Ponteiro para a lista de componentes.
+ *  @param nome Nome do componente a ser buscado.
+ *  @return Um ponteiro para o componente encontrado, ou NULL se não houver.
  */
-Componente getComponenteItemPorNome(ListaComponente* ls, const char* nome);
+Component* get_component_by_name(ListComponent* ls, const char* nome);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ESTRUTURAS_H

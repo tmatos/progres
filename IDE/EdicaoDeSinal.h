@@ -1,3 +1,9 @@
+/********************************
+ Progres - Verilog Simulator
+ (C) 2014-2025 Tiago Matos
+
+ Under terms of the MIT license.
+*********************************/
 
 #ifndef EDICAODESINAL_H
 #define EDICAODESINAL_H
@@ -19,6 +25,7 @@ class EdicaoDeSinal : public wxDialog
         virtual ~EdicaoDeSinal();
 
         void setFile(wxString filePath);
+        void closeFile();
 
         //(*Declarations(EdicaoDeSinal)
         wxButton* btnSalvar;
@@ -36,6 +43,8 @@ class EdicaoDeSinal : public wxDialog
         void OnbtnDescartarClick(wxCommandEvent& event);
         void OnbtnSalvarClick(wxCommandEvent& event);
         //*)
+
+        void keyPressed(wxKeyEvent& event);
 
         void OnClose(wxCloseEvent& event);
 
