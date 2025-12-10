@@ -25,13 +25,12 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew update
-        brew upgrade
         brew install m4 autoconf automake libtool
 
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Generate configure
+    - name: Generate configure (case Linux or macOS)
       if: runner.os == 'Linux' || runner.os == 'macOS'
       run: autoreconf --install
     
