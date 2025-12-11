@@ -45,14 +45,21 @@ public:
     */
 
 private:
+    void drawGrid(wxDC& canvas, int x0, int y0, int height);
+    void drawSignals(wxDC& canvas, int x0, int y0);
+
     Sinais* ondas;
     EdicaoDeSinal* editor;
 
     wxColour corDoTexto;
     wxColour corDaLinha;
     
-    int hzTam = 15;
+    int horizontSize = 15; // comprimeto horizontal de uma unidade de tempo
+    int verticalSize = 15; // altura de um pulso entre 0 e 1
+    int signalSpacement = 30; // espacamento vertical entre os sinais
 
+    int maxVerticalLines = 120;
+        
     int guide = 0;
     
     DECLARE_EVENT_TABLE()

@@ -148,106 +148,132 @@ void SinaisDrawPane::render(wxDC&  canvas)
         return;
     }
 
-    int i;
-    int j;
-    unsigned int k;
-    int l;
-
-    hzTam = 15; // comprimeto horizontal de uma unidade de tempo
-    const int vrTam = 15; // altura de um pulso entre 0 e 1
-    const int spacmtSinal = 30; // espaçamento vertical entre os sinais
-
-    // drawing start coords
+    // drawing start coordinates just for signals area
     int x0 = 70;
-    int y0 = 30; 
-
-    int x = x0;
-    int y = y0;
+    int y0 = 30;
 
     int yTexto = y0;
 
-    // nomes das entradas
+    // draw signal names
     canvas.SetTextForeground(corDoTexto);
-
-    for ( i=0 ; i < ondas->quantidade ; i++ )
+    for ( int i=0 ; i < ondas->quantidade ; i++ )
     {
         canvas.DrawText( wxString::FromUTF8(ondas->lista[i].nome),
                          wxPoint(5, yTexto) );
-        yTexto = yTexto + spacmtSinal;
+        yTexto = yTexto + signalSpacement;
     }
 
-    canvas.SetPen(*wxLIGHT_GREY_PEN);
+    drawGrid(canvas, x0, y0, yTexto);
 
-    // linhas horizontais do grid
-    for ( i=0 ; i < ondas->quantidade+1 ; i++ )
+    drawSignals(canvas, x0, y0);
+
+    if (guide > x0) // draw vertical guide line defined by mouse click
     {
-        canvas.DrawLine(    5, y0 + (i * spacmtSinal) - 7,
-                         2000, y0 + (i * spacmtSinal) - 7 );
+        canvas.SetPen(*wxGREEN_PEN);
+        canvas.DrawLine( guide, 1,
+                         guide, 700 );
+    }
+}
+
+void SinaisDrawPane::drawGrid(wxDC& canvas, int x0, int y0, int height)
+{
+    int xCoord;
+    int yCoord;
+    int yOffset;
+    int maxHorizonLineSize = maxVerticalLines * horizontSize;
+
+    canvas.SetPen(*wxLIGHT_GREY_PEN); // grid line colors
+
+    // draw horizontal lines
+    for ( int i=0 ; i < (ondas->quantidade + 1) ; i++ )
+    {
+        yCoord = y0 + (i * signalSpacement) - 7;
+        canvas.DrawLine(                  0, yCoord,
+                         maxHorizonLineSize, yCoord );
     }
 
-    // linhas verticais do grid e numeração
-    canvas.SetTextForeground(*wxBLUE);
-
+    // font for the time axis numbering
     wxFont font(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
     canvas.SetFont(font);
+    canvas.SetTextForeground(*wxBLUE);
 
-    for ( j=0 ; j < 120  ; j++ )
+    // draw vertical lines and time axis numbering
+    for ( int j=0 ; j < maxVerticalLines  ; j++ )
     {
+        xCoord = x0 + (j * horizontSize);
+        yOffset = 10;
+
         if ( j%5 == 0 )
         {
             canvas.DrawText( wxString::Format(_("%i"), j),
-                             wxPoint(x0 + (j*hzTam) + 2, 10 ) );
+                             wxPoint(xCoord + 2, yOffset ) );
         }
 
-        canvas.DrawLine( x0 + (j*hzTam), 10,
-                         x0 + (j*hzTam), yTexto+10 );
+        canvas.DrawLine( xCoord, yOffset,
+                         xCoord, height );
     }
+}
 
-    y = y0;
+void SinaisDrawPane::drawSignals(wxDC& canvas, int x0, int y0)
+{
+    int x;
+    int y;
+    int horizontalIncrement;
+    Pulso* it;
 
     canvas.SetPen(wxPen(corDaLinha));
+    y = y0;
 
-    for ( i=0 ; i < ondas->quantidade ; i++ )
+    for ( int i=0 ; i < ondas->quantidade ; i++ )
     {
         x = x0;
-
-        Pulso* it = ondas->lista[i].pulsos;
+        it = ondas->lista[i].pulsos;
 
         while ( it->valor != VAL_BLANK )
         {
+            horizontalIncrement = horizontSize * it->tempo;
+
             switch (it->valor)
             {
             case VAL_1:
                 canvas.DrawLine( x                      , y,
-                                 x + (hzTam * it->tempo), y );
+                                 x + horizontalIncrement, y );
                 break;
             case VAL_0:
-                canvas.DrawLine( x                      , y + vrTam,
-                                 x + (hzTam * it->tempo), y + vrTam );
+                canvas.DrawLine( x                      , y + verticalSize,
+                                 x + horizontalIncrement, y + verticalSize );
+                break;
+            case VAL_H:
+                canvas.DrawLine( x                      , y,
+                                 x + horizontalIncrement, y );
+                break;
+            case VAL_L:
+                canvas.DrawLine( x                      , y + verticalSize,
+                                 x + horizontalIncrement, y + verticalSize );
                 break;
             case VAL_X:
-                for ( k=0; k < it->tempo; k++ )
+                for ( unsigned int k=0 ; k < it->tempo ; k++ )
                 {
-                    canvas.DrawLine( x + hzTam*(k)      , y,
-                                     x + hzTam*(1 + k), y + vrTam );
+                    canvas.DrawLine( x + horizontSize*(k)    , y,
+                                     x + horizontSize*(1 + k), y + verticalSize );
 
-                    canvas.DrawLine( x + hzTam*(k)    , y + vrTam,
-                                     x + hzTam*(1 + k), y );
+                    canvas.DrawLine( x + horizontSize*(k)    , y + verticalSize,
+                                     x + horizontSize*(1 + k), y );
                 }
                 break;
             case VAL_Z:
-                for ( k=0; k < it->tempo; k++ )
+                for ( unsigned int k=0 ; k < it-> tempo; k++ )
                 {
-                    for ( l=0; l < hzTam; l+=2 )
+                    for ( int l=0 ; l < horizontSize ; l += 2 )
                     {
-                        canvas.DrawLine( x + k*(hzTam) + l, y,
-                                         x + k*(hzTam) + l, y + vrTam - 1 );
+                        canvas.DrawLine( x + k*(horizontSize) + l, y,
+                                         x + k*(horizontSize) + l, y + verticalSize - 1 );
                     }
 
-                    for ( l=1; l < hzTam; l+=2 )
+                    for ( int l=1 ; l < horizontSize ; l+=2 )
                     {
-                        canvas.DrawLine( x + k*(hzTam) + l, y,
-                                         x + k*(hzTam) + l, y + vrTam - 3 );
+                        canvas.DrawLine( x + k*(horizontSize) + l, y,
+                                         x + k*(horizontSize) + l, y + verticalSize - 3 );
                     }
                 }
                break;
@@ -255,19 +281,10 @@ void SinaisDrawPane::render(wxDC&  canvas)
                break;
             }
 
-            x = x + (hzTam * it->tempo);
-
+            x = x + horizontalIncrement;
             it++;
         }
 
-        y = y + spacmtSinal;
+        y = y + signalSpacement;
     }
-
-    if (guide > x0)
-    {
-        canvas.SetPen(*wxGREEN_PEN);
-        canvas.DrawLine( guide, 1,
-                         guide, 700 );
-    }
-
 }
