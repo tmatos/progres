@@ -47,6 +47,10 @@ public:
 private:
     void drawGrid(wxDC& canvas, int x0, int y0, int height);
     void drawSignals(wxDC& canvas, int x0, int y0);
+    void drawPulsesForZero(wxDC& canvas, int x, int y, unsigned int quantity);
+    void drawPulsesForOne(wxDC& canvas, int x, int y, unsigned int quantity);
+    void drawPulsesForX(wxDC& canvas, int x, int y, unsigned int quantity);
+    void drawPulsesForZ(wxDC& canvas, int x, int y, unsigned int quantity);
 
     Sinais* ondas;
     EdicaoDeSinal* editor;

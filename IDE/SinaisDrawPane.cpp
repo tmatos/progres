@@ -218,7 +218,6 @@ void SinaisDrawPane::drawSignals(wxDC& canvas, int x0, int y0)
 {
     int x;
     int y;
-    int horizontalIncrement;
     Pulso* it;
 
     canvas.SetPen(wxPen(corDaLinha));
@@ -231,60 +230,78 @@ void SinaisDrawPane::drawSignals(wxDC& canvas, int x0, int y0)
 
         while ( it->valor != VAL_BLANK )
         {
-            horizontalIncrement = horizontSize * it->tempo;
-
             switch (it->valor)
             {
             case VAL_1:
-                canvas.DrawLine( x                      , y,
-                                 x + horizontalIncrement, y );
+                drawPulsesForOne(canvas, x, y, it->tempo);
                 break;
             case VAL_0:
-                canvas.DrawLine( x                      , y + verticalSize,
-                                 x + horizontalIncrement, y + verticalSize );
+                drawPulsesForZero(canvas, x, y, it->tempo);
                 break;
             case VAL_H:
-                canvas.DrawLine( x                      , y,
-                                 x + horizontalIncrement, y );
+                drawPulsesForOne(canvas, x, y, it->tempo);
                 break;
             case VAL_L:
-                canvas.DrawLine( x                      , y + verticalSize,
-                                 x + horizontalIncrement, y + verticalSize );
+                drawPulsesForZero(canvas, x, y, it->tempo);
                 break;
             case VAL_X:
-                for ( unsigned int k=0 ; k < it->tempo ; k++ )
-                {
-                    canvas.DrawLine( x + horizontSize*(k)    , y,
-                                     x + horizontSize*(1 + k), y + verticalSize );
-
-                    canvas.DrawLine( x + horizontSize*(k)    , y + verticalSize,
-                                     x + horizontSize*(1 + k), y );
-                }
+                drawPulsesForX(canvas, x, y, it->tempo);
                 break;
             case VAL_Z:
-                for ( unsigned int k=0 ; k < it-> tempo; k++ )
-                {
-                    for ( int l=0 ; l < horizontSize ; l += 2 )
-                    {
-                        canvas.DrawLine( x + k*(horizontSize) + l, y,
-                                         x + k*(horizontSize) + l, y + verticalSize - 1 );
-                    }
-
-                    for ( int l=1 ; l < horizontSize ; l+=2 )
-                    {
-                        canvas.DrawLine( x + k*(horizontSize) + l, y,
-                                         x + k*(horizontSize) + l, y + verticalSize - 3 );
-                    }
-                }
+                drawPulsesForZ(canvas, x, y, it->tempo);
                break;
             case VAL_BLANK:
                break;
             }
 
-            x = x + horizontalIncrement;
+            x = x + (horizontSize * it->tempo);
             it++;
         }
 
         y = y + signalSpacement;
+    }
+}
+
+
+void SinaisDrawPane::drawPulsesForZero(wxDC& canvas, int x, int y, unsigned int quantity)
+{
+    canvas.DrawLine( x                          , y + verticalSize,
+                     x + quantity * horizontSize, y + verticalSize );
+
+}
+
+void SinaisDrawPane::drawPulsesForOne(wxDC& canvas, int x, int y, unsigned int quantity)
+{
+    canvas.DrawLine( x                          , y,
+                     x + quantity * horizontSize, y );
+}
+
+void SinaisDrawPane::drawPulsesForX(wxDC& canvas, int x, int y, unsigned int quantity)
+{
+    for ( unsigned int k=0 ; k < quantity ; k++ )
+    {
+        canvas.DrawLine( x + horizontSize*(k)    , y,
+                         x + horizontSize*(1 + k), y + verticalSize );
+
+        canvas.DrawLine( x + horizontSize*(k)    , y + verticalSize,
+                         x + horizontSize*(1 + k), y );
+    }
+}
+
+void SinaisDrawPane::drawPulsesForZ(wxDC& canvas, int x, int y, unsigned int quantity)
+{
+    for ( unsigned int k=0 ; k < quantity ; k++ )
+    {
+        for ( int l=0 ; l < horizontSize ; l += 2 )
+        {
+            canvas.DrawLine( x + k*(horizontSize) + l, y,
+                             x + k*(horizontSize) + l, y + verticalSize - 1 );
+        }
+
+        for ( int l=1 ; l < horizontSize ; l += 2 )
+        {
+            canvas.DrawLine( x + k*(horizontSize) + l, y,
+                             x + k*(horizontSize) + l, y + verticalSize - 3 );
+        }
     }
 }
