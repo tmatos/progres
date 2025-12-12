@@ -21,7 +21,7 @@ int anexa(char* str, char c)
     tmp[1] = '\0';
 
     // TODO: use safer implement.
-    strcat(str, tmp);
+    strncat(str, tmp, 2);
 
     // TODO: some checks...
 

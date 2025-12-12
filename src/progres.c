@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     save_outputs_to_path(str_wave_out_filepath, sinais_saidas);
 
     // export of VCD file
-    strcat(str_wave_out_filepath, ".vcd");
+    strncat(str_wave_out_filepath, ".vcd", 4);
     FILE* f_wave_out = fopen(str_wave_out_filepath, "w");
 
     if (!f_wave_out) {
