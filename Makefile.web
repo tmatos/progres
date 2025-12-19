@@ -4,33 +4,26 @@ INC_DIR = .
 OBJ_DIR = obj
 WASM_OBJ_DIR = wasm_obj
 
-CC = gcc
+CC = $(shell command -v emcc || echo "")
 CFLAGS = -I$(INC_DIR) -Wall -Wextra
 
-TARGET = progres
-
 SRC = $(shell find $(SRC_DIR) -name '*.c')
-
 OBJ = $(patsubst $(SRC)/%.c, $(OBJ_DIR)/%.o, $(SRC))
-
-TARGET = progres
+WASM_OBJ = $(patsubst $(OBJ)/%,$(WASM_OBJ_DIR)/%,$(OBJ))
 
 WEB_TARGET = webprogres
 
-WASM_OBJ = $(patsubst $(OBJ)/%,$(WASM_OBJ_DIR)/%,$(OBJ))
+ifeq (, $(CC))
+$(error "Emscripten was not found! Install or activate it to build the WebAssembly target.")
+else
+$(info ---)
+$(shell $(CC) -v)
+$(info ---)
+endif
 
-default: makedir all
+default: all
 
-debug: CFLAGS += -gdwarf-4 -g3
-debug: default
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-$(TARGET): $(OBJ) 
-	$(CC) -o $@ $^ $(CFLAGS)
-
-wasm: CC = emcc
+.PHONY: wasm
 wasm: makewebdir $(WEB_TARGET)
 
 $(WASM_OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h 
@@ -43,19 +36,13 @@ $(WEB_TARGET): $(WASM_OBJ)
 makewebdir:
 	mkdir -p $(WASM_OBJ_DIR)
 
-.PHONY: makedir
-makedir:
-	mkdir -p $(OBJ_DIR)
-
 .PHONY: all
-all: $(TARGET)
+all: wasm 
 
 .PHONY: clean
 clean:
-	rm -f $(OBJ_DIR)/*.o
-	rm -df $(OBJ_DIR)
-	rm -f $(TARGET)
 	rm -f $(WASM_OBJ_DIR)/*.o
 	rm -df $(WASM_OBJ_DIR)
 	rm -f $(WEB_TARGET).js
 	rm -f $(WEB_TARGET).wasm
+
