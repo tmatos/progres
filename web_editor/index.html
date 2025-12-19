@@ -18,7 +18,7 @@
 <div class="code-window">
   <header class="code-title">top.v</header>
 
-    <textarea id="code" name="code" class="code-editor">
+  <textarea id="code" name="code" class="code-editor">
 // somador completo
 
 module top(a, b, c_in, s, c_out);
@@ -38,7 +38,9 @@ module top(a, b, c_in, s, c_out);
   or(c_out, wa1, wa2, wa3);
 
 endmodule
-    </textarea>
+  </textarea>
+
+  <textarea id="output" name="output" rows="8" class="terminal-output"></textarea>
 
 </div>
 
@@ -53,6 +55,35 @@ endmodule
   });
   editor.setOption("theme", "twilight");
 </script>
+
+<script type='text/javascript'>
+  var Module = {
+    preRun: [],
+    postRun: [],
+    print: (function() {
+      var element = document.getElementById('output');
+      if (element)
+        element.value = ''; // clear browser cache
+      return function(text) {
+        if (arguments.length > 1)
+          text = Array.prototype.slice.call(arguments).join(' ');
+        console.log(text);
+        if (element) {
+          element.value += text + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      };
+    }) (),
+    printErr: function(text) {
+      if (arguments.length > 1)
+        text = Array.prototype.slice.call(arguments).join(' ');
+      console.error(text);
+    },
+    arguments: ['-v']
+  };
+</script>
+
+<script async type="text/javascript" src="webprogres.js"></script>
 
 </body>
 
