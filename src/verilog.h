@@ -39,11 +39,12 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
 
 /** @brief Cria uma estrutura de dados representando um module,
            a partir do primeiro no arquivo com o codigo fonte em Verilog.
- *  @param file_path String com o caminho do arquivo a ser processado.
+ *  @param f_verilog_source Handler para o arquivo a ser processado.
  *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
+ *  @param file_path Caminho do arquivo fonte Verilog (optional).
  *  @return Pointer para estrutura de dados do circuito ou NULL em caso de erro.
  */
-Module* load_module(const char* file_path, Evento** initial_task_events);
+Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path);
 
 /** @brief Parsing de definições de range.
  *  @param it Endereço para o iterador dos tokens.
