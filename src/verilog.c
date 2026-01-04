@@ -135,7 +135,7 @@ load_module_header_bad_return:
     return 0;
 }
 
-Module* load_module(const char* file_path, Evento** initial_task_events)
+Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path)
 {
     Component* in;
     Component* out;
@@ -143,7 +143,6 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     Component* net;
     Token* it = NULL;
     Module* circuito = NULL;
-    FILE* f_verilog_source;
 
     int range_msb;
     int range_lsb;
@@ -155,16 +154,6 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     VerilogError err;
 
     int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
-
-    f_verilog_source = fopen(file_path, "r");
-
-    if (!f_verilog_source) {
-        print("Impossibilitado de abrir o arquivo: %s\n", file_path);
-
-        return NULL;
-    }
-    
-    print("Abrindo o arquivo de circuito: %s\n", file_path);
 
     // lista de todos os identificadores
     ListToken* identifiers = new_list_token();
@@ -189,7 +178,10 @@ Module* load_module(const char* file_path, Evento** initial_task_events)
     if (!tokens)
         goto bad_return;
 
-    copy(tokens->file, file_path);
+    if (!file_path)
+        copy(tokens->file, "");
+    else
+        copy(tokens->file, file_path);
 
     // pre-processing pass to handle compiler directives, returns 1 if ok
     if (!pre_processor(tokens))

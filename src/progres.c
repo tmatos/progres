@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
 {
     int arg_offset = 0;
     char* str_verilog_source;
+    FILE* f_verilog_source;
 
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
@@ -54,10 +55,18 @@ int main(int argc, char* argv[])
     }
 
     str_verilog_source = argv[1 + arg_offset];
+    f_verilog_source = fopen(str_verilog_source, "r");
 
+    if (!f_verilog_source) {
+        print("Impossibilitado de abrir o arquivo: %s\n", f_verilog_source);
+        exit(1);
+    }
+    
+    print("Abrindo o arquivo de circuito: %s\n", f_verilog_source);
+    
     Evento* initial_task_events = NULL;
 
-    circuit = load_module(str_verilog_source, &initial_task_events);
+    circuit = load_module(f_verilog_source, &initial_task_events, str_verilog_source);
 
     if (!circuit) {
         print("Erro com o carregamento do codigo fonte do cicuito.\n");
