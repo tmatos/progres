@@ -23,3 +23,6 @@ stamp-h1
 config.h
 Makefile
 history/
+*.wasm
+webprogres.html
+webprogres.js
