@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Circuit Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -15,10 +16,10 @@
 
 <body>
 
-<div class="code-window">
-  <header class="code-title">top.v</header>
+  <div class="code-window">
+    <header id="code-window-title" class="code-title">top.v</header>
 
-  <textarea id="code" name="code" class="code-editor">
+    <textarea id="code" name="code" class="code-editor">
 // somador completo
 
 module top(a, b, c_in, s, c_out);
@@ -37,53 +38,166 @@ module top(a, b, c_in, s, c_out);
   and(wa3, b, c_in);
   or(c_out, wa1, wa2, wa3);
 
-endmodule
-  </textarea>
+endmodule</textarea>
 
-  <textarea id="output" name="output" rows="8" class="terminal-output"></textarea>
+    <textarea readonly id="output" name="output" rows="8" spellcheck="false" class="terminal-output"></textarea>
 
-</div>
+    <button onclick="createAndPassFile()">SAVE</button>
+    
+    <button onclick="runMain()">RUN</button>
 
-<script>
-  var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-    lineNumbers: true,
-    matchBrackets: true,
-    mode: {
-      name: "verilog",
-      noIndentKeywords: ["package"]
-    }
-  });
-  editor.setOption("theme", "twilight");
-</script>
+    <button onclick="downloadCode()">DOWNLOAD</button>
 
-<script type='text/javascript'>
-  var Module = {
-    preRun: [],
-    postRun: [],
-    print: (function() {
-      var element = document.getElementById('output');
-      if (element)
-        element.value = ''; // clear browser cache
-      return function(text) {
-        if (arguments.length > 1)
-          text = Array.prototype.slice.call(arguments).join(' ');
-        console.log(text);
+    <button onclick="doCall()">TEST CALL</button>
+  </div>
+
+  <script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: true,
+      matchBrackets: true,
+      mode: {
+        name: "verilog",
+        noIndentKeywords: ["package"]
+      }
+    });
+
+    editor.setOption("theme", "twilight");
+
+    editor.on('change', function() {
+      editor.save();
+    });
+  </script>
+
+  <script type='text/javascript'>
+
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: (function () {
+        var element = document.getElementById('output');
         if (element) {
-          element.value += text + "\n";
-          element.scrollTop = element.scrollHeight; // focus on bottom
+          element.value = '';
         }
-      };
-    }) (),
-    printErr: function(text) {
-      if (arguments.length > 1)
-        text = Array.prototype.slice.call(arguments).join(' ');
-      console.error(text);
-    },
-    arguments: ['-v']
-  };
-</script>
 
-<script async type="text/javascript" src="webprogres.js"></script>
+        return function (text) {
+          if (arguments.length > 1) {
+            text = Array.prototype.slice.call(arguments).join(' ');
+          }
+          console.log(text);
+          if (element) {
+            element.value += text + "\n";
+            element.scrollTop = element.scrollHeight; // focus on bottom
+          }
+        };
+      })(),
+      printErr: function (text) {
+        if (arguments.length > 1) {
+          text = Array.prototype.slice.call(arguments).join(' ');
+        }
+        console.error(text);
+      },
+      onRuntimeInitialized: function() {
+        // Setup FS API
+        FS.mkdir('/persist');
+        FS.mount(IDBFS, {}, '/persist');
+        // Load persistant files (sync from IDBFS to MEMFS), will do nothing on first run
+        FS.syncfs(true, function(err) {
+          if (err) {
+            console.error('Error: ' + err);
+          }
+        });
+        FS.chdir('/persist');
+      },
+      arguments: ['-v']
+    };
+
+    function downloadCode() {
+      const content = document.getElementById('code').value;
+      const fileBlob = createFileBlob(content, 'text/plain');
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(fileBlob);
+      link.download = 'top.v';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    function doCall() {
+      var str_code = document.getElementById('code').value;
+      var ptr = Module.ccall(
+        'w_load_module',        // name of C function
+        'number',               // return type
+        ['string', 'int'],           // argument types
+        [str_code, str_code.length]  // actual arguments
+      );
+      alert('Loaded module at pointer: ' + ptr);
+    }
+
+    function runMain() {
+      clearOutput();
+      var arguments = ['/persist/top.v'];
+      Module.callMain(arguments);
+    }
+
+    function saveDataArrayToFS(dataArray) {
+      // Convert the numeric array back to a string for display in JS
+      const decoder = new TextDecoder('utf-8');
+      const textContent = decoder.decode(dataArray);
+
+      // Store the file
+      let filename = 'top.v';
+      let stream = FS.open(filename, 'w+');
+      FS.write(stream, dataArray, 0, dataArray.length, 0);
+      FS.close(stream);
+
+      // Persist the changes (sync from MEMFS to IDBFS)
+      FS.syncfs(false, function(err) {
+        if (err) {
+          console.error('Error: ' + err);
+        }
+      });
+      // Check the file in IndexedDB section of the browser's web storage inspector. OK
+    }
+
+    async function createAndPassFile() {
+      const content = document.getElementById('code').value;
+      const fileName = 'top.v';
+      const mimeType = 'text/plain';
+
+      const fileBlob = createFileBlob(content, mimeType);
+      console.log(`Created Blob: ${fileName} (${fileBlob.size} bytes, type: ${fileBlob.type})`);
+
+      // Read the Blob data into a format WebAssembly can use (ArrayBuffer)
+      try {
+        // Use the built-in Blob method to get data as an ArrayBuffer
+        const arrayBuffer = await fileBlob.arrayBuffer();
+
+        // WebAssembly functions often take typed arrays like Uint8Array
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        console.log("Passing Uint8Array to wasm  ...");
+
+        saveDataArrayToFS(uint8Array);
+
+      } catch (error) {
+        console.error("Error reading Blob data:", error);
+        document.getElementById('output').textContent = "Error processing file: " + error.message;
+      }
+    }
+
+    function createFileBlob(content, mimeType) {
+      return new Blob([content], { type: mimeType });
+    }
+
+    function clearOutput() {
+      document.getElementById('output').value = '';
+    }
+
+  </script>
+
+  <script async type="text/javascript" src="webprogres.js"></script>
 
 </body>
 
