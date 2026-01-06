@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
     str_verilog_source = argv[1 + arg_offset];
     f_verilog_source = open_or_exit(str_verilog_source, "r");
-    print("Abrindo o arquivo de circuito: %s\n", f_verilog_source);
+    print("Abrindo o arquivo de circuito: %s\n", str_verilog_source);
     
     Evento* initial_task_events = NULL;
 
