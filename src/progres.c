@@ -55,13 +55,7 @@ int main(int argc, char* argv[])
     }
 
     str_verilog_source = argv[1 + arg_offset];
-    f_verilog_source = fopen(str_verilog_source, "r");
-
-    if (!f_verilog_source) {
-        print("Impossibilitado de abrir o arquivo: %s\n", f_verilog_source);
-        exit(1);
-    }
-    
+    f_verilog_source = open_or_exit(str_verilog_source, "r");
     print("Abrindo o arquivo de circuito: %s\n", f_verilog_source);
     
     Evento* initial_task_events = NULL;
@@ -113,7 +107,7 @@ int main(int argc, char* argv[])
 
     if (!f_wave_out) {
         print("Erro ao tentar abrir arquivo VCD de saida '%s' para gravacao.\n",
-                str_wave_out_filepath);
+              str_wave_out_filepath);
     }
     else {
         save_vcd(circuit, sinais_saidas, f_wave_out);
@@ -121,7 +115,6 @@ int main(int argc, char* argv[])
     }
     
     print("Arquivo VCD tambem salvo, em '%s'.\n", str_wave_out_filepath);
-
 
     delete_event_queue(&initial_task_events);
     free_signal_list(&sinais_entradas);
@@ -134,18 +127,9 @@ int main(int argc, char* argv[])
 Sinais* load_inputs_from_path(const char* path)
 {
     Sinais* sinais_entradas = NULL;
-
-    FILE* f_wave_in = fopen(path, "r");
-
-    if (!f_wave_in) {
-        print("Impossibilitado de abrir o arquivo de entrada: %s\n", path);
-        exit(1);
-    }
-
+    FILE* f_wave_in = open_or_exit(path, "r");
     print("Abrindo o arquivo de entrada: %s\n", path);
-
     sinais_entradas = load_input_signals(f_wave_in);
-
     fclose(f_wave_in);
 
     return sinais_entradas;
@@ -153,15 +137,27 @@ Sinais* load_inputs_from_path(const char* path)
 
 void save_outputs_to_path(const char* path, Sinais* outputs)
 {
-    FILE* f_wave_out = fopen(path, "w");
-
-    if (!f_wave_out) {
-        print("Erro ao abrir arquivo de saida '%s' para gravacao.\n", path);
-        exit(1);
-    }
-    
+    FILE* f_wave_out = open_or_exit(path, "w");
     save_signals(outputs, f_wave_out);
     fclose(f_wave_out);
     
     print("Arquivo de saida salvo em '%s'.\n", path);
+}
+
+FILE* open_or_exit(const char* path, const char* mode)
+{
+    FILE* f = fopen(path, mode);
+
+    if (!f) {
+        print("Erro ao abrir o arquivo: %s", path);
+        if ( mode[0] == 'r' )
+            print(" para leitura.\n");
+        else if ( mode[0] == 'w' )
+            print(" para escrita.\n");
+        else
+            print("\n");
+        exit(1);
+    }
+
+    return f;
 }

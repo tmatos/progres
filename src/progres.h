@@ -6,6 +6,8 @@
 #ifndef PROGRES_H
 #define PROGRES_H
 
+#include <stdio.h>
+
 #include "sinais.h"
 
 /// Program version number, as string
@@ -30,5 +32,13 @@ Sinais* load_inputs_from_path(const char* path);
  *  @note This function will write the output signals to a file in out custom format.
  */
 void save_outputs_to_path(const char* path, Sinais* outputs);
+
+/** @brief Open a file with the given path and mode, or exit the program if it fails.
+ *  @param path Path to the file to be opened.
+ *  @param mode Mode in which to open the file (e.g., "r" for read, "w" for write).
+ *  @return A pointer to the opened FILE object.
+ *  @note If the file cannot be opened, this function will print an error message and terminate the program.
+ */
+FILE* open_or_exit(const char* path, const char* mode);
 
 #endif // PROGRES_H
