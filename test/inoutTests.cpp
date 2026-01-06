@@ -199,8 +199,14 @@ public:
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
+    FILE* file_v = NULL;
 
-    circuit = load_module("./verilog_sample_src/bufgates.v", &q);
+    std::string path_file_v = "./verilog_sample_src/bufgates.v";
+
+    file_v = fopen(path_file_v.c_str(), "r");
+    CPPUNIT_ASSERT(file_v);
+
+    circuit = load_module(file_v, &q, path_file_v.c_str());
     CPPUNIT_ASSERT(circuit);
     
     FILE* f_in = fopen("./inout_sample_files/bufgates.in", "r");

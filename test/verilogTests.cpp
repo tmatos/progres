@@ -51,35 +51,47 @@ public:
 
   void test_load_module_fileEmpty()
   {
+    std::string path_file = "./verilog_sample_src/empty.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/empty.v", &q);
 
-    CPPUNIT_ASSERT( !circuit );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( !mod );
 
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_fileTop_module()
   {
+    std::string path_file = "./verilog_sample_src/top.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/top.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_fileTudo_module()
   {
+    std::string path_file = "./verilog_sample_src/tudo.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/tudo.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_reg_v()
@@ -107,73 +119,96 @@ public:
       {"r_7", 1, 0}
     };
 
+    std::string path_file = "./verilog_sample_src/reg.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/reg.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), circuit->list_register.total );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+    
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
 
-    for ( int i=0 ; i < circuit->list_register.total ; i++ )
+    CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), mod->list_register.total );
+
+    for ( int i=0 ; i < mod->list_register.total ; i++ )
     {
       std::string name = std::get<0>(regs_info[i]);
       unsigned size = std::get<1>(regs_info[i]);
       int is_signed = std::get<2>(regs_info[i]);
-      CPPUNIT_ASSERT( !strcmp(name.c_str(), circuit->list_register.itens[i]->name) );
-      CPPUNIT_ASSERT_EQUAL( size, circuit->list_register.itens[i]->size );
-      CPPUNIT_ASSERT_EQUAL( is_signed, circuit->list_register.itens[i]->is_signed );
+      CPPUNIT_ASSERT( !strcmp(name.c_str(), mod->list_register.itens[i]->name) );
+      CPPUNIT_ASSERT_EQUAL( size, mod->list_register.itens[i]->size );
+      CPPUNIT_ASSERT_EQUAL( is_signed, mod->list_register.itens[i]->is_signed );
     }
 
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_localparam_test_v()
   {
+    std::string path_file = "./verilog_sample_src/localparam_test.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/localparam_test.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT( circuit->list_param.total == 2 );
-    CPPUNIT_ASSERT( !strcmp(circuit->list_param.itens[0]->name, "VER_NUM") );
-    CPPUNIT_ASSERT_EQUAL( circuit->list_param.itens[0]->value, 123 );
-    CPPUNIT_ASSERT( !strcmp(circuit->list_param.itens[1]->name, "_AUTHOR_ID") );
-    CPPUNIT_ASSERT_EQUAL( circuit->list_param.itens[1]->value, 1 );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
+    CPPUNIT_ASSERT( mod->list_param.total == 2 );
+    CPPUNIT_ASSERT( !strcmp(mod->list_param.itens[0]->name, "VER_NUM") );
+    CPPUNIT_ASSERT_EQUAL( mod->list_param.itens[0]->value, 123 );
+    CPPUNIT_ASSERT( !strcmp(mod->list_param.itens[1]->name, "_AUTHOR_ID") );
+    CPPUNIT_ASSERT_EQUAL( mod->list_param.itens[1]->value, 1 );
 
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_named_gates_test_v()
   {
+    std::string path_file = "./verilog_sample_src/named_gates_test.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/named_gates_test.v", &q);
-    
-    CPPUNIT_ASSERT( circuit );
+
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_initial_single_test_v()
   {
+    std::string path_file = "./verilog_sample_src/initial_single_test.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/initial_single_test.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL( 1, circuit->list_param.total );
-    CPPUNIT_ASSERT_EQUAL( 0, circuit->list_param.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( 2, circuit->list_register.total );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)0, circuit->list_register.itens[0]->value );
-    CPPUNIT_ASSERT_EQUAL( (unsigned int)1, circuit->list_register.itens[1]->value );
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
+
+    CPPUNIT_ASSERT_EQUAL( 1, mod->list_param.total );
+    CPPUNIT_ASSERT_EQUAL( 0, mod->list_param.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( 2, mod->list_register.total );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)0, mod->list_register.itens[0]->value );
+    CPPUNIT_ASSERT_EQUAL( (unsigned int)1, mod->list_register.itens[1]->value );
 
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_initial_block_test_v()
   {
+    std::string path_file = "./verilog_sample_src/initial_block_test.v";
     Evento* q = new_empty_event();
-    Module* mod = load_module("./verilog_sample_src/initial_block_test.v", &q);
+
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
 
     const int expected_param_value = 1;
     const int expected_liter_value = 0;
@@ -191,29 +226,37 @@ public:
 
   void test_load_module_display_v()
   {
+    std::string path_file = "./verilog_sample_src/display.v";
     Evento* q = new_empty_event();
-    Module* m = load_module("./verilog_sample_src/display.v", &q);
 
-    CPPUNIT_ASSERT(m);
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod  = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT(mod);
 
     // TODO: more inspections
 
     delete_event_queue(&q);
-    free_module(&m);
+    free_module(&mod);
   }
   
   void test_load_module_assigns_v()
   {
+    std::string path_file = "./verilog_sample_src/assigns.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/assigns.v", &q);
 
-    CPPUNIT_ASSERT( circuit );
-    CPPUNIT_ASSERT_EQUAL(1, circuit->list_input_net->tamanho);
-    CPPUNIT_ASSERT_EQUAL(2, circuit->list_output_net->tamanho);
-    CPPUNIT_ASSERT_EQUAL(2, circuit->list_wire_net->tamanho);
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT( mod );
+    CPPUNIT_ASSERT_EQUAL(1, mod->list_input_net->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, mod->list_output_net->tamanho);
+    CPPUNIT_ASSERT_EQUAL(2, mod->list_wire_net->tamanho);
 
     Component* x;
-    x = circuit->list_output_net->itens[0];
+    x = mod->list_output_net->itens[0];
     // x (output) tem uma entrada que vem de um assign simples
     CPPUNIT_ASSERT_EQUAL(1, x->list_input->tamanho);
     CPPUNIT_ASSERT_EQUAL(ROLE_ASSIGN, x->list_input->itens[0]->atributos.role);
@@ -221,18 +264,22 @@ public:
     // TODO: more inspections
 
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_tri_state_gates_v()
   {
+    std::string path_file = "./verilog_sample_src/tri_state_gates.v";
     Evento* q = new_empty_event();
-    Module* circuit = load_module("./verilog_sample_src/tri_state_gates.v", &q);
 
-    CPPUNIT_ASSERT(circuit);
+    FILE* f = fopen(path_file.c_str(), "r");
+    CPPUNIT_ASSERT( f );
+
+    Module* mod = load_module(f, &q, path_file.c_str());
+    CPPUNIT_ASSERT(mod);
     
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_module(&mod);
   }
 
   void test_load_module_badverilog_XX_v()
@@ -361,17 +408,21 @@ public:
       "./verilog_sample_src/badverilog_88h.v"
     };
 
+    FILE* f = NULL;
     Evento* q = new_empty_event();
-    Module* circuit = NULL;
+    Module* mod = NULL;
 
     for ( std::string path : list_bad_files )
     {
+      f = fopen(path.c_str(), "r");
+      CPPUNIT_ASSERT( f );
+
       //std::cout << "test_load_module_badverilog_XX_v: " << path << std::endl;
-      circuit = load_module(path.c_str(), &q);
+      mod = load_module(f, &q, path.c_str());
 
-      CPPUNIT_ASSERT(!circuit);
+      CPPUNIT_ASSERT(!mod);
 
-      free_module(&circuit);
+      free_module(&mod);
     }
 
     delete_event_queue(&q);
@@ -395,16 +446,19 @@ public:
       "./verilog_sample_src/badtimescale_11.v"
     };
 
+    FILE* f = NULL;
     Evento* q = new_empty_event();
-    Module* circuit = NULL;
+    Module* mod = NULL;
 
     for ( std::string path : list_bad_files )
     {
-      circuit = load_module(path.c_str(), &q);
+      f = fopen(path.c_str(), "r");
+      CPPUNIT_ASSERT( f );
 
-      CPPUNIT_ASSERT(!circuit);
+      mod = load_module(f, &q, path.c_str());
+      CPPUNIT_ASSERT(!mod);
 
-      free_module(&circuit);
+      free_module(&mod);
     }
 
     delete_event_queue(&q);
