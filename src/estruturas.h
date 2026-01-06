@@ -136,6 +136,19 @@ typedef struct st_module {
     UnidTempo timescale_precision_unit;
 } Module;
 
+/** @brief Estrutura para a lista de modules.
+*/
+typedef struct st_list_module {
+    int total;
+    Module** itens;
+} ListModule;
+
+/** @brief Dealocate all the memory of a ListModule structure.
+ *  @param circuit Pointer to a pointer of ListModule type.
+ *  @return void
+ */
+void free_circuit(ListModule** circuit);
+
 /** @brief Alocação e inicialização de uma struct Module.
  *  @return Um ponteiro para a struct Module alocada e pre-inicializada.
  */

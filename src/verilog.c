@@ -135,13 +135,82 @@ load_module_header_bad_return:
     return 0;
 }
 
-Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path)
+ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path)
+{
+    ListModule* circuit;
+    Module* mod;
+    VerilogError err;
+    Token* it;
+    ListToken* tokens;
+    
+    tokens = tokeniza(f_verilog_source);
+
+    if (!tokens)
+        goto circuit_bad_return;
+
+    if (!file_path)
+        copy(tokens->file, "");
+    else
+        copy(tokens->file, file_path);
+
+    // pre-processing pass to handle compiler directives, returns 1 if ok
+    if (!pre_processor(tokens))
+        goto circuit_bad_return;
+
+    circuit = (ListModule*) xmalloc( sizeof(ListModule) );
+    circuit->total = 0;
+    circuit->itens = NULL;
+
+    mod = NULL;
+    it = tokens->primeiro;
+    while (1)
+    {
+        err = load_module(&it, initial_task_events, &mod);
+
+        if (err == END_OF_TOKENS)
+            break;
+
+        if (err != NO_ERROR)
+            goto circuit_bad_return;
+
+        circuit->total++;
+            
+        circuit->itens = (Module**) xrealloc( circuit->itens,
+                                              sizeof(Module*) * (circuit->total) );
+
+        circuit->itens[circuit->total - 1] = mod;
+    }
+
+    if (circuit->total == 0) {
+        free(circuit);
+        circuit = NULL;
+    }
+
+//success:
+    return circuit;
+
+circuit_bad_return:
+    delete_lista_token(tokens);
+
+    for ( int i=0 ; i < circuit->total ; i++ ) 
+    {
+        free_module( &(circuit->itens[i]) );
+    }
+    if (circuit->itens)
+        free(circuit->itens);
+    free(circuit);
+
+    fclose(f_verilog_source);
+
+    return NULL;
+}
+
+VerilogError load_module(Token** t, Evento** initial_task_events, Module** module_pointer)
 {
     Component* in;
     Component* out;
     Component* gate;
     Component* net;
-    Token* it = NULL;
     Module* circuito = NULL;
 
     int range_msb;
@@ -152,6 +221,9 @@ Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const 
     Evento* initial_tran_events = NULL;
 
     VerilogError err;
+
+    if ( !(*t) )
+        return END_OF_TOKENS;
 
     int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
 
@@ -172,24 +244,10 @@ Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const 
 
     // list for params
     ListToken* list_param = new_list_token();
-
-    ListToken* tokens = tokeniza(f_verilog_source);
-
-    if (!tokens)
-        goto bad_return;
-
-    if (!file_path)
-        copy(tokens->file, "");
-    else
-        copy(tokens->file, file_path);
-
-    // pre-processing pass to handle compiler directives, returns 1 if ok
-    if (!pre_processor(tokens))
-        goto bad_return;
+    
+    Token* it = *t;
 
     circuito = new_module();
-
-    it = tokens->primeiro;
 
     before_module:
 
@@ -592,13 +650,7 @@ Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const 
         else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
 
-            // nao deve haver mais nada alem do endmodule
-            if (it) {
-                show_error_msg("Token inesperado foi encontrado",
-                               it->linha, it->coluna, "nenhum codigo a mais", it->valor);
-                goto bad_return;
-            }
-            
+//load_module_sucess:
             // Liberar a memoria alocada no inicio da funcao
             delete_lista_token(identifiers);
             delete_lista_token(identifiers_to_be);
@@ -606,11 +658,11 @@ Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const 
             delete_lista_token(list_output);
             delete_lista_token(list_wire);
             delete_lista_token(list_param);
-            delete_lista_token(tokens);
 
-            fclose(f_verilog_source);
+            *module_pointer = circuito;
+            *t = it;
 
-            return circuito;
+            return NO_ERROR;
         }
         else if (it->classe == SYM_GRAVE_ACCENT) {
             VerilogError err = load_directive(&it, circuito);
@@ -748,15 +800,16 @@ bad_return:
     delete_lista_token(list_output);
     delete_lista_token(list_wire);
     delete_lista_token(list_param);
-    delete_lista_token(tokens);
 
     if (initial_tran_events)
         delete_event_queue(&initial_tran_events);
 
     free_module(&circuito);
-    fclose(f_verilog_source);
 
-    return NULL;
+    *t = it;
+    *module_pointer = NULL;
+
+    return ERROR_VERILOG;
 }
 
 int is_logic_gate(const Token* t)

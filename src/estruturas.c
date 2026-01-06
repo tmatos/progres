@@ -73,6 +73,23 @@ void free_module(Module** mod)
     *mod = NULL;
 }
 
+void free_circuit(ListModule** circuit)
+{
+    if ( !circuit || *circuit == NULL )
+        return;
+
+    for ( int i = 0 ; i < (*circuit)->total ; i++ )
+    {
+        free_module( &((*circuit)->itens[i]) );
+    }
+
+    if ( (*circuit)->itens )
+        free( (*circuit)->itens );
+
+    free( *circuit );
+    *circuit = NULL;
+}
+
 void add_input(Module* circ, Component* comp)
 {
     if(!circ || !comp)

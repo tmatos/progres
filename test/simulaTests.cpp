@@ -111,7 +111,7 @@ public:
 
   void test_simula_samplefile_andgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -123,13 +123,13 @@ public:
     FILE* f_andgates_in = fopen("./inout_sample_files/andgates.in", "r");
     CPPUNIT_ASSERT( f_andgates_in );
 
-    circuit = load_module(f_andgates_v, &q, s_andgates_v);
+    circuit = load_circuit(f_andgates_v, &q, s_andgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_andgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -151,12 +151,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_orgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -168,13 +168,13 @@ public:
     FILE* f_orgates_in = fopen("./inout_sample_files/orgates.in", "r");
     CPPUNIT_ASSERT( f_orgates_in );
 
-    circuit = load_module(f_orgates_v, &q, s_orgates_v);
+    circuit = load_circuit(f_orgates_v, &q, s_orgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_orgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -196,12 +196,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_nandgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -213,13 +213,13 @@ public:
     FILE* f_nandgates_in = fopen("./inout_sample_files/nandgates.in", "r");
     CPPUNIT_ASSERT( f_nandgates_in );
 
-    circuit = load_module(f_nandgates_v, &q, s_nandgates_v);
+    circuit = load_circuit(f_nandgates_v, &q, s_nandgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_nandgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -241,12 +241,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_norgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -258,13 +258,13 @@ public:
     FILE* f_norgates_in = fopen("./inout_sample_files/norgates.in", "r");
     CPPUNIT_ASSERT( f_norgates_in );
 
-    circuit = load_module(f_norgates_v, &q, s_norgates_v);
+    circuit = load_circuit(f_norgates_v, &q, s_norgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_norgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -286,12 +286,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_notgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -304,13 +304,13 @@ public:
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
     CPPUNIT_ASSERT( f_notgates_in );
 
-    circuit = load_module(f_notgates_v, &q, s_notgates_v);
+    circuit = load_circuit(f_notgates_v, &q, s_notgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_notgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 2, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -355,12 +355,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_bufgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -373,13 +373,13 @@ public:
     FILE* f_bufgates_in = fopen("./inout_sample_files/bufgates.in", "r");
     CPPUNIT_ASSERT( f_bufgates_in );
 
-    circuit = load_module(f_bufgates_v, &q, s_bufgates_v);
+    circuit = load_circuit(f_bufgates_v, &q, s_bufgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_bufgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -412,12 +412,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
   
   void test_simula_samplefile_xorgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -430,13 +430,13 @@ public:
     FILE* f_xorgates_in = fopen("./inout_sample_files/xorgates.in", "r");
     CPPUNIT_ASSERT( f_xorgates_in );
 
-    circuit = load_module(f_xorgates_v, &q, s_xorgates_v);
+    circuit = load_circuit(f_xorgates_v, &q, s_xorgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_xorgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -469,12 +469,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_xnorgates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -487,13 +487,13 @@ public:
     FILE* f_xnorgates_in = fopen("./inout_sample_files/xnorgates.in", "r");
     CPPUNIT_ASSERT( f_xnorgates_in );
 
-    circuit = load_module(f_xnorgates_v, &q, s_xnorgates_v);
+    circuit = load_circuit(f_xnorgates_v, &q, s_xnorgates_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_xnorgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -526,12 +526,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_delays_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinais* sim_outputs = NULL;
@@ -547,7 +547,7 @@ public:
     CPPUNIT_ASSERT(f_delays_in);
     CPPUNIT_ASSERT(f_delays_in_out);
 
-    circuit = load_module(f_delays_v, &q, s_delays_v);
+    circuit = load_circuit(f_delays_v, &q, s_delays_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = load_input_signals(f_delays_in);
@@ -559,7 +559,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(8, outputs->quantidade);
     CPPUNIT_ASSERT(outputs->lista);
 
-    sim_outputs = simula(circuit, inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q);
 
     CPPUNIT_ASSERT(sim_outputs);
     CPPUNIT_ASSERT_EQUAL(8, sim_outputs->quantidade);
@@ -573,12 +573,12 @@ public:
     free_signal_list(&outputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_display_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* sim_outputs = NULL;
     Evento* q = new_empty_event();
@@ -587,24 +587,24 @@ public:
     FILE* f_display_v = fopen(s_display_v, "r");
     CPPUNIT_ASSERT( f_display_v );
 
-    circuit = load_module(f_display_v, &q, s_display_v);
+    circuit = load_circuit(f_display_v, &q, s_display_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = new_signal_list();
     CPPUNIT_ASSERT(inputs);
 
-    sim_outputs = simula(circuit, inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT(sim_outputs);
 
     free_signal_list(&inputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_dumpfile_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* sim_outputs = NULL;
     Evento* q = new_empty_event();
@@ -618,12 +618,12 @@ public:
     inputs = new_signal_list();
     CPPUNIT_ASSERT(inputs);
 
-    circuit = load_module(f_dumpfile_v, &q, s_dumpfile_v);
+    circuit = load_circuit(f_dumpfile_v, &q, s_dumpfile_v);
     CPPUNIT_ASSERT(circuit);
     CPPUNIT_ASSERT(q->listaTransicao);
     CPPUNIT_ASSERT_EQUAL(TASK_DUMPFILE, q->listaTransicao->task_type);
 
-    sim_outputs = simula(circuit, inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT(sim_outputs);
 
     FILE* f_dumpfile_vcd = fopen(s_dumpfile_vcd, "r");
@@ -635,12 +635,12 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   void test_simula_samplefile_tri_state_gates_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -653,13 +653,13 @@ public:
     FILE* f_in = fopen("./inout_sample_files/tri_state_gates.in", "r");
     CPPUNIT_ASSERT( f_in );
 
-    circuit = load_module(f_v, &q, s_v);
+    circuit = load_circuit(f_v, &q, s_v);
     CPPUNIT_ASSERT( circuit );
 
     inputs = load_input_signals(f_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 4, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -686,14 +686,14 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
     
     // TODO: check all cases in the Table 7-5 of Std 1364-2005
   }
 
   void test_simula_samplefile_numbers_v()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Sinais* sim_outputs = NULL;
@@ -709,7 +709,7 @@ public:
     CPPUNIT_ASSERT(f_in);
     CPPUNIT_ASSERT(f_out);
 
-    circuit = load_module(f_v, &q, s_v);
+    circuit = load_circuit(f_v, &q, s_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = load_input_signals(f_in);
@@ -722,7 +722,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, outputs->quantidade);
     CPPUNIT_ASSERT(outputs->lista);
 
-    sim_outputs = simula(circuit, inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT(sim_outputs);
     CPPUNIT_ASSERT_EQUAL(2, sim_outputs->quantidade);
     CPPUNIT_ASSERT(sim_outputs->lista);
@@ -733,7 +733,7 @@ public:
     free_signal_list(&outputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
   /** @brief Single test case that covers all logic paths for compute_buf_if0_gate.

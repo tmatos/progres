@@ -8,6 +8,8 @@
 #include <vector>
 #include <tuple>
 
+#include "lex.h"
+#include "preprocessor.h"
 #include "verilog.h"
 
 class Testes_verilog : public CppUnit::TestFixture
@@ -31,6 +33,22 @@ class Testes_verilog : public CppUnit::TestFixture
 
 public:
 
+  Token* helper_tokenize_preproc(const char* filepath)
+  {
+    FILE* f = fopen(filepath, "r");
+    CPPUNIT_ASSERT( f );
+
+    ListToken* tokens = tokeniza(f);
+    CPPUNIT_ASSERT( tokens );
+
+    int preproc_result = pre_processor(tokens);
+    CPPUNIT_ASSERT_EQUAL( 1, preproc_result );
+
+    fclose(f);
+
+    return tokens->primeiro;
+  }
+
   void test_is_string_logic_gate()
   {
     CPPUNIT_ASSERT( is_string_logic_gate( (char*)"and") );
@@ -53,12 +71,12 @@ public:
   {
     std::string path_file = "./verilog_sample_src/empty.v";
     Evento* q = new_empty_event();
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
-
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( !mod );
+    CPPUNIT_ASSERT_EQUAL( END_OF_TOKENS, err );
 
     delete_event_queue(&q);
     free_module(&mod);
@@ -68,11 +86,10 @@ public:
   {
     std::string path_file = "./verilog_sample_src/top.v";
     Evento* q = new_empty_event();
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
-
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -84,10 +101,10 @@ public:
     std::string path_file = "./verilog_sample_src/tudo.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -122,10 +139,10 @@ public:
     std::string path_file = "./verilog_sample_src/reg.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
-    
-    Module* mod = load_module(f, &q, path_file.c_str());
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
+
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
 
     CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), mod->list_register.total );
@@ -149,10 +166,10 @@ public:
     std::string path_file = "./verilog_sample_src/localparam_test.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
     CPPUNIT_ASSERT( mod->list_param.total == 2 );
     CPPUNIT_ASSERT( !strcmp(mod->list_param.itens[0]->name, "VER_NUM") );
@@ -169,10 +186,10 @@ public:
     std::string path_file = "./verilog_sample_src/named_gates_test.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -184,10 +201,10 @@ public:
     std::string path_file = "./verilog_sample_src/initial_single_test.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
 
     CPPUNIT_ASSERT_EQUAL( 1, mod->list_param.total );
@@ -205,10 +222,10 @@ public:
     std::string path_file = "./verilog_sample_src/initial_block_test.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
 
     const int expected_param_value = 1;
     const int expected_liter_value = 0;
@@ -229,10 +246,10 @@ public:
     std::string path_file = "./verilog_sample_src/display.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod  = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT(mod);
 
     // TODO: more inspections
@@ -246,10 +263,10 @@ public:
     std::string path_file = "./verilog_sample_src/assigns.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT( mod );
     CPPUNIT_ASSERT_EQUAL(1, mod->list_input_net->tamanho);
     CPPUNIT_ASSERT_EQUAL(2, mod->list_output_net->tamanho);
@@ -272,10 +289,10 @@ public:
     std::string path_file = "./verilog_sample_src/tri_state_gates.v";
     Evento* q = new_empty_event();
 
-    FILE* f = fopen(path_file.c_str(), "r");
-    CPPUNIT_ASSERT( f );
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    Module* mod = load_module(f, &q, path_file.c_str());
+    VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT(mod);
     
     delete_event_queue(&q);
@@ -411,16 +428,16 @@ public:
     FILE* f = NULL;
     Evento* q = new_empty_event();
     Module* mod = NULL;
+    Token* it = NULL;
 
     for ( std::string path : list_bad_files )
     {
-      f = fopen(path.c_str(), "r");
-      CPPUNIT_ASSERT( f );
+      it = helper_tokenize_preproc(path.c_str());
 
       //std::cout << "test_load_module_badverilog_XX_v: " << path << std::endl;
-      mod = load_module(f, &q, path.c_str());
-
-      CPPUNIT_ASSERT(!mod);
+      VerilogError err = load_module(&it, &q, &mod);
+      CPPUNIT_ASSERT( !mod );
+      CPPUNIT_ASSERT( err != NO_ERROR );
 
       free_module(&mod);
     }
@@ -449,14 +466,15 @@ public:
     FILE* f = NULL;
     Evento* q = new_empty_event();
     Module* mod = NULL;
+    Token* it = NULL;
 
     for ( std::string path : list_bad_files )
     {
-      f = fopen(path.c_str(), "r");
-      CPPUNIT_ASSERT( f );
+      it = helper_tokenize_preproc(path.c_str());
 
-      mod = load_module(f, &q, path.c_str());
-      CPPUNIT_ASSERT(!mod);
+      VerilogError err = load_module(&it, &q, &mod);
+      CPPUNIT_ASSERT( !mod );
+      CPPUNIT_ASSERT( err != NO_ERROR );
 
       free_module(&mod);
     }

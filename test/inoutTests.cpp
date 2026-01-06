@@ -195,7 +195,7 @@ public:
 
   void test_save_vcd()
   {
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
@@ -206,7 +206,7 @@ public:
     file_v = fopen(path_file_v.c_str(), "r");
     CPPUNIT_ASSERT(file_v);
 
-    circuit = load_module(file_v, &q, path_file_v.c_str());
+    circuit = load_circuit(file_v, &q, path_file_v.c_str());
     CPPUNIT_ASSERT(circuit);
     
     FILE* f_in = fopen("./inout_sample_files/bufgates.in", "r");
@@ -216,14 +216,14 @@ public:
     fclose(f_in);
     CPPUNIT_ASSERT(inputs);
     
-    outputs = simula(circuit, inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q);
     CPPUNIT_ASSERT(outputs);
 
     FILE* file_vcd = fopen("test_output.vcd", "w");
     CPPUNIT_ASSERT(file_vcd);
 
     // Call the function to test
-    save_vcd(circuit, outputs, file_vcd);
+    save_vcd(circuit->itens[0], outputs, file_vcd);
     fclose(file_vcd);
 
     // Open the file to read and validate output
@@ -243,7 +243,7 @@ public:
     remove("test_output.vcd");
     free_signal_list(&inputs);
     free_signal_list(&outputs);
-    free_module(&circuit);
+    free_circuit(&circuit);
   }
 
 };

@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
-    Module* circuit = NULL;
+    ListModule* circuit = NULL;
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
 
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     
     Evento* initial_task_events = NULL;
 
-    circuit = load_module(f_verilog_source, &initial_task_events, str_verilog_source);
+    circuit = load_circuit(f_verilog_source, &initial_task_events, str_verilog_source);
 
     if (!circuit) {
         print("Erro com o carregamento do codigo fonte do cicuito.\n");
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         strncat(str_wave_out_filepath, ".out", 4);
     }
 
-    sinais_saidas = simula(circuit, sinais_entradas, &initial_task_events);
+    sinais_saidas = simula(circuit->itens[0], sinais_entradas, &initial_task_events);
 
     if (sinais_saidas) {
         print("Simulacao concluida com saidas geradas.\n");
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
               str_wave_out_filepath);
     }
     else {
-        save_vcd(circuit, sinais_saidas, f_wave_out);
+        save_vcd(circuit->itens[0], sinais_saidas, f_wave_out);
         fclose(f_wave_out);
     }
     
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
     delete_event_queue(&initial_task_events);
     free_signal_list(&sinais_entradas);
     free_signal_list(&sinais_saidas);
-    free_module(&circuit);
+    free_circuit(&circuit);
 
     return EXIT_SUCCESS;
 }

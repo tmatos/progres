@@ -24,7 +24,8 @@ typedef enum en_verilog_error {
     ERROR_VERILOG_BAD_EOF,
     ERROR_VERILOG_BAD_EXPRESSION,
     ERROR_VERILOG_UNDECLARED_MACRO,
-    NO_ERROR = 10
+    NO_ERROR = 10,
+    END_OF_TOKENS = 20
 } VerilogError;
 
 /** @brief Processar a parte do código que possui a declaração
@@ -37,14 +38,26 @@ typedef enum en_verilog_error {
  */
 int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Module* module);
 
-/** @brief Cria uma estrutura de dados representando um module,
-           a partir do primeiro no arquivo com o codigo fonte em Verilog.
+/** @brief Cria uma estrutura de dados representando um unico module a partir
+           dos tokens seguintes no fonte que contenham tal declaracao.
+ *  @param t Endereço para o iterador dos tokens.
+ *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
+ *  @param module_pointer Endereco do ponteiro para a struct do module a ser criado.
+ *  @return Código de erro do tipo VerilogError. Caso carregue um module com sucesso,
+            retorna NO_ERROR e o module_pointer vai referir para a struct criada.
+            Caso nao existam mais modules a serem carregados, retorna END_OF_TOKENS.
+            Em caso de erro, retorna algo diferente desses dois citados acima.
+ */
+VerilogError load_module(Token** t, Evento** initial_task_events, Module** module_pointer);
+
+/** @brief Cria a estrutura de dados (no momento, uma lista de modules) representando o circuito,
+           a partir da descrição contida no arquivo com código Verilog.
  *  @param f_verilog_source Handler para o arquivo a ser processado.
  *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
  *  @param file_path Caminho do arquivo fonte Verilog (optional).
  *  @return Pointer para estrutura de dados do circuito ou NULL em caso de erro.
  */
-Module* load_module(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path);
+ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path);
 
 /** @brief Parsing de definições de range.
  *  @param it Endereço para o iterador dos tokens.
