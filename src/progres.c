@@ -35,14 +35,14 @@ int main(int argc, char* argv[])
 
     if ( argc < 2 || iguais(argv[1], "-h") ) {
         printf("%s", _HELP_STRING_BRIEF);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     if ( iguais(argv[1], "-v") ) {
         printf("Progres Verilog Simulator - version %s\n"
                "(C) 2014-2025 Tiago Matos (tmatos.net)\n",
                _PROGRES_VERSION);
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
     
     if ( iguais(argv[1], "-s") ) {
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     }
 
     if ( (argc - arg_offset) < 2 ) {
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     str_verilog_source = argv[1 + arg_offset];
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
     if (!circuit) {
         print("Erro com o carregamento do codigo fonte do cicuito.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     print("Circuito carregado com sucesso.\n");
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
     if ( (argc - arg_offset) == 2 ) {
         print("Para haver simulacao, um arquivo de entrada deve ser fornecido.\n");
-        exit(0);
+        exit(EXIT_SUCCESS);
     }
 
     // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     if (!sinais_entradas) {
         print("Nao ha entradas para a simulacao do circuito.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // se foi fornecido o argumento com path para arquivo de saida
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
     free_signal_list(&sinais_saidas);
     free_module(&circuit);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 Sinais* load_inputs_from_path(const char* path)
@@ -156,7 +156,7 @@ FILE* open_or_exit(const char* path, const char* mode)
             print(" para escrita.\n");
         else
             print("\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     return f;

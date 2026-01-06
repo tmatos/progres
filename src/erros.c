@@ -60,5 +60,5 @@ void fatal_error_no_memory()
 {
     print("\nERRO FATAL: Sem memoria para alocar.\n");
 
-    exit(-1);
+    exit(EXIT_FAILURE);
 }
