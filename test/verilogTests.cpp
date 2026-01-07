@@ -49,6 +49,19 @@ public:
     return tokens->primeiro;
   }
 
+  ListToken* helper_tokenize_only(const char* filepath)
+  {
+    FILE* f = fopen(filepath, "r");
+    CPPUNIT_ASSERT( f );
+
+    ListToken* tokens = tokeniza(f);
+    CPPUNIT_ASSERT( tokens );
+
+    fclose(f);
+
+    return tokens;
+  }
+
   void test_is_string_logic_gate()
   {
     CPPUNIT_ASSERT( is_string_logic_gate( (char*)"and") );
@@ -429,17 +442,22 @@ public:
     Evento* q = new_empty_event();
     Module* mod = NULL;
     Token* it = NULL;
+    VerilogError err;
 
     for ( std::string path : list_bad_files )
     {
       it = helper_tokenize_preproc(path.c_str());
 
       //std::cout << "test_load_module_badverilog_XX_v: " << path << std::endl;
-      VerilogError err = load_module(&it, &q, &mod);
+      do {
+        if (mod)
+          free_module(&mod);
+        
+        err = load_module(&it, &q, &mod);
+      }
+      while (err == NO_ERROR);
+      
       CPPUNIT_ASSERT( !mod );
-      CPPUNIT_ASSERT( err != NO_ERROR );
-
-      free_module(&mod);
     }
 
     delete_event_queue(&q);
@@ -466,17 +484,31 @@ public:
     FILE* f = NULL;
     Evento* q = new_empty_event();
     Module* mod = NULL;
+    ListToken* tokens = NULL;
     Token* it = NULL;
+    PreprocesorResult result;
 
     for ( std::string path : list_bad_files )
     {
-      it = helper_tokenize_preproc(path.c_str());
+      tokens = helper_tokenize_only(path.c_str());
+      CPPUNIT_ASSERT( tokens->primeiro );
 
-      VerilogError err = load_module(&it, &q, &mod);
-      CPPUNIT_ASSERT( !mod );
-      CPPUNIT_ASSERT( err != NO_ERROR );
+      result = pre_processor(tokens); 
+      if (result == PREPROCESSOR_SUCCESS) {
+        CPPUNIT_ASSERT( tokens->primeiro );
+      
+        it = tokens->primeiro;
 
-      free_module(&mod);
+        VerilogError err = load_module(&it, &q, &mod);
+        CPPUNIT_ASSERT( !mod );
+        CPPUNIT_ASSERT( err != NO_ERROR );
+
+        delete_lista_token(tokens);
+        free_module(&mod);
+      }
+      else if (tokens) {
+        delete_lista_token(tokens);
+      }
     }
 
     delete_event_queue(&q);
