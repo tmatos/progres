@@ -89,7 +89,7 @@ void remove_macro_by_name(ListMacro* list, const char* name)
     list->total--;
 }
 
-int pre_processor(ListToken* lst)
+PreprocesorResult pre_processor(ListToken* lst)
 {
     Token* it;
     Macro* macro;
@@ -118,7 +118,7 @@ int pre_processor(ListToken* lst)
                 goto pre_processor_error_bad_eof;
             }
             else if (e == ERROR_VERILOG_BAD_TOKEN) {
-                return 0; // error already shown
+                return PREPROCESSOR_ERROR; // error already shown
             }
 
             continue;
@@ -133,7 +133,7 @@ int pre_processor(ListToken* lst)
                 goto pre_processor_error_bad_eof;
             }
             else if (e == ERROR_VERILOG_BAD_TOKEN) {
-                return 0; // error already shown
+                return PREPROCESSOR_ERROR; // error already shown
             }
             
             continue;
@@ -168,23 +168,23 @@ int pre_processor(ListToken* lst)
                            it->coluna,
                            "diretiva de compilador ou identificador",
                            it->valor);
-            return 0;
+            return PREPROCESSOR_ERROR;
         }
 
         avanca(&it);
     }
 
-//pre_processor_no_error:
-    return 1;
+//pre_processor_success:
+    return PREPROCESSOR_SUCCESS;
 
 pre_processor_error_bad_eof:
     show_error_msg("Final inesperado de arquivo", -1, -1, NULL, NULL);
-    return 0;
+    return PREPROCESSOR_ERROR;
 
 pre_processor_error_undeclared_macro:
     show_error_msg("Macro nao declarada", it->linha, it->coluna,
                    "macro previamente declarada", it->valor);
-    return 0;
+    return PREPROCESSOR_ERROR;
 }
 
 VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro)

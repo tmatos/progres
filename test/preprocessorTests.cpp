@@ -128,11 +128,11 @@ public:
 
     int n_tok_in = list_tok->tamanho;
 
-    int ret = pre_processor(list_tok);
+    PreprocesorResult ret = pre_processor(list_tok);
 
     //show_token_list(list_tok);
 
-    CPPUNIT_ASSERT_EQUAL(1, ret);
+    CPPUNIT_ASSERT_EQUAL(PREPROCESSOR_SUCCESS, ret);
 
     int n_tok_out = list_tok->tamanho;
 
@@ -152,8 +152,8 @@ public:
 
     int n_tok_in = list_tok->tamanho;
 
-    int ret = pre_processor(list_tok);
-    CPPUNIT_ASSERT_EQUAL(1, ret);
+    PreprocesorResult ret = pre_processor(list_tok);
+    CPPUNIT_ASSERT_EQUAL(PREPROCESSOR_SUCCESS, ret);
 
     int n_tok_out = list_tok->tamanho;
 
@@ -170,8 +170,8 @@ public:
     ListToken* list_tok = tokeniza(fp);
     CPPUNIT_ASSERT(list_tok);
 
-    int ret = pre_processor(list_tok);
-    CPPUNIT_ASSERT_EQUAL(1, ret);
+    PreprocesorResult ret = pre_processor(list_tok);
+    CPPUNIT_ASSERT_EQUAL(PREPROCESSOR_SUCCESS, ret);
   }
 
   void test_pre_processor_badpreproc_XX_v()

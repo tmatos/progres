@@ -13,6 +13,13 @@
 extern "C" {
 #endif
 
+/** @brief Enum for the pre-processor result flags.
+ */
+typedef enum en_preprocessor_result {
+    PREPROCESSOR_ERROR = 0,
+    PREPROCESSOR_SUCCESS = 1
+} PreprocesorResult;
+
 #define MAX_MACRO_NAME_SIZE 64
 
 #define MAX_MACRO_VALUE_SIZE 96
@@ -55,9 +62,9 @@ void remove_macro_by_name(ListMacro* list, const char* name);
 
 /** @brief Do pre-processing in the list of tokens.
  *  @param lst Pointer to the list of tokens.
- *  @return 1 if sucess, 0 otherwise.
+ *  @return PREPROCESSOR_SUCCESS if successful, PREPROCESSOR_ERROR otherwise.
  */
-int pre_processor(ListToken* lst);
+PreprocesorResult pre_processor(ListToken* lst);
 
 /** @brief Process the `define` directive.
  *  @param list_tok Pointer to the list of tokens of the source.
