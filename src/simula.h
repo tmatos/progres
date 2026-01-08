@@ -26,6 +26,14 @@ extern "C" {
  */
 Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events);
 
+/** @brief Valida se os sinais de entrada fornecidos correspondem
+ *         aos esperados pelo módulo.
+ *  @param module Ponteiro para o módulo a ser simulado.
+ *  @param signals Ponteiro para a estrutura Sinais contendo os sinais de entrada.
+ *  @return O número de sinais de entrada válidos encontrados.
+ */
+int validate_input_signals(Module* module, Sinais* signals);
+
 /** @brief Simulação da avaliação da porta 'buf'.
  *  @param input Valor lógico de entrada.
  *  @return O valor lógico resultante da operação BUF.

@@ -17,10 +17,43 @@
 #include "eventos.h"
 #include "erros.h"
 
-Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
+int validate_input_signals(Module* module, Sinais* signals)
 {
     int i;
     int j;
+    int validos = 0;
+
+    // Validacao da correspencia das signals entre os arquivos '.v' e '.in'
+    for ( i=0 ; i < module->list_input_net->tamanho ; i++ )
+    {
+        for ( j=0 ; j < signals->quantidade ; j++ )
+        {
+            if ( iguais(module->list_input_net->itens[i]->nome,
+                        signals->lista[j].nome) ) {
+                module->list_input_net->itens[i]->input_signal = &(signals->lista[j]);
+                validos++;
+                break;
+            }
+        }
+    }
+
+    // print matches msg
+    print("----------\n"
+          "Entradas: \n"
+          "   .v = %d\n"
+          "  .in = %d\n"
+          "match = %d\n"
+          "----------\n",
+          module->list_input_net->tamanho,
+          signals->quantidade,
+          validos);
+
+    return validos;
+}
+
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
+{
+    int i;
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
     Tempo t;
 
@@ -48,32 +81,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
         return NULL;
     }
 
-    validos = 0;
-
-    // Validacao da correspencia das entradas entre os arquivos '.v' e '.in'
-    for ( i=0 ; i < circuto->list_input_net->tamanho ; i++ )
-    {
-        for ( j=0 ; j < entradas->quantidade ; j++ )
-        {
-            if ( iguais(circuto->list_input_net->itens[i]->nome,
-                        entradas->lista[j].nome) ) {
-                circuto->list_input_net->itens[i]->input_signal = &(entradas->lista[j]);
-                validos++;
-                break;
-            }
-        }
-    }
-
-    // print matches msg
-    print("----------\n"
-          "Entradas: \n"
-          "   .v = %d\n"
-          "  .in = %d\n"
-          "match = %d\n"
-          "----------\n",
-          circuto->list_input_net->tamanho,
-          entradas->quantidade,
-          validos);
+    validos = validate_input_signals(circuto, entradas);
 
     if (validos < circuto->list_input_net->tamanho) {
         print("AVISO: O arquivo de entradas tem menos "
