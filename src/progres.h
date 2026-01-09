@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include "estruturas.h"
 #include "sinais.h"
 
 /// Program version number, as string
@@ -25,6 +26,13 @@
  *  @note The input file should be in a custom format that the program can parse.
  */
 Sinais* load_inputs_from_path(const char* path);
+
+/** @brief Create dummy input signals for the given module.
+ *  @param module Pointer to the Module structure for which to create dummy inputs.
+ *  @return A pointer to a Sinais structure containing the dummy input signals.
+ *  @note This function generates default or placeholder input signals for testing purposes.
+ */
+Sinais* create_dummy_inputs(Module* module);
 
 /** @brief Save the output signals to the specified path.
  *  @param path Path to the output file where the signals will be saved.

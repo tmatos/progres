@@ -69,28 +69,34 @@ int main(int argc, char* argv[])
 
     print("Circuito carregado com sucesso.\n");
 
-    // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
     if ( (argc - arg_offset) == 2 ) {
-        print("Para haver simulacao, um arquivo de entrada deve ser fornecido.\n");
-        exit(EXIT_SUCCESS);
-    }
+        // caso onde apenas o circuito, sem sinais de entradas, foi fornecido
+        print("Arquivo de entrada '.in' nao fornecido.\n");
 
-    // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
-    sinais_entradas = load_inputs_from_path( argv[2 + arg_offset] );
+        sinais_entradas = create_dummy_inputs(circuit->itens[0]);
 
-    if (!sinais_entradas) {
-        print("Nao ha entradas para a simulacao do circuito.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    // se foi fornecido o argumento com path para arquivo de saida
-    if ( (argc - arg_offset) > 3 ) {
-        copy(str_wave_out_filepath, argv[3+arg_offset]);
+        // derivando o path do arquivo de saida
+        copy(str_wave_out_filepath, str_verilog_source);
+        strncat(str_wave_out_filepath, ".out", 4);
     }
     else {
-        // senao, deriva-se do arquivo de entrada
-        copy(str_wave_out_filepath, argv[2+arg_offset]);
-        strncat(str_wave_out_filepath, ".out", 4);
+        // foi fornecido um path para arquivo de entradas da simulacao (argc > 2)
+        sinais_entradas = load_inputs_from_path( argv[2 + arg_offset] );
+
+        if (!sinais_entradas) {
+            print("Nao foi possivel carregar entradas para simulacao no arquivo fornecido.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // se foi fornecido o argumento com path para arquivo de saida
+        if ( (argc - arg_offset) > 3 ) {
+            copy(str_wave_out_filepath, argv[3+arg_offset]);
+        }
+        else {
+            // senao, deriva-se do arquivo de entrada
+            copy(str_wave_out_filepath, argv[2+arg_offset]);
+            strncat(str_wave_out_filepath, ".out", 4);
+        }
     }
 
     sinais_saidas = simula(circuit->itens[0], sinais_entradas, &initial_task_events);
@@ -133,6 +139,23 @@ Sinais* load_inputs_from_path(const char* path)
     fclose(f_wave_in);
 
     return sinais_entradas;
+}
+
+Sinais* create_dummy_inputs(Module* module)
+{
+    Sinais* inputs = new_signal_list();
+
+    print("Criando entradas dummy para o circuito.\n");
+
+    for ( int i=0 ; i < module->list_input_net->tamanho ; i++ )
+    {
+        Component* input_net = module->list_input_net->itens[i];
+        Sinal* sig = new_signal(input_net->nome);
+        add_new_pulse(sig, VAL_X, 1); // valor X por 1 unidade de tempo
+        insert_signal(inputs, sig);
+    }
+
+    return inputs;
 }
 
 void save_outputs_to_path(const char* path, Sinais* outputs)
