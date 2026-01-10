@@ -136,7 +136,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     }
 
     // ATENCAO: Sabemos que todos os componentes sao
-    // inicializados com o dynamic_value em X.
+    // inicializados com o dynamic_value em X (exceto constantes literais)
 
     // A partir daqui, ocorre a simulacao propriamente dita:
     t = 0;

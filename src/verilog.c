@@ -1351,7 +1351,26 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
     if (!avanca(&t))
         goto load_assign_bad_eof;
 
-    // simplest expression is another net,
+    // in fact, simplest expression is a constant value
+
+    if ( t->classe == NUM_BASE_DECIMAL ) {
+        // inserir, na lista de entradas da gate, esta entrada
+        Component* num = new_component("literal_number_decimal", ROLE_LITERAL_NUMBER);
+        num->dynamic_value = long_to_logicvalue(strtol(t->valor, NULL, 10));
+        insert_component(gate->list_input, num); // TODO: free mem later
+
+        if (!avanca(&t))
+            goto load_assign_bad_eof;
+
+        if (t->classe == SYM_SEMICOLON)
+            goto load_assign_sucess;
+
+        show_error_msg("Token inesperado foi encontrado",
+                       t->linha, t->coluna, ";", t->valor);
+        goto load_assign_bad_token;
+    }
+
+    // another simple expression case is some net,
     // logic synthesis, in this case, creates a buf.
     // negation (~) is also simple, it creates a not.
 
