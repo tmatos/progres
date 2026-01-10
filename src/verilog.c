@@ -1355,9 +1355,9 @@ VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, L
 
     if ( t->classe == NUM_BASE_DECIMAL ) {
         // inserir, na lista de entradas da gate, esta entrada
-        Component* num = new_component("literal_number_decimal", ROLE_LITERAL_NUMBER);
-        num->dynamic_value = long_to_logicvalue(strtol(t->valor, NULL, 10));
-        insert_component(gate->list_input, num); // TODO: free mem later
+        gate->atributos.role = ROLE_LITERAL_NUMBER;
+        gate->dynamic_value = long_to_logicvalue(strtol(t->valor, NULL, 10));
+        out->dynamic_value = gate->dynamic_value; // propagate value to output net
 
         if (!avanca(&t))
             goto load_assign_bad_eof;

@@ -272,8 +272,20 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     // copia as saidas da simulacao do ciruito para o retorno da funcao
     for ( i=0 ; i < circuto->list_output_net->tamanho ; i++ )
     {
-        insert_signal(saidas,
-                      circuto->list_output_net->itens[i]->output_signal);
+        Sinal* s = circuto->list_output_net->itens[i]->output_signal;
+
+        if (s) {
+            insert_signal(saidas, s);
+        }
+        else {
+            // cria sinal de saida constante com o valor dinamico do componente
+            ValorLogico v = circuto->list_output_net->itens[i]->dynamic_value;
+            Sinal* s_temp = new_signal(circuto->list_output_net->itens[i]->nome);
+            add_new_pulse(s_temp, v, t); // valor dinamico por todo o tempo da simulacao
+            insert_signal(saidas, s_temp);
+            free(s_temp->pulsos);
+            free(s_temp);
+        }
     }
 
     if (f_dump) {
