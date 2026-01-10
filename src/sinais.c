@@ -154,25 +154,24 @@ int add_new_signal(Sinais* list, const char* nome)
     return 1;
 }
 
-int insert_signal(Sinais* list_sinal, Sinal* sinal)
+int insert_signal(Sinais* destin_list, Sinal* signal)
 {
     Pulso *it = NULL;
 
-    if (!sinal)
+    if (!signal)
         return 0;
 
-    if (!list_sinal) // FIXME
-        list_sinal = new_signal_list();
+    if (!destin_list) // FIXME
+        destin_list = new_signal_list();
 
-    add_new_signal(list_sinal, sinal->nome);
+    add_new_signal(destin_list, signal->nome);
 
-    it = sinal->pulsos;
+    it = signal->pulsos;
     while(it->valor != VAL_BLANK)
     {
         // add cada pulso do sinal original ao novo sinal
         // criado na lista destino (que esta na ultima posicao)
-        
-        add_new_pulse( list_sinal->lista + (list_sinal->quantidade - 1),
+        add_new_pulse( destin_list->lista + (destin_list->quantidade - 1),
                        it->valor,
                        it->tempo );
 

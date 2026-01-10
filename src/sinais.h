@@ -144,12 +144,12 @@ void free_signal_list(Sinais** list);
  */
 int add_new_signal(Sinais* list, const char* nome);
 
-/** @brief Copia um sinal para a struct que representa uma lista de sinais.
- *  @param list_sinal Uma lista de sinais.
- *  @param sinal O sinal a ser copiado.
+/** @brief Insere, copiando, um sinal ja existente em uma lista de sinais destino.
+ *  @param destin_list A lista de sinais que recebera o sinal.
+ *  @param signal O sinal original a ser copiado.
  *  @return 1 em caso de sucesso, 0 caso falhe.
  */
-int insert_signal(Sinais* list_sinal, Sinal* sinal);
+int insert_signal(Sinais* destin_list, Sinal* signal);
 
 #ifdef __cplusplus
 }
