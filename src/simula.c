@@ -189,6 +189,16 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                 set_dumpfile(&f_dump, tr->task_code);
                 // TODO: set more flags for dumpfile
                 break;
+            case TASK_FINISH:
+                while (fila)
+                {
+                    Transicao* lt = pop_event(&fila);
+                    if (lt)
+                        delete_list_transicao(&lt);
+                }
+                tr = NULL; // exit outer while loop
+                continue;
+                break;
             default:
                 break;
             }

@@ -1459,6 +1459,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 {
     int count = 0; // task arg counter
     SystemTask task = TASK_UNKNOWN;
+    char str[MAX_TOKEN_SIZE] = "";
 
     Token* it = *pit;
 
@@ -1479,6 +1480,10 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     }
     else if ( iguais(it->valor, "dumpfile") ) {
         task = TASK_DUMPFILE;
+    }
+    else if ( iguais(it->valor, "finish") ) {
+        task = TASK_FINISH;
+        goto load_systask_sucess;
     }
     else {
         show_error_msg("Task invalida ou nao suportada",
@@ -1502,9 +1507,6 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     }
 
     // read arguments
-
-    char str[MAX_TOKEN_SIZE];
-    str[0] = '\0';
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
