@@ -20,11 +20,12 @@ extern "C" {
     @param circuto Ponteiro para um Module, já inicializado.
     @param entradas Ponteiro para a struct Sinais, contendo entradas do circuito.
     @param initial_task_events Ponteiro para a fila de eventos iniciais com tasks.
+    @param f_dump Ponteiro para o ponteiro do handler do arquivo de dump (VCD) da simulação.
     @return Um ponteiro para uma estrutura Sinais contendo as saídas do circuito
             após a simulação. Retorna NULL se houver algum erro ou se as entradas
             não corresponderem às esperadas no module.
  */
-Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events);
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, FILE** f_dump);
 
 /** @brief Valida se os sinais de entrada fornecidos correspondem
  *         aos esperados pelo módulo.

@@ -200,6 +200,7 @@ public:
     Sinais* outputs = NULL;
     Evento* q = new_empty_event();
     FILE* file_v = NULL;
+    FILE* f_dump = NULL;
 
     std::string path_file_v = "./verilog_sample_src/bufgates.v";
 
@@ -216,7 +217,7 @@ public:
     fclose(f_in);
     CPPUNIT_ASSERT(inputs);
     
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(outputs);
 
     FILE* file_vcd = fopen("test_output.vcd", "w");
@@ -244,6 +245,9 @@ public:
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     free_circuit(&circuit);
+    if (f_dump) {
+      fclose(f_dump);
+    }
   }
 
 };

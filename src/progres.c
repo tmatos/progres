@@ -22,8 +22,9 @@ int global_silent_mode;
 int main(int argc, char* argv[])
 {
     int arg_offset = 0;
-    char* str_verilog_source;
-    FILE* f_verilog_source;
+    char* str_verilog_source = NULL;
+    FILE* f_verilog_source = NULL;
+    FILE* f_dump = NULL;
 
     Sinais* sinais_entradas = NULL;
     Sinais* sinais_saidas = NULL;
@@ -99,7 +100,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    sinais_saidas = simula(circuit->itens[0], sinais_entradas, &initial_task_events);
+    sinais_saidas = simula(circuit->itens[0], sinais_entradas, &initial_task_events, &f_dump);
 
     if (sinais_saidas) {
         print("Simulacao concluida com saidas geradas.\n");
@@ -107,20 +108,23 @@ int main(int argc, char* argv[])
 
     save_outputs_to_path(str_wave_out_filepath, sinais_saidas);
 
-    // export of VCD file
-    strncat(str_wave_out_filepath, ".vcd", 4);
-    FILE* f_wave_out = fopen(str_wave_out_filepath, "w");
+    // force export of VCD file
+    if ( !f_dump ) {
+        strncat(str_wave_out_filepath, ".vcd", 4);
+        f_dump = fopen(str_wave_out_filepath, "w");
+        if ( !f_dump ) {
+            print("Erro ao tentar abrir arquivo VCD de saida '%s' para gravacao.\n",
+                  str_wave_out_filepath);
+        }
+        else {
+            print("Um arquivo VCD tambem sera salvo, em '%s'.\n", str_wave_out_filepath);
+        }
+    }
 
-    if (!f_wave_out) {
-        print("Erro ao tentar abrir arquivo VCD de saida '%s' para gravacao.\n",
-              str_wave_out_filepath);
+    if (f_dump) {
+        save_vcd(circuit->itens[0], sinais_saidas, f_dump);
+        fclose(f_dump);
     }
-    else {
-        save_vcd(circuit->itens[0], sinais_saidas, f_wave_out);
-        fclose(f_wave_out);
-    }
-    
-    print("Arquivo VCD tambem salvo, em '%s'.\n", str_wave_out_filepath);
 
     delete_event_queue(&initial_task_events);
     free_signal_list(&sinais_entradas);

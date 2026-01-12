@@ -51,7 +51,7 @@ int validate_input_signals(Module* module, Sinais* signals)
     return validos;
 }
 
-Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
+Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, FILE** f_dump)
 {
     int i;
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
@@ -74,7 +74,6 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
     ValorLogico valor_control;
     ValorLogico valor_data;
 
-    FILE* f_dump = NULL;
     Sinais* saidas = new_signal_list();
 
     if (!circuto || !entradas) {
@@ -186,7 +185,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
                 print("%s\n", tr->task_code);
                 break;
             case TASK_DUMPFILE:
-                set_dumpfile(&f_dump, tr->task_code);
+                set_dumpfile(f_dump, tr->task_code);
                 // TODO: set more flags for dumpfile
                 break;
             case TASK_FINISH:
@@ -296,11 +295,6 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events)
             free(s_temp->pulsos);
             free(s_temp);
         }
-    }
-
-    if (f_dump) {
-        fclose(f_dump);
-        f_dump = NULL;
     }
 
     return saidas;

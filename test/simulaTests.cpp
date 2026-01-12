@@ -42,11 +42,12 @@ public:
     Module *circ = NULL;
     Sinais *inputs = NULL;
     Sinais *outputs = NULL;
+    FILE* f_dump = NULL;
 
-    outputs = simula(circ, inputs, NULL);
-
+    outputs = simula(circ, inputs, NULL, &f_dump);
     CPPUNIT_ASSERT_EQUAL( (Sinais*)NULL, outputs );
 
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     free_module(&circ);
@@ -57,16 +58,17 @@ public:
     Module *circ = new_module();
     Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
+    FILE* f_dump = NULL;
 
     CPPUNIT_ASSERT(circ);
     CPPUNIT_ASSERT(inputs);
 
-    outputs = simula(circ, inputs, NULL);
-
+    outputs = simula(circ, inputs, NULL, &f_dump);
     CPPUNIT_ASSERT(outputs);
     CPPUNIT_ASSERT_EQUAL( outputs->quantidade, 0 );
     CPPUNIT_ASSERT_EQUAL( (Sinal*)NULL, outputs->lista );
 
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     free_module(&circ);
@@ -77,6 +79,7 @@ public:
     Module *circ = new_module();
     Sinais *inputs = new_signal_list();
     Sinais *outputs = NULL;
+    FILE* f_dump = NULL;
 
     char str_nome_entrada_1[50] = "sinal_in_1";
 
@@ -100,10 +103,10 @@ public:
     CPPUNIT_ASSERT( circ->list_input_net->itens );
     CPPUNIT_ASSERT( ! strcmp(str_nome_entrada_1, circ->list_input_net->itens[0]->nome) );
 
-    outputs = simula(circ, inputs, NULL);
-
+    outputs = simula(circ, inputs, NULL, &f_dump);
     CPPUNIT_ASSERT(outputs);
 
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     free_module(&circ);
@@ -111,6 +114,7 @@ public:
 
   void test_simula_samplefile_andgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -129,7 +133,7 @@ public:
     inputs = load_input_signals(f_andgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -147,6 +151,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_andgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -156,6 +161,7 @@ public:
 
   void test_simula_samplefile_orgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -174,7 +180,7 @@ public:
     inputs = load_input_signals(f_orgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -192,6 +198,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_orgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -201,6 +208,7 @@ public:
 
   void test_simula_samplefile_nandgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -219,7 +227,7 @@ public:
     inputs = load_input_signals(f_nandgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -237,6 +245,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_nandgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -246,6 +255,7 @@ public:
 
   void test_simula_samplefile_norgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -264,7 +274,7 @@ public:
     inputs = load_input_signals(f_norgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -282,6 +292,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_norgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -291,6 +302,7 @@ public:
 
   void test_simula_samplefile_notgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -310,7 +322,7 @@ public:
     inputs = load_input_signals(f_notgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 2, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -351,6 +363,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_notgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -360,6 +373,7 @@ public:
 
   void test_simula_samplefile_bufgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -379,7 +393,7 @@ public:
     inputs = load_input_signals(f_bufgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -408,6 +422,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_bufgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -417,6 +432,7 @@ public:
   
   void test_simula_samplefile_xorgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -436,7 +452,7 @@ public:
     inputs = load_input_signals(f_xorgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -465,6 +481,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_xorgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -474,6 +491,7 @@ public:
 
   void test_simula_samplefile_xnorgates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -493,7 +511,7 @@ public:
     inputs = load_input_signals(f_xnorgates_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -522,6 +540,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_xnorgates_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -531,6 +550,7 @@ public:
 
   void test_simula_samplefile_delays_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -559,14 +579,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(8, outputs->quantidade);
     CPPUNIT_ASSERT(outputs->lista);
 
-    sim_outputs = simula(circuit->itens[0], inputs, &q);
-
+    sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
     CPPUNIT_ASSERT_EQUAL(8, sim_outputs->quantidade);
     CPPUNIT_ASSERT(sim_outputs->lista);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
     
+    helper_close_dump_file(&f_dump);
     fclose(f_delays_in);
     fclose(f_delays_in_out);
     free_signal_list(&inputs);
@@ -578,6 +598,7 @@ public:
 
   void test_simula_samplefile_display_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* sim_outputs = NULL;
@@ -593,9 +614,10 @@ public:
     inputs = new_signal_list();
     CPPUNIT_ASSERT(inputs);
 
-    sim_outputs = simula(circuit->itens[0], inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
 
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
@@ -604,6 +626,7 @@ public:
 
   void test_simula_samplefile_dumpfile_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* sim_outputs = NULL;
@@ -623,7 +646,7 @@ public:
     CPPUNIT_ASSERT(q->listaTransicao);
     CPPUNIT_ASSERT_EQUAL(TASK_DUMPFILE, q->listaTransicao->task_type);
 
-    sim_outputs = simula(circuit->itens[0], inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
 
     FILE* f_dumpfile_vcd = fopen(s_dumpfile_vcd, "r");
@@ -631,7 +654,7 @@ public:
 
     fclose(f_dumpfile_vcd);
     remove(s_dumpfile_vcd);
-
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&sim_outputs);
     delete_event_queue(&q);
@@ -640,6 +663,7 @@ public:
 
   void test_simula_samplefile_tri_state_gates_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -659,7 +683,7 @@ public:
     inputs = load_input_signals(f_in);
     CPPUNIT_ASSERT( inputs );
 
-    outputs = simula(circuit->itens[0], inputs, &q);
+    outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
     CPPUNIT_ASSERT_EQUAL( 4, outputs->quantidade );
     CPPUNIT_ASSERT( outputs->lista );
@@ -682,6 +706,7 @@ public:
     CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
 
+    helper_close_dump_file(&f_dump);
     fclose(f_in);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
@@ -693,6 +718,7 @@ public:
 
   void test_simula_samplefile_numbers_v()
   {
+    FILE* f_dump = NULL;
     ListModule* circuit = NULL;
     Sinais* inputs = NULL;
     Sinais* outputs = NULL;
@@ -722,13 +748,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, outputs->quantidade);
     CPPUNIT_ASSERT(outputs->lista);
 
-    sim_outputs = simula(circuit->itens[0], inputs, &q);
+    sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
     CPPUNIT_ASSERT_EQUAL(2, sim_outputs->quantidade);
     CPPUNIT_ASSERT(sim_outputs->lista);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
 
+    helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
     free_signal_list(&outputs);
     free_signal_list(&sim_outputs);
@@ -900,6 +927,14 @@ public:
     }
 
     return true;
+  }
+
+  void helper_close_dump_file(FILE** f_dump)
+  {
+    if (f_dump && *f_dump) {
+        fclose(*f_dump);
+        *f_dump = NULL;
+    }
   }
 
 };
