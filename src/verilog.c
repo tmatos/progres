@@ -1176,6 +1176,13 @@ initial_block_loop:
             goto load_initial_block_bad_eof;
         }
 
+        // handle optional semicolon after delay number
+        if ( it->classe == SYM_SEMICOLON ) {
+            if ( !avanca(&it) ) {
+                goto load_initial_block_bad_eof;
+            }
+        }        
+
         goto initial_block_loop;
     }
 
