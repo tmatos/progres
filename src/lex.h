@@ -20,6 +20,7 @@ extern "C" {
 
 #define MAX_TOKEN_SIZE 128 /// Qtde maxima de caracteres permitidos em um Token
 #define MAX_DIGITOS_NUM 13 /// Qtde maxima de digitos num numero inteiro a ser reconhecido
+#define MAX_SIZE_NUMBER 1024 /// Tamanho maximo permitido para um numero literal sized
 
 /** @brief Enumeracao para a classe do token detectado.
  */
@@ -112,7 +113,8 @@ typedef enum en_token_class {
 
     STRING,
     IDENTIFIER,
-    _UNKNOWN
+    _UNKNOWN,
+    _TO_DETECT // usado internamente no processo de tokenizacao
 } TokenClass;
 
 /** @brief Struct for pairs that represents the mapping between
@@ -152,15 +154,31 @@ ListToken* new_list_token();
  */
 void delete_lista_token(ListToken* list);
 
+/** @brief Cria um novo token com os dados especificados.
+ *  @param value String que representa o valor textual do token.
+ *  @param line Linha no arquivo onde o token foi encontrado.
+ *  @param column Coluna no arquivo onde o token inicia-se.
+ *  @param class Classe do token, conforme enum TokenClass.
+ *  @return Ponteiro para o token criado.
+ */
+Token* new_token(const char* value, int line, int column, TokenClass t_class);
+
+/** @brief Adiciona um token inicializado ao final da lista de tokens.
+ *  @param list Ponteiro para a struct da lista onde o token sera adicionado.
+ *  @param tok Ponteiro para o token a ser adicionado.
+ *  @return void.
+ */
+void add_token_to_list(ListToken* list, Token* tok);
+
 /** @brief Insere na lista um novo token a partir de um caractere,
            deve-se especificar a posicao do mesmo no arquivo.
  *  @param lista Onde sera inserido o token.
  *  @param tok Um único caractere que representa o token.
  *  @param p_linha Linha no arquivo onde está o token.
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
- *  @return Verdadeiro caso sucesso, falso caso falhe.
+ *  @return void.
  */
-int insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna);
+void insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna);
 
 /** @brief Insere na lista um novo token a partir de uma string,
            deve-se especificar a posicao do mesmo no arquivo.
@@ -168,9 +186,9 @@ int insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna);
  *  @param tok Uma string que representa o token.
  *  @param p_linha Linha no arquivo onde está o token.
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
- *  @return Verdadeiro caso sucesso, falso caso falhe.
+ *  @return void.
  */
-int insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna);
+void insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna);
 
 /** @brief Remove the token, specified by its pointer, from the list.
  *  @param list The list from which the token will be removed.

@@ -14,7 +14,13 @@ extern "C" {
 
 #define MSG_ERROR_LEX_UNEXPECTED_SYMBOL "Simbolo nao esperado"
 #define MSG_ERROR_LEX_INVALID_CHAR "Caractere nao permitido"
+#define MSG_ERROR_LEX_UNEXPECTED_CHAR "Caractere nao esperado nesse contexto"
 #define MSG_ERROR_LEX_TOKEN_SIZE_MAXED "Token excede o tamanho maximo permitido"
+#define MSG_ERROR_LEX_INVALID_NUMBER_SIZE "Este tamanho para o numero nao e permitido"
+#define MSG_ERROR_LEX_NO_DIGITS "Este numero nao contem digitos"
+#define MSG_ERROR_LEX_NUMBER_SIZE_EXCEEDED "Numero excede o tamanho que foi previamente definido"
+#define MSG_ERROR_LEX_NUMBER_SIZE_MISMATCH "Tamanho do numero nao corresponde ao especificado"
+#define MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE "O underscore nao pode ser usado nessa posicao"
 
 /** @brief Exibe uma mensagem de erro sobre declarar um identificador com nome ja utilizado.
  *  @param tok String com o identificador. 
