@@ -637,7 +637,8 @@ int is_allowed_identifier(Token* tk)
 
 ListToken* tokeniza(FILE* arquivo)
 {
-    unsigned int number_size; // usado para contar o tamanho de numeros literais
+    unsigned int number_size; // usado quando se define o tamanho de numeros literais
+    unsigned int num_size_count; // contador auxiliar para a qtde de digitos em numeros literais
     int linha = 1; // contador para linha corrente do arquivo
     int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
 
@@ -987,7 +988,7 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     goto end_state;
                 }
 
-                unsigned int num_size_count = 0;
+                num_size_count = 0;
                 while ( c == '0' || c == '1' || c == '_' ) {
                     if ( c != '_') {
                         num_size_count++;
@@ -996,29 +997,96 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     anexa(tok, c);
                     c = fgetc(arquivo);
                 }
-
-                if ( num_size_count == 0 ) {
-                    show_error_lexical(MSG_ERROR_LEX_NO_DIGITS, linha, coluna);
-                    goto end_state;
-                }
-                
-                if ( num_size_count > number_size ) {
-                    show_error_lexical(MSG_ERROR_LEX_NUMBER_SIZE_EXCEEDED, linha, coluna - len(tok));
-                    goto end_state;
-                }
-
-                insert_token_of_string(tokens, tok, linha, coluna - len(tok));
             }
-            // else if ( c == 'o' || c == 'O' ) {
-            // }
-            // else if ( c == 'd' || c == 'D' ) {
-            // }
-            // else if ( c == 'h' || c == 'H' ) {
-            // }
+            else if ( c == 'o' || c == 'O' ) {
+                coluna++;
+                anexa(tok, c);
+                c = fgetc(arquivo);
+
+                if ( c < '0' || c > '7' ) {
+                    if ( c == '_' )
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                    else
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+
+                    goto end_state;
+                }
+
+                num_size_count = 0;
+                while ( (c >= '0' && c <= '7') || c == '_' ) {
+                    if ( c != '_') {
+                        num_size_count++;
+                    }
+                    coluna++;
+                    anexa(tok, c);
+                    c = fgetc(arquivo);
+                }
+            }
+            else if ( c == 'd' || c == 'D' ) {
+                coluna++;
+                anexa(tok, c);
+                c = fgetc(arquivo);
+
+                if ( !isdigit(c) ) {
+                    if ( c == '_' )
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                    else
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+
+                    goto end_state;
+                }
+
+                num_size_count = 0;
+                while ( isdigit(c) || c == '_' ) {
+                    if ( c != '_') {
+                        num_size_count++;
+                    }
+                    coluna++;
+                    anexa(tok, c);
+                    c = fgetc(arquivo);
+                }
+            }
+            else if ( c == 'h' || c == 'H' ) {
+                coluna++;
+                anexa(tok, c);
+                c = fgetc(arquivo);
+
+                if ( !isxdigit(c) ) {
+                    if ( c == '_' )
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                    else
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+
+                    goto end_state;
+                }
+
+                num_size_count = 0;
+                while ( isxdigit(c) || c == '_' ) {
+                    if ( c != '_') {
+                        num_size_count++;
+                    }
+                    coluna++;
+                    anexa(tok, c);
+                    c = fgetc(arquivo);
+                }
+            }
             else {
                 show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
                 goto end_state;
             }
+            
+            if ( num_size_count == 0 ) {
+                show_error_lexical(MSG_ERROR_LEX_NO_DIGITS, linha, coluna);
+                goto end_state;
+            }
+            
+            if ( num_size_count > number_size ) {
+                show_error_lexical(MSG_ERROR_LEX_NUMBER_SIZE_EXCEEDED, linha, coluna - len(tok));
+                goto end_state;
+            }
+
+            // TODO define here the token class for sized number literals
+            insert_token_of_string(tokens, tok, linha, coluna - len(tok));
         }
     }
 
