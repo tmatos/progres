@@ -13,6 +13,10 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE( Testes_lex );
   CPPUNIT_TEST( test_iguais );
   CPPUNIT_TEST( test_has_only_digits );
+  CPPUNIT_TEST( test_avanca );
+  CPPUNIT_TEST( test_backtrack );
+  CPPUNIT_TEST( test_new_token );
+  CPPUNIT_TEST( test_new_token_to_detect_class );
   CPPUNIT_TEST( test_new_list_token );
   CPPUNIT_TEST( test_insert_token_of_string );
   CPPUNIT_TEST( test_remove_tokens_by_value );
@@ -32,6 +36,103 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  void test_avanca()
+  {
+    Token* t_0 = new_token("module", 1, 1, KW_MODULE);
+    Token* t_1 = new_token("(", 1, 8, SYM_OPEN_BRACKET);
+    Token* t_2 = new_token(")", 1, 9, SYM_CLOSE_BRACKET);
+    
+    CPPUNIT_ASSERT(t_0);
+    CPPUNIT_ASSERT(t_1);
+    CPPUNIT_ASSERT(t_2);
+
+    t_0->seguinte = t_1;
+    t_1->anterior = t_0;
+    t_1->seguinte = t_2;
+    t_2->anterior = t_1;
+    
+    Token* cursor = NULL;
+    CPPUNIT_ASSERT_EQUAL( (Token*)NULL, avanca(&cursor) );
+
+    cursor = t_2;
+    CPPUNIT_ASSERT_EQUAL( (Token*)NULL, avanca(&cursor) );
+
+    cursor = t_0;
+    CPPUNIT_ASSERT_EQUAL( t_1, avanca(&cursor) );
+
+    cursor = t_1;
+    CPPUNIT_ASSERT_EQUAL( t_2, avanca(&cursor) );
+  }
+
+  void test_backtrack()
+  {
+    Token* t_0 = new_token("module", 1, 1, KW_MODULE);
+    Token* t_1 = new_token("(", 1, 8, SYM_OPEN_BRACKET);
+    Token* t_2 = new_token(")", 1, 9, SYM_CLOSE_BRACKET);
+    Token* t_3 = new_token(";", 1, 10, SYM_SEMICOLON);
+    
+    CPPUNIT_ASSERT(t_0);
+    CPPUNIT_ASSERT(t_1);
+    CPPUNIT_ASSERT(t_2);
+    CPPUNIT_ASSERT(t_3);
+
+    t_0->seguinte = t_1;
+    t_1->anterior = t_0;
+    t_1->seguinte = t_2;
+    t_2->anterior = t_1;
+    t_2->seguinte = t_3;
+    t_3->anterior = t_2;
+    
+    Token* cursor = NULL;
+    CPPUNIT_ASSERT_EQUAL( (Token*)NULL, backtrack(&cursor) );
+
+    cursor = t_0;
+    CPPUNIT_ASSERT_EQUAL( (Token*)NULL, backtrack(&cursor) );
+
+    cursor = t_1;
+    CPPUNIT_ASSERT_EQUAL( t_0, backtrack(&cursor) );
+
+    cursor = t_2;
+    CPPUNIT_ASSERT_EQUAL( t_1, backtrack(&cursor) );
+
+    cursor = t_3;
+    CPPUNIT_ASSERT_EQUAL( t_2, backtrack(&cursor) );
+  }
+
+  void test_new_token()
+  {
+    char value[] = "some_token";
+    int line = 500;
+    int column = 10;
+    TokenClass t_class = KW_MODULE;
+
+    Token* t = new_token(value, line, column, t_class);
+    CPPUNIT_ASSERT(t);
+    CPPUNIT_ASSERT( ! t->anterior );
+    CPPUNIT_ASSERT( ! t->seguinte );
+    CPPUNIT_ASSERT_EQUAL( line, t->linha );
+    CPPUNIT_ASSERT_EQUAL( column, t->coluna );
+    CPPUNIT_ASSERT( !strcmp(value, t->valor) );
+    CPPUNIT_ASSERT_EQUAL( t_class, t->classe );
+  }
+
+  void test_new_token_to_detect_class()
+  {
+    char value[] = "some_token_0";
+    TokenClass detected_class = get_token_class(value);
+    int line = 1;
+    int column = 1;
+
+    Token* t = new_token(value, line, column, _TO_DETECT);
+    CPPUNIT_ASSERT(t);
+    CPPUNIT_ASSERT( ! t->anterior );
+    CPPUNIT_ASSERT( ! t->seguinte );
+    CPPUNIT_ASSERT_EQUAL( line, t->linha );
+    CPPUNIT_ASSERT_EQUAL( column, t->coluna );
+    CPPUNIT_ASSERT( !strcmp(value, t->valor) );
+    CPPUNIT_ASSERT_EQUAL( detected_class, t->classe );
+  }
 
   void test_new_list_token()
   {
