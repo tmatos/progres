@@ -24,7 +24,7 @@ typedef enum en_verilog_error {
     ERROR_VERILOG_BAD_EOF,
     ERROR_VERILOG_BAD_EXPRESSION,
     ERROR_VERILOG_UNDECLARED_MACRO,
-    NO_ERROR = 10,
+    NO_ERROR_VERILOG = 10,
     END_OF_TOKENS = 20
 } VerilogError;
 
@@ -44,7 +44,7 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
  *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
  *  @param module_pointer Endereco do ponteiro para a struct do module a ser criado.
  *  @return Código de erro do tipo VerilogError. Caso carregue um module com sucesso,
-            retorna NO_ERROR e o module_pointer vai referir para a struct criada.
+            retorna NO_ERROR_VERILOG e o module_pointer vai referir para a struct criada.
             Caso nao existam mais modules a serem carregados, retorna END_OF_TOKENS.
             Em caso de erro, retorna algo diferente desses dois citados acima.
  */

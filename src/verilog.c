@@ -170,7 +170,7 @@ ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, c
         if (err == END_OF_TOKENS)
             break;
 
-        if (err != NO_ERROR)
+        if (err != NO_ERROR_VERILOG)
             goto circuit_bad_return;
 
         circuit->total++;
@@ -662,7 +662,7 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
             *module_pointer = circuito;
             *t = it;
 
-            return NO_ERROR;
+            return NO_ERROR_VERILOG;
         }
         else if (it->classe == SYM_GRAVE_ACCENT) {
             VerilogError err = load_directive(&it, circuito);
@@ -951,7 +951,7 @@ load_reg_identifier_list:
 
 //load_reg_sucess:
     *it = t;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_reg_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -1027,7 +1027,7 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
 
 //load_range_sucess:
     *it = t;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_range_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -1102,7 +1102,7 @@ VerilogError load_directive(Token** it, Module* module)
 
 //load_directive_sucess:
     *it = t;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_directive_bad_number:
     show_error_msg("Numero invalido", t->linha, t->coluna,
@@ -1241,7 +1241,7 @@ initial_block_expect_semicolon:
 
 load_initial_block_sucess:
     *pit = it;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_initial_block_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -1295,7 +1295,7 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
 
 //load_reg_attribution_sucess:
     *it = t;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_reg_attribution_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -1451,7 +1451,7 @@ load_assign_identifiers:
 
 load_assign_sucess:
     *it = t;
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_assign_bad_token:
     delete_componente(&gate);
@@ -1576,7 +1576,7 @@ load_systask_sucess:
     insert_task_event(initial_task_events, t, task, str);
     *pit = it;
 
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 load_systask_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;

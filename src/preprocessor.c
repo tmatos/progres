@@ -241,7 +241,7 @@ VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* li
     *p_tok_it = it;
 
 //preproc_define_success:
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 preproc_define_error_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -284,7 +284,7 @@ VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* lis
     *p_tok_it = it;
 
 //preproc_undef_success:
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 preproc_undef_error_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
@@ -333,7 +333,7 @@ VerilogError preproc_timescale(Token** p_tok_it)
     *p_tok_it = it;
 
 //preproc_timescale_success:
-    return NO_ERROR;
+    return NO_ERROR_VERILOG;
 
 pre_processor_error_bad_eof:
     return ERROR_VERILOG_BAD_EOF;

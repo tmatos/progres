@@ -381,7 +381,7 @@ public:
         
         err = load_module(&it, &q, &mod);
       }
-      while (err == NO_ERROR);
+      while (err == NO_ERROR_VERILOG);
       
       CPPUNIT_ASSERT( !mod );
     }
@@ -416,7 +416,7 @@ public:
 
         VerilogError err = load_module(&it, &q, &mod);
         CPPUNIT_ASSERT( !mod );
-        CPPUNIT_ASSERT( err != NO_ERROR );
+        CPPUNIT_ASSERT( err != NO_ERROR_VERILOG );
 
         delete_lista_token(tokens);
         free_module(&mod);
