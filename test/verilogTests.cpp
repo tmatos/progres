@@ -8,6 +8,13 @@
 #include <vector>
 #include <tuple>
 
+#if defined(_WIN32)
+  #include <windows.h>
+#else
+  #include <dirent.h>
+  #include <fnmatch.h>
+#endif
+
 #include "lex.h"
 #include "preprocessor.h"
 #include "verilog.h"
@@ -32,6 +39,46 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  std::list<std::string>* helper_list_files_in_dir(const std::string& directory, const std::string& mask)
+  {
+    std::list<std::string> *file_list = new std::list<std::string>();
+
+#if defined(_WIN32)
+    std::string search_path = directory;
+    if ( !search_path.empty() && search_path.back() != '\\' && search_path.back() != '/')
+      search_path += "\\";
+    search_path += mask;
+
+    WIN32_FIND_DATAA fd;
+    HANDLE hFind = FindFirstFileA(search_path.c_str(), &fd);
+    if (hFind != INVALID_HANDLE_VALUE) {
+      do {
+        if ( !(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ) {
+          file_list->push_back(directory + "\\" + fd.cFileName);
+        }
+      }
+      while (FindNextFileA(hFind, &fd));
+      FindClose(hFind);
+    }
+#else
+    DIR* dir = opendir(directory.c_str());
+    if (!dir)
+      return file_list;
+
+    struct dirent* entry;
+    while ( (entry = readdir(dir)) != nullptr )
+    {
+      if ( fnmatch(mask.c_str(), entry->d_name, 0) == 0 ) {
+        std::string sep = (directory.empty() || directory.back() == '/') ? "" : "/";
+        file_list->push_back(directory + sep + entry->d_name);
+      }
+    }
+    closedir(dir);
+#endif
+
+    return file_list;
+  }
 
   Token* helper_tokenize_preproc(const char* filepath)
   {
@@ -314,129 +361,8 @@ public:
 
   void test_load_module_badverilog_XX_v()
   {
-    std::list<std::string> list_bad_files = {
-      "./verilog_sample_src/badverilog_00.v",
-      "./verilog_sample_src/badverilog_01.v",
-      "./verilog_sample_src/badverilog_02.v",
-      "./verilog_sample_src/badverilog_03.v",
-      "./verilog_sample_src/badverilog_04.v",
-      "./verilog_sample_src/badverilog_05.v",
-      "./verilog_sample_src/badverilog_06.v",
-      "./verilog_sample_src/badverilog_07.v",
-      "./verilog_sample_src/badverilog_08.v",
-      "./verilog_sample_src/badverilog_09.v",
-      "./verilog_sample_src/badverilog_10.v",
-      "./verilog_sample_src/badverilog_11.v",
-      "./verilog_sample_src/badverilog_12.v",
-      "./verilog_sample_src/badverilog_13.v",
-      "./verilog_sample_src/badverilog_14.v",
-      "./verilog_sample_src/badverilog_15.v",
-      "./verilog_sample_src/badverilog_16.v",
-      "./verilog_sample_src/badverilog_17.v",
-      "./verilog_sample_src/badverilog_17a.v",
-      "./verilog_sample_src/badverilog_17b.v",
-      "./verilog_sample_src/badverilog_18.v",
-      "./verilog_sample_src/badverilog_19.v",
-      "./verilog_sample_src/badverilog_20.v",
-      "./verilog_sample_src/badverilog_21.v",
-      "./verilog_sample_src/badverilog_22.v",
-      "./verilog_sample_src/badverilog_23.v",
-      "./verilog_sample_src/badverilog_24.v",
-      "./verilog_sample_src/badverilog_25.v",
-      "./verilog_sample_src/badverilog_26.v",
-      "./verilog_sample_src/badverilog_27.v",
-      "./verilog_sample_src/badverilog_28.v",
-      "./verilog_sample_src/badverilog_29.v",
-      "./verilog_sample_src/badverilog_29a.v",
-      "./verilog_sample_src/badverilog_30.v",
-      "./verilog_sample_src/badverilog_30a.v",
-      "./verilog_sample_src/badverilog_31.v",
-      "./verilog_sample_src/badverilog_32.v",
-      "./verilog_sample_src/badverilog_33.v",
-      "./verilog_sample_src/badverilog_34.v",
-      "./verilog_sample_src/badverilog_35.v",
-      "./verilog_sample_src/badverilog_36.v",
-      "./verilog_sample_src/badverilog_37.v",
-      "./verilog_sample_src/badverilog_38.v",
-      "./verilog_sample_src/badverilog_39.v",
-      "./verilog_sample_src/badverilog_40.v",
-      "./verilog_sample_src/badverilog_41.v",
-      "./verilog_sample_src/badverilog_42.v",
-      "./verilog_sample_src/badverilog_43.v",
-      "./verilog_sample_src/badverilog_44.v",
-      "./verilog_sample_src/badverilog_45.v",
-      "./verilog_sample_src/badverilog_46.v",
-      "./verilog_sample_src/badverilog_46a.v",
-      "./verilog_sample_src/badverilog_47.v",
-      "./verilog_sample_src/badverilog_48.v",
-      "./verilog_sample_src/badverilog_49.v",
-      "./verilog_sample_src/badverilog_50.v",
-      "./verilog_sample_src/badverilog_51.v",
-      "./verilog_sample_src/badverilog_52.v",
-      "./verilog_sample_src/badverilog_53.v",
-      "./verilog_sample_src/badverilog_53a.v",
-      "./verilog_sample_src/badverilog_54.v",
-      "./verilog_sample_src/badverilog_55.v",
-      "./verilog_sample_src/badverilog_56.v",
-      "./verilog_sample_src/badverilog_57.v",
-      "./verilog_sample_src/badverilog_58.v",
-      "./verilog_sample_src/badverilog_58a.v",
-      "./verilog_sample_src/badverilog_59.v",
-      "./verilog_sample_src/badverilog_60.v",
-      "./verilog_sample_src/badverilog_61.v",
-      "./verilog_sample_src/badverilog_62.v",
-      "./verilog_sample_src/badverilog_63.v",
-      "./verilog_sample_src/badverilog_64.v",
-      "./verilog_sample_src/badverilog_65.v",
-      "./verilog_sample_src/badverilog_66.v",
-      "./verilog_sample_src/badverilog_67.v",
-      "./verilog_sample_src/badverilog_68.v",
-      "./verilog_sample_src/badverilog_69.v",
-      "./verilog_sample_src/badverilog_70.v",
-      "./verilog_sample_src/badverilog_71.v",
-      "./verilog_sample_src/badverilog_71a.v",
-      "./verilog_sample_src/badverilog_72.v",
-      "./verilog_sample_src/badverilog_73.v",
-      "./verilog_sample_src/badverilog_74.v",
-      "./verilog_sample_src/badverilog_75.v",
-      "./verilog_sample_src/badverilog_76.v",
-      "./verilog_sample_src/badverilog_77.v",
-      "./verilog_sample_src/badverilog_78.v",
-      "./verilog_sample_src/badverilog_79.v",
-      "./verilog_sample_src/badverilog_80.v",
-      "./verilog_sample_src/badverilog_81.v",
-      "./verilog_sample_src/badverilog_82.v",
-      "./verilog_sample_src/badverilog_83.v",
-      "./verilog_sample_src/badverilog_83a.v",
-      "./verilog_sample_src/badverilog_83b.v",
-      "./verilog_sample_src/badverilog_84.v",
-      "./verilog_sample_src/badverilog_84a.v",
-      "./verilog_sample_src/badverilog_85.v",
-      "./verilog_sample_src/badverilog_85a.v",
-      "./verilog_sample_src/badverilog_86.v",
-      "./verilog_sample_src/badverilog_86a.v",
-      "./verilog_sample_src/badverilog_87.v",
-      "./verilog_sample_src/badverilog_87a.v",
-      "./verilog_sample_src/badverilog_87b.v",
-      "./verilog_sample_src/badverilog_87c.v",
-      "./verilog_sample_src/badverilog_87d.v",
-      "./verilog_sample_src/badverilog_87e.v",
-      "./verilog_sample_src/badverilog_87f.v",
-      "./verilog_sample_src/badverilog_87g.v",
-      "./verilog_sample_src/badverilog_87h.v",
-      "./verilog_sample_src/badverilog_87i.v",
-      "./verilog_sample_src/badverilog_87j.v",
-      "./verilog_sample_src/badverilog_87k.v",
-      "./verilog_sample_src/badverilog_88.v",
-      "./verilog_sample_src/badverilog_88a.v",
-      "./verilog_sample_src/badverilog_88b.v",
-      "./verilog_sample_src/badverilog_88c.v",
-      "./verilog_sample_src/badverilog_88d.v",
-      "./verilog_sample_src/badverilog_88e.v",
-      "./verilog_sample_src/badverilog_88f.v",
-      "./verilog_sample_src/badverilog_88g.v",
-      "./verilog_sample_src/badverilog_88h.v"
-    };
+    std::list<std::string> *list_bad_files;
+    list_bad_files = helper_list_files_in_dir("./verilog_sample_src/", "badverilog_*.v");
 
     FILE* f = NULL;
     Evento* q = new_empty_event();
@@ -444,7 +370,7 @@ public:
     Token* it = NULL;
     VerilogError err;
 
-    for ( std::string path : list_bad_files )
+    for ( std::string path : *list_bad_files )
     {
       it = helper_tokenize_preproc(path.c_str());
 
@@ -465,21 +391,8 @@ public:
 
   void test_load_module_badtimescale_XX_v()
   {
-    std::list<std::string> list_bad_files = {
-      "./verilog_sample_src/badtimescale_00.v",
-      "./verilog_sample_src/badtimescale_01.v",
-      "./verilog_sample_src/badtimescale_01a.v",
-      "./verilog_sample_src/badtimescale_02.v",
-      "./verilog_sample_src/badtimescale_03.v",
-      "./verilog_sample_src/badtimescale_04.v",
-      "./verilog_sample_src/badtimescale_05.v",
-      "./verilog_sample_src/badtimescale_06.v",
-      "./verilog_sample_src/badtimescale_07.v",
-      "./verilog_sample_src/badtimescale_08.v",
-      "./verilog_sample_src/badtimescale_09.v",
-      "./verilog_sample_src/badtimescale_10.v",
-      "./verilog_sample_src/badtimescale_11.v"
-    };
+    std::list<std::string> *list_bad_files;
+    list_bad_files = helper_list_files_in_dir("./verilog_sample_src/", "badtimescale_*.v");
 
     FILE* f = NULL;
     Evento* q = new_empty_event();
@@ -488,8 +401,10 @@ public:
     Token* it = NULL;
     PreprocesorResult result;
 
-    for ( std::string path : list_bad_files )
+    for ( std::string path : *list_bad_files )
     {
+      //std::cout << "test_load_module_badtimescale_XX_v: " << path << std::endl;
+
       tokens = helper_tokenize_only(path.c_str());
       CPPUNIT_ASSERT( tokens->primeiro );
 
