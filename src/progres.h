@@ -12,7 +12,7 @@
 #include "sinais.h"
 
 /// Program version number, as string
-#define _PROGRES_VERSION "0.0.7-beta"
+#define _PROGRES_VERSION "0.0.8-beta"
 
 /// Brief command line help string
 #define _HELP_STRING_BRIEF "Usage: progres [-s] verilog_file.v [input stimulus file] [output stimulus file]\n"
