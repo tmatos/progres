@@ -26,6 +26,7 @@ class Testes_simula : public CppUnit::TestFixture
   CPPUNIT_TEST( test_simula_samplefile_xnorgates_v );
   CPPUNIT_TEST( test_simula_samplefile_delays_v );
   CPPUNIT_TEST( test_simula_samplefile_display_v );
+  CPPUNIT_TEST( test_simula_samplefile_finish_v );
   CPPUNIT_TEST( test_simula_samplefile_dumpfile_v );
   CPPUNIT_TEST( test_simula_samplefile_tri_state_gates_v );
   CPPUNIT_TEST( test_simula_samplefile_numbers_v );
@@ -609,6 +610,34 @@ public:
     CPPUNIT_ASSERT( f_display_v );
 
     circuit = load_circuit(f_display_v, &q, s_display_v);
+    CPPUNIT_ASSERT(circuit);
+
+    inputs = new_signal_list();
+    CPPUNIT_ASSERT(inputs);
+
+    sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
+    CPPUNIT_ASSERT(sim_outputs);
+
+    helper_close_dump_file(&f_dump);
+    free_signal_list(&inputs);
+    free_signal_list(&sim_outputs);
+    delete_event_queue(&q);
+    free_circuit(&circuit);
+  }
+
+  void test_simula_samplefile_finish_v()
+  {
+    FILE* f_dump = NULL;
+    ListModule* circuit = NULL;
+    Sinais* inputs = NULL;
+    Sinais* sim_outputs = NULL;
+    Evento* q = new_empty_event();
+
+    char s_finish_v[] = "./verilog_sample_src/finish.v";
+    FILE* f_finish_v = fopen(s_finish_v, "r");
+    CPPUNIT_ASSERT( f_finish_v );
+
+    circuit = load_circuit(f_finish_v, &q, s_finish_v);
     CPPUNIT_ASSERT(circuit);
 
     inputs = new_signal_list();
