@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TextOutputter.h>
-#include <cstring>
+#include <string>
 
 #include "strutil.h"
 #include "lex.h"
@@ -25,10 +25,11 @@ public:
 
   void test_new_component()
   {
-    char nome[] = "entrada_0"; 
-    Component* c0 = new_component( (char*)nome, ROLE_INPUT );
+    std::string nome("entrada_0");
+    Component* c0 = new_component( nome.c_str(), ROLE_INPUT );
     CPPUNIT_ASSERT(c0);
-    CPPUNIT_ASSERT( !strcmp( (char*)(c0->nome), (char*)nome ) );
+    std::string nome_em_c0(c0->nome);
+    CPPUNIT_ASSERT_EQUAL( nome, nome_em_c0 );
     CPPUNIT_ASSERT_EQUAL( c0->atributos.role, ROLE_INPUT );
     CPPUNIT_ASSERT_EQUAL( c0->dynamic_value, VAL_X );
     CPPUNIT_ASSERT( c0->list_input );
@@ -75,10 +76,10 @@ public:
 
   void test_insert_component()
   {
-    char str_c0[] = "entrada_0";
-    char str_c1[] = "entrada_1"; 
-    Component* c0 = new_component( (char*)str_c0, ROLE_INPUT );
-    Component* c1 = new_component( (char*)str_c1, ROLE_INPUT );
+    std::string str_c0 = "entrada_0";
+    std::string str_c1 = "entrada_1"; 
+    Component* c0 = new_component( str_c0.c_str(), ROLE_INPUT );
+    Component* c1 = new_component( str_c1.c_str(), ROLE_INPUT );
 
     ListComponent* list = new_list_component();
 
@@ -96,6 +97,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(list->tamanho, 2);
     CPPUNIT_ASSERT(list->itens);
     CPPUNIT_ASSERT_EQUAL(list->itens[1], c1);
+
+    std::string nome_em_c0(c0->nome);
+    std::string nome_em_c1(c1->nome);
+    CPPUNIT_ASSERT_EQUAL( str_c0, nome_em_c0 );
+    CPPUNIT_ASSERT_EQUAL( str_c1, nome_em_c1 );
   }
 
   void test_getXPorNome()
@@ -109,45 +115,45 @@ public:
     CPPUNIT_ASSERT( !get_input_by_name(circ, null_name) );
     CPPUNIT_ASSERT( !get_output_by_name(circ, null_name) );
 
-    char str_porta[] = "porta_01";
-    char str_wire[] = "fio_01"; 
-    char str_in[] = "entrada_01";
-    char str_out[] = "saida_01"; 
-    Component* c_porta = new_component( (char*)str_porta, ROLE_AND );
-    Component* c_wire = new_component( (char*)str_wire, ROLE_WIRE );
-    Component* c_in = new_component( (char*)str_in, ROLE_INPUT );
-    Component* c_out = new_component( (char*)str_out, ROLE_OUTPUT );
+    std::string str_porta = "porta_01";
+    std::string str_wire = "fio_01"; 
+    std::string str_in = "entrada_01";
+    std::string str_out = "saida_01"; 
+    Component* c_porta = new_component( str_porta.c_str(), ROLE_AND );
+    Component* c_wire = new_component( str_wire.c_str(), ROLE_WIRE );
+    Component* c_in = new_component( str_in.c_str(), ROLE_INPUT );
+    Component* c_out = new_component( str_out.c_str(), ROLE_OUTPUT );
 
     insert_component(circ->list_logic_gate, c_porta);
     insert_component(circ->list_wire_net, c_wire);
     insert_component(circ->list_input_net, c_in);
     insert_component(circ->list_output_net, c_out);
 
-    CPPUNIT_ASSERT( get_gate_by_name(circ, str_porta) );
-    CPPUNIT_ASSERT( get_wire_by_name(circ, str_wire) );
-    CPPUNIT_ASSERT( get_input_by_name(circ, str_in) );
-    CPPUNIT_ASSERT( get_output_by_name(circ, str_out) );
+    CPPUNIT_ASSERT( get_gate_by_name(circ, str_porta.c_str()) );
+    CPPUNIT_ASSERT( get_wire_by_name(circ, str_wire.c_str()) );
+    CPPUNIT_ASSERT( get_input_by_name(circ, str_in.c_str()) );
+    CPPUNIT_ASSERT( get_output_by_name(circ, str_out.c_str()) );
 
-    CPPUNIT_ASSERT( !get_gate_by_name(circ, str_in) );
-    CPPUNIT_ASSERT( !get_wire_by_name(circ, str_in) );
-    CPPUNIT_ASSERT( !get_input_by_name(circ, str_out) );
-    CPPUNIT_ASSERT( !get_output_by_name(circ, str_in) );
+    CPPUNIT_ASSERT( !get_gate_by_name(circ, str_in.c_str()) );
+    CPPUNIT_ASSERT( !get_wire_by_name(circ, str_in.c_str()) );
+    CPPUNIT_ASSERT( !get_input_by_name(circ, str_out.c_str()) );
+    CPPUNIT_ASSERT( !get_output_by_name(circ, str_in.c_str()) );
   }
 
   void test_get_param_by_name()
   {
-    char str_param_name[] = "ALGUM_NOME_001";
+    std::string str_param_name = "ALGUM_NOME_001";
     int N = 255;
 
     Module* circ = new_module();
     CPPUNIT_ASSERT(circ);
 
-    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, str_param_name) );
+    CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, str_param_name.c_str()) );
 
     Param p;
     p.is_local = 0;
     p.value = N;
-    copy(p.name, str_param_name);
+    copy(p.name, str_param_name.c_str());
 
     add_param(circ, &p);
 
@@ -156,34 +162,35 @@ public:
     CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, "algum") );
     CPPUNIT_ASSERT( ! get_param_by_name(circ->list_param, "ALGUM") );
 
-    Param* r = get_param_by_name(circ->list_param, str_param_name);
+    Param* r = get_param_by_name(circ->list_param, str_param_name.c_str());
 
     CPPUNIT_ASSERT( r );
-    CPPUNIT_ASSERT( !strcmp(str_param_name, r->name) );
+    std::string name_in_r(r->name);
+    CPPUNIT_ASSERT_EQUAL( str_param_name, name_in_r );
     CPPUNIT_ASSERT_EQUAL( N, r->value );
   }
 
   void test_get_reg_by_name()
   {
-    char str_reg_name[] = "register_ALGUM_NOME_001";
+    std::string str_reg_name = "register_ALGUM_NOME_001";
 
     Module* circ = new_module();
     CPPUNIT_ASSERT(circ);
 
-    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, str_reg_name) );
+    CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, str_reg_name.c_str()) );
 
-    add_register(circ, str_reg_name, 32, 0);
+    add_register(circ, str_reg_name.c_str(), 32, 0);
 
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, NULL) );
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "") );
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "algum") );
     CPPUNIT_ASSERT( ! get_reg_by_name(circ->list_register, "ALGUM") );
 
-    Register* r = get_reg_by_name(circ->list_register, str_reg_name);
+    Register* r = get_reg_by_name(circ->list_register, str_reg_name.c_str());
 
     CPPUNIT_ASSERT( r );
-    CPPUNIT_ASSERT( !strcmp(str_reg_name, r->name) );
+    std::string name_in_r(r->name);
+    CPPUNIT_ASSERT_EQUAL( str_reg_name, name_in_r );
   }
 
 };
-
