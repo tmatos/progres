@@ -1,7 +1,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TextOutputter.h>
-#include <cstring>
 #include <list>
 #include <string>
 
@@ -102,35 +101,37 @@ public:
 
   void test_new_token()
   {
-    char value[] = "some_token";
+    std::string str_value = "some_token";
     int line = 500;
     int column = 10;
     TokenClass t_class = KW_MODULE;
 
-    Token* t = new_token(value, line, column, t_class);
+    Token* t = new_token(str_value.c_str(), line, column, t_class);
     CPPUNIT_ASSERT(t);
     CPPUNIT_ASSERT( ! t->anterior );
     CPPUNIT_ASSERT( ! t->seguinte );
     CPPUNIT_ASSERT_EQUAL( line, t->linha );
     CPPUNIT_ASSERT_EQUAL( column, t->coluna );
-    CPPUNIT_ASSERT( !strcmp(value, t->valor) );
+    std::string str_token_value(t->valor);
+    CPPUNIT_ASSERT_EQUAL( str_value, str_token_value );
     CPPUNIT_ASSERT_EQUAL( t_class, t->classe );
   }
 
   void test_new_token_to_detect_class()
   {
-    char value[] = "some_token_0";
-    TokenClass detected_class = get_token_class(value);
+    std::string str_value = "some_token_0";
+    TokenClass detected_class = get_token_class(str_value.c_str());
     int line = 1;
     int column = 1;
 
-    Token* t = new_token(value, line, column, _TO_DETECT);
+    Token* t = new_token(str_value.c_str(), line, column, _TO_DETECT);
     CPPUNIT_ASSERT(t);
     CPPUNIT_ASSERT( ! t->anterior );
     CPPUNIT_ASSERT( ! t->seguinte );
     CPPUNIT_ASSERT_EQUAL( line, t->linha );
     CPPUNIT_ASSERT_EQUAL( column, t->coluna );
-    CPPUNIT_ASSERT( !strcmp(value, t->valor) );
+    std::string str_token_value(t->valor);
+    CPPUNIT_ASSERT_EQUAL( str_value, str_token_value );
     CPPUNIT_ASSERT_EQUAL( detected_class, t->classe );
   }
 
@@ -161,7 +162,8 @@ public:
     CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
     CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
     CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
-    CPPUNIT_ASSERT( !strcmp(token0.c_str(), l->primeiro->valor) );
+    std::string str_l_first_value(l->primeiro->valor);
+    CPPUNIT_ASSERT_EQUAL( token0, str_l_first_value );
     
     insert_token_of_string(l, token1.c_str(), 3000, 210);
     
@@ -172,10 +174,11 @@ public:
     CPPUNIT_ASSERT_EQUAL( 2, l->tamanho );
     CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
     CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
-    CPPUNIT_ASSERT( !strcmp(token0.c_str(), l->primeiro->valor) );
+    CPPUNIT_ASSERT_EQUAL( token0, str_l_first_value );
     CPPUNIT_ASSERT_EQUAL( 3000, l->ultimo->linha );
     CPPUNIT_ASSERT_EQUAL( 210, l->ultimo->coluna );
-    CPPUNIT_ASSERT( !strcmp(token1.c_str(), l->ultimo->valor) );
+    std::string str_l_last_value(l->ultimo->valor);
+    CPPUNIT_ASSERT_EQUAL( token1, str_l_last_value );
     CPPUNIT_ASSERT( ! l->primeiro->anterior );
     CPPUNIT_ASSERT( ! l->ultimo->seguinte );
     CPPUNIT_ASSERT( l->primeiro->seguinte == l->ultimo );
@@ -622,9 +625,11 @@ public:
 
     Token* it = tokens->primeiro;
 
-    for ( auto s : tokens_esperados ) {
+    for ( std::string s : tokens_esperados )
+    {
       CPPUNIT_ASSERT(it);
-      CPPUNIT_ASSERT( !strcmp(s.c_str(), it->valor) );
+      std::string str_it_valor(it->valor);
+      CPPUNIT_ASSERT_EQUAL( s, str_it_valor );
       it = it->seguinte;
     }
 
