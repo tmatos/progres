@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TextOutputter.h>
-#include <cstring>
+#include <string>
 
 #include "estruturas.h"
 #include "sinais.h"
@@ -40,7 +40,8 @@ public:
     CPPUNIT_ASSERT(!fila);
 
     Tempo t = (Tempo)5000;
-    Component* c0 = new_component( (char*)"entrada_componente_0", ROLE_INPUT );
+    std::string nome_componente_0 = "entrada_componente_0";
+    Component* c0 = new_component( nome_componente_0.c_str(), ROLE_INPUT );
     ValorLogico v = VAL_1;
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
@@ -55,7 +56,8 @@ public:
 
     t = 11000;
     v = VAL_0;
-    Component* c1 = new_component( (char*)"entrada_componente_1", ROLE_INPUT );
+    std::string nome_componente_1 = "entrada_componente_1";
+    Component* c1 = new_component( nome_componente_1.c_str(), ROLE_INPUT );
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c1, NULL, v );
 
@@ -86,13 +88,15 @@ public:
 
     Tempo t = (Tempo)10;
     ValorLogico v = VAL_1;
-    Component* c_0 = new_component( (char*)"in_component_0", ROLE_INPUT );
+    std::string nome_componente_0 = "in_component_0";
+    Component* c_0 = new_component( nome_componente_0.c_str(), ROLE_INPUT );
 
     insert_event( &q, t, EVT_NET_TRANSITION, c_0, NULL, v );
 
     t = 11;
     v = VAL_0;
-    Component* c_1 = new_component( (char*)"in_component_1", ROLE_INPUT );
+    std::string nome_componente_1 = "in_component_1";
+    Component* c_1 = new_component( nome_componente_1.c_str(), ROLE_INPUT );
 
     insert_event( &q, t, EVT_NET_TRANSITION, c_1, NULL, v );
 
@@ -116,7 +120,8 @@ public:
     Evento* fila = NULL;
 
     Tempo t = (Tempo)5000;
-    Component* c0 = new_component( (char*)"wire_component_0", ROLE_WIRE );
+    std::string nome_componente_0 = "wire_component_0";
+    Component* c0 = new_component( nome_componente_0.c_str(), ROLE_WIRE );
     ValorLogico v = VAL_1;
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
@@ -126,17 +131,20 @@ public:
 
     Transicao* tr = get_transitions_at_time(fila, t);
     CPPUNIT_ASSERT(tr);
-    // CPPUNIT_ASSERT( !strcmp("wire_component_0", (char*)tr->fio->nome) );
+    std::string str_tr_fio_nome(tr->fio->nome);
+    CPPUNIT_ASSERT_EQUAL( nome_componente_0, str_tr_fio_nome );
 
     CPPUNIT_ASSERT( ! get_transitions_at_time(fila, (Tempo)50 ) );
     CPPUNIT_ASSERT( ! get_transitions_at_time(fila, (Tempo)15000 ) );
 
-    Component* c1 = new_component( (char*)"wire_component_1", ROLE_WIRE );
+    std::string nome_componente_1 = "wire_component_1";
+    Component* c1 = new_component( nome_componente_1.c_str(), ROLE_WIRE );
     insert_event( &fila, (Tempo)7000, EVT_NET_TRANSITION, c1, NULL, VAL_0 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
 
-    Component* c2 = new_component( (char*)"wire_component_2", ROLE_WIRE );
+    std::string nome_componente_2 = "wire_component_2";
+    Component* c2 = new_component( nome_componente_2.c_str(), ROLE_WIRE );
     insert_event( &fila, (Tempo)5550, EVT_NET_TRANSITION, c2, NULL, VAL_1 );
     CPPUNIT_ASSERT(fila);
     CPPUNIT_ASSERT(fila->proximo);
@@ -164,17 +172,20 @@ public:
     CPPUNIT_ASSERT( ! pop_event(NULL) );
     CPPUNIT_ASSERT( ! pop_event(&q) );
 
+    std::string nome_componente_0 = "in_component_0";
+    std::string nome_componente_1 = "in_component_1";
+
     insert_event( &q,
                   (Tempo)10,
                   EVT_NET_TRANSITION,
-                  new_component( (char*)"in_component_0", ROLE_INPUT ),
+                  new_component( nome_componente_0.c_str(), ROLE_INPUT ),
                   NULL,
                   VAL_0 );
 
     insert_event( &q,
                   (Tempo)10,
                   EVT_NET_TRANSITION,
-                  new_component( (char*)"in_component_1", ROLE_INPUT ),
+                  new_component( nome_componente_1.c_str(), ROLE_INPUT ),
                   NULL,
                   VAL_X );
 

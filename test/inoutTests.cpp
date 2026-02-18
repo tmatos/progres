@@ -1,7 +1,6 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/TextOutputter.h>
-#include <cstring>
 #include <list>
 #include <string>
 
@@ -52,6 +51,8 @@ public:
 
   void test_load_input_signals_oneInputFile()
   {
+    std::string expected_name_a = "a";
+
     FILE* file_inputs = fopen("./inout_sample_files/one.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
@@ -61,12 +62,17 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
     CPPUNIT_ASSERT( inputs->lista );
-    CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
+
+    std::string str_name_a(inputs->lista[0].nome);
+    CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
   }
 
   void test_load_input_signals_twoInputFile()
   {
+    std::string expected_name_a = "a";
+    std::string expected_name_b = "b";
+
     FILE* file_inputs = fopen("./inout_sample_files/two.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
@@ -76,14 +82,19 @@ public:
     CPPUNIT_ASSERT( inputs->lista );
     fclose(file_inputs);
 
-    CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
+    std::string str_name_a(inputs->lista[0].nome);
+    std::string str_name_b(inputs->lista[1].nome);
+    CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
+    CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
     CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].duracaoTotal );
   }
 
   void test_load_input_signals_file_notgates_in()
   {
+    std::string expected_name_a = "a";
+    std::string expected_name_b = "b";
+
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
     CPPUNIT_ASSERT( f_notgates_in );
 
@@ -93,8 +104,10 @@ public:
     CPPUNIT_ASSERT( inputs->lista );
     fclose(f_notgates_in);
 
-    CPPUNIT_ASSERT( !strcmp( (char*)"a", (char*)inputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( !strcmp( (char*)"b", (char*)inputs->lista[1].nome ) );
+    std::string str_name_a(inputs->lista[0].nome);
+    std::string str_name_b(inputs->lista[1].nome);
+    CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
+    CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
     CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].duracaoTotal );
 
@@ -166,8 +179,11 @@ public:
 
     CPPUNIT_ASSERT_EQUAL( inputs->quantidade, outputs->quantidade );
 
-    for ( int i = 0; i < inputs->quantidade; ++i ) {
-      CPPUNIT_ASSERT( !strcmp(inputs->lista[i].nome, outputs->lista[i].nome) );
+    for ( int i = 0; i < inputs->quantidade; ++i )
+    {
+      std::string str_nome_input_i(inputs->lista[i].nome);
+      std::string str_nome_output_i(outputs->lista[i].nome);
+      CPPUNIT_ASSERT_EQUAL( str_nome_input_i, str_nome_output_i );
       CPPUNIT_ASSERT_EQUAL( inputs->lista[i].duracaoTotal, outputs->lista[i].duracaoTotal );
       
       for ( int j = 0; j < 3; ++j )
@@ -234,7 +250,9 @@ public:
     // Read and validate SOME contents of the VCD file
     char buffer[256];
     fgets(buffer, sizeof(buffer), file_vcd);
-    CPPUNIT_ASSERT(strcmp(buffer, "$date\n") == 0);
+    std::string str_expected = "$date\n";
+    std::string str_buffer(buffer);
+    CPPUNIT_ASSERT_EQUAL( str_expected, str_buffer );
 
     fclose(file_vcd);
     
