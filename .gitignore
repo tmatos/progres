@@ -17,8 +17,6 @@ autom4te.cache/
 autoscan.log
 config.log
 config.status
-compile
-missing
 stamp-h1
 config.h
 Makefile
