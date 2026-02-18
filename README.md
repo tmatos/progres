@@ -104,11 +104,24 @@ To build the executable, which may be copied to any desired location in
 your filesystem. For now, this file is self-sufficient.
 
 
-## 4. Contacts
+## 4. Tests
+
+Unit testing is done with C++ using CppUnit. These are in the `test` dir.
+A Makefile is provided with some usefull targets. The default is `tests`,
+wich will run all the tests within the suite.
+
+You can also run `make coverage` to get test coverage information, generate
+a report in HTML with `make html` and get both the report along with branch
+coverage information using `make branchcov`.
+
+**Note:** You have to manually clean the test executable using `make clean`.
+
+
+## 5. Contacts
 
 * Email: tiago AT tmatos DOT net
-* Site: https://tmatos.net
-* Repo: https://github.com/tmatos/progres
+* Site: <https://tmatos.net>
+* Repo: <https://github.com/tmatos/progres>
 
 
-(C) 2014, 2025 Tiago Matos
+(C) 2014-2026 Tiago Matos
