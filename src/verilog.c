@@ -43,7 +43,7 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
     }
     else {
         // senao, adicione-o a lista de identifiers
-        insert_token_of_string(identifiers, t->valor, -1, -1);
+        insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
         copy(module->name, t->valor);
     }
 
@@ -108,8 +108,8 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
                 goto load_module_header_bad_return;
             }
 
-            insert_token_of_string(identifiers, t->valor, -1, -1);
-            insert_token_of_string(livres, t->valor, -1, -1);
+            insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
+            insert_token_of_string(livres, t->valor, -1, -1, IDENTIFIER);
             expect_comma = 1;
 
             avanca(&t);
@@ -342,13 +342,13 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
                 }
 
                 if ( token_subcase == KW_INPUT ) {
-                    insert_token_of_string(list_input, it->valor, -1, -1);
+                    insert_token_of_string(list_input, it->valor, -1, -1, IDENTIFIER);
 
                     // atribui como entrada o identificador na estrutura
                     add_input( circuito, new_component(it->valor, ROLE_INPUT) );
                 }
                 else if ( token_subcase == KW_OUTPUT ) {
-                    insert_token_of_string(list_output, it->valor, -1, -1);
+                    insert_token_of_string(list_output, it->valor, -1, -1, IDENTIFIER);
 
                     // atribui como saida o identificador na estrutura
                     add_output( circuito, new_component(it->valor, ROLE_OUTPUT) );
@@ -382,8 +382,8 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
                         goto bad_return;
                     }
 
-                    insert_token_of_string(identifiers, it->valor, -1, -1);
-                    insert_token_of_string(list_wire, it->valor, -1, -1);
+                    insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
+                    insert_token_of_string(list_wire, it->valor, -1, -1, IDENTIFIER);
 
                     // atribui como wire o identificador na estrutura
                     net = new_component(it->valor, ROLE_WIRE);
@@ -470,7 +470,7 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
                     goto bad_return;
                 }
 
-                insert_token_of_string(identifiers, it->valor, -1, -1);
+                insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
                 copy(gate->nome, it->valor);
 
                 avanca(&it);
@@ -716,8 +716,8 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
                 goto bad_return;
             }
 
-            insert_token_of_string(identifiers, it->valor, -1, -1);
-            insert_token_of_string(list_param, it->valor, -1, -1);
+            insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
+            insert_token_of_string(list_param, it->valor, -1, -1, IDENTIFIER);
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
             param->is_local = 1;
@@ -929,7 +929,7 @@ load_reg_identifier_list:
     }
     
     // adicionar na lista de identificadores usados
-    insert_token_of_string(identifiers, t->valor, -1, -1);
+    insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
 
     add_register(module, t->valor, (range_msb - range_lsb + 1), is_signed);
 

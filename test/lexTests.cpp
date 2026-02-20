@@ -151,7 +151,7 @@ public:
     std::string token0("my_token");
     std::string token1("<=");
     
-    insert_token_of_string(l, token0.c_str(), 3000, 200);
+    insert_token_of_string(l, token0.c_str(), 3000, 200, IDENTIFIER);
     
     CPPUNIT_ASSERT(l);
     CPPUNIT_ASSERT( l->primeiro );
@@ -165,7 +165,7 @@ public:
     std::string str_l_first_value(l->primeiro->valor);
     CPPUNIT_ASSERT_EQUAL( token0, str_l_first_value );
     
-    insert_token_of_string(l, token1.c_str(), 3000, 210);
+    insert_token_of_string(l, token1.c_str(), 3000, 210, SYM_LESS_OR_EQUAL);
     
     CPPUNIT_ASSERT(l);
     CPPUNIT_ASSERT( l->primeiro );
@@ -195,7 +195,7 @@ public:
     std::string token3("#");
     std::string tokenZ("zzzzz");
     
-    insert_token_of_string(l, token0.c_str(), 500, 210);
+    insert_token_of_string(l, token0.c_str(), 500, 210, IDENTIFIER);
     CPPUNIT_ASSERT(l);
     CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
     
@@ -207,10 +207,10 @@ public:
     CPPUNIT_ASSERT( ! l->primeiro );
     CPPUNIT_ASSERT( ! l->ultimo );
 
-    insert_token_of_string(l, token0.c_str(), 10, 1);
-    insert_token_of_string(l, token1.c_str(), 20, 1);
-    insert_token_of_string(l, token2.c_str(), 50, 1);
-    insert_token_of_string(l, token3.c_str(), 500, 1);
+    insert_token_of_string(l, token0.c_str(), 10, 1, IDENTIFIER);
+    insert_token_of_string(l, token1.c_str(), 20, 1, SYM_LESS_OR_EQUAL);
+    insert_token_of_string(l, token2.c_str(), 50, 1, KW_WIRE);
+    insert_token_of_string(l, token3.c_str(), 500, 1, SYM_HASHTAG);
     CPPUNIT_ASSERT_EQUAL( 4, l->tamanho );
 
     remove_tokens_by_value(l, token0.c_str());
@@ -325,7 +325,7 @@ public:
 
     int line = 1;
     for (auto s : lst_str) {
-      insert_token_of_string(lst_tk, s.c_str(), line, 1);
+      insert_token_of_string(lst_tk, s.c_str(), line, 1, _TO_DETECT);
       line++;
     }
 

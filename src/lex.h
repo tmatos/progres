@@ -186,9 +186,10 @@ void insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna)
  *  @param tok Uma string que representa o token.
  *  @param p_linha Linha no arquivo onde está o token.
  *  @param p_coluna Coluna no arquivo onde inicia-se o token.
+ *  @param tok_class A classe do token, conforme a enum TokenClass.
  *  @return void.
  */
-void insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna);
+void insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna, TokenClass tok_class);
 
 /** @brief Remove the token, specified by its pointer, from the list.
  *  @param list The list from which the token will be removed.

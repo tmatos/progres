@@ -63,7 +63,8 @@ Sinais* load_input_signals(FILE* file)
         insert_token_of_string(list_used_identifiers,
                                it->valor,
                                it->linha,
-                               it->coluna);
+                               it->coluna,
+                               IDENTIFIER);
 
         add_new_signal(list_input, it->valor);
 
