@@ -102,10 +102,12 @@ VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* 
  * @brief Parsing of register attributions inside of initial blocks.
  * @param it Pointer to a token iterator (which is also a pointer).
  * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
+ * @param initial_events Pointer to a queue of events happening inside initial blocks.
+ * @param t_ev Time when the event ocurs in the simulation.
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module);
+VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module, Evento** initial_events, Tempo t_ev);
 
 /**
  * @brief Parsing of assigns.

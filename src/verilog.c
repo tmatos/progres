@@ -1202,7 +1202,7 @@ initial_block_loop:
             goto load_initial_block_bad_token;
         }
 
-        err = load_reg_attribution(&it, list_param, module);
+        err = load_reg_attribution(&it, list_param, module, initial_task_events, t);
     }
 
     switch (err)
@@ -1250,10 +1250,16 @@ load_initial_block_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module)
+VerilogError load_reg_attribution(
+    Token** it,
+    ListToken* list_param,
+    Module* module,
+    Evento** initial_events,
+    Tempo t_ev)
 {
     Register* left_reg = NULL;
     Param* p = NULL;
+    ValorLogico logic_value = VAL_X;
     
     Token* t = *it;
 
@@ -1291,7 +1297,9 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
         goto load_reg_attribution_bad_token;
     }
 
-    // TODO: create atribution event and add it to apropriate queue
+    // TODO: make reg attribution not only for bits 
+    logic_value = left_reg->value == 0 ? VAL_0 : VAL_1;
+    insert_event(initial_events, t_ev, EVT_REG_ATTRIBUTION, NULL, left_reg, logic_value);
 
 //load_reg_attribution_sucess:
     *it = t;
@@ -1408,12 +1416,14 @@ load_assign_identifiers:
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
-    else if( has_item_of_string_value(list_out, t->valor) ) {
+    else if ( has_item_of_string_value(list_out, t->valor) ) {
         // inserir, na lista de entradas da gate, esta entrada
         in = get_component_by_name(module->list_output_net, t->valor);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
+    //else if ( get_reg_by_name(module->list_register, t->valor) ) {
+    //}
     else {
         show_error_msg("Este identificador nao consta como alguma net declarada",
                         t->linha, t->coluna,
