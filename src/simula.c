@@ -184,6 +184,9 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
             case TASK_DISPLAY:
                 print("%s\n", tr->task_code);
                 break;
+            case TASK_WRITE:
+                print("%s", tr->task_code);
+                break;
             case TASK_DUMPFILE:
                 set_dumpfile(f_dump, tr->task_code);
                 // TODO: set more flags for dumpfile

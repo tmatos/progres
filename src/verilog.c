@@ -1495,6 +1495,9 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     if ( iguais(it->valor, "display") ) {
         task = TASK_DISPLAY;
     }
+    else if ( iguais(it->valor, "write") ) {
+        task = TASK_WRITE;
+    }
     else if ( iguais(it->valor, "dumpfile") ) {
         task = TASK_DUMPFILE;
     }
@@ -1528,7 +1531,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
 
-    // first arg SHOULD be a string
+    // first arg SHOULD be a string (for now)
 
     if ( it->classe != STRING ) {
         show_error_msg("Token inesperado foi encontrado",
@@ -1543,6 +1546,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     str[len(it->valor) - 2] = '\0'; // remove the last quote
 
     // for Sdisplay: there may be zero to n more args
+    // for Swrite: there may be zero to n more args
     // for $dumpfile: there are no more args
 
 systask_args_load:
