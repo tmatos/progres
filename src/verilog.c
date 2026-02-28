@@ -1505,6 +1505,10 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
         task = TASK_FINISH;
         goto load_systask_sucess;
     }
+    else if ( iguais(it->valor, "stop") ) {
+        task = TASK_STOP;
+        goto load_systask_sucess;
+    }
     else {
         show_error_msg("Task invalida ou nao suportada",
                        it->linha,

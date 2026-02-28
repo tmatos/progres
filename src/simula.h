@@ -134,6 +134,12 @@ void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Compone
  */
 void set_dumpfile(FILE** pp_file, const char* s_path);
 
+/** @brief Inspection console launched at $stop system task calls.
+ *  @param module Pointer to the module being simulated.
+ *  @param t Time of the simulation when $stop was reached.
+ */
+void inspection_console(Module* module, Tempo t);
+
 #ifdef __cplusplus
 }
 #endif

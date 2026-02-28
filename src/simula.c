@@ -201,6 +201,9 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
                 tr = NULL; // exit outer while loop
                 continue;
                 break;
+            case TASK_STOP:
+                inspection_console(circuto, t);
+                break;
             default:
                 break;
             }
@@ -563,4 +566,17 @@ void set_dumpfile(FILE** pp_file, const char* s_path)
     if ( *pp_file == NULL ) {
         print("erro: nao foi possivel abrir o arquivo '%s' para escrita.", s_path);
     }
+}
+
+void inspection_console(Module* module, Tempo t)
+{
+    int code;
+    print("[$stop call] in module: '%s'\n", module->name);
+    print("At simulation time: %d\n", (unsigned int)t);
+    print("Type 'c' to continue...\n");
+    do {
+        print("> ");
+        code = getchar();
+    }
+    while ( code != (int)'c' );
 }
