@@ -90,21 +90,21 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
     }
 
     // task ocurrences are copied into the event queue
-    Evento* evit = initial_task_events ? *initial_task_events : NULL;
-    while (evit)
+    Evento* evt_it = initial_task_events ? *initial_task_events : NULL;
+    while (evt_it)
     {
-        Transicao* tranit = evit->listaTransicao;
-        while (tranit)
+        Transicao* tran_it = evt_it->listaTransicao;
+        while (tran_it)
         {
             insert_task_event(&fila,
-                              evit->quando,
-                              tranit->task_type,
-                              tranit->task_code);
+                              evt_it->quando,
+                              tran_it->task_type,
+                              tran_it->task_arg);
 
-            tranit = tranit->proximo;
+            tran_it = tran_it->proximo;
         }
         
-        evit = evit->proximo;
+        evt_it = evt_it->proximo;
     }
 
     // Inicializacao da fila de eventos com os valores das entradas
@@ -182,13 +182,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
             switch (tr->task_type)
             {
             case TASK_DISPLAY:
-                print("%s\n", tr->task_code);
+                print("%s\n", tr->task_arg.string_literal);
                 break;
             case TASK_WRITE:
-                print("%s", tr->task_code);
+                print("%s", tr->task_arg.string_literal);
                 break;
             case TASK_DUMPFILE:
-                set_dumpfile(f_dump, tr->task_code);
+                set_dumpfile(f_dump, tr->task_arg.string_literal);
                 // TODO: set more flags for dumpfile
                 break;
             case TASK_FINISH:

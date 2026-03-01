@@ -7,6 +7,7 @@
 #ifndef EVENTOS_H
 #define EVENTOS_H
 
+#include "lex.h"
 #include "estruturas.h"
 #include "sinais.h"
 
@@ -83,6 +84,17 @@ typedef enum {
     IS_NOT_A_TASK
 } SystemTask;
 
+/**
+ * @brief Contains a single argument of a system task.
+ */
+typedef union un_systemtask_arg {
+    char string_literal[MAX_TOKEN_SIZE];
+    int number_literal;
+    ValorLogico logic_value;
+    Component* net;
+    Register* reg;
+} SystemTaskArg;
+
 typedef struct st_transicao Transicao;
 
 /**
@@ -92,7 +104,7 @@ typedef struct st_transicao Transicao;
  */
 struct st_transicao {
     SystemTask task_type;
-    char* task_code;
+    SystemTaskArg task_arg;
 
     Component* fio; // Indica o componente sobre o qual o evento se origina, apenas wires
     Register* reg; // in case of a transition in register value
@@ -151,11 +163,11 @@ Evento* new_empty_event();
  *         Se já houver um evento no tempo t, adiciona à lista de transições desse evento.
  * @param fila Ponteiro para a fila de eventos.
  * @param t Tempo em que ocorre o evento.
- * @param sys_task Tipo de SystemTask, conforme SystemTask.
- * @param code String com algum dado ou código associado à task em questão.
+ * @param sys_task Tipo desta system task, conforme a enum SystemTask.
+ * @param sys_task_arg Um dos argumentos fornecidos à task em questão.
  * @return void
  */
-void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code);
+void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, SystemTaskArg sys_task_arg);
 
 /** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
  *         comp para o novoValor. Mas, se houver já na fila evento marcado para t,

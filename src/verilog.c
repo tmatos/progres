@@ -1477,6 +1477,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     int count = 0; // task arg counter
     SystemTask task = TASK_UNKNOWN;
     char str[MAX_TOKEN_SIZE] = "";
+    SystemTaskArg arg;
 
     Token* it = *pit;
 
@@ -1548,6 +1549,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     copy(str, it->valor + 1); // remove the first quote
     str[len(it->valor) - 2] = '\0'; // remove the last quote
+    copy(arg.string_literal, str);
 
     // for Sdisplay: there may be zero to n more args
     // for Swrite: there may be zero to n more args
@@ -1591,7 +1593,7 @@ systask_args_load:
     goto systask_args_load;
 
 load_systask_sucess:
-    insert_task_event(initial_task_events, t, task, str);
+    insert_task_event(initial_task_events, t, task, arg);
     *pit = it;
 
     return NO_ERROR_VERILOG;

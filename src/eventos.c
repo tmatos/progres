@@ -51,7 +51,7 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Component* comp, Register
     evt->listaTransicao->proximo = NULL;
 
     evt->listaTransicao->task_type = IS_NOT_A_TASK;
-    evt->listaTransicao->task_code = NULL;
+    evt->listaTransicao->task_arg.number_literal = 0;
 
     // empty queue
     if ( !(*fila) ) {
@@ -134,7 +134,7 @@ void delete_event_queue(Evento** queue)
     *queue = NULL;
 }
 
-void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* code)
+void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, SystemTaskArg sys_task_arg)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior
@@ -145,8 +145,7 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, const char* 
     evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
 
     evt->listaTransicao->task_type = sys_task;
-    evt->listaTransicao->task_code = (char*) xmalloc( sizeof(char) * MAX_TOKEN_SIZE + 1 );
-    copy( evt->listaTransicao->task_code, code );
+    evt->listaTransicao->task_arg = sys_task_arg;
 
     evt->listaTransicao->fio = NULL;
     evt->listaTransicao->reg = NULL;
