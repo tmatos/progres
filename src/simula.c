@@ -573,10 +573,12 @@ void inspection_console(Module* module, Tempo t)
     int code;
     print("[$stop call] in module: '%s'\n", module->name);
     print("At simulation time: %d\n", (unsigned int)t);
-    print("Type 'c' to continue...\n");
+    print("Enter 'c' to continue...\n");
     do {
         print("> ");
         code = getchar();
+        if ( code == (int)'\n' ) continue;
+        while ( getchar() != (int)'\n' );
     }
     while ( code != (int)'c' );
 }
