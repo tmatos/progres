@@ -20,9 +20,17 @@
 #include "lex.h"
 #include "preprocessor.h"
 
-int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Module* module)
+int load_module_header(
+    Token** it,
+    ListToken* identifiers,
+    ListToken* livres,
+    ListToken* identifiers_input,
+    ListToken* identifiers_output,
+    Module* module)
 {
     int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
+    int is_defined_input = 0; //flag indica que net do identificador sera input
+    int is_defined_output = 0; //flag indica net do identificador como output
 
     Token* t = *it;
 
@@ -97,6 +105,18 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
                 goto load_module_header_bad_return;
             }
 
+            if ( t->classe == KW_INPUT || t->classe == KW_OUTPUT ) {
+                is_defined_input = (t->classe == KW_INPUT) ? 1 : 0;
+                is_defined_output = (t->classe == KW_OUTPUT) ? 1 : 0;
+
+                avanca(&t);
+                if (!t) {
+                    show_error_msg("Final do arquivo nao esperado",
+                                   -1, -1, "identificador valido", NULL);
+                    goto load_module_header_bad_return;
+                }
+            }
+
             if ( !is_allowed_identifier(t) ) {
                 show_error_msg("Identificador nao foi encontrado",
                                t->linha, t->coluna, "um identificador", t->valor);
@@ -109,7 +129,16 @@ int load_module_header(Token** it, ListToken* identifiers, ListToken* livres, Mo
             }
 
             insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
-            insert_token_of_string(livres, t->valor, -1, -1, IDENTIFIER);
+
+            if (is_defined_input)
+                insert_token_of_string(identifiers_input, t->valor, -1, -1, IDENTIFIER);
+            else if (is_defined_output)
+                insert_token_of_string(identifiers_output, t->valor, -1, -1, IDENTIFIER);
+            else
+                insert_token_of_string(livres, t->valor, -1, -1, IDENTIFIER);
+
+            is_defined_input = 0;
+            is_defined_output = 0;
             expect_comma = 1;
 
             avanca(&t);
@@ -272,8 +301,14 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
         goto before_module;
     }
 
-    if ( !load_module_header(&it, identifiers, identifiers_to_be, circuito) )
+    if ( !load_module_header(&it,
+                             identifiers,
+                             identifiers_to_be,
+                             list_input,
+                             list_output,
+                             circuito) ) {
         goto bad_return;
+    }
 
     if (!avanca(&it))
         goto bad_return_unexpected_eof;
