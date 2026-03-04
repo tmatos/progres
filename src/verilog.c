@@ -216,6 +216,9 @@ ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, c
     }
 
 //success:
+    delete_lista_token(tokens);
+    fclose(f_verilog_source);
+    
     return circuit;
 
 circuit_bad_return:
