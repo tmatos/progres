@@ -280,6 +280,11 @@ ListComponent* new_list_component_of_size(unsigned int size);
  */
 void delete_list_component(ListComponent** ppl);
 
+/** @brief Libera completamente uma lista de registradores da memória.
+ *  @param list_reg Ponteiro para a struct ListRegister a ser liberada.
+*/
+void delete_list_register(ListRegister* list_reg);
+
 /** @brief Insere o componente na lista de componentes.
  *  @param ls Ponteiro para a lista de componentes.
  *  @param cp Ponteiro para o componente a ser inserido.

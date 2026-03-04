@@ -60,8 +60,7 @@ void free_module(Module** mod)
     if ( (*mod)->list_param.itens )
         free( (*mod)->list_param.itens );
 
-    if ( (*mod)->list_register.itens )
-        free( (*mod)->list_register.itens );
+    delete_list_register( &((*mod)->list_register) );
 
     if ( (*mod)->sinais_input )
         free( (*mod)->sinais_input );
@@ -169,6 +168,25 @@ void delete_list_component(ListComponent** ppl)
 
     free(*ppl);
     *ppl = NULL;
+}
+
+void delete_list_register(ListRegister* list_reg)
+{
+    if ( !list_reg || !list_reg->itens )
+        return;
+
+    int i;
+
+    for ( i = 0; i < list_reg->total; i++ )
+    {
+        if ( list_reg->itens[i] ) {
+            free( list_reg->itens[i] );
+        }
+    }
+
+    free( list_reg->itens );
+    list_reg->itens = NULL;
+    list_reg->total = 0;
 }
 
 void insert_component(ListComponent* ls, Component* cp)
