@@ -57,9 +57,7 @@ void free_module(Module** mod)
     delete_list_component( &((*mod)->list_logic_gate) );
     delete_list_component( &((*mod)->list_wire_net) );
 
-    if ( (*mod)->list_param.itens )
-        free( (*mod)->list_param.itens );
-
+    delete_list_param( &((*mod)->list_param) );
     delete_list_register( &((*mod)->list_register) );
 
     if ( (*mod)->sinais_input )
@@ -168,6 +166,25 @@ void delete_list_component(ListComponent** ppl)
 
     free(*ppl);
     *ppl = NULL;
+}
+
+void delete_list_param(ListParam* list_param)
+{
+    if ( !list_param || !list_param->itens )
+        return;
+
+    int i;
+
+    for ( i = 0; i < list_param->total; i++ )
+    {
+        if ( list_param->itens[i] ) {
+            free( list_param->itens[i] );
+        }
+    }
+
+    free( list_param->itens );
+    list_param->itens = NULL;
+    list_param->total = 0;
 }
 
 void delete_list_register(ListRegister* list_reg)

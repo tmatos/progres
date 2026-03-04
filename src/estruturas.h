@@ -280,6 +280,11 @@ ListComponent* new_list_component_of_size(unsigned int size);
  */
 void delete_list_component(ListComponent** ppl);
 
+/** @brief Libera completamente uma lista de parametros da memória.
+ *  @param list_param Ponteiro para a struct ListParam a ser liberada.
+*/
+void delete_list_param(ListParam* list_param);
+
 /** @brief Libera completamente uma lista de registradores da memória.
  *  @param list_reg Ponteiro para a struct ListRegister a ser liberada.
 */
