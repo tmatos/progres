@@ -132,6 +132,11 @@ int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao);
  */
 Sinais* new_signal_list();
 
+/** @brief Free used memory and set NULL to the pointer.
+ *  @param signal Pointer to a pointer to the Sinal struct.
+ */
+void free_signal(Sinal** signal);
+
 /** @brief Free mem and set NULL to pointer.
  *  @param list Pointer to Sinais*
  */

@@ -284,23 +284,23 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
         list_changed_gates = NULL;
     }
 
-    // copia as saidas da simulacao do ciruito para o retorno da funcao
+    // move as saidas da simulacao do circuito para o retorno da funcao
     for ( i=0 ; i < circuto->list_output_net->tamanho ; i++ )
     {
         Sinal* s = circuto->list_output_net->itens[i]->output_signal;
 
         if (s) {
             insert_signal(saidas, s);
+            free_signal(&s);
+            continue;
         }
-        else {
-            // cria sinal de saida constante com o valor dinamico do componente
-            ValorLogico v = circuto->list_output_net->itens[i]->dynamic_value;
-            Sinal* s_temp = new_signal(circuto->list_output_net->itens[i]->nome);
-            add_new_pulse(s_temp, v, t); // valor dinamico por todo o tempo da simulacao
-            insert_signal(saidas, s_temp);
-            free(s_temp->pulsos);
-            free(s_temp);
-        }
+
+        // cria sinal de saida constante com o valor dinamico do componente
+        ValorLogico v = circuto->list_output_net->itens[i]->dynamic_value;
+        Sinal* s_temp = new_signal(circuto->list_output_net->itens[i]->nome);
+        add_new_pulse(s_temp, v, t); // dynamic value for all the simulat. time
+        insert_signal(saidas, s_temp);
+        free_signal(&s_temp);
     }
 
     return saidas;

@@ -111,6 +111,15 @@ Sinais* new_signal_list()
     return s;
 }
 
+void free_signal(Sinal** signal)
+{
+    if ( *signal ) {
+        free( (**signal).pulsos );
+        free( *signal );
+        *signal = NULL;
+    }
+}
+
 void free_signal_list(Sinais** list)
 {
     int i;
@@ -118,10 +127,12 @@ void free_signal_list(Sinais** list)
     if ( *list ) {
         for ( i=0 ; i < (*list)->quantidade ; i++ )
         {
+            // NOTE: not using free_signal() here because of reallocs in lista
             free( (*list)->lista[i].pulsos );
         }
         
         if ( (*list)->lista ) {
+            // NOTE: the array (*list)->lista grows with reallocs
             free( (*list)->lista );
         }
 
