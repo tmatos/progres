@@ -313,6 +313,9 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
             fprintf(file, "%c", get_char_from_logic_value(v));
             fprintf(file, "%c\n", (char) (s + i));
         }
+
+        // pop_event() didn't free the memory, we do it here
+        delete_list_transicao(&list_tran);
     }
 
     // final line
