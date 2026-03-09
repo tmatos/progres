@@ -34,6 +34,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_load_module_display_v );
   CPPUNIT_TEST( test_load_module_assigns_v );
   CPPUNIT_TEST( test_load_module_tri_state_gates_v );
+  CPPUNIT_TEST( test_load_module_port_directions_in_header_v );
   CPPUNIT_TEST( test_load_module_badverilog_XX_v );
   CPPUNIT_TEST( test_load_module_badtimescale_XX_v );
   CPPUNIT_TEST_SUITE_END();
@@ -355,6 +356,40 @@ public:
     VerilogError err = load_module(&it, &q, &mod);
     CPPUNIT_ASSERT(mod);
     
+    delete_event_queue(&q);
+    free_module(&mod);
+  }
+
+  void test_load_module_port_directions_in_header_v()
+  {
+    std::string path_file = "./verilog_sample_src/port_directions_in_header.v";
+
+    std::vector<std::string> expected_inputs = {"a", "b", "c_in"};
+    std::vector<std::string> expected_outputs = {"s", "c_out"};
+
+    Evento* q = new_empty_event();
+
+    Module* mod = NULL;
+    Token* it = helper_tokenize_preproc(path_file.c_str());
+
+    VerilogError err = load_module(&it, &q, &mod);
+    CPPUNIT_ASSERT(mod);
+
+    CPPUNIT_ASSERT_EQUAL( static_cast<int>( expected_inputs.size() ),
+                          mod->list_input_net->tamanho );
+    CPPUNIT_ASSERT_EQUAL( static_cast<int>( expected_outputs.size() ),
+                          mod->list_output_net->tamanho );
+
+    for ( int i = 0 ; i < expected_inputs.size() ; i++ ) {
+      std::string str_input_i( mod->list_input_net->itens[i]->nome );
+      CPPUNIT_ASSERT_EQUAL( expected_inputs[i], str_input_i );
+    }
+
+    for ( int i = 0 ; i < expected_outputs.size() ; i++ ) {
+      std::string str_output_i( mod->list_output_net->itens[i]->nome );
+      CPPUNIT_ASSERT_EQUAL( expected_outputs[i], str_output_i );
+    }
+
     delete_event_queue(&q);
     free_module(&mod);
   }

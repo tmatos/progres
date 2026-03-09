@@ -28,7 +28,7 @@ int load_module_header(
     ListToken* identifiers_output,
     Module* module)
 {
-    int expect_comma = 0; //flag para indicar se estamos esperando por uma virgula
+    int expect_comma = 0; //flag para indicar se estamos esperando por virgula
     int is_defined_input = 0; //flag indica que net do identificador sera input
     int is_defined_output = 0; //flag indica net do identificador como output
 
@@ -41,7 +41,8 @@ int load_module_header(
     }
 
     if (!avanca(&t)) {
-        show_error_msg("Final do arquivo nao esperado", -1, -1, "um identificador", NULL);
+        show_error_msg("Final do arquivo nao esperado", -1, -1,
+                       "um identificador", NULL);
         goto load_module_header_bad_return;
     }
     else if (!is_allowed_identifier(t)) {
@@ -56,7 +57,8 @@ int load_module_header(
     }
 
     if (!avanca(&t)) {
-        show_error_msg("Final do arquivo nao esperado", -1, -1, "(' ou ';", NULL);
+        show_error_msg("Final do arquivo nao esperado", -1, -1,
+                       "(' ou ';", NULL);
         goto load_module_header_bad_return;
     }
     else if (t->classe != SYM_OPEN_BRACKET && t->classe != SYM_SEMICOLON) {
@@ -130,12 +132,19 @@ int load_module_header(
 
             insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
 
-            if (is_defined_input)
-                insert_token_of_string(identifiers_input, t->valor, -1, -1, IDENTIFIER);
-            else if (is_defined_output)
-                insert_token_of_string(identifiers_output, t->valor, -1, -1, IDENTIFIER);
-            else
+            if (is_defined_input) {
+                insert_token_of_string(identifiers_input,
+                                       t->valor, -1, -1, IDENTIFIER);
+                add_input( module, new_component(t->valor, ROLE_INPUT) );
+            }
+            else if (is_defined_output) {
+                insert_token_of_string(identifiers_output,
+                                       t->valor, -1, -1, IDENTIFIER);
+                add_output( module, new_component(t->valor, ROLE_OUTPUT) );
+            }
+            else {
                 insert_token_of_string(livres, t->valor, -1, -1, IDENTIFIER);
+            }
 
             is_defined_input = 0;
             is_defined_output = 0;
@@ -164,7 +173,10 @@ load_module_header_bad_return:
     return 0;
 }
 
-ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, const char* file_path)
+ListModule* load_circuit(
+    FILE* f_verilog_source,
+    Evento** initial_task_events,
+    const char* file_path)
 {
     ListModule* circuit;
     Module* mod;
@@ -204,8 +216,8 @@ ListModule* load_circuit(FILE* f_verilog_source, Evento** initial_task_events, c
 
         circuit->total++;
             
-        circuit->itens = (Module**) xrealloc( circuit->itens,
-                                              sizeof(Module*) * (circuit->total) );
+        circuit->itens = (Module**) xrealloc(circuit->itens,
+                                             sizeof(Module*) * (circuit->total));
 
         circuit->itens[circuit->total - 1] = mod;
     }
@@ -237,7 +249,10 @@ circuit_bad_return:
     return NULL;
 }
 
-VerilogError load_module(Token** t, Evento** initial_task_events, Module** module_pointer)
+VerilogError load_module(
+    Token** t,
+    Evento** initial_task_events,
+    Module** module_pointer)
 {
     Component* in;
     Component* out;
@@ -257,7 +272,7 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
     if ( !(*t) )
         return END_OF_TOKENS;
 
-    int expect_comma = 0; // flag para indicar se estamos esperando por uma virgula
+    int expect_comma = 0; // flag para indicar se estamos esperando por virgula
 
     // lista de todos os identificadores
     ListToken* identifiers = new_list_token();
@@ -371,7 +386,8 @@ VerilogError load_module(Token** t, Evento** initial_task_events, Module** modul
                     }
                 }
 
-                if ( (token_subcase != KW_WIRE) && !has_item_of_string_value(identifiers_to_be, it->valor) ) {
+                if ( (token_subcase != KW_WIRE) &&
+                     !has_item_of_string_value(identifiers_to_be, it->valor) ) {
                     show_error_msg("Identificador invalido",
                                    it->linha, it->coluna,
                                    "identificador valido e que ainda possa ser atribuido",
