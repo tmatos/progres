@@ -69,9 +69,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(circ->list_wire_net->tamanho, 0);
     CPPUNIT_ASSERT(!circ->list_wire_net->itens);
 
-    CPPUNIT_ASSERT(circ->list_logic_gate);
-    CPPUNIT_ASSERT_EQUAL(circ->list_logic_gate->tamanho, 0);
-    CPPUNIT_ASSERT(!circ->list_logic_gate->itens);
+    CPPUNIT_ASSERT(circ->list_all_components);
+    CPPUNIT_ASSERT_EQUAL(circ->list_all_components->tamanho, 0);
+    CPPUNIT_ASSERT(!circ->list_all_components->itens);
   }
 
   void test_insert_component()
@@ -124,7 +124,7 @@ public:
     Component* c_in = new_component( str_in.c_str(), ROLE_INPUT );
     Component* c_out = new_component( str_out.c_str(), ROLE_OUTPUT );
 
-    insert_component(circ->list_logic_gate, c_porta);
+    insert_component(circ->list_all_components, c_porta);
     insert_component(circ->list_wire_net, c_wire);
     insert_component(circ->list_input_net, c_in);
     insert_component(circ->list_output_net, c_out);

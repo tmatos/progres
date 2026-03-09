@@ -1350,7 +1350,12 @@ load_reg_attribution_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module)
+VerilogError load_assign(
+    Token** it,
+    ListToken* list_wire,
+    ListToken* list_in,
+    ListToken* list_out,
+    Module* module)
 {
     Component* in;
     Component* out;
@@ -1498,6 +1503,7 @@ load_assign_identifiers:
     goto load_assign_identifiers;
 
 load_assign_sucess:
+    insert_component(module->list_all_components, gate);
     *it = t;
     return NO_ERROR_VERILOG;
 

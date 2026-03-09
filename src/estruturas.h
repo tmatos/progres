@@ -125,7 +125,7 @@ typedef struct st_module {
     Sinais* sinais_output;
 
     ListComponent* list_wire_net;
-    ListComponent* list_logic_gate;
+    ListComponent* list_all_components;
 
     ListRegister list_register;
     ListParam list_param;
@@ -255,10 +255,13 @@ Component* get_output_by_name(Module* circ, const char* nome);
  */
 Component* new_component(const char* nome, Role role);
 
-/** @brief Libera completamente um Componente da memória.
+/** @brief Libera uma struct Componente da memória e seta seu ponteiro para NULL.
  *  @param c Ponteiro para um ponteiro da strcut Componente.
- *  @return void
- *  @note A lista de entradas e saídas do componente também é liberada.
+ *  @note As duas listas para inputs e outputs em Componente também são liberadas,
+ *        contudo, em cada lista, existe um array de ponteiros para Componente.
+ *        Cada componente em si que possa estar referenciado nesse array
+ *        deverá ser liberado apropriadamente, posteriormente.
+ *        Para tal, uma lista de todos os componentes deve ser mantida.
  */
 void delete_componente(Component** c);
 

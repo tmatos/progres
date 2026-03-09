@@ -29,7 +29,7 @@ Module* new_module()
 
     circuito->list_wire_net = new_list_component();
 
-    circuito->list_logic_gate = new_list_component();
+    circuito->list_all_components = new_list_component();
 
     circuito->list_register.total = 0;
     circuito->list_register.itens = NULL;
@@ -49,22 +49,22 @@ Module* new_module()
 
 void free_module(Module** mod)
 {
-    if ( *mod == NULL )
+    if ( !mod || *mod == NULL )
         return;
 
-    delete_list_component( &((*mod)->list_input_net) );
-    delete_list_component( &((*mod)->list_output_net) );
-    delete_list_component( &((*mod)->list_logic_gate) );
-    delete_list_component( &((*mod)->list_wire_net) );
+    delete_list_component( &((**mod).list_input_net) );
+    delete_list_component( &((**mod).list_output_net) );
+    delete_list_component( &((**mod).list_all_components) );
+    delete_list_component( &((**mod).list_wire_net) );
 
-    delete_list_param( &((*mod)->list_param) );
-    delete_list_register( &((*mod)->list_register) );
+    delete_list_param( &((**mod).list_param) );
+    delete_list_register( &((**mod).list_register) );
 
-    if ( (*mod)->sinais_input )
-        free( (*mod)->sinais_input );
+    if ( (**mod).sinais_input )
+        free( (**mod).sinais_input );
     
-    if ( (*mod)->sinais_output )
-        free( (*mod)->sinais_output );
+    if ( (**mod).sinais_output )
+        free( (**mod).sinais_output );
     
     free( *mod );
     *mod = NULL;
@@ -75,13 +75,13 @@ void free_circuit(ListModule** circuit)
     if ( !circuit || *circuit == NULL )
         return;
 
-    for ( int i = 0 ; i < (*circuit)->total ; i++ )
+    for ( int i = 0 ; i < (**circuit).total ; i++ )
     {
-        free_module( &((*circuit)->itens[i]) );
+        free_module( (**circuit).itens + i );
     }
 
-    if ( (*circuit)->itens )
-        free( (*circuit)->itens );
+    if ( (**circuit).itens )
+        free( (**circuit).itens );
 
     free( *circuit );
     *circuit = NULL;
@@ -116,7 +116,7 @@ void add_gate(Module* circ, Component* comp)
     if(!circ || !comp)
         return;
 
-    insert_component(circ->list_logic_gate, comp);
+    insert_component(circ->list_all_components, comp);
 }
 
 ListComponent* new_list_component()
@@ -148,20 +148,18 @@ ListComponent* new_list_component_of_size(unsigned int size)
 
 void delete_list_component(ListComponent** ppl)
 {
-    if ( *ppl == NULL )
+    if ( !ppl || *ppl == NULL )
         return;
     
-    if ( (*ppl)->itens ) {
-        int i;
-
-        for ( i = 0; i < (*ppl)->tamanho; i++ )
+    if ( (**ppl).itens ) {
+        for ( int i = 0 ; i < (**ppl).tamanho ; i++ )
         {
-            if ( (*ppl)->itens[i] ) {
-                delete_componente( &((*ppl)->itens[i]) );
+            if ( (**ppl).itens[i] != NULL ) {
+                delete_componente( (**ppl).itens + i );
             }
         }
 
-        free( (*ppl)->itens );
+        free( (**ppl).itens );
     }
 
     free(*ppl);
@@ -330,21 +328,21 @@ Component* new_component(const char* nome, Role role)
 
 void delete_componente(Component** c)
 {
-    if ( !(*c) )
+    if ( !c || !(*c) )
         return;
 
-    if ( (*c)->list_input ) {
-        if ( (*c)->list_input->itens ) {
-            free( (*c)->list_input->itens );
+    if ( (**c).list_input ) {
+        if ( (**c).list_input->itens ) {
+            free( (**c).list_input->itens );
         }
-        free( (*c)->list_input );
+        free( (**c).list_input );
     }
 
-    if ( (*c)->list_output ) {
-        if ( (*c)->list_output->itens ) {
-            free( (*c)->list_output->itens );
+    if ( (**c).list_output ) {
+        if ( (**c).list_output->itens ) {
+            free( (**c).list_output->itens );
         }
-        free( (*c)->list_output );
+        free( (**c).list_output );
     }
 
     free(*c);
@@ -372,7 +370,7 @@ Component* get_gate_by_name(Module* circ, const char* nome)
     if(!circ || !nome)
         return NULL;
 
-    return get_component_by_name(circ->list_logic_gate, nome);
+    return get_component_by_name(circ->list_all_components, nome);
 }
 
 Component* get_wire_by_name(Module* circ, const char* nome)
