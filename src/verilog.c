@@ -1599,6 +1599,11 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     // first arg SHOULD be a string (for now)
 
     if ( it->classe != STRING ) {
+        if ( task == TASK_DUMPFILE ) {
+            copy(arg.string_literal, "dump.vcd");
+            goto systask_args_load_close_bracket;
+        }
+
         show_error_msg("Token inesperado foi encontrado",
                        it->linha,
                        it->coluna,
@@ -1619,6 +1624,8 @@ systask_args_load:
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
+
+systask_args_load_close_bracket:
 
     if ( it->classe == SYM_CLOSE_BRACKET ) {
         goto load_systask_sucess;
