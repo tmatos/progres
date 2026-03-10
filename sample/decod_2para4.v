@@ -1,20 +1,20 @@
 
 // decodificador de 2 para 4
 
-module doisParaQuatro(a, b, q0, q1, q2, q3);
+module decod_2para4(a, b, q0, q1, q2, q3);
 
-input a, b; // um numero rep. por dois bits
+input a, b; // um numero representado por dois bits
 
 output q0, q1, q2, q3; // saida
 
-wire aNeg, bNeg;
+wire a_neg, b_neg;
 
-not(aNeg, a);
-not(bNeg, b);
+not(a_neg, a);
+not(b_neg, b);
 
-and(q0, aNeg, bNeg);
-and(q1, b, aNeg);
-and(q2, a, bNeg);
+and(q0, a_neg, b_neg);
+and(q1, b, a_neg);
+and(q2, a, b_neg);
 and(q3, a, b);
 
 endmodule

@@ -67,26 +67,18 @@ Example:
 ``` 
 // Input file with two signals
 
-first
-{
- X(2), 0(5), 1(3)
+first {
+  X(2), 0(5), 1(3)
 }
 
-second { 0(2),1(2),x(3),0(3) }
+second { 0(2), 1(2), x(3), 0(3) }
 
 // End of input file
 ```
 
 In this file, we have the following signal representations:
 
-```
-                  ▁▁▁
-    first: ╳╳▁▁▁▁▁▏  
-time unit: 0123456789
-             ▁▁      
-   second: ▁▁▏ ╳╳╳▁▁▁
-time unit: 0123456789
-```
+![Diagram of example waveform](docs/img/wave_example.png)
 
 
 ## 3. Building and installing
@@ -106,9 +98,10 @@ your filesystem. For now, this file is self-sufficient.
 
 ## 4. Tests
 
-Unit testing is done with C++ using CppUnit. These are in the `test` dir.
-A Makefile is provided with some usefull targets. The default is `tests`,
-wich will run all the tests within the suite.
+Unit testing is done with C++11 using the CppUnit test framework. All the
+related files are inside the `test` directory. A Makefile is provided with
+some usefull targets. The default is `tests`, wich will run all the tests
+within the suite.
 
 You can also run `make coverage` to get test coverage information, generate
 a report in HTML with `make html` and get both the report along with branch

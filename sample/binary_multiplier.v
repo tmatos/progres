@@ -2,9 +2,9 @@
 // Binary multiplier (2 bit in, 4 bit out)
 // a * b = c
 
-module BinaryMultiply(a0, a1,
-                      b0, b1,
-                      c0, c1, c2, c3);
+module binary_multiplier(a0, a1,
+                         b0, b1,
+                         c0, c1, c2, c3);
   
   input a0, a1;
   input b0, b1;

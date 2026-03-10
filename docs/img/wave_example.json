@@ -1,0 +1,12 @@
+{
+ signal: [
+   {name:'first',  wave: 'x.l....h..'},
+   {name:'second', wave: 'l.h.X..l..'},
+ ],
+ foot:{
+   text:'time axis',
+   tock:0,
+   every:1
+ },
+ config: { hscale: 1 }
+}
