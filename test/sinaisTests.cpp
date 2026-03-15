@@ -29,13 +29,13 @@ public:
     
     CPPUNIT_ASSERT( sinal_unnamed );
     CPPUNIT_ASSERT( !strcmp( (char*)"", (char*)sinal_unnamed->nome ) );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_unnamed->duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_unnamed->total_time );
 
     Sinal *sinal_teste = new_signal( (char*)"teste" );
     
     CPPUNIT_ASSERT( sinal_teste );
     CPPUNIT_ASSERT( !strcmp( (char*)"teste", (char*)sinal_teste->nome ) );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_teste->duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_teste->total_time );
   }
 
   void test_set_signal_name()
@@ -75,11 +75,11 @@ public:
     
     int ret = add_new_pulse(sinal, VAL_0, (Tempo)5);
     CPPUNIT_ASSERT(ret);
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, sinal->duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5, sinal->total_time );
     
     ret = add_new_pulse(sinal, VAL_0, (Tempo)30000);
     CPPUNIT_ASSERT(ret);
-    CPPUNIT_ASSERT_EQUAL( (Tempo)30005, sinal->duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)30005, sinal->total_time );
 
     ret = add_new_pulse(NULL, VAL_0, (Tempo)30);
     CPPUNIT_ASSERT(!ret);
@@ -110,14 +110,14 @@ public:
     CPPUNIT_ASSERT( sinais->lista );
     CPPUNIT_ASSERT( sinais->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL( VAL_BLANK, sinais->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinais->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinais->lista[0].total_time );
     
     add_new_signal(sinais, str_nome_2);
     CPPUNIT_ASSERT_EQUAL( 2, sinais->quantidade );
     CPPUNIT_ASSERT( sinais->lista );
     CPPUNIT_ASSERT( sinais->lista[1].pulsos );
     CPPUNIT_ASSERT_EQUAL( VAL_BLANK, sinais->lista[1].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinais->lista[1].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinais->lista[1].total_time );
   }
 
   void test_insert_signal()
@@ -132,7 +132,7 @@ public:
     insert_signal(sinais, sinal_0);
     
     CPPUNIT_ASSERT_EQUAL( 1, sinais->quantidade );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)(255+250+10), sinais->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)(255+250+10), sinais->lista[0].total_time );
     CPPUNIT_ASSERT( sinais->lista[0].pulsos );
     CPPUNIT_ASSERT_EQUAL(      VAL_1, sinais->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)255, sinais->lista[0].pulsos[0].tempo );
@@ -151,7 +151,7 @@ public:
     insert_signal(sinais, sinal_1);
     
     CPPUNIT_ASSERT_EQUAL( 2, sinais->quantidade );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)(1010+200+5+1), sinais->lista[1].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)(1010+200+5+1), sinais->lista[1].total_time );
     CPPUNIT_ASSERT( sinais->lista[1].pulsos );
     CPPUNIT_ASSERT_EQUAL(             VAL_1, sinais->lista[1].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)(1010+200), sinais->lista[1].pulsos[0].tempo );

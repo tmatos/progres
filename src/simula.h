@@ -17,15 +17,19 @@ extern "C" {
 
 /** @brief Função que faz a simulação do circuito com as entradas especificadas.
            Em caso de sucesso, retorna as saídas dessa simulação.
-    @param circuto Ponteiro para um Module, já inicializado.
-    @param entradas Ponteiro para a struct Sinais, contendo entradas do circuito.
-    @param initial_task_events Ponteiro para a fila de eventos iniciais com tasks.
+    @param module Ponteiro para um Module, já inicializado.
+    @param input_stimulus Ponteiro para a struct Sinais, contendo entradas do circuito.
+    @param initial_events Ponteiro para a fila de eventos iniciais.
     @param f_dump Ponteiro para o ponteiro do handler do arquivo de dump (VCD) da simulação.
     @return Um ponteiro para uma estrutura Sinais contendo as saídas do circuito
             após a simulação. Retorna NULL se houver algum erro ou se as entradas
             não corresponderem às esperadas no module.
  */
-Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, FILE** f_dump);
+Sinais* simula(
+        Module* module,
+        Sinais* input_stimulus,
+        Evento** initial_events,
+        FILE** f_dump);
 
 /** @brief Valida se os sinais de entrada fornecidos correspondem
  *         aos esperados pelo módulo.
@@ -117,7 +121,7 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
 
 /** @brief Cria novos eventos na fila de acordo com a saidas (result) computadas
  *         para a porta lógica (gate), no tempo t indicado.
- *  @param fila Ponteiro para a fila de eventos onde os novos eventos serão inseridos.
+ *  @param queue Ponteiro para a fila de eventos onde os novos eventos serão inseridos.
  *  @param t Tempo base para o cálculo de quando os novos eventos devem ocorrer.
  *  @param timescale Escala de tempo do circuito, para calcular o tempo real de cada evento.
  *  @param gate Ponteiro para o componente que representa a porta lógica que dá origem,
@@ -125,12 +129,16 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data);
  *  @param result Valor lógico resultante da operação ocorrida em gate que servirá de
  *                entrada para cada uma de suas saídas conectadas, nos eventos futuro.
  */
-void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result);
+void create_events_from_outputs(
+        Evento** queue,
+        Tempo t,
+        Tempo timescale,
+        Component* gate,
+        ValorLogico result);
 
 /** @brief Set the dump file for simulation output.
  *  @param pp_file Pointer to a file pointer where the dump file will be set.
  *  @param s_path String with a path to the dump file.
- *  @return void
  */
 void set_dumpfile(FILE** pp_file, const char* s_path);
 

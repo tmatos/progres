@@ -51,7 +51,11 @@ int validate_input_signals(Module* module, Sinais* signals)
     return validos;
 }
 
-Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, FILE** f_dump)
+Sinais* simula(
+    Module* module,
+    Sinais* input_stimulus,
+    Evento** initial_events,
+    FILE** f_dump)
 {
     int i;
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
@@ -60,7 +64,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
     Transicao* list_tr = NULL;
     Transicao* tr = NULL; // iterator
 
-    Evento* fila = NULL;
+    Evento* queue = NULL;
     Pulso* p = NULL;
 
     ListComponent* list_changed_gates = NULL;
@@ -76,13 +80,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
 
     Sinais* saidas = new_signal_list();
 
-    if (!circuto || !entradas) {
+    if (!module || !input_stimulus) {
         return NULL;
     }
 
-    validos = validate_input_signals(circuto, entradas);
+    validos = validate_input_signals(module, input_stimulus);
 
-    if (validos < circuto->list_input_net->tamanho) {
+    if (validos < module->list_input_net->tamanho) {
         print("AVISO: O arquivo de entradas tem menos "
               "sinais de entrada que o circuito.\n");
 
@@ -90,46 +94,46 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
     }
 
     // task ocurrences are copied into the event queue
-    Evento* evt_it = initial_task_events ? *initial_task_events : NULL;
+    Evento* evt_it = initial_events ? *initial_events : NULL;
     while (evt_it)
     {
-        Transicao* tran_it = evt_it->listaTransicao;
+        Transicao* tran_it = evt_it->list_transition;
         while (tran_it)
         {
-            insert_task_event(&fila,
-                              evt_it->quando,
+            insert_task_event(&queue,
+                              evt_it->instant,
                               tran_it->task_type,
                               tran_it->task_arg);
 
-            tran_it = tran_it->proximo;
+            tran_it = tran_it->next;
         }
         
-        evt_it = evt_it->proximo;
+        evt_it = evt_it->next;
     }
 
     // Inicializacao da fila de eventos com os valores das entradas
-    for ( i=0 ; i < circuto->list_input_net->tamanho ; i++ )
+    for ( i=0 ; i < module->list_input_net->tamanho ; i++ )
     {
         t = 0;
 
-        p = circuto->list_input_net->itens[i]->input_signal->pulsos;
+        p = module->list_input_net->itens[i]->input_signal->pulsos;
         while (p->valor != VAL_BLANK)
         {
-            insert_event(&fila,
+            insert_event(&queue,
                          t,
                          EVT_NET_TRANSITION,
-                         circuto->list_input_net->itens[i],
+                         module->list_input_net->itens[i],
                          NULL,
                          p->valor);
 
-            t = t + p->tempo * circuto->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
+            t = t + p->tempo * module->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
-        insert_event(&fila,
+        insert_event(&queue,
                      t,
                      EVT_NET_TRANSITION,
-                     circuto->list_input_net->itens[i],
+                     module->list_input_net->itens[i],
                      NULL,
                      VAL_X); // este sinal fica ate infitito
     }
@@ -140,13 +144,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
     // A partir daqui, ocorre a simulacao propriamente dita:
     t = 0;
 
-    while (fila)
+    while (queue)
     {
         list_changed_gates = new_list_component();
 
-        t = fila->quando;
+        t = queue->instant;
 
-        list_tr = pop_event(&fila);
+        list_tr = pop_event(&queue);
         tr = list_tr;
 
         // nao sendo uma system task: atualiza valores de fios e faz
@@ -156,27 +160,27 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
         {
             // apenas tambem se houver mudanca de valor no fio
             if ( (tr->task_type == IS_NOT_A_TASK) &&
-                 (tr->fio->dynamic_value != tr->novoValor) )
+                 (tr->net->dynamic_value != tr->new_value) )
             {
-                for ( i=0 ; i < tr->fio->list_output->tamanho ; i++ )
+                for ( i=0 ; i < tr->net->list_output->tamanho ; i++ )
                 {
                     if ( !has_component_by_pointer(list_changed_gates,
-                                                   tr->fio->list_output->itens[i]) ) {
+                                                   tr->net->list_output->itens[i]) ) {
                         insert_component(list_changed_gates,
-                                         tr->fio->list_output->itens[i]);
+                                         tr->net->list_output->itens[i]);
                     }
                 }
 
-                if (tr->fio->atributos.role == ROLE_OUTPUT) {
-                    if ( !(tr->fio->output_signal) ) {
-                        tr->fio->output_signal = new_signal( tr->fio->nome );
+                if (tr->net->atributos.role == ROLE_OUTPUT) {
+                    if ( !(tr->net->output_signal) ) {
+                        tr->net->output_signal = new_signal( tr->net->nome );
                     }
-                    add_new_pulse(tr->fio->output_signal,
-                                  tr->fio->dynamic_value,
-                                  t - tr->fio->output_signal->duracaoTotal);
+                    add_new_pulse(tr->net->output_signal,
+                                  tr->net->dynamic_value,
+                                  t - tr->net->output_signal->total_time);
                 }
 
-                tr->fio->dynamic_value = tr->novoValor;
+                tr->net->dynamic_value = tr->new_value;
             }
 
             switch (tr->task_type)
@@ -192,9 +196,9 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
                 // TODO: set more flags for dumpfile
                 break;
             case TASK_FINISH:
-                while (fila)
+                while (queue)
                 {
-                    Transicao* lt = pop_event(&fila);
+                    Transicao* lt = pop_event(&queue);
                     if (lt)
                         delete_list_transicao(&lt);
                 }
@@ -202,13 +206,13 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
                 continue;
                 break;
             case TASK_STOP:
-                inspection_console(circuto, t);
+                inspection_console(module, t);
                 break;
             default:
                 break;
             }
 
-            tr = tr->proximo;
+            tr = tr->next;
         }
 
         // pop_event() nao liberou mem da lista de transicoes, fazemos isso aqui
@@ -274,7 +278,7 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
                 break;
             }
 
-            create_events_from_outputs(&fila, t, circuto->timescale_number, gate, result);
+            create_events_from_outputs(&queue, t, module->timescale_number, gate, result);
         }
 
         // free mem
@@ -285,9 +289,9 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
     }
 
     // move as saidas da simulacao do circuito para o retorno da funcao
-    for ( i=0 ; i < circuto->list_output_net->tamanho ; i++ )
+    for ( i=0 ; i < module->list_output_net->tamanho ; i++ )
     {
-        Sinal* s = circuto->list_output_net->itens[i]->output_signal;
+        Sinal* s = module->list_output_net->itens[i]->output_signal;
 
         if (s) {
             insert_signal(saidas, s);
@@ -296,8 +300,8 @@ Sinais* simula(Module* circuto, Sinais* entradas, Evento** initial_task_events, 
         }
 
         // cria sinal de saida constante com o valor dinamico do componente
-        ValorLogico v = circuto->list_output_net->itens[i]->dynamic_value;
-        Sinal* s_temp = new_signal(circuto->list_output_net->itens[i]->nome);
+        ValorLogico v = module->list_output_net->itens[i]->dynamic_value;
+        Sinal* s_temp = new_signal(module->list_output_net->itens[i]->nome);
         add_new_pulse(s_temp, v, t); // dynamic value for all the simulat. time
         insert_signal(saidas, s_temp);
         free_signal(&s_temp);
@@ -537,14 +541,19 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
     }
 }
 
-void create_events_from_outputs(Evento** fila, Tempo t, Tempo timescale, Component* gate, ValorLogico result)
+void create_events_from_outputs(
+    Evento** queue,
+    Tempo t,
+    Tempo timescale,
+    Component* gate,
+    ValorLogico result)
 {
     int j;
 
     // cria eventos relativos as saidas da porta
     for ( j=0 ; j < gate->list_output->tamanho ; j++ )
     {
-        insert_event(fila,
+        insert_event(queue,
                      t + gate->atributos.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,
                      EVT_NET_TRANSITION,
                      gate->list_output->itens[j],

@@ -100,17 +100,18 @@ typedef struct st_transicao Transicao;
 /**
  * @brief Estrutura que representa uma transição do valor lógico de um fio.
           Um lista é formada pelo encadeamento dessas transições.
-          Esta lista é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
+          Esta lista é referenciada pelo seu primeiro elemento,
+          e temos que o último precede um NULL.
  */
 struct st_transicao {
     SystemTask task_type;
     SystemTaskArg task_arg;
 
-    Component* fio; // Indica o componente sobre o qual o evento se origina, apenas wires
+    Component* net; // indicates the net over wich the event originates
     Register* reg; // in case of a transition in register value
-    ValorLogico novoValor; // Novo valor lógico a ser setado
+    ValorLogico new_value; // new value of the net/register after transition
 
-    Transicao* proximo;
+    Transicao* next;
 };
 
 typedef Transicao* ListTransicao;
@@ -133,14 +134,14 @@ typedef struct st_evento Evento;
           Esta fila é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
  */
 struct st_evento {
-    Tempo quando; // Indica o instante de ocorrência do evento
+    Tempo instant; // indicates the instant at which the event occurs
 
     EventKind kind;
 
-    Transicao* listaTransicao;
-    Transicao* ultimaTransicao;
+    Transicao* list_transition;
+    Transicao* last_transition;
 
-    Evento* proximo;
+    Evento* next;
 };
 
 typedef Evento* FilaEventos;
@@ -161,25 +162,41 @@ Evento* new_empty_event();
 
 /** @brief Insere um novo evento na fila de eventos, ordenando-o pelo tempo.
  *         Se já houver um evento no tempo t, adiciona à lista de transições desse evento.
- * @param fila Ponteiro para a fila de eventos.
+ * @param queue Ponteiro para a fila de eventos.
  * @param t Tempo em que ocorre o evento.
  * @param sys_task Tipo desta system task, conforme a enum SystemTask.
  * @param sys_task_arg Um dos argumentos fornecidos à task em questão.
- * @return void
  */
-void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, SystemTaskArg sys_task_arg);
+void insert_task_event(
+    Evento** queue,
+    Tempo t,
+    SystemTask sys_task,
+    SystemTaskArg sys_task_arg);
 
 /** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
- *         comp para o novoValor. Mas, se houver já na fila evento marcado para t,
+ *         comp para o new_value. Mas, se houver já na fila evento marcado para t,
  *         apenas adiciona à lista de transições desse evento, a nova transição.
+ * @param queue Pointer to the event queue.
+ * @param t Time at which the event occurs.
+ * @param k Type of the event, as per EventKind.
+ * @param comp Component that undergoes the transition.
+ * @param r Register that undergoes the transition (if applicable, otherwise NULL).
+ * @param new_value New value of the component or register after the transition.
+ * @note If there is already an event at time t, the new transition is added
+ *       to that event's transition list.
  */
-void insert_event(Evento **fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor);
+void insert_event(
+    Evento** queue,
+    Tempo t,
+    EventKind k,
+    Component* comp,
+    Register* r,
+    ValorLogico new_value);
 
 /** @brief Libera completamente a fila de eventos da memória.
- *  @param fila Ponteiro para a fila de eventos a ser liberada.
- *  @return void
+ *  @param queue Ponteiro para a fila de eventos a ser liberada.
  */
-void delete_event_queue(Evento **fila);
+void delete_event_queue(Evento **queue);
 
 /** @brief Cria um novo evento, sem transições definidas, no tempo t.
  *  @param t Tempo em que ocorre o evento.
@@ -190,18 +207,18 @@ Evento* new_event_at(Tempo t, EventKind k);
 
 /** @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
  *         Se não houver evento nesse tempo t, retornará NULL.
- *  @param fila Ponteiro para a fila de eventos.
+ *  @param queue Ponteiro para a fila de eventos.
  *  @param t Tempo em que se deseja obter as transições.
  *  @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
  */
-Transicao* get_transitions_at_time(Evento* fila, Tempo t);
+Transicao* get_transitions_at_time(Evento* queue, Tempo t);
 
 /** @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
- *  @param fila Ponteiro para a fila de eventos.
+ *  @param queue Ponteiro para a fila de eventos.
  *  @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
  *  @note A fila é atualizada, removendo o evento mais próximo.
  */
-Transicao* pop_event(Evento** fila);
+Transicao* pop_event(Evento** queue);
 
 #ifdef __cplusplus
 }

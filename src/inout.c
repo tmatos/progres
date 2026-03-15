@@ -293,15 +293,15 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
 
     while (fila)
     {
-        t = fila->quando;
+        t = fila->instant;
 
         list_tran = pop_event(&fila);
         it = list_tran;
 
         while (it)
         {
-            it->fio->dynamic_value = it->novoValor;
-            it = it->proximo;
+            it->net->dynamic_value = it->new_value;
+            it = it->next;
         }
 
         // #time

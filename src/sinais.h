@@ -87,7 +87,7 @@ typedef struct st_pulso {
 typedef struct st_sinal {
     char nome[MAX_NOME_SINAL];
     Pulso* pulsos;
-    Tempo duracaoTotal;
+    Tempo total_time;
 } Sinal;
 
 /** @brief Um conjunto de um ou mais sinais.

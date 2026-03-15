@@ -65,7 +65,7 @@ public:
 
     std::string str_name_a(inputs->lista[0].nome);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
   }
 
   void test_load_input_signals_twoInputFile()
@@ -86,8 +86,8 @@ public:
     std::string str_name_b(inputs->lista[1].nome);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
     CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].total_time );
   }
 
   void test_load_input_signals_file_notgates_in()
@@ -108,8 +108,8 @@ public:
     std::string str_name_b(inputs->lista[1].nome);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
     CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].duracaoTotal );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[1].pulsos[0].valor );
@@ -184,7 +184,7 @@ public:
       std::string str_nome_input_i(inputs->lista[i].nome);
       std::string str_nome_output_i(outputs->lista[i].nome);
       CPPUNIT_ASSERT_EQUAL( str_nome_input_i, str_nome_output_i );
-      CPPUNIT_ASSERT_EQUAL( inputs->lista[i].duracaoTotal, outputs->lista[i].duracaoTotal );
+      CPPUNIT_ASSERT_EQUAL( inputs->lista[i].total_time, outputs->lista[i].total_time );
       
       for ( int j = 0; j < 3; ++j )
       {

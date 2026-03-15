@@ -141,7 +141,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
@@ -188,7 +188,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
@@ -235,7 +235,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
@@ -282,7 +282,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
     CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
@@ -332,7 +332,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("na", s.nome ) );
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -350,7 +350,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("nnb", s.nome ) );
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -403,7 +403,7 @@ public:
 
     CPPUNIT_ASSERT( ! strcmp("y", s.nome ) );
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)48, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)48, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -462,7 +462,7 @@ public:
 
     s = outputs->lista[0];
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -521,7 +521,7 @@ public:
 
     s = outputs->lista[0];
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
@@ -672,8 +672,8 @@ public:
 
     circuit = load_circuit(f_dumpfile_v, &q, s_dumpfile_v);
     CPPUNIT_ASSERT(circuit);
-    CPPUNIT_ASSERT(q->listaTransicao);
-    CPPUNIT_ASSERT_EQUAL(TASK_DUMPFILE, q->listaTransicao->task_type);
+    CPPUNIT_ASSERT(q->list_transition);
+    CPPUNIT_ASSERT_EQUAL(TASK_DUMPFILE, q->list_transition->task_type);
 
     sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
@@ -721,7 +721,7 @@ public:
 
     s = outputs->lista[0];
     CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)12, s.duracaoTotal );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)12, s.total_time );
 
     CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
     CPPUNIT_ASSERT_EQUAL( (Tempo)4, s.pulsos[0].tempo );

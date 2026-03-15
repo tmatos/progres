@@ -27,7 +27,7 @@ Sinal* new_signal(const char* nome)
 
     sinal->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
     set_pulse_blank( sinal->pulsos + 0 );
-    sinal->duracaoTotal = 0;
+    sinal->total_time = 0;
 
     return sinal;
 }
@@ -94,7 +94,7 @@ int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao)
         set_pulse_blank( &(s->pulsos[tamanho - 1]) );
     }
 
-    s->duracaoTotal += duracao;
+    s->total_time += duracao;
 
     return 1;
 }
@@ -160,7 +160,7 @@ int add_new_signal(Sinais* list, const char* nome)
 
     s->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
     set_pulse_blank( s->pulsos + 0 );
-    s->duracaoTotal = 0;
+    s->total_time = 0;
     
     return 1;
 }

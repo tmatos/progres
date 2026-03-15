@@ -47,12 +47,12 @@ public:
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
   
     CPPUNIT_ASSERT(fila);
-    CPPUNIT_ASSERT_EQUAL(fila->quando, t);
-    CPPUNIT_ASSERT(fila->listaTransicao);
-    CPPUNIT_ASSERT_EQUAL(fila->listaTransicao->fio, c0);
-    CPPUNIT_ASSERT_EQUAL(fila->listaTransicao->novoValor, v);
-    CPPUNIT_ASSERT(!fila->listaTransicao->proximo);
-    CPPUNIT_ASSERT(!fila->proximo);
+    CPPUNIT_ASSERT_EQUAL(fila->instant, t);
+    CPPUNIT_ASSERT(fila->list_transition);
+    CPPUNIT_ASSERT_EQUAL(fila->list_transition->net, c0);
+    CPPUNIT_ASSERT_EQUAL(fila->list_transition->new_value, v);
+    CPPUNIT_ASSERT(!fila->list_transition->next);
+    CPPUNIT_ASSERT(!fila->next);
 
     t = 11000;
     v = VAL_0;
@@ -62,21 +62,21 @@ public:
     insert_event( &fila, t, EVT_NET_TRANSITION, c1, NULL, v );
 
     CPPUNIT_ASSERT(fila);
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5000, fila->quando );
-    CPPUNIT_ASSERT(fila->listaTransicao);
-    CPPUNIT_ASSERT_EQUAL( c0, fila->listaTransicao->fio );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)5000, fila->instant );
+    CPPUNIT_ASSERT(fila->list_transition);
+    CPPUNIT_ASSERT_EQUAL( c0, fila->list_transition->net );
 
-    CPPUNIT_ASSERT(fila->proximo);
-    CPPUNIT_ASSERT_EQUAL( t, fila->proximo->quando );
-    CPPUNIT_ASSERT(fila->proximo->listaTransicao);
-    CPPUNIT_ASSERT_EQUAL( c1, fila->proximo->listaTransicao->fio );
-    CPPUNIT_ASSERT_EQUAL( v, fila->proximo->listaTransicao->novoValor );
-    CPPUNIT_ASSERT(!fila->proximo->listaTransicao->proximo);
-    CPPUNIT_ASSERT(!fila->proximo->proximo);
+    CPPUNIT_ASSERT(fila->next);
+    CPPUNIT_ASSERT_EQUAL( t, fila->next->instant );
+    CPPUNIT_ASSERT(fila->next->list_transition);
+    CPPUNIT_ASSERT_EQUAL( c1, fila->next->list_transition->net );
+    CPPUNIT_ASSERT_EQUAL( v, fila->next->list_transition->new_value );
+    CPPUNIT_ASSERT(!fila->next->list_transition->next);
+    CPPUNIT_ASSERT(!fila->next->next);
     
-    free(fila->proximo->listaTransicao);
-    free(fila->proximo);
-    free(fila->listaTransicao);
+    free(fila->next->list_transition);
+    free(fila->next);
+    free(fila->list_transition);
     free(fila);
 
     //TODO: testar ainda mais outras possibilidades
@@ -102,7 +102,7 @@ public:
 
     // check list existence
     CPPUNIT_ASSERT(q);
-    CPPUNIT_ASSERT(q->listaTransicao);
+    CPPUNIT_ASSERT(q->list_transition);
 
     delete_event_queue(&q);
 
@@ -126,12 +126,12 @@ public:
 
     insert_event( &fila, t, EVT_NET_TRANSITION, c0, NULL, v );
     CPPUNIT_ASSERT(fila);
-    CPPUNIT_ASSERT(fila->listaTransicao);
-    CPPUNIT_ASSERT( !fila->proximo );
+    CPPUNIT_ASSERT(fila->list_transition);
+    CPPUNIT_ASSERT( !fila->next );
 
     Transicao* tr = get_transitions_at_time(fila, t);
     CPPUNIT_ASSERT(tr);
-    std::string str_tr_fio_nome(tr->fio->nome);
+    std::string str_tr_fio_nome(tr->net->nome);
     CPPUNIT_ASSERT_EQUAL( nome_componente_0, str_tr_fio_nome );
 
     CPPUNIT_ASSERT( ! get_transitions_at_time(fila, (Tempo)50 ) );
@@ -141,25 +141,25 @@ public:
     Component* c1 = new_component( nome_componente_1.c_str(), ROLE_WIRE );
     insert_event( &fila, (Tempo)7000, EVT_NET_TRANSITION, c1, NULL, VAL_0 );
     CPPUNIT_ASSERT(fila);
-    CPPUNIT_ASSERT(fila->proximo);
+    CPPUNIT_ASSERT(fila->next);
 
     std::string nome_componente_2 = "wire_component_2";
     Component* c2 = new_component( nome_componente_2.c_str(), ROLE_WIRE );
     insert_event( &fila, (Tempo)5550, EVT_NET_TRANSITION, c2, NULL, VAL_1 );
     CPPUNIT_ASSERT(fila);
-    CPPUNIT_ASSERT(fila->proximo);
-    CPPUNIT_ASSERT(fila->proximo->proximo);
+    CPPUNIT_ASSERT(fila->next);
+    CPPUNIT_ASSERT(fila->next->next);
 
     Transicao* tr_no_meio = get_transitions_at_time(fila, (Tempo)5550);
     CPPUNIT_ASSERT(tr);
 
     CPPUNIT_ASSERT( ! get_transitions_at_time(fila, (Tempo)5551 ) );
 
-    free(fila->proximo->proximo->listaTransicao);
-    free(fila->proximo->proximo);
-    free(fila->proximo->listaTransicao);
-    free(fila->proximo);
-    free(fila->listaTransicao);
+    free(fila->next->next->list_transition);
+    free(fila->next->next);
+    free(fila->next->list_transition);
+    free(fila->next);
+    free(fila->list_transition);
     free(fila);
 
     // what more?
@@ -192,7 +192,7 @@ public:
     Transicao* tr = pop_event(&q);
 
     CPPUNIT_ASSERT(tr);
-    CPPUNIT_ASSERT(tr->proximo);
+    CPPUNIT_ASSERT(tr->next);
 
     tr = pop_event(&q);
 

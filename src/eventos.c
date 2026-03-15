@@ -18,11 +18,11 @@
 Evento* new_event_at(Tempo t, EventKind k)
 {
     Evento* e = (Evento*) xmalloc(sizeof(Evento));
-    e->quando = t;
+    e->instant = t;
     e->kind = k;
-    e->listaTransicao = NULL;
-    e->ultimaTransicao = NULL;
-    e->proximo = NULL;
+    e->list_transition = NULL;
+    e->last_transition = NULL;
+    e->next = NULL;
 
     return e;
 }
@@ -32,7 +32,13 @@ Evento* new_empty_event()
     return new_event_at( (Tempo)0, EVT_SYS_TASK );
 }
 
-void insert_event(Evento** fila, Tempo t, EventKind k, Component* comp, Register* r, ValorLogico novoValor)
+void insert_event(
+    Evento** queue,
+    Tempo t,
+    EventKind k,
+    Component* comp,
+    Register* r,
+    ValorLogico new_value)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior
@@ -43,72 +49,72 @@ void insert_event(Evento** fila, Tempo t, EventKind k, Component* comp, Register
 
     evt = new_event_at(t, k);
 
-    evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
+    evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
     
-    evt->listaTransicao->fio = comp;
-    evt->listaTransicao->reg = r;
-    evt->listaTransicao->novoValor = novoValor;
-    evt->listaTransicao->proximo = NULL;
+    evt->list_transition->net = comp;
+    evt->list_transition->reg = r;
+    evt->list_transition->new_value = new_value;
+    evt->list_transition->next = NULL;
 
-    evt->listaTransicao->task_type = IS_NOT_A_TASK;
-    evt->listaTransicao->task_arg.number_literal = 0;
+    evt->list_transition->task_type = IS_NOT_A_TASK;
+    evt->list_transition->task_arg.number_literal = 0;
 
     // empty queue
-    if ( !(*fila) ) {
-        evt->ultimaTransicao = evt->listaTransicao;
-        *fila = evt;
+    if ( !(*queue) ) {
+        evt->last_transition = evt->list_transition;
+        *queue = evt;
 
         return;
     }
 
     ant = NULL; // evento anterior
-    it = *fila; // iterador de evento
-    while ( it && (it->quando < t) )
+    it = *queue; // event iterator
+    while ( it && (it->instant < t) )
     {
         ant = it;
-        it = it->proximo;
+        it = it->next;
     }
 
      // insert the event at the last position in queue
     if (!it) {
-        evt->ultimaTransicao = evt->listaTransicao;
+        evt->last_transition = evt->list_transition;
 
-        evt->proximo = it;
-        ant->proximo = evt;
+        evt->next = it;
+        ant->next = evt;
 
         return;
     }
 
     // um evento no instante existe, adicionar a lista de transicoes
-    if (t == it->quando)
+    if (t == it->instant)
     {
-        if (it->ultimaTransicao)
-            it->ultimaTransicao->proximo = evt->listaTransicao;
+        if (it->last_transition)
+            it->last_transition->next = evt->list_transition;
         else
-            it->listaTransicao = evt->listaTransicao;
+            it->list_transition = evt->list_transition;
 
-        it->ultimaTransicao = evt->listaTransicao;
+        it->last_transition = evt->list_transition;
 
         free(evt);
 
         return;
     }
 
-    if (t < it->quando)
+    if (t < it->instant)
     {
         // insert event at the beginning of the queue
         if (ant == NULL) {
-            evt->ultimaTransicao = evt->listaTransicao;
-            evt->proximo = it;
-            *fila = evt; // ele vira o primeiro da fila
+            evt->last_transition = evt->list_transition;
+            evt->next = it;
+            *queue = evt; // it becomes the first in the queue
 
             return;
         }
         
         // insert between two events, the previous and next
-        evt->ultimaTransicao = evt->listaTransicao;
-        evt->proximo = it;
-        ant->proximo = evt;
+        evt->last_transition = evt->list_transition;
+        evt->next = it;
+        ant->next = evt;
     }
 }
 
@@ -122,19 +128,23 @@ void delete_event_queue(Evento** queue)
 
     while (evt_it)
     {
-        if ( evt_it->listaTransicao ) {
-            delete_list_transicao( &(evt_it->listaTransicao) );
+        if ( evt_it->list_transition ) {
+            delete_list_transicao( &(evt_it->list_transition) );
         }
 
         tmp = evt_it;
-        evt_it = evt_it->proximo;
+        evt_it = evt_it->next;
         free(tmp);
     }
 
     *queue = NULL;
 }
 
-void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, SystemTaskArg sys_task_arg)
+void insert_task_event(
+    Evento** queue,
+    Tempo t,
+    SystemTask sys_task,
+    SystemTaskArg sys_task_arg)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior
@@ -142,110 +152,110 @@ void insert_task_event(Evento** fila, Tempo t, SystemTask sys_task, SystemTaskAr
 
     evt = new_event_at(t, EVT_SYS_TASK);
 
-    evt->listaTransicao = (Transicao*) xmalloc(sizeof(Transicao));
+    evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
 
-    evt->listaTransicao->task_type = sys_task;
-    evt->listaTransicao->task_arg = sys_task_arg;
+    evt->list_transition->task_type = sys_task;
+    evt->list_transition->task_arg = sys_task_arg;
 
-    evt->listaTransicao->fio = NULL;
-    evt->listaTransicao->reg = NULL;
-    evt->listaTransicao->novoValor = VAL_BLANK;
-    evt->listaTransicao->proximo = NULL;
+    evt->list_transition->net = NULL;
+    evt->list_transition->reg = NULL;
+    evt->list_transition->new_value = VAL_BLANK;
+    evt->list_transition->next = NULL;
 
     // empty queue case
-    if ( !(*fila) ) {
-        evt->ultimaTransicao = evt->listaTransicao;
-        *fila = evt;
+    if ( !(*queue) ) {
+        evt->last_transition = evt->list_transition;
+        *queue = evt;
 
         return;
     }
 
     // search for the position
     ant = NULL;
-    it = *fila;
-    while ( it && (it->quando < t) )
+    it = *queue;
+    while ( it && (it->instant < t) )
     {
         ant = it;
-        it = it->proximo;
+        it = it->next;
     }
 
      // insert the event at the last position in queue
     if (!it) {
-        evt->ultimaTransicao = evt->listaTransicao;
+        evt->last_transition = evt->list_transition;
 
-        evt->proximo = it;
-        ant->proximo = evt;
+        evt->next = it;
+        ant->next = evt;
 
         return;
     }
 
     // an event exists at same instant, so
     // append the new evt transi list to the existing evt transi list 
-    if (t == it->quando)
+    if (t == it->instant)
     {
-        if (it->ultimaTransicao)
-            it->ultimaTransicao->proximo = evt->listaTransicao;
+        if (it->last_transition)
+            it->last_transition->next = evt->list_transition;
         else
-            it->listaTransicao = evt->listaTransicao;
+            it->list_transition = evt->list_transition;
 
-        it->ultimaTransicao = evt->listaTransicao;
+        it->last_transition = evt->list_transition;
 
         free(evt);
 
         return;
     }
 
-    if (t < it->quando)
+    if (t < it->instant)
     {
         // insert event at the beginning of the queue
         if (ant == NULL) {
-            evt->ultimaTransicao = evt->listaTransicao;
-            evt->proximo = it;
-            *fila = evt; // it becomes the first in the queue
+            evt->last_transition = evt->list_transition;
+            evt->next = it;
+            *queue = evt; // it becomes the first in the queue
 
             return;
         }
         
         // insert between two events, the previous and next
-        evt->ultimaTransicao = evt->listaTransicao;
-        evt->proximo = it;
-        ant->proximo = evt;
+        evt->last_transition = evt->list_transition;
+        evt->next = it;
+        ant->next = evt;
     }
 }
 
-Transicao* get_transitions_at_time(Evento* fila, Tempo t)
+Transicao* get_transitions_at_time(Evento* queue, Tempo t)
 {
-    Evento* it = fila; // iterador de evento
+    Evento* it = queue; // event iterator
     
-    while( it && (it->quando < t)  )
+    while( it && (it->instant < t)  )
     {
-        it = it->proximo;
+        it = it->next;
     }
 
-    if( it && (t == it->quando) )
-        return it->listaTransicao;
+    if( it && (t == it->instant) )
+        return it->list_transition;
     else
         return NULL;
 }
 
-Transicao* pop_event(Evento** fila)
+Transicao* pop_event(Evento** queue)
 {
     Transicao* ret = NULL;
     Evento* dead = NULL;
 
-    if(!fila)
+    if(!queue)
         return NULL;
 
-    if( !(*fila) )
+    if( !(*queue) )
         return NULL;
 
-    if( ! (*fila)->listaTransicao )
+    if( ! (*queue)->list_transition )
         return NULL;
 
-    ret = (*fila)->listaTransicao;
+    ret = (*queue)->list_transition;
 
-    dead = (*fila);
-    (*fila) = (*fila)->proximo;
+    dead = (*queue);
+    (*queue) = (*queue)->next;
     free(dead);
 
     return ret;
@@ -263,7 +273,7 @@ void delete_list_transicao(Transicao** list)
     while (pt)
     {
         pta = pt;
-        pt = pt->proximo;
+        pt = pt->next;
         free(pta);
     }
 
