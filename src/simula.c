@@ -93,17 +93,27 @@ Sinais* simula(
         return NULL;
     }
 
-    // task ocurrences are copied into the event queue
+    // initial event ocurrences are copied into the event queue
     Evento* evt_it = initial_events ? *initial_events : NULL;
     while (evt_it)
     {
         Transicao* tran_it = evt_it->list_transition;
         while (tran_it)
         {
-            insert_task_event(&queue,
-                              evt_it->instant,
-                              tran_it->task_type,
-                              tran_it->task_arg);
+            if ( tran_it->task_type == IS_NOT_A_TASK ) {
+                insert_event(&queue,
+                             evt_it->instant,
+                             EVT_NET_TRANSITION,
+                             tran_it->net,
+                             tran_it->reg,
+                             tran_it->new_value);
+            }
+            else {
+                insert_task_event(&queue,
+                                 evt_it->instant,
+                                 tran_it->task_type,
+                                 tran_it->task_arg);
+            }
 
             tran_it = tran_it->next;
         }

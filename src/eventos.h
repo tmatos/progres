@@ -174,13 +174,13 @@ void insert_task_event(
     SystemTaskArg sys_task_arg);
 
 /** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
- *         comp para o new_value. Mas, se houver já na fila evento marcado para t,
+ *         comp para o new_value. Mas, havendo já na fila evento marcado para t,
  *         apenas adiciona à lista de transições desse evento, a nova transição.
  * @param queue Pointer to the event queue.
  * @param t Time at which the event occurs.
- * @param k Type of the event, as per EventKind.
+ * @param kind Type of the event, as per EventKind.
  * @param comp Component that undergoes the transition.
- * @param r Register that undergoes the transition (if applicable, otherwise NULL).
+ * @param reg Register that undergoes the transition (if applicable, else NULL).
  * @param new_value New value of the component or register after the transition.
  * @note If there is already an event at time t, the new transition is added
  *       to that event's transition list.
@@ -188,9 +188,9 @@ void insert_task_event(
 void insert_event(
     Evento** queue,
     Tempo t,
-    EventKind k,
+    EventKind kind,
     Component* comp,
-    Register* r,
+    Register* reg,
     ValorLogico new_value);
 
 /** @brief Libera completamente a fila de eventos da memória.

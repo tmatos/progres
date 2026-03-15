@@ -1,6 +1,6 @@
 /**
  * @file verilog.h
- * @brief Rotinas para parsing de arquivos Verilog
+ * @brief Rotinas para o parsing dos arquivos Verilog
  */
 
 #ifndef VERILOG_H
@@ -101,10 +101,15 @@ VerilogError load_directive(Token** it, Module* module);
  * @param identifiers Pointer to a list of tokens made of all identifiers related to nets.
  * @param list_param Pointer to a list of tokens made of identifiers related to parameters.
  * @param module Pointer to the Verilog module struct.
- * @param initial_task_events Pointer to a queue of events for system tasks.
+ * @param initial_events Pointer to a queue of the initial events.
  * @return Error code of type VerilogError.
  */
-VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* list_param, Module* module, Evento** initial_task_events);
+VerilogError load_initial_block(
+    Token** pit,
+    ListToken* identifiers,
+    ListToken* list_param,
+    Module* module,
+    Evento** initial_events);
 
 /**
  * @brief Parsing of register attributions inside of initial blocks.
@@ -115,7 +120,12 @@ VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* 
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* module, Evento** initial_events, Tempo t_ev);
+VerilogError load_reg_attribution(
+    Token** it,
+    ListToken* list_param,
+    Module* module,
+    Evento** initial_events,
+    Tempo t_ev);
 
 /**
  * @brief Parsing of assigns.
@@ -126,7 +136,12 @@ VerilogError load_reg_attribution(Token** it, ListToken* list_param, Module* mod
  * @param module Pointer to the Verilog module struct.
  * @return Error code of type VerilogError.
  */
-VerilogError load_assign(Token** it, ListToken* list_wire, ListToken* list_in, ListToken* list_out, Module* module);
+VerilogError load_assign(
+    Token** it,
+    ListToken* list_wire,
+    ListToken* list_in,
+    ListToken* list_out,
+    Module* module);
 
 /**
  * @brief Parsing of system tasks.

@@ -28,6 +28,7 @@ Module* new_module()
     circuito->sinais_output = NULL;
 
     circuito->list_wire_net = new_list_component();
+    circuito->list_reg_net = new_list_component();
 
     circuito->list_all_components = new_list_component();
 
@@ -56,6 +57,7 @@ void free_module(Module** mod)
     delete_list_component( &((**mod).list_output_net) );
     delete_list_component( &((**mod).list_all_components) );
     delete_list_component( &((**mod).list_wire_net) );
+    delete_list_component( &((**mod).list_reg_net) );
 
     delete_list_param( &((**mod).list_param) );
     delete_list_register( &((**mod).list_register) );
@@ -240,6 +242,11 @@ void add_register(Module* mod, const char* name, unsigned int size, int is_signe
     }
 
     mod->list_register.itens[mod->list_register.total - 1] = reg;
+
+    // a net related to this reg, to enable some connections
+    Component* net = new_component(name, ROLE_WIRE);
+    net->size = reg->size;
+    insert_component(mod->list_reg_net, net);
 }
 
 Register* get_reg_by_name(ListRegister list, const char* name)

@@ -35,9 +35,9 @@ Evento* new_empty_event()
 void insert_event(
     Evento** queue,
     Tempo t,
-    EventKind k,
+    EventKind kind,
     Component* comp,
-    Register* r,
+    Register* reg,
     ValorLogico new_value)
 {
     Evento* evt = NULL;
@@ -47,12 +47,12 @@ void insert_event(
     if (!comp)
         return;
 
-    evt = new_event_at(t, k);
+    evt = new_event_at(t, kind);
 
     evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
     
     evt->list_transition->net = comp;
-    evt->list_transition->reg = r;
+    evt->list_transition->reg = reg;
     evt->list_transition->new_value = new_value;
     evt->list_transition->next = NULL;
 

@@ -125,6 +125,7 @@ typedef struct st_module {
     Sinais* sinais_output;
 
     ListComponent* list_wire_net;
+    ListComponent* list_reg_net; // complementar
     ListComponent* list_all_components;
 
     ListRegister list_register;

@@ -1172,7 +1172,12 @@ load_directive_bad_token:
     return ERROR_VERILOG_BAD_TOKEN;
 }
 
-VerilogError load_initial_block(Token** pit, ListToken* identifiers, ListToken* list_param, Module* module, Evento** initial_task_events)
+VerilogError load_initial_block(
+    Token** pit,
+    ListToken* identifiers,
+    ListToken* list_param,
+    Module* module,
+    Evento** initial_events)
 {
     VerilogError err;
     int is_single_statement = 1;
@@ -1242,21 +1247,21 @@ initial_block_loop:
 
     if ( it->classe == SYM_DOLLAR ) {
         // systask handling
-        err = load_systask(&it, initial_task_events, t);
+        err = load_systask(&it, initial_events, t);
     }
     else {
         // try to treat a single statement attribution, for now
 
         if ( !has_item_of_string_value(identifiers, it->valor) ) {
-            show_error_msg("Nota, o initial ainda nao foi devidamente implementado",
+            show_error_msg("Note, initial blocks aren't yet fully implemented",
                            it->linha,
                            it->coluna,
-                           "apenas uma atribuicao",
+                           "just an attribution",
                            it->valor);
             goto load_initial_block_bad_token;
         }
 
-        err = load_reg_attribution(&it, list_param, module, initial_task_events, t);
+        err = load_reg_attribution(&it, list_param, module, initial_events, t);
     }
 
     switch (err)
@@ -1312,6 +1317,7 @@ VerilogError load_reg_attribution(
     Tempo t_ev)
 {
     Register* left_reg = NULL;
+    Component* reg_net = NULL;
     Param* p = NULL;
     ValorLogico logic_value = VAL_X;
     
@@ -1353,7 +1359,9 @@ VerilogError load_reg_attribution(
 
     // TODO: make reg attribution not only for bits 
     logic_value = left_reg->value == 0 ? VAL_0 : VAL_1;
-    insert_event(initial_events, t_ev, EVT_REG_ATTRIBUTION, NULL, left_reg, logic_value);
+    reg_net = get_component_by_name(module->list_reg_net, left_reg->name);
+    insert_event(initial_events, t_ev, EVT_REG_ATTRIBUTION,
+                 reg_net, left_reg, logic_value);
 
 //load_reg_attribution_sucess:
     *it = t;
@@ -1481,8 +1489,11 @@ load_assign_identifiers:
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
-    //else if ( get_reg_by_name(module->list_register, t->valor) ) {
-    //}
+    else if ( get_reg_by_name(module->list_register, t->valor) ) {
+        in = get_component_by_name(module->list_reg_net, t->valor);
+        insert_component(gate->list_input, in);
+        insert_component(in->list_output, gate);
+    }
     else {
         show_error_msg("Este identificador nao consta como alguma net declarada",
                         t->linha, t->coluna,
