@@ -212,7 +212,8 @@ void insert_component(ListComponent* ls, Component* cp)
         ls->itens = (Component**) xmalloc(sizeof(Component*));
     }
     else {
-        ls->itens = (Component**) xrealloc( ls->itens, sizeof(Component*) * ls->tamanho );
+        ls->itens = (Component**) xrealloc(ls->itens,
+                                           sizeof(Component*) * ls->tamanho);
     }
 
     ls->itens[ls->tamanho - 1] = cp;
@@ -243,12 +244,10 @@ void add_register(Module* mod, const char* name, unsigned int size, int is_signe
 
 Register* get_reg_by_name(ListRegister list, const char* name)
 {
-    int i;
-
     if(!name)
         return NULL;
     
-    for ( i = 0 ; i < list.total ; i++ ) {
+    for ( int i = 0 ; i < list.total ; i++ ) {
         if( iguais(list.itens[i]->name, name) ) {
             return list.itens[i];
         }
@@ -259,14 +258,15 @@ Register* get_reg_by_name(ListRegister list, const char* name)
 
 void add_param(Module* circ, Param* param)
 {
-    if(circ->list_param.total == 0) {
-        circ->list_param.total++;
-        circ->list_param.itens = (Param**) xmalloc(sizeof(Param*));
+    circ->list_param.total++;
+    size_t new_size = sizeof(Param*) * circ->list_param.total;
+
+    if (circ->list_param.total == 1) {
+        circ->list_param.itens = (Param**) xmalloc(new_size);
     }
     else {
-        circ->list_param.total++;
         circ->list_param.itens = (Param**) xrealloc(circ->list_param.itens,
-                                                     sizeof(Param*) * circ->list_param.total);
+                                                    new_size);
     }
 
     circ->list_param.itens[circ->list_param.total - 1] = param;
@@ -274,12 +274,10 @@ void add_param(Module* circ, Param* param)
 
 Param* get_param_by_name(ListParam list, const char* name)
 {
-    int i;
-
-    if(!name)
+    if (!name)
         return NULL;
     
-    for ( i = 0 ; i < list.total ; i++ ) {
+    for ( int i = 0 ; i < list.total ; i++ ) {
         if( iguais(list.itens[i]->name, name) ) {
             return list.itens[i];
         }
@@ -290,13 +288,11 @@ Param* get_param_by_name(ListParam list, const char* name)
 
 int has_component_by_pointer(ListComponent* ls, Component* cp)
 {
-    int i;
-
-    if(!ls || !cp)
+    if (!ls || !cp)
         return 0;
 
-    for( i=0 ; i < ls->tamanho ; i++ ) {
-        if( ls->itens[i] == cp ) {
+    for ( int i=0 ; i < ls->tamanho ; i++ ) {
+        if ( ls->itens[i] == cp ) {
             return 1;
         }
     }
@@ -352,13 +348,11 @@ void delete_componente(Component** c)
 
 Component* get_component_by_name(ListComponent* ls, const char* nome)
 {
-    int i;
-
-    if(!ls || !nome)
+    if (!ls || !nome)
         return NULL;
 
-    for( i=0 ; i < ls->tamanho ; i++ ) {
-        if( iguais(ls->itens[i]->nome, nome) ) {
+    for ( int i=0 ; i < ls->tamanho ; i++ ) {
+        if ( iguais(ls->itens[i]->nome, nome) ) {
            return ls->itens[i];
         }
     }

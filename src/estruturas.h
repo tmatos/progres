@@ -296,8 +296,8 @@ void delete_list_register(ListRegister* list_reg);
 /** @brief Insere o componente na lista de componentes.
  *  @param ls Ponteiro para a lista de componentes.
  *  @param cp Ponteiro para o componente a ser inserido.
- *  @return void
- *  @note A cada nova inserção a lista é realocada para aumentar o tamanho do array de itens.
+ *  @note A cada nova inserção a lista é realocada para aumentar o tamanho
+ *        do array de itens. Doesn't check for duplicities.
  */
 void insert_component(ListComponent* ls, Component* cp);
 
