@@ -218,7 +218,7 @@ void insert_component(ListComponent* ls, Component* cp)
     ls->itens[ls->tamanho - 1] = cp;
 }
 
-void add_register(Module* circ, const char* name, unsigned int size, int is_signed)
+void add_register(Module* mod, const char* name, unsigned int size, int is_signed)
 {
     Register* reg = (Register*) xmalloc(sizeof(Register));
 
@@ -226,18 +226,19 @@ void add_register(Module* circ, const char* name, unsigned int size, int is_sign
     reg->size = size;
     reg->is_signed = is_signed;
     reg->value = (unsigned int) VAL_0;
+    
+    mod->list_register.total++;
+    size_t new_size = sizeof(Register*) * mod->list_register.total;
 
-    if(circ->list_register.total == 0) {
-        circ->list_register.total++;
-        circ->list_register.itens = (Register**) xmalloc(sizeof(Register*));
+    if(mod->list_register.total == 1) {
+        mod->list_register.itens = (Register**) xmalloc(new_size);
     }
     else {
-        circ->list_register.total++;
-        circ->list_register.itens = (Register**) xrealloc(circ->list_register.itens,
-                                                     sizeof(Register*) * circ->list_register.total);
+        mod->list_register.itens = (Register**) xrealloc(mod->list_register.itens,
+                                                         new_size);
     }
 
-    circ->list_register.itens[circ->list_register.total - 1] = reg;
+    mod->list_register.itens[mod->list_register.total - 1] = reg;
 }
 
 Register* get_reg_by_name(ListRegister list, const char* name)

@@ -160,14 +160,14 @@ Module* new_module();
  */
 void free_module(Module** mod);
 
-/** @brief Inserir um registrador novo no circuito.
- *  @param circ Ponteiro para o circuito.
+/** @brief Inserir um registrador novo no module.
+ *  @param mod Pointer to a Module type.
  *  @param name Nome dado ao registrador.
  *  @param size Comprimento, em quantidade de bits.
  *  @param is_signed Verdadeiro caso seja com sinal.
- *  @return void
+ *  @note Doesn't check for duplicities.
  */
-void add_register(Module* circ, const char* name, unsigned int size, int is_signed);
+void add_register(Module* mod, const char* name, unsigned int size, int is_signed);
 
 /** @brief Obter um Register de uma lista usando o nome como chave.
  *  @param list Uma struct 'ListRegister'.
