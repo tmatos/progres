@@ -57,7 +57,8 @@ void insert_event(
     evt->list_transition->next = NULL;
 
     evt->list_transition->task_type = IS_NOT_A_TASK;
-    evt->list_transition->task_arg.number_literal = 0;
+    evt->list_transition->task_args.count = 0;
+    evt->list_transition->task_args.itens = NULL;
 
     // empty queue
     if ( !(*queue) ) {
@@ -144,7 +145,7 @@ void insert_task_event(
     Evento** queue,
     Tempo t,
     SystemTask sys_task,
-    SystemTaskArg sys_task_arg)
+    ListSystemTaskArg sys_task_args)
 {
     Evento* evt = NULL;
     Evento* ant = NULL; // evento anterior
@@ -155,7 +156,7 @@ void insert_task_event(
     evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
 
     evt->list_transition->task_type = sys_task;
-    evt->list_transition->task_arg = sys_task_arg;
+    evt->list_transition->task_args = sys_task_args;
 
     evt->list_transition->net = NULL;
     evt->list_transition->reg = NULL;

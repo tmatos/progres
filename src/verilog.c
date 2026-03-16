@@ -1545,10 +1545,11 @@ load_assign_bad_eof:
 
 VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 {
-    int count = 0; // task arg counter
     SystemTask task = TASK_UNKNOWN;
+    ListSystemTaskArg args;
+    args.count = 0;
+    args.itens = NULL;
     char str[MAX_TOKEN_SIZE] = "";
-    SystemTaskArg arg;
 
     Token* it = *pit;
 
@@ -1606,12 +1607,14 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
+        
+    args.itens = (SystemTaskArg*) xcalloc(1, sizeof(SystemTaskArg));
 
     // first arg SHOULD be a string (for now)
 
     if ( it->classe != STRING ) {
         if ( task == TASK_DUMPFILE ) {
-            copy(arg.string_literal, "dump.vcd");
+            copy(args.itens->string_literal, "dump.vcd");
             goto systask_args_load_close_bracket;
         }
 
@@ -1625,7 +1628,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     copy(str, it->valor + 1); // remove the first quote
     str[len(it->valor) - 2] = '\0'; // remove the last quote
-    copy(arg.string_literal, str);
+    copy(args.itens->string_literal, str);
 
     // for Sdisplay: there may be zero to n more args
     // for Swrite: there may be zero to n more args
@@ -1637,6 +1640,8 @@ systask_args_load:
         goto load_systask_bad_eof;
 
 systask_args_load_close_bracket:
+
+    args.count++;
 
     if ( it->classe == SYM_CLOSE_BRACKET ) {
         goto load_systask_sucess;
@@ -1666,19 +1671,21 @@ systask_args_load_close_bracket:
     // TODO: check arg validity and save to some stack
     // if (it->class == ???)
 
-    count++;
-
     goto systask_args_load;
 
 load_systask_sucess:
-    insert_task_event(initial_task_events, t, task, arg);
+    insert_task_event(initial_task_events, t, task, args);
     *pit = it;
 
     return NO_ERROR_VERILOG;
 
 load_systask_bad_token:
+    if (args.itens)
+        free(args.itens);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_systask_bad_eof:
+    if (args.itens)
+        free(args.itens);
     return ERROR_VERILOG_BAD_EOF;
 }

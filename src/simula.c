@@ -112,7 +112,7 @@ Sinais* simula(
                 insert_task_event(&queue,
                                  evt_it->instant,
                                  tran_it->task_type,
-                                 tran_it->task_arg);
+                                 tran_it->task_args);
             }
 
             tran_it = tran_it->next;
@@ -196,13 +196,13 @@ Sinais* simula(
             switch (tr->task_type)
             {
             case TASK_DISPLAY:
-                print("%s\n", tr->task_arg.string_literal);
+                print("%s\n", tr->task_args.itens[0].string_literal);
                 break;
             case TASK_WRITE:
-                print("%s", tr->task_arg.string_literal);
+                print("%s", tr->task_args.itens[0].string_literal);
                 break;
             case TASK_DUMPFILE:
-                set_dumpfile(f_dump, tr->task_arg.string_literal);
+                set_dumpfile(f_dump, tr->task_args.itens[0].string_literal);
                 // TODO: set more flags for dumpfile
                 break;
             case TASK_FINISH:
@@ -221,6 +221,8 @@ Sinais* simula(
             default:
                 break;
             }
+            
+            free(tr->task_args.itens);
 
             tr = tr->next;
         }

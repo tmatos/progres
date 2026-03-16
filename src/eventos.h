@@ -95,6 +95,16 @@ typedef union un_systemtask_arg {
     Register* reg;
 } SystemTaskArg;
 
+/**
+ * @brief Contains a list of arguments for a system task.
+ *        The count field indicates how many arguments are in the list,
+ *        and the itens field is an array of pointers to SystemTaskArg.
+ */
+typedef struct st_list_systemtaskarg {
+    unsigned int count;
+    SystemTaskArg* itens;
+} ListSystemTaskArg;
+
 typedef struct st_transicao Transicao;
 
 /**
@@ -105,7 +115,7 @@ typedef struct st_transicao Transicao;
  */
 struct st_transicao {
     SystemTask task_type;
-    SystemTaskArg task_arg;
+    ListSystemTaskArg task_args;
 
     Component* net; // indicates the net over wich the event originates
     Register* reg; // in case of a transition in register value
@@ -165,13 +175,13 @@ Evento* new_empty_event();
  * @param queue Ponteiro para a fila de eventos.
  * @param t Tempo em que ocorre o evento.
  * @param sys_task Tipo desta system task, conforme a enum SystemTask.
- * @param sys_task_arg Um dos argumentos fornecidos à task em questão.
+ * @param sys_task_args Lista de argumentos fornecidos à task em questão.
  */
 void insert_task_event(
     Evento** queue,
     Tempo t,
     SystemTask sys_task,
-    SystemTaskArg sys_task_arg);
+    ListSystemTaskArg sys_task_args);
 
 /** @brief Adiciona à fila um evento no tempo t que faz a transição do valor de
  *         comp para o new_value. Mas, havendo já na fila evento marcado para t,
