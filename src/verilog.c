@@ -1610,12 +1610,14 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
         
     args.itens = (SystemTaskArg*) xcalloc(1, sizeof(SystemTaskArg));
 
-    // first arg SHOULD be a string (for now)
+    // first arg is most of the times a string literal...
 
     if ( it->classe != STRING ) {
-        if ( task == TASK_DUMPFILE ) {
-            copy(args.itens->string_literal, "dump.vcd");
-            goto systask_args_load_close_bracket;
+        if ( it->classe == SYM_CLOSE_BRACKET && task == TASK_DUMPFILE ) {
+            // $dumpfile() without any args defaults to: "dump.vcd"
+            args.count = 1;
+            copy(args.itens[0].string_literal, "dump.vcd");
+            goto load_systask_sucess;
         }
 
         show_error_msg("Token inesperado foi encontrado",
@@ -1628,7 +1630,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     copy(str, it->valor + 1); // remove the first quote
     str[len(it->valor) - 2] = '\0'; // remove the last quote
-    copy(args.itens->string_literal, str);
+    copy(args.itens[0].string_literal, str);
 
     // for Sdisplay: there may be zero to n more args
     // for Swrite: there may be zero to n more args
@@ -1638,8 +1640,6 @@ systask_args_load:
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
-
-systask_args_load_close_bracket:
 
     args.count++;
 
