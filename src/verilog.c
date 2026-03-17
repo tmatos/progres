@@ -1549,7 +1549,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     ListSystemTaskArg args;
     args.count = 0;
     args.itens = NULL;
-    char str[MAX_TOKEN_SIZE] = "";
+    args.types = NULL;
 
     Token* it = *pit;
 
@@ -1607,8 +1607,9 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
-        
+
     args.itens = (SystemTaskArg*) xcalloc(1, sizeof(SystemTaskArg));
+    args.types = (SystemTaskArgType*) xcalloc(1, sizeof(SystemTaskArgType));
 
     // first arg is most of the times a string literal...
 
@@ -1617,6 +1618,7 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
             // $dumpfile() without any args defaults to: "dump.vcd"
             args.count = 1;
             copy(args.itens[0].string_literal, "dump.vcd");
+            args.types[0] = ARG_STRING_LITERAL;
             goto load_systask_sucess;
         }
 
@@ -1628,9 +1630,8 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
         goto load_systask_bad_token;
     }
 
-    copy(str, it->valor + 1); // remove the first quote
-    str[len(it->valor) - 2] = '\0'; // remove the last quote
-    copy(args.itens[0].string_literal, str);
+    copy_removing_quotes(args.itens[0].string_literal, it->valor);
+    args.types[0] = ARG_STRING_LITERAL;
 
     // for Sdisplay: there may be zero to n more args
     // for Swrite: there may be zero to n more args
@@ -1667,6 +1668,27 @@ systask_args_load:
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
+
+    args.itens = (SystemTaskArg*) xrealloc( args.itens, sizeof(SystemTaskArg) * (args.count + 1) );
+    args.types = (SystemTaskArgType*) xrealloc( args.types, sizeof(SystemTaskArgType) * (args.count + 1) );
+
+    // check the next argument type
+    if ( it->classe == STRING ) {
+        copy_removing_quotes(args.itens[args.count].string_literal, it->valor);
+        args.types[args.count] = ARG_STRING_LITERAL;
+    }
+    else if ( it->classe == NUM_BASE_DECIMAL ) {
+        args.itens[args.count].number_literal = strtol(it->valor, NULL, 10);
+        args.types[args.count] = ARG_NUMBER_LITERAL;
+    }
+    else {
+        show_error_msg("Token inesperado foi encontrado",
+                       it->linha,
+                       it->coluna,
+                       "uma string ou numero",
+                       it->valor);
+        goto load_systask_bad_token;
+    }
     
     // TODO: check arg validity and save to some stack
     // if (it->class == ???)
@@ -1682,10 +1704,14 @@ load_systask_sucess:
 load_systask_bad_token:
     if (args.itens)
         free(args.itens);
+    if (args.types)
+        free(args.types);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_systask_bad_eof:
     if (args.itens)
         free(args.itens);
+    if (args.types)
+        free(args.types);
     return ERROR_VERILOG_BAD_EOF;
 }

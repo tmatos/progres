@@ -196,10 +196,22 @@ Sinais* simula(
             switch (tr->task_type)
             {
             case TASK_DISPLAY:
-                print("%s\n", tr->task_args.itens[0].string_literal);
+                // TODO: make it work like printf, with format specifiers...
+                for ( unsigned int j=0 ; j < tr->task_args.count ; j++ )
+                {
+                    if ( tr->task_args.types[j] == ARG_STRING_LITERAL ) {
+                        print("%s ", tr->task_args.itens[j].string_literal);
+                    }
+                }
+                print("\n");
                 break;
             case TASK_WRITE:
-                print("%s", tr->task_args.itens[0].string_literal);
+                for ( unsigned int j=0 ; j < tr->task_args.count ; j++ )
+                {
+                    if ( tr->task_args.types[j] == ARG_STRING_LITERAL ) {
+                        print("%s", tr->task_args.itens[j].string_literal);
+                    }
+                }
                 break;
             case TASK_DUMPFILE:
                 set_dumpfile(f_dump, tr->task_args.itens[0].string_literal);
@@ -223,6 +235,7 @@ Sinais* simula(
             }
             
             free(tr->task_args.itens);
+            free(tr->task_args.types);
 
             tr = tr->next;
         }

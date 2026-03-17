@@ -59,6 +59,7 @@ void insert_event(
     evt->list_transition->task_type = IS_NOT_A_TASK;
     evt->list_transition->task_args.count = 0;
     evt->list_transition->task_args.itens = NULL;
+    evt->list_transition->task_args.types = NULL;
 
     // empty queue
     if ( !(*queue) ) {

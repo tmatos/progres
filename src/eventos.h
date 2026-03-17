@@ -95,6 +95,18 @@ typedef union un_systemtask_arg {
     Register* reg;
 } SystemTaskArg;
 
+/** @brief Enum to identify the type of a system task argument, which can be
+ *         a string literal, a number literal, a logic value, a pointer
+ *         to a net, or a pointer to a register, for now.
+ */
+typedef enum en_systemtask_arg_type {
+    ARG_STRING_LITERAL,
+    ARG_NUMBER_LITERAL,
+    ARG_LOGIC_VALUE,
+    ARG_NET_POINTER,
+    ARG_REG_POINTER
+} SystemTaskArgType;
+
 /**
  * @brief Contains a list of arguments for a system task.
  *        The count field indicates how many arguments are in the list,
@@ -103,6 +115,7 @@ typedef union un_systemtask_arg {
 typedef struct st_list_systemtaskarg {
     unsigned int count;
     SystemTaskArg* itens;
+    SystemTaskArgType* types; // parallel array to 'itens' indicating type of each arg
 } ListSystemTaskArg;
 
 typedef struct st_transicao Transicao;
