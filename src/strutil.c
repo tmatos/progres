@@ -76,6 +76,21 @@ char* copy(char* dest, const char* src)
     return strcpy(dest, src);
 }
 
+char* copy_removing_quotes(char* dest, const char* src)
+{
+    char str[MAX_TOKEN_SIZE] = "";
+
+    if ( src[0] != '"' || src[len(src) - 1] != '"' ) {
+        // if not between quotes, just copy
+        return copy(dest, src);
+    }
+
+    copy(str, src + 1); // remove the first quote
+    str[len(src) - 2] = '\0'; // remove the last quote
+
+    return copy(dest, str);
+}
+
 void print(const char* fmt, ...)
 {
     if (global_silent_mode) {

@@ -53,6 +53,14 @@ size_t len(const char* str);
  */
 char* copy(char* dest, const char* src);
 
+/** @brief Copy src to dest, but removing the first and last characters in the
+ *         source string only if they both are quotes ("").
+ *  @param dest Destination C string.
+ *  @param src Source C string.
+ *  @return Same return of the copy() function, after removing the quotes.
+ */
+char* copy_removing_quotes(char* dest, const char* src);
+
 /** @brief Wrapper to printf()
  *  @param fmt String with the format argument
  */
