@@ -66,6 +66,11 @@ char* copy_removing_quotes(char* dest, const char* src);
  */
 void print(const char* fmt, ...);
 
+/** @brief Remove all underscores from a string literal, modifying it in place.
+ *  @param str Pointer to the string literal to be modified.
+ */
+void remove_underscores_from_literal(char* str);
+
 #ifdef __cplusplus
 }
 #endif

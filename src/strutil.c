@@ -102,3 +102,23 @@ void print(const char* fmt, ...)
     vprintf(fmt, args);
     va_end(args);
 }
+
+void remove_underscores_from_literal(char* str)
+{
+    // TODO: add test for it
+
+    char* src = str;
+    char* dst = str;
+
+    while (*src)
+    {
+        if (*src != '_') {
+            *dst = *src;
+            dst++;
+        }
+
+        src++;
+    }
+
+    *dst = '\0';
+}

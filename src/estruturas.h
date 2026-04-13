@@ -100,7 +100,7 @@ typedef struct st_reg {
     char name[MAX_REGISTER_NAME_SIZE];
     unsigned int size; // size in bits
     int is_signed; // true if reg signed
-    unsigned int value; // stored binary value // TODO: change this type
+    unsigned int value; // stored binary value // TODO: change this type to array with 4 value logic
 } Register;
 
 /** @brief Estrutura para a lista de registradores de um module.

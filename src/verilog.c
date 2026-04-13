@@ -1347,6 +1347,25 @@ VerilogError load_reg_attribution(
     if ( is_valid_natural_number(t->valor) ) {
         left_reg->value = strtol(t->valor, NULL, 10);
     }
+    else if ( t->classe == NUM_BASE_BINARY ) {
+        // if number size is greater than register size: error
+
+        unsigned int bit_size = get_bit_size_from_literal_token(t);
+
+        if ( bit_size > left_reg->size ) {
+            show_error_msg("Valor literal tem mais bits do que o registrador",
+                           t->linha, t->coluna, NULL, t->valor);
+            goto load_reg_attribution_bad_token;
+        }
+
+        if ( bit_size < left_reg->size ) {
+            // show_warning_msg("Valor literal tem menos bits do que o registrador",
+            //                  t->linha, t->coluna, NULL, t->valor);
+        }
+
+        left_reg->size = bit_size;
+        left_reg->value = get_value_from_literal_token(t);
+    }
     else if ( has_item_of_string_value(list_param, t->valor) ) {
         p = get_param_by_name(module->list_param, t->valor);
         left_reg->value = p->value;

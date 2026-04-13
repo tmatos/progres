@@ -265,6 +265,22 @@ ListToken* tokeniza(FILE *arquivo);
  */
 TokenClass get_token_class(const char* s_tok);
 
+/** @brief Returns the number of bits represented in a numeric literal token,
+ *         according to the Verilog standard.
+ *  @param tok Pointer to a Token struct that represents a literal token.
+ *  @return The number of bits represented in the literal token.
+ *          If the token is not a valid literal, returns 0.
+ */
+unsigned int get_bit_size_from_literal_token(const Token* tok);
+
+/** @brief Returns the value represented in a numeric literal token,
+ *         according to the Verilog standard.
+ *  @param tok Pointer to a Token struct that represents a literal token.
+ *  @return The value represented in the literal token as an unsigned int.
+ *          If the token is not a valid literal, returns 0.
+ */
+unsigned int get_value_from_literal_token(const Token* tok);
+
 #ifdef __cplusplus
 }
 #endif

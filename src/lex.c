@@ -1091,8 +1091,8 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                 goto end_state;
             }
 
-            // TODO define here the token class for sized number literals
             insert_token_of_string(tokens, tok, linha, coluna - len(tok), tok_class);
+            goto start_after_getc_state;
         }
     }
 
@@ -1158,4 +1158,82 @@ end_state: // label para o estado de encerramento do lexer
     free(tok);
 
     return tokens;
+}
+
+unsigned int get_bit_size_from_literal_token(const Token* tok)
+{
+    unsigned int size = 0;
+    char base = 'd'; // default base is decimal
+    char str_value[MAX_TOKEN_SIZE] = { 0x00 };
+
+    if ( !tok || tok->valor[0] == 0x00 )
+        return 0;
+
+    if ( is_valid_natural_number(tok->valor) )
+        return 32; // (default size) by a peculiarity of the function above
+
+    if ( tok->classe != NUM_BASE_BINARY &&
+         tok->classe != NUM_BASE_OCTAL &&
+         tok->classe != NUM_BASE_DECIMAL &&
+         tok->classe != NUM_BASE_HEX )
+        return 0;
+
+    if ( tok->valor[0] == '\'' )
+        return 32; // default when size is not specified
+
+    sscanf(tok->valor, "%u'%c%s", &size, &base, str_value);
+
+    return size;
+}
+
+unsigned int get_value_from_literal_token(const Token* tok)
+{
+    unsigned int size = 0;
+    char base = 'd'; // default base is decimal
+    char value_str[MAX_TOKEN_SIZE] = { 0x00 };
+    unsigned int value = 0;
+
+    if ( !tok || tok->valor[0] == 0x00 )
+        return 0;
+
+    if ( is_valid_natural_number(tok->valor) )
+        return (unsigned int) strtoul(tok->valor, NULL, 10);
+
+    if ( tok->classe != NUM_BASE_BINARY &&
+         tok->classe != NUM_BASE_OCTAL &&
+         tok->classe != NUM_BASE_DECIMAL &&
+         tok->classe != NUM_BASE_HEX )
+        return 0;
+
+    if ( tok->valor[0] == '\'' )
+        sscanf(tok->valor, "'%c%s", &base, value_str);
+    else
+        sscanf(tok->valor, "%u'%c%s", &size, &base, value_str);
+
+    remove_underscores_from_literal(    value_str);
+
+    switch (base)
+    {
+    case 'b':
+    case 'B':
+        value = (unsigned int) strtoul(value_str, NULL, 2);
+        break;
+    case 'o':
+    case 'O':
+        value = (unsigned int) strtoul(value_str, NULL, 8);
+        break;
+    case 'd':
+    case 'D':
+        value = (unsigned int) strtoul(value_str, NULL, 10);
+        break;
+    case 'h':
+    case 'H':
+        value = (unsigned int) strtoul(value_str, NULL, 16);
+        break;
+    default:
+        value = 0;
+        break;
+    }
+
+    return value;
 }
