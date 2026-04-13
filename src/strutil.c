@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -53,10 +53,12 @@ int has_only_digits(const char* str)
 
 int is_valid_natural_number(const char* str)
 {
+    // TODO: another function for negative numbers, if needed
+
     if (!str)
         return 0;
 
-    // importante nao ser um valor muito grande, esses numeros
+    // is important to check the maximum allowed size for a number literal
     if ( !has_only_digits(str) || !(len(str) <= MAX_DIGITOS_NUM) ) {
         return 0;
     }

@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -1169,17 +1169,14 @@ unsigned int get_bit_size_from_literal_token(const Token* tok)
     if ( !tok || tok->valor[0] == 0x00 )
         return 0;
 
-    if ( is_valid_natural_number(tok->valor) )
-        return 32; // (default size) by a peculiarity of the function above
-
     if ( tok->classe != NUM_BASE_BINARY &&
          tok->classe != NUM_BASE_OCTAL &&
          tok->classe != NUM_BASE_DECIMAL &&
          tok->classe != NUM_BASE_HEX )
         return 0;
 
-    if ( tok->valor[0] == '\'' )
-        return 32; // default when size is not specified
+    if ( is_valid_natural_number(tok->valor) || tok->valor[0] == '\'' )
+        return 32; // default size when not specified, as per Verilog standard 
 
     sscanf(tok->valor,
            "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
@@ -1198,14 +1195,14 @@ unsigned int get_value_from_literal_token(const Token* tok)
     if ( !tok || tok->valor[0] == 0x00 )
         return 0;
 
-    if ( is_valid_natural_number(tok->valor) )
-        return (unsigned int) strtoul(tok->valor, NULL, 10);
-
     if ( tok->classe != NUM_BASE_BINARY &&
          tok->classe != NUM_BASE_OCTAL &&
          tok->classe != NUM_BASE_DECIMAL &&
          tok->classe != NUM_BASE_HEX )
         return 0;
+
+    if ( is_valid_natural_number(tok->valor) )
+        return (unsigned int) strtoul(tok->valor, NULL, 10);
 
     if ( tok->valor[0] == '\'' )
         sscanf(tok->valor,
@@ -1215,6 +1212,24 @@ unsigned int get_value_from_literal_token(const Token* tok)
         sscanf(tok->valor,
                "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
                &size, &base, value_str);
+
+    convert_value_string_to_uint(value_str, base);
+    
+    return value;
+}
+
+unsigned int convert_value_string_to_uint(char* value_str, char base)
+{
+    unsigned int value = 0;
+
+    // incorrect arguments will return 0
+    if ( !value_str || value_str[0] == 0x00 ||
+         (base != 'b' && base != 'B' &&
+          base != 'o' && base != 'O' &&
+          base != 'd' && base != 'D' &&
+          base != 'h' && base != 'H') ) {
+        return 0;
+    }
 
     remove_underscores_from_literal(value_str);
 

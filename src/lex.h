@@ -1,6 +1,14 @@
 /**
  * @file lex.h
- * @brief Funcoes elementares de processamento lexico dos arquivos fonte.
+ * @brief Elementary lexical processing functions and types for source files.
+ * This module is responsible for tokenizing the source code, which involves
+ * reading the source file character by character, identifying meaningful
+ * sequences of characters (tokens), and categorizing them according to their
+ * type (e.g., keywords, identifiers, literals, symbols). The resulting tokens
+ * are stored in a list for subsequent syntactic analysis. This module also
+ * provides utility functions for managing the list of tokens, such as adding,
+ * removing, and displaying tokens, as well as functions for determining token
+ * classes and extracting info from literal tokens according to the standard.
  */
 
 #ifndef LEX_H
@@ -280,6 +288,17 @@ unsigned int get_bit_size_from_literal_token(const Token* tok);
  *          If the token is not a valid literal, returns 0.
  */
 unsigned int get_value_from_literal_token(const Token* tok);
+
+/**
+ * @brief Converts the value part of the string representing a numeric literal
+ *        to an unsigned int, according to the specified base.
+ * @param value_str The string representing the value part of a numeric literal.
+ * @param base The base of the numeric literal, which can be 'b' (binary),
+ *             'o' (octal), 'd' (decimal), or 'h' (hexadecimal).
+ * @note Invalid arguments (NULL pointers, empty strings, or invalid bases)
+ *       will result in a return value of 0.
+*/
+unsigned int convert_value_string_to_uint(char* value_str, char base);
 
 #ifdef __cplusplus
 }
