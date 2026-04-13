@@ -12,6 +12,10 @@ extern int global_silent_mode;
 extern "C" {
 #endif
 
+// Stringification macros
+#define STR(x) #x
+#define XSTR(x) STR(x)
+
 /** @brief Faz o append de um char numa string qualquer.
  *  @param str Uma string qualquer.
  *  @param c Um caractere.

@@ -1181,7 +1181,9 @@ unsigned int get_bit_size_from_literal_token(const Token* tok)
     if ( tok->valor[0] == '\'' )
         return 32; // default when size is not specified
 
-    sscanf(tok->valor, "%u'%c%s", &size, &base, str_value);
+    sscanf(tok->valor,
+           "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
+           &size, &base, str_value);
 
     return size;
 }
@@ -1206,11 +1208,15 @@ unsigned int get_value_from_literal_token(const Token* tok)
         return 0;
 
     if ( tok->valor[0] == '\'' )
-        sscanf(tok->valor, "'%c%s", &base, value_str);
+        sscanf(tok->valor,
+               "'%c%" XSTR(MAX_TOKEN_SIZE) "s",
+               &base, value_str);
     else
-        sscanf(tok->valor, "%u'%c%s", &size, &base, value_str);
+        sscanf(tok->valor,
+               "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
+               &size, &base, value_str);
 
-    remove_underscores_from_literal(    value_str);
+    remove_underscores_from_literal(value_str);
 
     switch (base)
     {
