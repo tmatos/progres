@@ -259,13 +259,12 @@ void save_vcd(Module* module, Sinais* sinais, FILE* file)
     
     Transicao* list_tran = NULL;
     Transicao* it = NULL;
-    Pulso* p;
     ValorLogico v;
 
     for ( i=0 ; i < sinais->quantidade ; i++ )
     {
         t = 0;
-        p = sinais->lista[i].pulsos;
+        Pulso* p = sinais->lista[i].pulsos;
 
         while (p->valor != VAL_BLANK)
         {

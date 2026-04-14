@@ -389,16 +389,12 @@ ValorLogico compute_xnor_gate(ValorLogico a, ValorLogico b)
 // Std 1364-2005, Table 7-3
 ValorLogico compute_or_gate(ListComponent* inputs)
 {
-    int i;
-    ValorLogico input_at_i;
-    ValorLogico out;
-
-    out = VAL_0;
+    ValorLogico out = VAL_0;
     
-    // computa o valor da operacao or sobre todas as entradas
-    for ( i=0 ; i < inputs->tamanho ; i++ )
+    // compute the logic value of the 'or' operation over all its inputs
+    for ( int i=0 ; i < inputs->tamanho ; i++ )
     {
-        input_at_i = inputs->itens[i]->dynamic_value;
+        ValorLogico input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_1) {
             out = VAL_1;
@@ -416,16 +412,12 @@ ValorLogico compute_or_gate(ListComponent* inputs)
 // Std 1364-2005, Table 7-3
 ValorLogico compute_and_gate(ListComponent* inputs)
 {
-    int i;
-    ValorLogico input_at_i;
-    ValorLogico out;
-    
-    out = VAL_1;
+    ValorLogico out = VAL_1;
 
-    // computa o valor da operacao and sobre todas as entradas
-    for ( i=0 ; i < inputs->tamanho ; i++ )
+    // compute the logic value of the 'and' operation over all its inputs
+    for ( int i=0 ; i < inputs->tamanho ; i++ )
     {
-        input_at_i = inputs->itens[i]->dynamic_value;
+        ValorLogico input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_0) {
             out = VAL_0;
@@ -442,8 +434,7 @@ ValorLogico compute_and_gate(ListComponent* inputs)
 
 ValorLogico compute_nor_gate(ListComponent* inputs)
 {
-    ValorLogico out;
-    out = compute_or_gate(inputs);
+    ValorLogico out = compute_or_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -455,8 +446,7 @@ ValorLogico compute_nor_gate(ListComponent* inputs)
 
 ValorLogico compute_nand_gate(ListComponent* inputs)
 {
-    ValorLogico out;
-    out  = compute_and_gate(inputs);
+    ValorLogico out  = compute_and_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -573,10 +563,8 @@ void create_events_from_outputs(
     Component* gate,
     ValorLogico result)
 {
-    int j;
-
-    // cria eventos relativos as saidas da porta
-    for ( j=0 ; j < gate->list_output->tamanho ; j++ )
+    // create events related to the gate outputs
+    for ( int j=0 ; j < gate->list_output->tamanho ; j++ )
     {
         insert_event(queue,
                      t + gate->atributos.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,

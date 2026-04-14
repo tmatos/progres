@@ -128,21 +128,20 @@ ListComponent* new_list_component()
 
 ListComponent* new_list_component_of_size(unsigned int size)
 {
-    unsigned int i;
     ListComponent* list_comp;
-
     list_comp = (ListComponent*) xmalloc( sizeof(ListComponent) );
     list_comp->tamanho = size;
 
     if (size == 0) {
         list_comp->itens = NULL;
+        
+        return list_comp;
     }
-    else {
-        list_comp->itens = (Component**) xmalloc( sizeof(Component*) * size );
 
-        for ( i = 0; i < size; i++ ) {
-            list_comp->itens[i] = NULL;
-        }
+    list_comp->itens = (Component**) xmalloc( sizeof(Component*) * size );
+
+    for ( unsigned int i = 0; i < size; i++ ) {
+        list_comp->itens[i] = NULL;
     }
 
     return list_comp;

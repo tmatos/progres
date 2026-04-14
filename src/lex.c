@@ -151,11 +151,10 @@ void delete_lista_token(ListToken* list)
         return;
     }
 
-    Token* an;
     Token* it = list->primeiro;
 
     while(it) {
-        an = it;
+        Token* an = it;
         it = it->seguinte;
         free(an);
     }

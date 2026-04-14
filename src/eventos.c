@@ -122,7 +122,6 @@ void insert_event(
 
 void delete_event_queue(Evento** queue)
 {
-    Evento* tmp;
     Evento* evt_it = *queue;
 
     if ( (queue == NULL) || (*queue == NULL) )
@@ -134,7 +133,7 @@ void delete_event_queue(Evento** queue)
             delete_list_transicao( &(evt_it->list_transition) );
         }
 
-        tmp = evt_it;
+        Evento* tmp = evt_it;
         evt_it = evt_it->next;
         free(tmp);
     }
@@ -266,7 +265,6 @@ Transicao* pop_event(Evento** queue)
 void delete_list_transicao(Transicao** list)
 {
     Transicao* pt = *list;
-    Transicao* pta;
 
     if ( (list == NULL) || (*list == NULL) ) {
         return;
@@ -274,7 +272,7 @@ void delete_list_transicao(Transicao** list)
 
     while (pt)
     {
-        pta = pt;
+        Transicao* pta = pt;
         pt = pt->next;
         free(pta);
     }

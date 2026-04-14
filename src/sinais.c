@@ -122,10 +122,8 @@ void free_signal(Sinal** signal)
 
 void free_signal_list(Sinais** list)
 {
-    int i;
-
     if ( *list ) {
-        for ( i=0 ; i < (*list)->quantidade ; i++ )
+        for ( int i=0 ; i < (*list)->quantidade ; i++ )
         {
             // NOTE: not using free_signal() here because of reallocs in lista
             free( (*list)->lista[i].pulsos );
