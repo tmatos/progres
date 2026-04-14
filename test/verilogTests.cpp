@@ -399,7 +399,6 @@ public:
     std::list<std::string> *list_bad_files;
     list_bad_files = helper_list_files_in_dir("./verilog_sample_src/", "badverilog_*.v");
 
-    FILE* f = NULL;
     Evento* q = new_empty_event();
     Module* mod = NULL;
     Token* it = NULL;

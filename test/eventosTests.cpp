@@ -150,7 +150,7 @@ public:
     CPPUNIT_ASSERT(fila->next);
     CPPUNIT_ASSERT(fila->next->next);
 
-    Transicao* tr_no_meio = get_transitions_at_time(fila, (Tempo)5550);
+    //Transicao* tr_no_meio = get_transitions_at_time(fila, (Tempo)5550);
     CPPUNIT_ASSERT(tr);
 
     CPPUNIT_ASSERT( ! get_transitions_at_time(fila, (Tempo)5551 ) );

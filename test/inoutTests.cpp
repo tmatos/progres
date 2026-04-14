@@ -140,15 +140,14 @@ public:
       "./inout_sample_files/badinput_9.in"
     };
 
-    Sinais* inputs = NULL;
-    FILE* fp = NULL;
-
     for ( std::string path : list_bad_files )
     {
-      fp = fopen( path.c_str(), "r");
+      FILE* fp = fopen( path.c_str(), "r");
       CPPUNIT_ASSERT( fp );
+
       Sinais* inputs = load_input_signals(fp);
       CPPUNIT_ASSERT( !inputs );
+
       fclose(fp);
     }
   }
