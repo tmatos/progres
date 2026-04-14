@@ -1164,7 +1164,7 @@ unsigned int get_bit_size_from_literal_token(const Token* tok)
 {
     unsigned int size = 0;
     char base = 'd'; // default base is decimal
-    char str_value[MAX_TOKEN_SIZE] = { 0x00 };
+    char str_value[MAX_TOKEN_SIZE+1] = { 0x00 };
 
     if ( !tok || tok->valor[0] == 0x00 )
         return 0;
@@ -1189,7 +1189,7 @@ unsigned int get_value_from_literal_token(const Token* tok)
 {
     unsigned int size = 0;
     char base = 'd'; // default base is decimal
-    char value_str[MAX_TOKEN_SIZE] = { 0x00 };
+    char value_str[MAX_TOKEN_SIZE+1] = { 0x00 };
     unsigned int value = 0;
 
     if ( !tok || tok->valor[0] == 0x00 )
