@@ -112,20 +112,22 @@ public:
 
   void test_is_string_logic_gate()
   {
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"and") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"or") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"xor") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"nand") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"nor") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"xnor") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"not") );
-    CPPUNIT_ASSERT( is_string_logic_gate( (char*)"buf") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"a") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"aa") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"n") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"nn") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)"") );
-    CPPUNIT_ASSERT( ! is_string_logic_gate( (char*)" ") );
+    std::list<std::string> logic_gates = {
+      "and", "or", "xor", "nand", "nor", "xnor", "not", "buf"
+    };
+
+    std::list<std::string> are_not_logic_gates = { 
+      "a", "aa", "n", "nn", "", " ", "  ", "o", "x", "no", "xn", "xno", "nan",
+      "an", "andd", "orr", "xorr", "nandd", "norr", "xnorr", "nott", "buff",
+    };
+
+    for (const std::string& gate : logic_gates) {
+      CPPUNIT_ASSERT( is_string_logic_gate( gate.c_str() ) );
+    }
+
+    for (const std::string& invalid_gate : are_not_logic_gates) {
+      CPPUNIT_ASSERT( ! is_string_logic_gate( invalid_gate.c_str() ) );
+    }
   }
 
   void test_load_module_fileEmpty()

@@ -9,7 +9,8 @@
 class Testes_sinais : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( Testes_sinais );
-  CPPUNIT_TEST( test_new_signal );
+  CPPUNIT_TEST( test_new_signal_unamed );
+  CPPUNIT_TEST( test_new_signal_named );
   CPPUNIT_TEST( test_set_signal_name );
   CPPUNIT_TEST( test_set_pulse_blank );
   CPPUNIT_TEST( test_add_new_pulse );
@@ -23,34 +24,54 @@ class Testes_sinais : public CppUnit::TestFixture
 
 public:
 
-  void test_new_signal()
+  void test_new_signal_unamed()
   {
-    Sinal *sinal_unnamed = new_signal(NULL);
-    
-    CPPUNIT_ASSERT( sinal_unnamed );
-    CPPUNIT_ASSERT( !strcmp( (char*)"", (char*)sinal_unnamed->nome ) );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_unnamed->total_time );
+    std::string str_empty = "";
 
-    Sinal *sinal_teste = new_signal( (char*)"teste" );
-    
+    Sinal *sinal_unnamed = new_signal(NULL);
+    CPPUNIT_ASSERT( sinal_unnamed );
+
+    std::string str_nome_sinal_unnamed( sinal_unnamed->nome );
+
+    CPPUNIT_ASSERT_EQUAL( str_empty, str_nome_sinal_unnamed );
+    CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_unnamed->total_time );
+  }
+
+  void test_new_signal_named()
+  {
+    std::string str_nome_teste = "teste";
+
+    Sinal *sinal_teste = new_signal( str_nome_teste.c_str() );
     CPPUNIT_ASSERT( sinal_teste );
-    CPPUNIT_ASSERT( !strcmp( (char*)"teste", (char*)sinal_teste->nome ) );
+    
+    std::string str_nome_teste_sinal( sinal_teste->nome );
+
+    CPPUNIT_ASSERT_EQUAL( str_nome_teste, str_nome_teste_sinal );
     CPPUNIT_ASSERT_EQUAL( (Tempo)0, sinal_teste->total_time );
   }
 
   void test_set_signal_name()
   {
-    Sinal *sinal = new_signal( (char*)"teste" );
+    std::string str_original_name = "teste";
 
-    int ret = set_signal_name(sinal, (char*)"123" );
-    
+    Sinal *sinal = new_signal( str_original_name.c_str() );
+    CPPUNIT_ASSERT( sinal );
+
+    std::string str_new_name = "123";
+
+    int ret = set_signal_name(sinal, str_new_name.c_str() );
     CPPUNIT_ASSERT(ret);
-    CPPUNIT_ASSERT( !strcmp( (char*)"123", (char*)sinal->nome ) );
+
+    std::string str_new_name_sinal( sinal->nome );
+
+    CPPUNIT_ASSERT_EQUAL( str_new_name, str_new_name_sinal );
 
     ret = set_signal_name(NULL, NULL);
-
     CPPUNIT_ASSERT(!ret);
-    CPPUNIT_ASSERT( !strcmp( (char*)"123", (char*)sinal->nome ) );
+
+    std::string str_new_name_sinal_again( sinal->nome );
+
+    CPPUNIT_ASSERT_EQUAL( str_new_name, str_new_name_sinal_again );
   }
 
   void test_set_pulse_blank()
@@ -69,7 +90,9 @@ public:
 
   void test_add_new_pulse()
   {
-    Sinal *sinal = new_signal( (char*)"teste" );
+    std::string str_signal_name = "teste";
+
+    Sinal *sinal = new_signal( str_signal_name.c_str() );
 
     CPPUNIT_ASSERT(sinal);
     
@@ -122,9 +145,12 @@ public:
 
   void test_insert_signal()
   {
+    std::string str_signal_name_teste_0 = "sinal_teste_0";
+    std::string str_signal_name_teste_1 = "sinal_teste_0";
+
     Sinais *sinais = new_signal_list();
     
-    Sinal *sinal_0 = new_signal( (char*)"sinal_teste_0" );
+    Sinal *sinal_0 = new_signal( str_signal_name_teste_0.c_str() );
     add_new_pulse(sinal_0, VAL_1, (Tempo)255);   // 0
     add_new_pulse(sinal_0, VAL_0, (Tempo)250);   // 1
     add_new_pulse(sinal_0, VAL_1, (Tempo) 10);   // 2
@@ -141,7 +167,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(      VAL_1, sinais->lista[0].pulsos[2].valor );
     CPPUNIT_ASSERT_EQUAL(  (Tempo)10, sinais->lista[0].pulsos[2].tempo );
     
-    Sinal *sinal_1 = new_signal( (char*)"sinal_teste_1" );
+    Sinal *sinal_1 = new_signal( str_signal_name_teste_1.c_str() );
     add_new_pulse(sinal_1, VAL_1, (Tempo)1010);  // 0
     add_new_pulse(sinal_1, VAL_1, (Tempo) 200);  // 1
     add_new_pulse(sinal_1, VAL_0, (Tempo)   5);  // 2
