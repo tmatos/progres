@@ -107,8 +107,6 @@ void print(const char* fmt, ...)
 
 void remove_underscores_from_literal(char* str)
 {
-    // TODO: add test for it
-
     char* src = str;
     char* dst = str;
 

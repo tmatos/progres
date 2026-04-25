@@ -12,6 +12,7 @@
 #include "verilogTests.cpp"
 #include "inoutTests.cpp"
 #include "errosTests.cpp"
+#include "strutilTests.cpp"
 
 int global_silent_mode;
 
@@ -29,6 +30,7 @@ int main(int argc, char **argv)
   runner.addTest( Testes_verilog::suite() );
   runner.addTest( Testes_inout::suite() );
   runner.addTest( Testes_erros::suite() );
+  runner.addTest( Testes_strutil::suite() );
   int returnVal = runner.run() ? 0 : 1;
   textOut.printStatistics();
   return returnVal;
