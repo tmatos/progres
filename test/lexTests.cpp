@@ -28,6 +28,9 @@ class Testes_lex : public CppUnit::TestFixture
   CPPUNIT_TEST( test_tokeniza_multiline_v );
   CPPUNIT_TEST( test_tokeniza_strings_v );
   CPPUNIT_TEST( test_tokeniza_bad_lexical_v );
+  CPPUNIT_TEST( test_get_bit_size_from_literal_token );
+  CPPUNIT_TEST( test_convert_value_string_to_uint );
+  CPPUNIT_TEST( test_get_value_from_literal_token );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -561,6 +564,143 @@ public:
 
     ListToken* tokens = tokeniza(f_bad_lexical);
     CPPUNIT_ASSERT_EQUAL( 21, tokens->tamanho );
+  }
+
+  void test_get_bit_size_from_literal_token()
+  {
+    std::vector<std::tuple<TokenClass, std::string, unsigned int>> tups_tok_str_uint = {
+      {_UNKNOWN, "unknown_token", 0},
+      {NUM_BASE_DECIMAL, "", 0},
+      {NUM_BASE_DECIMAL, "0", 32},
+      {NUM_BASE_DECIMAL, "1", 32},
+      {NUM_BASE_DECIMAL, "123", 32},
+      {NUM_BASE_DECIMAL, "255", 32},
+      {NUM_BASE_DECIMAL, "256", 32},
+      {NUM_BASE_DECIMAL, "1023", 32},
+      {NUM_BASE_DECIMAL, "1024", 32},
+      {NUM_BASE_BINARY, "1'b1", 1},
+      {NUM_BASE_BINARY, "2'b00", 2},
+      {NUM_BASE_BINARY, "3'b010", 3},
+      {NUM_BASE_BINARY, "8'b10101010", 8},
+      {NUM_BASE_BINARY, "10'b1010101010", 10},
+      {NUM_BASE_BINARY, "16'b1010101010101010", 16},
+      {NUM_BASE_BINARY, "16'b1010101_010101010", 16},
+      {NUM_BASE_HEX, "16'hDEAD", 16},
+      {NUM_BASE_HEX, "32'hDEADBEEF", 32},
+      {NUM_BASE_HEX, "32'hDEAD_BEEF", 32},
+      {NUM_BASE_HEX, "64'hBEEF_BABA_CADA_FADA", 64},
+      {NUM_BASE_OCTAL, "3'o0", 3},
+      {NUM_BASE_OCTAL, "6'o77", 6},
+      {NUM_BASE_OCTAL, "9'o770", 9},
+      {NUM_BASE_OCTAL, "12'o7701", 12},
+      {NUM_BASE_OCTAL, "18'o770155", 18},
+      {NUM_BASE_OCTAL, "18'o77_01_55", 18},
+      {NUM_BASE_OCTAL, "36'o770155770155", 36}
+    };
+
+    for ( auto t : tups_tok_str_uint )
+    {
+      TokenClass tok_class = std::get<0>(t);
+      std::string tok_str = std::get<1>(t);
+      unsigned int expected_size = std::get<2>(t);
+
+      Token tk;
+      tk.linha = 1;
+      tk.coluna = 1;
+      tk.anterior = NULL;
+      tk.seguinte = NULL;
+      tk.classe = tok_class;
+      copy(tk.valor, tok_str.c_str());
+
+      unsigned int bit_size = get_bit_size_from_literal_token(&tk);
+
+      CPPUNIT_ASSERT_EQUAL( expected_size, bit_size );
+    }
+  }
+
+  void test_convert_value_string_to_uint()
+  {
+    std::vector<std::tuple<char, std::string, unsigned int>> tups_base_str_uint = {
+      
+      // incorrect cases shall return 0
+      {'x', "FF", 0},
+      {'h', "", 0},
+
+      {'d', "0", 0},
+      {'d', "1", 1},
+      {'d', "123", 123},
+      {'d', "255", 255},
+      {'d', "256", 256},
+      {'d', "1023", 1023},
+      {'d', "1024", 1024},
+
+      {'b', "0", 0},
+      {'b', "1", 1},
+      {'b', "10101010", 170},
+      {'b', "1010101010", 682},
+      {'b', "101010101010", 2730},
+      {'b', "1010101010101010", 43690},
+
+      {'h', "0", 0},
+      {'h', "1", 1},
+      {'h', "DEAD", 57005},
+      {'h', "DEADBEEF", 3735928559},
+
+      {'o', "0", 0},
+      {'o', "1", 1},
+      {'o', "770", 504},
+      {'o', "7701", 4033},
+      {'o', "770155", 258157},
+      {'o', "770155770155", 67674566765}
+    };
+
+    for ( auto t : tups_base_str_uint )
+    {
+      char base = std::get<0>(t);
+      std::string str = std::get<1>(t);
+      unsigned int expected_uint = std::get<2>(t);
+
+      char c_str[MAX_TOKEN_SIZE];
+      copy(c_str, str.c_str());
+
+      unsigned int uint_returned = convert_value_string_to_uint(c_str, base);
+
+      CPPUNIT_ASSERT_EQUAL( expected_uint, uint_returned );
+    }
+  }
+
+  void test_get_value_from_literal_token()
+  { 
+    std::vector<std::tuple<TokenClass, std::string, unsigned int>> tups_tokcls_str_uint = {
+      {_UNKNOWN, "unknown_token", 0},
+      {NUM_BASE_DECIMAL, "", 0},
+      {NUM_BASE_DECIMAL, "0", 0},
+      {NUM_BASE_DECIMAL, "1", 1},
+      {NUM_BASE_DECIMAL, "123", 123},
+      {NUM_BASE_DECIMAL, "255", 255},
+      {NUM_BASE_DECIMAL, "256", 256},
+      {NUM_BASE_DECIMAL, "1023", 1023},
+      {NUM_BASE_DECIMAL, "1024", 1024}
+    };
+
+    for ( auto t : tups_tokcls_str_uint )
+    {
+      TokenClass tok_class = std::get<0>(t);
+      std::string tok_str = std::get<1>(t);
+      unsigned int expected_uint = std::get<2>(t);
+
+      Token tk;
+      tk.linha = 1;
+      tk.coluna = 1;
+      tk.anterior = NULL;
+      tk.seguinte = NULL;
+      tk.classe = tok_class;
+      copy(tk.valor, tok_str.c_str());
+
+      unsigned int returned_uint = get_value_from_literal_token(&tk);
+
+      CPPUNIT_ASSERT_EQUAL( expected_uint, returned_uint );
+    }
   }
 
 };
