@@ -1189,7 +1189,6 @@ unsigned int get_value_from_literal_token(const Token* tok)
     unsigned int size = 0;
     char base = 'd'; // default base is decimal
     char value_str[MAX_TOKEN_SIZE+1] = { 0x00 };
-    unsigned int value = 0;
 
     if ( !tok || tok->valor[0] == 0x00 )
         return 0;
@@ -1212,9 +1211,7 @@ unsigned int get_value_from_literal_token(const Token* tok)
                "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
                &size, &base, value_str);
 
-    convert_value_string_to_uint(value_str, base);
-    
-    return value;
+    return convert_value_string_to_uint(value_str, base);
 }
 
 unsigned int convert_value_string_to_uint(char* value_str, char base)
@@ -1251,7 +1248,6 @@ unsigned int convert_value_string_to_uint(char* value_str, char base)
         value = (unsigned int) strtoul(value_str, NULL, 16);
         break;
     default:
-        value = 0;
         break;
     }
 
