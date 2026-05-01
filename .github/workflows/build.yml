@@ -28,7 +28,7 @@ jobs:
         brew install m4 autoconf automake libtool
 
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
 
     - name: Generate configure (case Linux or macOS)
       if: runner.os == 'Linux' || runner.os == 'macOS'
@@ -42,7 +42,7 @@ jobs:
       shell: bash
     
     - name: Archive executables
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: binary-${{ matrix.os }}
         path: |
