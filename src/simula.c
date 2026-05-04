@@ -217,6 +217,9 @@ Sinais* simula(
                 set_dumpfile(f_dump, tr->task_args.itens[0].string_literal);
                 // TODO: set more flags for dumpfile
                 break;
+            case TASK_DUMPVARS:
+                // TODO
+                break;
             case TASK_FINISH:
                 while (queue)
                 {

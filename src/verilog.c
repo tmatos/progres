@@ -1593,6 +1593,9 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
     else if ( iguais(it->valor, "dumpfile") ) {
         task = TASK_DUMPFILE;
     }
+    else if ( iguais(it->valor, "dumpvars") ) {
+        task = TASK_DUMPVARS;
+    }
     else if ( iguais(it->valor, "finish") ) {
         task = TASK_FINISH;
         goto load_systask_sucess;
@@ -1612,6 +1615,17 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     if ( !avanca(&it) )
         goto load_systask_bad_eof;
+
+    if ( task == TASK_DUMPVARS && it->classe == SYM_SEMICOLON ) {
+        // $dumpvars; without any args defaults to: all variables
+        args.count = 1;
+        args.itens = (SystemTaskArg*) xcalloc(1, sizeof(SystemTaskArg));
+        args.types = (SystemTaskArgType*) xcalloc(1, sizeof(SystemTaskArgType));
+        args.itens[0].string_literal[0] = '\0'; // empty string means all variables
+        args.types[0] = ARG_STRING_LITERAL;
+        backtrack(&it);
+        goto load_systask_sucess;
+    }
 
     if (it->classe != SYM_OPEN_BRACKET) {
         show_error_msg("Token inesperado foi encontrado",
@@ -1637,6 +1651,14 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
             // $dumpfile() without any args defaults to: "dump.vcd"
             args.count = 1;
             copy(args.itens[0].string_literal, "dump.vcd");
+            args.types[0] = ARG_STRING_LITERAL;
+            goto load_systask_sucess;
+        }
+
+        if ( it->classe == SYM_CLOSE_BRACKET && task == TASK_DUMPVARS ) {
+            // $dumpvars() without any args defaults to: all variables
+            args.count = 1;
+            args.itens[0].string_literal[0] = '\0'; // empty string means all variables
             args.types[0] = ARG_STRING_LITERAL;
             goto load_systask_sucess;
         }
