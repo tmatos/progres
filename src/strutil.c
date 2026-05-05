@@ -20,7 +20,7 @@ int anexa(char* str, char c)
     tmp[0] = c;
     tmp[1] = '\0';
 
-    // TODO: use safer implement.
+    // TODO: use a safer implementation
     strncat(str, tmp, 2);
 
     // TODO: some checks...
@@ -30,7 +30,7 @@ int anexa(char* str, char c)
 
 int iguais(const char* a, const char* b)
 {
-	// TODO: use safer implement.
+	// TODO: use a safer implementation
     return !strcmp(a, b);
 }
 

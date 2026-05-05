@@ -118,15 +118,15 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_define.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokenize(fp);
     CPPUNIT_ASSERT(list_tok);
 
     //show_token_list(list_tok);
 
-    CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->valor, "VER") );
-    CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->anterior->valor, "\x60") );
+    CPPUNIT_ASSERT( !strcmp(list_tok->last->previous->previous->value, "VER") );
+    CPPUNIT_ASSERT( !strcmp(list_tok->last->previous->previous->previous->value, "\x60") );
 
-    int n_tok_in = list_tok->tamanho;
+    int n_tok_in = list_tok->count;
 
     PreprocesorResult ret = pre_processor(list_tok);
 
@@ -134,12 +134,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(PREPROCESSOR_SUCCESS, ret);
 
-    int n_tok_out = list_tok->tamanho;
+    int n_tok_out = list_tok->count;
 
     CPPUNIT_ASSERT_EQUAL(n_tok_out + 5, n_tok_in);
 
-    CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->valor, "5") );
-    CPPUNIT_ASSERT( !strcmp(list_tok->ultimo->anterior->anterior->anterior->valor, "=") );
+    CPPUNIT_ASSERT( !strcmp(list_tok->last->previous->previous->value, "5") );
+    CPPUNIT_ASSERT( !strcmp(list_tok->last->previous->previous->previous->value, "=") );
   }
 
   void test_pre_processor_undef_v()
@@ -147,19 +147,19 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_undef.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokenize(fp);
     CPPUNIT_ASSERT(list_tok);
 
-    int n_tok_in = list_tok->tamanho;
+    int n_tok_in = list_tok->count;
 
     PreprocesorResult ret = pre_processor(list_tok);
     CPPUNIT_ASSERT_EQUAL(PREPROCESSOR_SUCCESS, ret);
 
-    int n_tok_out = list_tok->tamanho;
+    int n_tok_out = list_tok->count;
 
     CPPUNIT_ASSERT_EQUAL(n_tok_out + (4+4+3+1), n_tok_in);
 
-    CPPUNIT_ASSERT( !strcmp(list_tok->primeiro->valor, "module") );
+    CPPUNIT_ASSERT( !strcmp(list_tok->first->value, "module") );
   }
 
   void test_pre_processor_directives_v()
@@ -167,7 +167,7 @@ public:
     FILE* fp = fopen("./verilog_sample_src/preproc_directives.v", "r");
     CPPUNIT_ASSERT(fp);
 
-    ListToken* list_tok = tokeniza(fp);
+    ListToken* list_tok = tokenize(fp);
     CPPUNIT_ASSERT(list_tok);
 
     PreprocesorResult ret = pre_processor(list_tok);
@@ -199,7 +199,7 @@ public:
       fp = fopen(path.c_str(), "r");
       CPPUNIT_ASSERT(fp);
 
-      list_tok = tokeniza(fp);
+      list_tok = tokenize(fp);
       CPPUNIT_ASSERT(list_tok);
       
       CPPUNIT_ASSERT( !pre_processor(list_tok) );

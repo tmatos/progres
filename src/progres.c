@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
     FILE* f_verilog_source = NULL;
     FILE* f_dump = NULL;
 
-    Sinais* sinais_entradas = NULL;
-    Sinais* sinais_saidas = NULL;
+    SignalArray* sinais_entradas = NULL;
+    SignalArray* sinais_saidas = NULL;
     ListModule* circuit = NULL;
 
     char str_wave_out_filepath[MAX_FILE_PATH_SIZE] = "";
@@ -59,9 +59,11 @@ int main(int argc, char* argv[])
     f_verilog_source = open_or_exit(str_verilog_source, "r");
     print("Abrindo o arquivo de circuito: %s\n", str_verilog_source);
     
-    Evento* initial_task_events = NULL;
+    Event* initial_task_events = NULL;
 
-    circuit = load_circuit(f_verilog_source, &initial_task_events, str_verilog_source);
+    circuit = load_circuit(f_verilog_source,
+                           &initial_task_events,
+                           str_verilog_source);
 
     if (!circuit) {
         print("Erro com o carregamento do codigo fonte do cicuito.\n");
@@ -100,7 +102,10 @@ int main(int argc, char* argv[])
         }
     }
 
-    sinais_saidas = simula(circuit->itens[0], sinais_entradas, &initial_task_events, &f_dump);
+    sinais_saidas = simula(circuit->itens[0],
+                           sinais_entradas,
+                           &initial_task_events,
+                           &f_dump);
 
     if (sinais_saidas) {
         print("Simulacao concluida com saidas geradas.\n");
@@ -117,7 +122,8 @@ int main(int argc, char* argv[])
                   str_wave_out_filepath);
         }
         else {
-            print("Um arquivo VCD tambem sera salvo, em '%s'.\n", str_wave_out_filepath);
+            print("Um arquivo VCD tambem sera salvo, em '%s'.\n",
+                  str_wave_out_filepath);
         }
     }
 
@@ -134,9 +140,9 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
 }
 
-Sinais* load_inputs_from_path(const char* path)
+SignalArray* load_inputs_from_path(const char* path)
 {
-    Sinais* sinais_entradas = NULL;
+    SignalArray* sinais_entradas = NULL;
     FILE* f_wave_in = open_or_exit(path, "r");
     print("Abrindo o arquivo de entrada: %s\n", path);
     sinais_entradas = load_input_signals(f_wave_in);
@@ -145,24 +151,24 @@ Sinais* load_inputs_from_path(const char* path)
     return sinais_entradas;
 }
 
-Sinais* create_dummy_inputs(Module* module)
+SignalArray* create_dummy_inputs(Module* module)
 {
-    Sinais* inputs = new_signal_list();
+    SignalArray* inputs = new_signal_list();
 
     print("Criando entradas dummy para o circuito.\n");
 
-    for ( int i=0 ; i < module->list_input_net->tamanho ; i++ )
+    for ( int i=0 ; i < module->list_input_net->total ; i++ )
     {
         Component* input_net = module->list_input_net->itens[i];
-        Sinal* sig = new_signal(input_net->nome);
-        add_new_pulse(sig, VAL_X, 1); // valor X por 1 unidade de tempo
+        Signal* sig = new_signal(input_net->name);
+        add_new_pulse(sig, VAL_X, 1); // value X por 1 unit de tempo
         insert_signal(inputs, sig);
     }
 
     return inputs;
 }
 
-void save_outputs_to_path(const char* path, Sinais* outputs)
+void save_outputs_to_path(const char* path, SignalArray* outputs)
 {
     FILE* f_wave_out = open_or_exit(path, "w");
     save_signals(outputs, f_wave_out);

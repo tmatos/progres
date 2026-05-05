@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -26,7 +26,8 @@ void insert_macro(ListMacro* lst, const char* name, const char* value)
     }
     else {
         lst->total++;
-        lst->itens = (Macro**) xrealloc(lst->itens, sizeof(Macro*) * lst->total);
+        lst->itens = (Macro**) xrealloc(lst->itens,
+                                        sizeof(Macro*) * lst->total);
     }
 
     m = (Macro*) xmalloc(sizeof(Macro));
@@ -99,7 +100,7 @@ PreprocesorResult pre_processor(ListToken* lst)
     list_macro.total = 0;
     list_macro.itens = NULL;
 
-    it = lst->primeiro;
+    it = lst->first;
 
     while (it)
     {
@@ -111,7 +112,7 @@ PreprocesorResult pre_processor(ListToken* lst)
         if ( !avanca(&it) )
             goto pre_processor_error_bad_eof;
 
-        if ( iguais("define", it->valor) ) {
+        if ( iguais("define", it->value) ) {
             e = preproc_define(lst, &it, &list_macro);
 
             if (e == ERROR_VERILOG_BAD_EOF) {
@@ -123,7 +124,7 @@ PreprocesorResult pre_processor(ListToken* lst)
 
             continue;
         }
-        else if (iguais("undef", it->valor)) {
+        else if (iguais("undef", it->value)) {
             e = preproc_undef(lst, &it, &list_macro);
 
             if (e == ERROR_VERILOG_UNDECLARED_MACRO) {
@@ -138,36 +139,36 @@ PreprocesorResult pre_processor(ListToken* lst)
             
             continue;
         }
-        else if ( iguais("timescale", it->valor) ) {
+        else if ( iguais("timescale", it->value) ) {
             e = preproc_timescale(&it);
 
             if (e == ERROR_VERILOG_BAD_EOF) {
                 goto pre_processor_error_bad_eof;
             }
         }
-        else if (iguais("resetall", it->valor)) {
+        else if (iguais("resetall", it->value)) {
 
             // TODO
 
         }
         else if (is_allowed_identifier(it)) {
-            macro = get_macro_by_name(list_macro, it->valor);
+            macro = get_macro_by_name(list_macro, it->value);
 
             if (!macro)
                 goto pre_processor_error_undeclared_macro;
 
-            remove_token(lst, it->anterior); // remove previous '`' token
+            remove_token(lst, it->previous); // remove previous '`' token
             
             // update current token
-            copy(it->valor, macro->value);
-            it->classe = get_token_class(it->valor);
+            copy(it->value, macro->value);
+            it->classe = get_token_class(it->value);
         }
         else {
             show_error_msg("Token inesperado",
-                           it->linha,
-                           it->coluna,
+                           it->line,
+                           it->column,
                            "diretiva de compilador ou identificador",
-                           it->valor);
+                           it->value);
             return PREPROCESSOR_ERROR;
         }
 
@@ -182,12 +183,15 @@ pre_processor_error_bad_eof:
     return PREPROCESSOR_ERROR;
 
 pre_processor_error_undeclared_macro:
-    show_error_msg("Macro nao declarada", it->linha, it->coluna,
-                   "macro previamente declarada", it->valor);
+    show_error_msg("Macro nao declarada", it->line, it->column,
+                   "macro previamente declarada", it->value);
     return PREPROCESSOR_ERROR;
 }
 
-VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
+VerilogError preproc_define(
+    ListToken* list_tok,
+    Token** p_tok_it,
+    ListMacro* list_macro)
 {
     Token* temp;
 
@@ -200,37 +204,37 @@ VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* li
         goto preproc_define_error_bad_eof;
 
     if ( !is_allowed_identifier(it) ) {
-        show_error_msg("Token inesperado", it->linha, it->coluna,
-                       "identificador", it->valor);
+        show_error_msg("Token inesperado", it->line, it->column,
+                       "identificador", it->value);
         goto preproc_define_error_bad_token;
     }
 
-    if ( len(it->valor) > MAX_MACRO_NAME_SIZE ) {
+    if ( len(it->value) > MAX_MACRO_NAME_SIZE ) {
         show_error_size_exceeded("Nome de macro muito grande",
-                                 it->linha, it->coluna, it->valor,
+                                 it->line, it->column, it->value,
                                  MAX_MACRO_NAME_SIZE);
         goto preproc_define_error_bad_token;
     }
 
-    copy(macro_name, it->valor);
+    copy(macro_name, it->value);
     
     if ( !avanca(&it) )
         goto preproc_define_error_bad_eof;
 
-    if ( len(it->valor) > MAX_MACRO_VALUE_SIZE ) {
+    if ( len(it->value) > MAX_MACRO_VALUE_SIZE ) {
         show_error_size_exceeded("Comprimento da macro muito grande",
-                                 it->linha, it->coluna, it->valor,
+                                 it->line, it->column, it->value,
                                  MAX_MACRO_VALUE_SIZE);
         goto preproc_define_error_bad_token;
     }
 
-    copy(macro_value, it->valor);
+    copy(macro_value, it->value);
 
     insert_macro(list_macro, macro_name, macro_value);
 
-    remove_token(list_tok, it->anterior->anterior->anterior); // grave accent
-    remove_token(list_tok, it->anterior->anterior); // define directive
-    remove_token(list_tok, it->anterior); // macro identifier
+    remove_token(list_tok, it->previous->previous->previous); // grave accent
+    remove_token(list_tok, it->previous->previous); // define directive
+    remove_token(list_tok, it->previous); // macro identifier
 
     temp = it; // macro value
 
@@ -250,7 +254,10 @@ preproc_define_error_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro)
+VerilogError preproc_undef(
+    ListToken* list_tok,
+    Token** p_tok_it,
+    ListMacro* list_macro)
 {   
     Token* temp;
     Macro* macro = NULL;
@@ -261,24 +268,24 @@ VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* lis
         goto preproc_undef_error_bad_eof;
 
     if ( !is_allowed_identifier(it) ) {
-        show_error_msg("Token inesperado", it->linha, it->coluna,
-                       "identificador", it->valor);
+        show_error_msg("Token inesperado", it->line, it->column,
+                       "identificador", it->value);
         goto preproc_undef_error_bad_token;
     }
 
-    macro = get_macro_by_name(*list_macro, it->valor);
+    macro = get_macro_by_name(*list_macro, it->value);
 
     if (!macro)
         return ERROR_VERILOG_UNDECLARED_MACRO;
 
-    remove_macro_by_name(list_macro, it->valor);
+    remove_macro_by_name(list_macro, it->value);
 
     temp = it;
 
     avanca(&it);
     
-    remove_token(list_tok, temp->anterior->anterior); // grave accent
-    remove_token(list_tok, temp->anterior); // undefine directive
+    remove_token(list_tok, temp->previous->previous); // grave accent
+    remove_token(list_tok, temp->previous); // undefine directive
     remove_token(list_tok, temp); // macro identifier
 
     *p_tok_it = it;

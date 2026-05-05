@@ -45,10 +45,10 @@ public:
     CPPUNIT_ASSERT(t_1);
     CPPUNIT_ASSERT(t_2);
 
-    t_0->seguinte = t_1;
-    t_1->anterior = t_0;
-    t_1->seguinte = t_2;
-    t_2->anterior = t_1;
+    t_0->next = t_1;
+    t_1->previous = t_0;
+    t_1->next = t_2;
+    t_2->previous = t_1;
     
     Token* cursor = NULL;
     CPPUNIT_ASSERT_EQUAL( (Token*)NULL, avanca(&cursor) );
@@ -75,12 +75,12 @@ public:
     CPPUNIT_ASSERT(t_2);
     CPPUNIT_ASSERT(t_3);
 
-    t_0->seguinte = t_1;
-    t_1->anterior = t_0;
-    t_1->seguinte = t_2;
-    t_2->anterior = t_1;
-    t_2->seguinte = t_3;
-    t_3->anterior = t_2;
+    t_0->next = t_1;
+    t_1->previous = t_0;
+    t_1->next = t_2;
+    t_2->previous = t_1;
+    t_2->next = t_3;
+    t_3->previous = t_2;
     
     Token* cursor = NULL;
     CPPUNIT_ASSERT_EQUAL( (Token*)NULL, backtrack(&cursor) );
@@ -107,11 +107,11 @@ public:
 
     Token* t = new_token(str_value.c_str(), line, column, t_class);
     CPPUNIT_ASSERT(t);
-    CPPUNIT_ASSERT( ! t->anterior );
-    CPPUNIT_ASSERT( ! t->seguinte );
-    CPPUNIT_ASSERT_EQUAL( line, t->linha );
-    CPPUNIT_ASSERT_EQUAL( column, t->coluna );
-    std::string str_token_value(t->valor);
+    CPPUNIT_ASSERT( ! t->previous );
+    CPPUNIT_ASSERT( ! t->next );
+    CPPUNIT_ASSERT_EQUAL( line, t->line );
+    CPPUNIT_ASSERT_EQUAL( column, t->column );
+    std::string str_token_value(t->value);
     CPPUNIT_ASSERT_EQUAL( str_value, str_token_value );
     CPPUNIT_ASSERT_EQUAL( t_class, t->classe );
   }
@@ -125,11 +125,11 @@ public:
 
     Token* t = new_token(str_value.c_str(), line, column, _TO_DETECT);
     CPPUNIT_ASSERT(t);
-    CPPUNIT_ASSERT( ! t->anterior );
-    CPPUNIT_ASSERT( ! t->seguinte );
-    CPPUNIT_ASSERT_EQUAL( line, t->linha );
-    CPPUNIT_ASSERT_EQUAL( column, t->coluna );
-    std::string str_token_value(t->valor);
+    CPPUNIT_ASSERT( ! t->previous );
+    CPPUNIT_ASSERT( ! t->next );
+    CPPUNIT_ASSERT_EQUAL( line, t->line );
+    CPPUNIT_ASSERT_EQUAL( column, t->column );
+    std::string str_token_value(t->value);
     CPPUNIT_ASSERT_EQUAL( str_value, str_token_value );
     CPPUNIT_ASSERT_EQUAL( detected_class, t->classe );
   }
@@ -138,9 +138,9 @@ public:
   {
     ListToken* l = new_list_token();
     CPPUNIT_ASSERT(l);
-    CPPUNIT_ASSERT( ! l->primeiro );
-    CPPUNIT_ASSERT( ! l->ultimo );
-    CPPUNIT_ASSERT_EQUAL( 0, l->tamanho );
+    CPPUNIT_ASSERT( ! l->first );
+    CPPUNIT_ASSERT( ! l->last );
+    CPPUNIT_ASSERT_EQUAL( 0, l->count );
   }  
 
   void test_insert_token_of_string()
@@ -153,35 +153,35 @@ public:
     insert_token_of_string(l, token0.c_str(), 3000, 200, IDENTIFIER);
     
     CPPUNIT_ASSERT(l);
-    CPPUNIT_ASSERT( l->primeiro );
-    CPPUNIT_ASSERT( l->ultimo );
-    CPPUNIT_ASSERT( l->primeiro == l->ultimo );
-    CPPUNIT_ASSERT( ! l->primeiro->seguinte );
-    CPPUNIT_ASSERT( ! l->primeiro->anterior );
-    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
-    CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
-    CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
-    std::string str_l_first_value(l->primeiro->valor);
+    CPPUNIT_ASSERT( l->first );
+    CPPUNIT_ASSERT( l->last );
+    CPPUNIT_ASSERT( l->first == l->last );
+    CPPUNIT_ASSERT( ! l->first->next );
+    CPPUNIT_ASSERT( ! l->first->previous );
+    CPPUNIT_ASSERT_EQUAL( 1, l->count );
+    CPPUNIT_ASSERT_EQUAL( 3000, l->first->line );
+    CPPUNIT_ASSERT_EQUAL( 200, l->first->column );
+    std::string str_l_first_value(l->first->value);
     CPPUNIT_ASSERT_EQUAL( token0, str_l_first_value );
     
     insert_token_of_string(l, token1.c_str(), 3000, 210, SYM_LESS_OR_EQUAL);
     
     CPPUNIT_ASSERT(l);
-    CPPUNIT_ASSERT( l->primeiro );
-    CPPUNIT_ASSERT( l->ultimo );
-    CPPUNIT_ASSERT( l->primeiro != l->ultimo );
-    CPPUNIT_ASSERT_EQUAL( 2, l->tamanho );
-    CPPUNIT_ASSERT_EQUAL( 3000, l->primeiro->linha );
-    CPPUNIT_ASSERT_EQUAL( 200, l->primeiro->coluna );
+    CPPUNIT_ASSERT( l->first );
+    CPPUNIT_ASSERT( l->last );
+    CPPUNIT_ASSERT( l->first != l->last );
+    CPPUNIT_ASSERT_EQUAL( 2, l->count );
+    CPPUNIT_ASSERT_EQUAL( 3000, l->first->line );
+    CPPUNIT_ASSERT_EQUAL( 200, l->first->column );
     CPPUNIT_ASSERT_EQUAL( token0, str_l_first_value );
-    CPPUNIT_ASSERT_EQUAL( 3000, l->ultimo->linha );
-    CPPUNIT_ASSERT_EQUAL( 210, l->ultimo->coluna );
-    std::string str_l_last_value(l->ultimo->valor);
+    CPPUNIT_ASSERT_EQUAL( 3000, l->last->line );
+    CPPUNIT_ASSERT_EQUAL( 210, l->last->column );
+    std::string str_l_last_value(l->last->value);
     CPPUNIT_ASSERT_EQUAL( token1, str_l_last_value );
-    CPPUNIT_ASSERT( ! l->primeiro->anterior );
-    CPPUNIT_ASSERT( ! l->ultimo->seguinte );
-    CPPUNIT_ASSERT( l->primeiro->seguinte == l->ultimo );
-    CPPUNIT_ASSERT( l->primeiro == l->ultimo->anterior );
+    CPPUNIT_ASSERT( ! l->first->previous );
+    CPPUNIT_ASSERT( ! l->last->next );
+    CPPUNIT_ASSERT( l->first->next == l->last );
+    CPPUNIT_ASSERT( l->first == l->last->previous );
   }
 
   void test_remove_tokens_by_value()
@@ -196,32 +196,32 @@ public:
     
     insert_token_of_string(l, token0.c_str(), 500, 210, IDENTIFIER);
     CPPUNIT_ASSERT(l);
-    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 1, l->count );
     
     remove_tokens_by_value(l, tokenZ.c_str()); // nao sera encontrado
-    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 1, l->count );
 
     remove_tokens_by_value(l, token0.c_str());
-    CPPUNIT_ASSERT_EQUAL( 0, l->tamanho );
-    CPPUNIT_ASSERT( ! l->primeiro );
-    CPPUNIT_ASSERT( ! l->ultimo );
+    CPPUNIT_ASSERT_EQUAL( 0, l->count );
+    CPPUNIT_ASSERT( ! l->first );
+    CPPUNIT_ASSERT( ! l->last );
 
     insert_token_of_string(l, token0.c_str(), 10, 1, IDENTIFIER);
     insert_token_of_string(l, token1.c_str(), 20, 1, SYM_LESS_OR_EQUAL);
     insert_token_of_string(l, token2.c_str(), 50, 1, KW_WIRE);
     insert_token_of_string(l, token3.c_str(), 500, 1, SYM_HASHTAG);
-    CPPUNIT_ASSERT_EQUAL( 4, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 4, l->count );
 
     remove_tokens_by_value(l, token0.c_str());
-    CPPUNIT_ASSERT_EQUAL( 3, l->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 3, l->count );
 
     remove_tokens_by_value(l, token2.c_str());
-    CPPUNIT_ASSERT_EQUAL( 2, l->tamanho );
-    CPPUNIT_ASSERT( l->primeiro != l->ultimo );
+    CPPUNIT_ASSERT_EQUAL( 2, l->count );
+    CPPUNIT_ASSERT( l->first != l->last );
 
     remove_tokens_by_value(l, token3.c_str());
-    CPPUNIT_ASSERT_EQUAL( 1, l->tamanho );
-    CPPUNIT_ASSERT( l->primeiro == l->ultimo );
+    CPPUNIT_ASSERT_EQUAL( 1, l->count );
+    CPPUNIT_ASSERT( l->first == l->last );
   }
 
   void test_is_single_char_symbol()
@@ -253,17 +253,17 @@ public:
     };
 
     Token tk;
-    tk.linha = 3;
-    tk.coluna = 1;
-    tk.seguinte = NULL;
+    tk.line = 3;
+    tk.column = 1;
+    tk.next = NULL;
 
     for (auto s : list_valid) {
-      copy(tk.valor, s.c_str());
+      copy(tk.value, s.c_str());
       CPPUNIT_ASSERT( is_allowed_identifier(&tk) );
     }
 
     for (auto s : list_invalid) {
-      copy(tk.valor, s.c_str());
+      copy(tk.value, s.c_str());
       CPPUNIT_ASSERT( !is_allowed_identifier(&tk) );  
     }
 
@@ -300,23 +300,23 @@ public:
   void test_is_reserverd_word()
   {
     Token tk;
-    tk.linha = 10;
-    tk.coluna = 5;
-    tk.seguinte = NULL;
+    tk.line = 10;
+    tk.column = 5;
+    tk.next = NULL;
 
-    copy(tk.valor, "aaa");
+    copy(tk.value, "aaa");
     CPPUNIT_ASSERT( ! is_reserverd_word(&tk) );
 
-    copy(tk.valor, "123");
+    copy(tk.value, "123");
     CPPUNIT_ASSERT( ! is_reserverd_word(&tk) );
 
-    copy(tk.valor, "wire");
+    copy(tk.value, "wire");
     CPPUNIT_ASSERT( is_reserverd_word(&tk) );
 
-    copy(tk.valor, "always");
+    copy(tk.value, "always");
     CPPUNIT_ASSERT( is_reserverd_word(&tk) );
 
-    copy(tk.valor, "xor");
+    copy(tk.value, "xor");
     CPPUNIT_ASSERT( is_reserverd_word(&tk) );
 
     CPPUNIT_ASSERT( ! is_reserverd_word((Token*)NULL) );
@@ -534,22 +534,22 @@ public:
     FILE* arquivo = fopen(file_path, "r");
     CPPUNIT_ASSERT(arquivo);
 
-    ListToken* tokens = tokeniza(arquivo);
+    ListToken* tokens = tokenize(arquivo);
     CPPUNIT_ASSERT(tokens);
 
-    CPPUNIT_ASSERT_EQUAL( (size_t)tokens_esperados.size(), (size_t)tokens->tamanho );
+    CPPUNIT_ASSERT_EQUAL( (size_t)tokens_esperados.size(), (size_t)tokens->count );
 
-    Token* it = tokens->primeiro;
+    Token* it = tokens->first;
 
     for ( std::string s : tokens_esperados )
     {
       CPPUNIT_ASSERT(it);
-      std::string str_it_valor(it->valor);
+      std::string str_it_valor(it->value);
       CPPUNIT_ASSERT_EQUAL( s, str_it_valor );
-      it = it->seguinte;
+      it = it->next;
     }
 
-    CPPUNIT_ASSERT_EQUAL(tokens->ultimo->seguinte, it);
+    CPPUNIT_ASSERT_EQUAL(tokens->last->next, it);
     CPPUNIT_ASSERT(!it);
 
     fclose(arquivo);
@@ -562,8 +562,8 @@ public:
     FILE* f_bad_lexical = fopen("./verilog_sample_src/bad_lexical.v", "r");
     CPPUNIT_ASSERT(f_bad_lexical);
 
-    ListToken* tokens = tokeniza(f_bad_lexical);
-    CPPUNIT_ASSERT_EQUAL( 21, tokens->tamanho );
+    ListToken* tokens = tokenize(f_bad_lexical);
+    CPPUNIT_ASSERT_EQUAL( 21, tokens->count );
   }
 
   void test_get_bit_size_from_literal_token()
@@ -605,12 +605,12 @@ public:
       unsigned int expected_size = std::get<2>(t);
 
       Token tk;
-      tk.linha = 1;
-      tk.coluna = 1;
-      tk.anterior = NULL;
-      tk.seguinte = NULL;
+      tk.line = 1;
+      tk.column = 1;
+      tk.previous = NULL;
+      tk.next = NULL;
       tk.classe = tok_class;
-      copy(tk.valor, tok_str.c_str());
+      copy(tk.value, tok_str.c_str());
 
       unsigned int bit_size = get_bit_size_from_literal_token(&tk);
 
@@ -740,12 +740,12 @@ public:
       unsigned int expected_uint = std::get<2>(t);
 
       Token tk;
-      tk.linha = 1;
-      tk.coluna = 1;
-      tk.anterior = NULL;
-      tk.seguinte = NULL;
+      tk.line = 1;
+      tk.column = 1;
+      tk.previous = NULL;
+      tk.next = NULL;
       tk.classe = tok_class;
-      copy(tk.valor, tok_str.c_str());
+      copy(tk.value, tok_str.c_str());
 
       unsigned int returned_uint = get_value_from_literal_token(&tk);
 

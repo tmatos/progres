@@ -31,7 +31,7 @@ public:
     FILE* file_inputs = fopen("./inout_sample_files/empty.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = load_input_signals(file_inputs);
+    SignalArray* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( !inputs );
     fclose(file_inputs);
   }
@@ -41,9 +41,9 @@ public:
     FILE* file_inputs = fopen("./inout_sample_files/empty_signal.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = load_input_signals(file_inputs);
+    SignalArray* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
-    CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
+    CPPUNIT_ASSERT_EQUAL( 1, inputs->count );
 
     free(inputs);
     fclose(file_inputs);
@@ -56,16 +56,16 @@ public:
     FILE* file_inputs = fopen("./inout_sample_files/one.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = load_input_signals(file_inputs);
+    SignalArray* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
     fclose(file_inputs);
 
-    CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
-    CPPUNIT_ASSERT( inputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, inputs->count );
+    CPPUNIT_ASSERT( inputs->itens );
 
-    std::string str_name_a(inputs->lista[0].nome);
+    std::string str_name_a(inputs->itens[0].name);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, inputs->itens[0].total_time );
   }
 
   void test_load_input_signals_twoInputFile()
@@ -76,18 +76,18 @@ public:
     FILE* file_inputs = fopen("./inout_sample_files/two.in", "r");
     CPPUNIT_ASSERT( file_inputs );
 
-    Sinais* inputs = load_input_signals(file_inputs);
+    SignalArray* inputs = load_input_signals(file_inputs);
     CPPUNIT_ASSERT( inputs );
-    CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
-    CPPUNIT_ASSERT( inputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 2, inputs->count );
+    CPPUNIT_ASSERT( inputs->itens );
     fclose(file_inputs);
 
-    std::string str_name_a(inputs->lista[0].nome);
-    std::string str_name_b(inputs->lista[1].nome);
+    std::string str_name_a(inputs->itens[0].name);
+    std::string str_name_b(inputs->itens[1].name);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
     CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, inputs->lista[1].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, inputs->itens[0].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Time)10, inputs->itens[1].total_time );
   }
 
   void test_load_input_signals_file_notgates_in()
@@ -98,27 +98,27 @@ public:
     FILE* f_notgates_in = fopen("./inout_sample_files/notgates.in", "r");
     CPPUNIT_ASSERT( f_notgates_in );
 
-    Sinais* inputs = load_input_signals(f_notgates_in);
+    SignalArray* inputs = load_input_signals(f_notgates_in);
     CPPUNIT_ASSERT( inputs );
-    CPPUNIT_ASSERT_EQUAL( 2, inputs->quantidade );
-    CPPUNIT_ASSERT( inputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 2, inputs->count );
+    CPPUNIT_ASSERT( inputs->itens );
     fclose(f_notgates_in);
 
-    std::string str_name_a(inputs->lista[0].nome);
-    std::string str_name_b(inputs->lista[1].nome);
+    std::string str_name_a(inputs->itens[0].name);
+    std::string str_name_b(inputs->itens[1].name);
     CPPUNIT_ASSERT_EQUAL( expected_name_a, str_name_a );
     CPPUNIT_ASSERT_EQUAL( expected_name_b, str_name_b );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[0].total_time );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, inputs->lista[1].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, inputs->itens[0].total_time );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, inputs->itens[1].total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->lista[1].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[0].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[1].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->lista[0].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->lista[1].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[0].pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->lista[1].pulsos[3].valor );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->itens[0].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, inputs->itens[1].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->itens[0].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->itens[1].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->itens[0].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, inputs->itens[1].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->itens[0].pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, inputs->itens[1].pulses[3].value );
   }
 
   void test_load_input_signals_file_badinput_XX_in()
@@ -145,7 +145,7 @@ public:
       FILE* fp = fopen( path.c_str(), "r");
       CPPUNIT_ASSERT( fp );
 
-      Sinais* inputs = load_input_signals(fp);
+      SignalArray* inputs = load_input_signals(fp);
       CPPUNIT_ASSERT( !inputs );
 
       fclose(fp);
@@ -157,7 +157,7 @@ public:
     FILE* fp = fopen("./inout_sample_files/allpulses.in", "r");
     CPPUNIT_ASSERT( fp );
 
-    Sinais* inputs = load_input_signals(fp);
+    SignalArray* inputs = load_input_signals(fp);
     CPPUNIT_ASSERT( inputs );
     fclose(fp);
 
@@ -170,27 +170,27 @@ public:
     fp = fopen("./inout_sample_files/allpulses.in.out", "r");
     CPPUNIT_ASSERT( fp );
 
-    Sinais* outputs = load_input_signals(fp);
+    SignalArray* outputs = load_input_signals(fp);
     CPPUNIT_ASSERT( outputs );
     fclose(fp);
 
     // verificando se o sinal original e o que foi salvo sao iguais
 
-    CPPUNIT_ASSERT_EQUAL( inputs->quantidade, outputs->quantidade );
+    CPPUNIT_ASSERT_EQUAL( inputs->count, outputs->count );
 
-    for ( int i = 0; i < inputs->quantidade; ++i )
+    for ( int i = 0; i < inputs->count; ++i )
     {
-      std::string str_nome_input_i(inputs->lista[i].nome);
-      std::string str_nome_output_i(outputs->lista[i].nome);
-      CPPUNIT_ASSERT_EQUAL( str_nome_input_i, str_nome_output_i );
-      CPPUNIT_ASSERT_EQUAL( inputs->lista[i].total_time, outputs->lista[i].total_time );
+      std::string str_name_input_i(inputs->itens[i].name);
+      std::string str_name_output_i(outputs->itens[i].name);
+      CPPUNIT_ASSERT_EQUAL( str_name_input_i, str_name_output_i );
+      CPPUNIT_ASSERT_EQUAL( inputs->itens[i].total_time, outputs->itens[i].total_time );
       
       for ( int j = 0; j < 3; ++j )
       {
-        CPPUNIT_ASSERT_EQUAL( inputs->lista[i].pulsos[j].tempo,
-                              outputs->lista[i].pulsos[j].tempo );
-        CPPUNIT_ASSERT_EQUAL( inputs->lista[i].pulsos[j].valor,
-                              outputs->lista[i].pulsos[j].valor );
+        CPPUNIT_ASSERT_EQUAL( inputs->itens[i].pulses[j].time,
+                              outputs->itens[i].pulses[j].time );
+        CPPUNIT_ASSERT_EQUAL( inputs->itens[i].pulses[j].value,
+                              outputs->itens[i].pulses[j].value );
       }
     }
 
@@ -211,9 +211,9 @@ public:
   void test_save_vcd()
   {
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
     FILE* file_v = NULL;
     FILE* f_dump = NULL;
 

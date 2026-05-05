@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -16,122 +16,122 @@
 #include "strutil.h"
 #include "lex.h"
 
-Sinal* new_signal(const char* nome)
+Signal* new_signal(const char* name)
 {
-    Sinal* sinal = (Sinal*) xmalloc(sizeof(Sinal));
+    Signal* sinal = (Signal*) xmalloc(sizeof(Signal));
 
-    if (nome)
-        set_signal_name(sinal, nome);
+    if (name)
+        set_signal_name(sinal, name);
     else
         set_signal_name(sinal, "");
 
-    sinal->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
-    set_pulse_blank( sinal->pulsos + 0 );
+    sinal->pulses = (Pulse*) xmalloc(sizeof(Pulse));
+    set_pulse_blank( sinal->pulses + 0 );
     sinal->total_time = 0;
 
     return sinal;
 }
 
-int set_signal_name(Sinal* s, const char* nome)
+int set_signal_name(Signal* s, const char* name)
 {
-    if (!s || !nome)
+    if (!s || !name)
         return 0;
 
-    copy(s->nome, nome);
+    copy(s->name, name);
 
     return 1;
 }
 
-int set_pulse_blank(Pulso* p)
+int set_pulse_blank(Pulse* p)
 {
     if (!p)
         return 0;
 
-    p->valor = VAL_BLANK;
-    p->tempo = 0;
-    p->unidade = UN_S;
+    p->value = VAL_BLANK;
+    p->time = 0;
+    p->unit = UN_S;
 
     return 1;
 }
 
-int add_new_pulse(Sinal* s, ValorLogico valor, Tempo duracao)
+int add_new_pulse(Signal* s, LogicValue value, Time time_length)
 {
-    int tamanho;
-    int qtd;
-    Pulso* it;
+    int size;
+    int count;
+    Pulse* it;
 
     if (!s)
         return 0;
 
-    if (!s->pulsos)
+    if (!s->pulses)
         return 0;
 
-    tamanho = 2; // tamanho minimo de array de pulsos com algum valor
+    size = 2; // tamanho minimo de array de pulsos com algum valor
 
-    qtd = 0;
-    it = s->pulsos;
+    count = 0;
+    it = s->pulses;
 
-    // add na contagem a qtd de pulsos (com valor) ja existente
-    while(it->valor != VAL_BLANK)
+    // add na contagem a quantidade de pulsos (com valor) ja existente
+    while(it->value != VAL_BLANK)
     {
-        qtd++;
+        count++;
         it++;
     }
 
-    tamanho += qtd;
+    size += count;
 
-    if ( (qtd > 0) && (s->pulsos[qtd - 1].valor == valor) ) {
-        s->pulsos[qtd - 1].tempo += duracao;
+    if ( (count > 0) && (s->pulses[count - 1].value == value) ) {
+        s->pulses[count - 1].time += time_length;
     }
     else {
-        s->pulsos = (Pulso*) xrealloc( s->pulsos, sizeof(Pulso) * tamanho );
+        s->pulses = (Pulse*) xrealloc( s->pulses, sizeof(Pulse) * size );
 
         // acessando a penultima posicao, lembre que eh um vetor
-        s->pulsos[tamanho - 2].valor = valor;
-        s->pulsos[tamanho - 2].tempo = duracao;
+        s->pulses[size - 2].value = value;
+        s->pulses[size - 2].time = time_length;
 
         // acessando a ultima posicao
-        set_pulse_blank( &(s->pulsos[tamanho - 1]) );
+        set_pulse_blank( &(s->pulses[size - 1]) );
     }
 
-    s->total_time += duracao;
+    s->total_time += time_length;
 
     return 1;
 }
 
-Sinais* new_signal_list()
+SignalArray* new_signal_list()
 {
-    Sinais* s = (Sinais*) xmalloc(sizeof(Sinais));
+    SignalArray* s = (SignalArray*) xmalloc(sizeof(SignalArray));
 
     if (s) {
-        s->quantidade = 0;
-        s->lista = NULL;
+        s->count = 0;
+        s->itens = NULL;
     }
 
     return s;
 }
 
-void free_signal(Sinal** signal)
+void free_signal(Signal** signal)
 {
     if ( *signal ) {
-        free( (**signal).pulsos );
+        free( (**signal).pulses );
         free( *signal );
         *signal = NULL;
     }
 }
 
-void free_signal_list(Sinais** list)
+void free_signal_list(SignalArray** list)
 {
     if ( *list ) {
-        for ( int i=0 ; i < (*list)->quantidade ; i++ )
+        for ( int i=0 ; i < (*list)->count ; i++ )
         {
-            // NOTE: not using free_signal() here because of reallocs in lista
-            free( (*list)->lista[i].pulsos );
+            // NOTE: not using free_signal() here because of reallocs in itens
+            free( (*list)->itens[i].pulses );
         }
         
-        if ( (*list)->lista ) {
-            // NOTE: the array (*list)->lista grows with reallocs
-            free( (*list)->lista );
+        if ( (*list)->itens ) {
+            // NOTE: the array (*list)->itens grows with reallocs
+            free( (*list)->itens );
         }
 
         free( *list );
@@ -139,33 +139,33 @@ void free_signal_list(Sinais** list)
     }
 }
 
-int add_new_signal(Sinais* list, const char* nome)
+int add_new_signal(SignalArray* list, const char* name)
 {
-    Sinal* s;
+    Signal* s;
 
-    list->quantidade++;
+    list->count++;
 
-    if ( list->quantidade == 1 ) {
-        list->lista = (Sinal*) xmalloc(sizeof(Sinal));
+    if ( list->count == 1 ) {
+        list->itens = (Signal*) xmalloc(sizeof(Signal));
     }
     else {
-        list->lista = (Sinal*) xrealloc( list->lista,
-                                         sizeof(Sinal) * list->quantidade );
+        list->itens = (Signal*) xrealloc( list->itens,
+                                         sizeof(Signal) * list->count );
     }
 
-    s = list->lista + (list->quantidade - 1);
-    set_signal_name(s, nome);
+    s = list->itens + (list->count - 1);
+    set_signal_name(s, name);
 
-    s->pulsos = (Pulso*) xmalloc(sizeof(Pulso));
-    set_pulse_blank( s->pulsos + 0 );
+    s->pulses = (Pulse*) xmalloc(sizeof(Pulse));
+    set_pulse_blank( s->pulses + 0 );
     s->total_time = 0;
     
     return 1;
 }
 
-int insert_signal(Sinais* destin_list, Sinal* signal)
+int insert_signal(SignalArray* destin_list, Signal* signal)
 {
-    Pulso *it = NULL;
+    Pulse *it = NULL;
 
     if (!signal)
         return 0;
@@ -173,16 +173,16 @@ int insert_signal(Sinais* destin_list, Sinal* signal)
     if (!destin_list) // FIXME
         destin_list = new_signal_list();
 
-    add_new_signal(destin_list, signal->nome);
+    add_new_signal(destin_list, signal->name);
 
-    it = signal->pulsos;
-    while(it->valor != VAL_BLANK)
+    it = signal->pulses;
+    while(it->value != VAL_BLANK)
     {
         // add cada pulso do sinal original ao novo sinal
         // criado na lista destino (que esta na ultima posicao)
-        add_new_pulse( destin_list->lista + (destin_list->quantidade - 1),
-                       it->valor,
-                       it->tempo );
+        add_new_pulse( destin_list->itens + (destin_list->count - 1),
+                       it->value,
+                       it->time );
 
         it++;
     }
@@ -190,7 +190,7 @@ int insert_signal(Sinais* destin_list, Sinal* signal)
     return 1;
 }
 
-UnidTempo get_timeunit_from_str(const char* str)
+TimeUnit get_timeunit_from_str(const char* str)
 {
     if ( !str || str[0] == 0x00 )
         goto invalid_timeunit;
@@ -232,7 +232,7 @@ invalid_timeunit:
     return UN_INVALID;
 }
 
-const char* get_str_from_timeunit(UnidTempo unit)
+const char* get_str_from_timeunit(TimeUnit unit)
 {
     switch (unit)
     {
@@ -253,7 +253,7 @@ const char* get_str_from_timeunit(UnidTempo unit)
     }
 }
 
-ValorLogico long_to_logicvalue(long n)
+LogicValue long_to_logicvalue(long n)
 {
     // Check the least significant bit of n
     // If the LSB is 1, (n & 1) will be 1

@@ -22,14 +22,16 @@ extern "C" {
 #define MSG_ERROR_LEX_NUMBER_SIZE_MISMATCH "Tamanho do numero nao corresponde ao especificado"
 #define MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE "O underscore nao pode ser usado nessa posicao"
 
-/** @brief Exibe uma mensagem de erro sobre declarar um identificador com nome ja utilizado.
+/** @brief Exibe uma mensagem de erro sobre declarar um identificador com
+ *         um nome ja utilizado previamente.
  *  @param tok String com o identificador. 
  *  @param lin A linha onde ocorre o erro.
  *  @param col A coluna onde ocorre o erro.
  */
 void show_error_identifier_duplicate(const char* tok, int lin, int col);
 
-/** @brief Exibe uma mensagem de erro relativa a analise lexica do arquivo fonte em questao.
+/** @brief Exibe uma mensagem de erro relativa a analise lexica do arquivo
+ *         fonte em questao.
  *  @param msg O texto da mensagem de erro a ser exibida.
  *  @param lin A linha onde ocorre o erro no fonte. -1 para omitir.
  *  @param col A coluna onde ocorre o erro no fonte. -1 para omitir.
@@ -37,25 +39,37 @@ void show_error_identifier_duplicate(const char* tok, int lin, int col);
 void show_error_lexical(const char* msg, int lin, int col);
 
 /** @brief Exibe na saida padrao, uma mensagem de erro relativa a analise
-            lexica ou sintatica do arquivo fonte em questao.
+           lexica ou sintatica do arquivo fonte em questao.
  *  @param msg O texto da mensagem de erro a ser exibida.
  *  @param lin A linha onde ocorre o erro no fonte. -1 para omitir.
  *  @param col A coluna onde ocorre o erro no fonte. -1 para omitir.
  *  @param expected Uma string com o que era esperado. NULL para omitir.
- *  @param found Uma string com o que foi encontrado no lugar. NULL para omitir.
+ *  @param found Uma string com o que foi encontrado no lugar.
+ *               Utilize NULL para omitir a exibição da mesma.
  */
-void show_error_msg(const char* msg, int lin, int col, const char* expected, const char* found);
+void show_error_msg(
+    const char* msg,
+    int lin,
+    int col,
+    const char* expected,
+    const char* found);
 
-/** @brief Exibe, na saida padrao, uma mensagem de erro relativa a violacao de restricao para tamanhos.
+/** @brief Exibe, na saida padrao, uma mensagem de erro relativa a violacao
+ *         de restricao para tamanhos.
  *  @param msg Um texto para a mensagem de erro a ser exibida.
  *  @param lin A linha onde ocorre o erro, no codigo fonte.
  *  @param col A coluna onde ocorre o erro, no codigo fonte.
  *  @param tok String com a representacao do token relativo ao erro.
  *  @param max Numero que representa o valor maximo admitido.
  */
-void show_error_size_exceeded(const char *msg, int lin, int col, const char *tok, int max);
+void show_error_size_exceeded(
+    const char *msg,
+    int lin,
+    int col,
+    const char *tok,
+    int max);
 
-/** @brief Exibe uma mensagem de erro por falta de memoria e encerra o programa.
+/** @brief Exibe mensagem de erro por falta de memoria e encerra o programa.
  *  @return void (program error code: -1)
  */
 void fatal_error_no_memory();

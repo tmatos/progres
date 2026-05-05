@@ -1,6 +1,7 @@
 /**
  * @file inout.h
- * @brief Protótipos das funções de leitura e gravação dos arquivos de sinas de entrada e saída.
+ * @brief Protótipos das funções de leitura e gravação dos arquivos
+ *        de sinas de entrada e saída.
  */
 
 #ifndef INOUT_H
@@ -24,7 +25,7 @@ extern "C" {
  *  @param file O handler do arquivo de entrada com sinais a ser processado.
  *  @return A estrutura de dados contendo todos os sinais lidos do arquivo.
  */
-Sinais* load_input_signals(FILE* file);
+SignalArray* load_input_signals(FILE* file);
 
 /** @brief Salva todos os sinais contidos no conjunto para o arquivo de saída
            com a formatação padrão.
@@ -32,7 +33,7 @@ Sinais* load_input_signals(FILE* file);
  *  @param file Arquivo a ser escrito com a representação dos sinais.
  *  @return void
  */
-void save_signals(Sinais* signals, FILE* file);
+void save_signals(SignalArray* signals, FILE* file);
 
 /** @brief Gera um arquivo VCD (Value Change Dump) a partir do módulo e dos sinais.
  *         O arquivo VCD é usado para registrar as mudanças de valor nos sinais
@@ -42,25 +43,25 @@ void save_signals(Sinais* signals, FILE* file);
  * @param file O handler do arquivo onde o VCD será escrito.
  * @return void
  */
-void save_vcd(Module* module, Sinais* sinais, FILE* file);
+void save_vcd(Module* module, SignalArray* sinais, FILE* file);
 
 /** @brief Converte um valor lógico para o caractere correspondente.
- *  @param value Algum dos disponíveis na enum ValorLogico.
+ *  @param value Algum dos disponíveis na enum LogicValue.
  *  @return Um dos seguintes: '0', '1', 'x' ou 'z'.
  *          Se o valor não for reconhecido, retorna 'x' por padrão.
  *  @note Os valores 'H' e 'L' são tratados como '1' e '0', respectivamente.
  */
-char get_char_from_logic_value(ValorLogico value);
+char get_char_from_logic_value(LogicValue value);
 
 /** @brief Export VCD to file.
  */
-void save_vcd(Module* module, Sinais* sinais, FILE* file);
+void save_vcd(Module* module, SignalArray* sinais, FILE* file);
 
 /** @brief Exibe uma mensagem de erro e retorna um NULL.
  *         Indicando que o arquivo de entrada está corrompido.
- *  @return Um ponteiro para uma struct Sinais com valor NULL.
+ *  @return Um ponteiro para uma struct SignalArray com valor NULL.
 */
-Sinais* show_fatal_error_corrupt_file();
+SignalArray* show_fatal_error_corrupt_file();
 
 #ifdef __cplusplus
 }

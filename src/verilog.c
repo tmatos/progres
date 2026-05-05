@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -36,7 +36,7 @@ int load_module_header(
 
     if (t->classe != KW_MODULE) {
         show_error_msg("Palavra-chave nao encontrada onde esperada",
-                       t->linha, t->coluna, "module", t->valor);
+                       t->line, t->column, "module", t->value);
         goto load_module_header_bad_return;
     }
 
@@ -47,13 +47,13 @@ int load_module_header(
     }
     else if (!is_allowed_identifier(t)) {
         show_error_msg("Identificador nao encontrado",
-                       t->linha, t->coluna,"identificador valido", t->valor);
+                       t->line, t->column,"identificador valido", t->value);
         goto load_module_header_bad_return;
     }
     else {
         // senao, adicione-o a lista de identifiers
-        insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
-        copy(module->name, t->valor);
+        insert_token_of_string(identifiers, t->value, -1, -1, IDENTIFIER);
+        copy(module->name, t->value);
     }
 
     if (!avanca(&t)) {
@@ -64,7 +64,7 @@ int load_module_header(
     else if (t->classe != SYM_OPEN_BRACKET && t->classe != SYM_SEMICOLON) {
         // se t->valor nao eh '(' ou ';', pare
         show_error_msg("Simbolo esperado nao foi encontrado",
-                     t->linha, t->coluna, "(' ou ';", t->valor);
+                     t->line, t->column, "(' ou ';", t->value);
         goto load_module_header_bad_return;
     }
 
@@ -103,7 +103,7 @@ int load_module_header(
                 }
 
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               t->linha, t->coluna, ",' ou ')", t->valor);
+                               t->line, t->column, ",' ou ')", t->value);
                 goto load_module_header_bad_return;
             }
 
@@ -121,29 +121,29 @@ int load_module_header(
 
             if ( !is_allowed_identifier(t) ) {
                 show_error_msg("Identificador nao foi encontrado",
-                               t->linha, t->coluna, "um identificador", t->valor);
+                               t->line, t->column, "um identificador", t->value);
                 goto load_module_header_bad_return;
             }
 
-            if ( has_item_of_string_value(identifiers, t->valor) ) {
-                show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+            if ( has_item_of_string_value(identifiers, t->value) ) {
+                show_error_identifier_duplicate(t->value, t->line, t->column);
                 goto load_module_header_bad_return;
             }
 
-            insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
+            insert_token_of_string(identifiers, t->value, -1, -1, IDENTIFIER);
 
             if (is_defined_input) {
                 insert_token_of_string(identifiers_input,
-                                       t->valor, -1, -1, IDENTIFIER);
-                add_input( module, new_component(t->valor, ROLE_INPUT) );
+                                       t->value, -1, -1, IDENTIFIER);
+                add_input( module, new_component(t->value, ROLE_INPUT) );
             }
             else if (is_defined_output) {
                 insert_token_of_string(identifiers_output,
-                                       t->valor, -1, -1, IDENTIFIER);
-                add_output( module, new_component(t->valor, ROLE_OUTPUT) );
+                                       t->value, -1, -1, IDENTIFIER);
+                add_output( module, new_component(t->value, ROLE_OUTPUT) );
             }
             else {
-                insert_token_of_string(livres, t->valor, -1, -1, IDENTIFIER);
+                insert_token_of_string(livres, t->value, -1, -1, IDENTIFIER);
             }
 
             is_defined_input = 0;
@@ -160,7 +160,7 @@ int load_module_header(
 
         if (t->classe != SYM_SEMICOLON) {
             show_error_msg("Simbolo esperado nao foi encontrado",
-                           t->linha, t->coluna, ";", t->valor);
+                           t->line, t->column, ";", t->value);
             goto load_module_header_bad_return;
         }
     }
@@ -175,7 +175,7 @@ load_module_header_bad_return:
 
 ListModule* load_circuit(
     FILE* f_verilog_source,
-    Evento** initial_task_events,
+    Event** initial_task_events,
     const char* file_path)
 {
     ListModule* circuit;
@@ -184,7 +184,7 @@ ListModule* load_circuit(
     Token* it;
     ListToken* tokens;
     
-    tokens = tokeniza(f_verilog_source);
+    tokens = tokenize(f_verilog_source);
 
     if (!tokens)
         goto circuit_bad_return;
@@ -203,7 +203,7 @@ ListModule* load_circuit(
     circuit->itens = NULL;
 
     mod = NULL;
-    it = tokens->primeiro;
+    it = tokens->first;
     while (1)
     {
         err = load_module(&it, initial_task_events, &mod);
@@ -251,7 +251,7 @@ circuit_bad_return:
 
 VerilogError load_module(
     Token** t,
-    Evento** initial_task_events,
+    Event** initial_task_events,
     Module** module_pointer)
 {
     Component* in;
@@ -265,7 +265,7 @@ VerilogError load_module(
     int input_count;
     int output_count;
 
-    Evento* initial_tran_events = NULL;
+    Event* initial_tran_events = NULL;
 
     VerilogError err;
 
@@ -381,31 +381,31 @@ VerilogError load_module(
                     }
                     else {
                         show_error_msg("Simbolo esperado nao foi encontrado",
-                                       it->linha, it->coluna, ",' ou ';", it->valor);
+                                       it->line, it->column, ",' ou ';", it->value);
                         goto bad_return;
                     }
                 }
 
                 if ( (token_subcase != KW_WIRE) &&
-                     !has_item_of_string_value(identifiers_to_be, it->valor) ) {
+                     !has_item_of_string_value(identifiers_to_be, it->value) ) {
                     show_error_msg("Identificador invalido",
-                                   it->linha, it->coluna,
+                                   it->line, it->column,
                                    "identificador valido e que ainda possa ser atribuido",
                                    NULL);
                     goto bad_return;
                 }
 
                 if ( token_subcase == KW_INPUT ) {
-                    insert_token_of_string(list_input, it->valor, -1, -1, IDENTIFIER);
+                    insert_token_of_string(list_input, it->value, -1, -1, IDENTIFIER);
 
                     // atribui como entrada o identificador na estrutura
-                    add_input( circuito, new_component(it->valor, ROLE_INPUT) );
+                    add_input( circuito, new_component(it->value, ROLE_INPUT) );
                 }
                 else if ( token_subcase == KW_OUTPUT ) {
-                    insert_token_of_string(list_output, it->valor, -1, -1, IDENTIFIER);
+                    insert_token_of_string(list_output, it->value, -1, -1, IDENTIFIER);
 
                     // atribui como saida o identificador na estrutura
-                    add_output( circuito, new_component(it->valor, ROLE_OUTPUT) );
+                    add_output( circuito, new_component(it->value, ROLE_OUTPUT) );
                 }
                 else if ( token_subcase == KW_WIRE ) {
                     range_msb = 0;
@@ -427,25 +427,25 @@ VerilogError load_module(
 
                     if ( !is_allowed_identifier(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
-                                       it->linha, it->coluna, "um identificador", it->valor);
+                                       it->line, it->column, "um identificador", it->value);
                         goto bad_return;
                     }
 
-                    if ( has_item_of_string_value(identifiers, it->valor) ) {
-                        show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                    if ( has_item_of_string_value(identifiers, it->value) ) {
+                        show_error_identifier_duplicate(it->value, it->line, it->column);
                         goto bad_return;
                     }
 
-                    insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
-                    insert_token_of_string(list_wire, it->valor, -1, -1, IDENTIFIER);
+                    insert_token_of_string(identifiers, it->value, -1, -1, IDENTIFIER);
+                    insert_token_of_string(list_wire, it->value, -1, -1, IDENTIFIER);
 
                     // atribui como wire o identificador na estrutura
-                    net = new_component(it->valor, ROLE_WIRE);
+                    net = new_component(it->value, ROLE_WIRE);
                     net->size = (range_msb - range_lsb + 1);
                     add_wire(circuito, net);
                 }
 
-                remove_tokens_by_value(identifiers_to_be, it->valor);
+                remove_tokens_by_value(identifiers_to_be, it->value);
 
                 expect_comma = 1;
 
@@ -519,13 +519,13 @@ VerilogError load_module(
             }
 
             if (is_allowed_identifier(it)) {  
-                if (has_item_of_string_value(identifiers, it->valor)) {
-                    show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+                if (has_item_of_string_value(identifiers, it->value)) {
+                    show_error_identifier_duplicate(it->value, it->line, it->column);
                     goto bad_return;
                 }
 
-                insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
-                copy(gate->nome, it->valor);
+                insert_token_of_string(identifiers, it->value, -1, -1, IDENTIFIER);
+                copy(gate->name, it->value);
 
                 avanca(&it);
             }
@@ -542,18 +542,18 @@ VerilogError load_module(
                                    -1, -1, "um numero inteiro nao negativo", NULL);
                     goto bad_return;
                 }
-                else if ( !is_valid_natural_number(it->valor) ) {
+                else if ( !is_valid_natural_number(it->value) ) {
                     char esperado[67];
                     snprintf(esperado, 67,
                              "um numero inteiro nao negativo e com ate %d digitos",
                              MAX_DIGITOS_NUM);
                     show_error_msg("Numero valido nao foi encontrado",
-                                   it->linha, it->coluna, esperado, it->valor);
+                                   it->line, it->column, esperado, it->value);
                     goto bad_return;
                 }
                 else {
                     // Guardar o delay dessa gate
-                    gate->atributos.delay = strtol(it->valor, NULL, 10); //FIXME: tipo errado!
+                    gate->attributes.delay = strtol(it->value, NULL, 10); //FIXME: tipo errado!
                 }
 
                 if (!avanca(&it)) {
@@ -564,7 +564,7 @@ VerilogError load_module(
 
             if (it->classe != SYM_OPEN_BRACKET) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, "(", it->valor);
+                               it->line, it->column, "(", it->value);
                 goto bad_return;
             }
 
@@ -578,22 +578,22 @@ VerilogError load_module(
 
         //gate_outputs: // Label para a parte onde ha leitura de saidas da porta logica
 
-            if (has_item_of_string_value(list_wire, it->valor)) {
+            if (has_item_of_string_value(list_wire, it->value)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->list_wire_net, it->valor);
+                out = get_component_by_name(circuito->list_wire_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
             }
-            else if (has_item_of_string_value(list_output, it->valor)) {
+            else if (has_item_of_string_value(list_output, it->value)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->list_output_net, it->valor);
+                out = get_component_by_name(circuito->list_output_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
             }
             else {
                 show_error_msg("Fio ou saida nao foi encontrado",
-                               it->linha, it->coluna,
-                               "identificador para wire ou output", it->valor);
+                               it->line, it->column,
+                               "identificador para wire ou output", it->value);
                 goto bad_return;
             }
 
@@ -606,7 +606,7 @@ VerilogError load_module(
 
             if (it->classe != SYM_COMMA) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, ",", it->valor);
+                               it->line, it->column, ",", it->value);
                 goto bad_return;
             }
 
@@ -624,39 +624,39 @@ VerilogError load_module(
 
             if ( it->classe == NUM_BASE_DECIMAL ) {
                 Component* num = new_component("literal_number_decimal", ROLE_LITERAL_NUMBER);
-                num->dynamic_value = long_to_logicvalue(strtol(it->valor, NULL, 10));
+                num->dynamic_value = long_to_logicvalue(strtol(it->value, NULL, 10));
                 insert_component(gate->list_input, num); // TODO: free mem later
             }
-            else if (has_item_of_string_value(list_wire, it->valor)) {
+            else if (has_item_of_string_value(list_wire, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_wire_net, it->valor);
+                in = get_component_by_name(circuito->list_wire_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
-            else if (has_item_of_string_value(list_input, it->valor)) {
+            else if (has_item_of_string_value(list_input, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_input_net, it->valor);
+                in = get_component_by_name(circuito->list_input_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
-            else if (has_item_of_string_value(list_output, it->valor)) {
+            else if (has_item_of_string_value(list_output, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_output_net, it->valor);
+                in = get_component_by_name(circuito->list_output_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
             else {
                 show_error_msg("Entrada da porta logica invalida",
-                               it->linha, it->coluna,
+                               it->line, it->column,
                                "uma entrada valida (tipo net ou numero literal)",
-                               it->valor);
+                               it->value);
                 goto bad_return;
             }
 
             input_count++;
 
             if (!avanca(&it)) {
-                if ( gate->atributos.role == ROLE_NOT || gate->atributos.role == ROLE_BUF ) {
+                if ( gate->attributes.role == ROLE_NOT || gate->attributes.role == ROLE_BUF ) {
                     show_error_msg("Final do arquivo nao esperado",
                                    -1, -1, ")", NULL);
                 }
@@ -669,11 +669,11 @@ VerilogError load_module(
             }
 
             if (it->classe != SYM_CLOSE_BRACKET) {
-                if ( (gate->atributos.role == ROLE_NOT) ||
-                     (gate->atributos.role == ROLE_BUF) || 
+                if ( (gate->attributes.role == ROLE_NOT) ||
+                     (gate->attributes.role == ROLE_BUF) || 
                      (is_tristate_logic(gate) && input_count == 2) ) {
                     show_error_msg("Simbolo esperado nao foi encontrado",
-                                   it->linha, it->coluna, ")", it->valor);
+                                   it->line, it->column, ")", it->value);
                     goto bad_return;
                 }
                 
@@ -683,7 +683,7 @@ VerilogError load_module(
                 }
                 
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, ")' ou ',", it->valor);
+                               it->line, it->column, ")' ou ',", it->value);
                 goto bad_return;
             }
 
@@ -694,7 +694,7 @@ VerilogError load_module(
 
             if (it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, ";", it->valor);
+                               it->line, it->column, ";", it->value);
                 goto bad_return;
             }
 
@@ -754,28 +754,28 @@ VerilogError load_module(
 
             if (!is_allowed_identifier(it)) {
                 show_error_msg("Token inesperado foi encontrado",
-                               it->linha, it->coluna, "um identificador", it->valor);
+                               it->line, it->column, "um identificador", it->value);
                 goto bad_return;
             }
     
-            if (has_item_of_string_value(identifiers, it->valor)) {
-                show_error_identifier_duplicate(it->valor, it->linha, it->coluna);
+            if (has_item_of_string_value(identifiers, it->value)) {
+                show_error_identifier_duplicate(it->value, it->line, it->column);
                 goto bad_return;
             }
 
-            if (len(it->valor) > MAX_PARAM_NAME_SIZE) {
+            if (len(it->value) > MAX_PARAM_NAME_SIZE) {
                 show_error_size_exceeded("Excedido o tamanho de caracteres para o parametro",
-                                         it->linha, it->coluna, it->valor, MAX_PARAM_NAME_SIZE);
+                                         it->line, it->column, it->value, MAX_PARAM_NAME_SIZE);
 
                 goto bad_return;
             }
 
-            insert_token_of_string(identifiers, it->valor, -1, -1, IDENTIFIER);
-            insert_token_of_string(list_param, it->valor, -1, -1, IDENTIFIER);
+            insert_token_of_string(identifiers, it->value, -1, -1, IDENTIFIER);
+            insert_token_of_string(list_param, it->value, -1, -1, IDENTIFIER);
 
             Param* param = (Param*) xcalloc(1, sizeof(Param));
             param->is_local = 1;
-            copy( param->name, it->valor );
+            copy( param->name, it->value );
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, "=", NULL);
@@ -784,7 +784,7 @@ VerilogError load_module(
 
             if (it->classe != SYM_EQ) {
                 show_error_msg("Token inesperado foi encontrado",
-                               it->linha, it->coluna, "=", it->valor);
+                               it->line, it->column, "=", it->value);
                 goto bad_return;
             }
 
@@ -795,13 +795,13 @@ VerilogError load_module(
             }
 
             // TODO: implement for all number types and notations
-            if( !is_valid_natural_number(it->valor) ) {
+            if( !is_valid_natural_number(it->value) ) {
                 show_error_msg("Token inesperado foi encontrado",
-                               it->linha, it->coluna, "um numero", it->valor);
+                               it->line, it->column, "um numero", it->value);
                 goto bad_return;
             }
 
-            param->value = strtol(it->valor, NULL, 10);
+            param->value = strtol(it->value, NULL, 10);
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado", -1, -1, ";", NULL);
@@ -810,7 +810,7 @@ VerilogError load_module(
 
             if (it->classe != SYM_SEMICOLON) {
                 show_error_msg("Simbolo esperado nao foi encontrado",
-                               it->linha, it->coluna, ";", it->valor);
+                               it->line, it->column, ";", it->value);
                 goto bad_return;
             }
 
@@ -834,7 +834,7 @@ VerilogError load_module(
         }
         else {
             show_error_msg("Token inesperado foi encontrado",
-                           it->linha, it->coluna, "algum comando", it->valor);
+                           it->line, it->column, "algum comando", it->value);
             goto bad_return;
         }
 
@@ -907,7 +907,7 @@ int is_tristate_logic(const Component* gate)
 
     for ( i = 0; i < 4; i++ )
     {
-        if (gate->atributos.role == op[i])
+        if (gate->attributes.role == op[i])
             return 1;
     }
     
@@ -927,7 +927,11 @@ int is_string_logic_gate(const char* s)
     );
 }
 
-VerilogError load_reg(Token** it, ListToken* identifiers, ListToken* list_param, Module* module)
+VerilogError load_reg(
+    Token** it,
+    ListToken* identifiers,
+    ListToken* list_param,
+    Module* module)
 {
     int is_signed;
     int range_msb;
@@ -972,20 +976,20 @@ load_reg_identifier_list:
 
     if (!is_allowed_identifier(t)) {
         show_error_msg("Identificador nao foi encontrado",
-                       t->linha, t->coluna, "um identificador", t->valor);
+                       t->line, t->column, "um identificador", t->value);
         goto load_reg_bad_token;
     }
 
     // verificar se pode utilizar este identificador
-    if (has_item_of_string_value(identifiers, t->valor)) {
-        show_error_identifier_duplicate(t->valor, t->linha, t->coluna);
+    if (has_item_of_string_value(identifiers, t->value)) {
+        show_error_identifier_duplicate(t->value, t->line, t->column);
         goto load_reg_bad_token;
     }
     
     // adicionar na lista de identificadores usados
-    insert_token_of_string(identifiers, t->valor, -1, -1, IDENTIFIER);
+    insert_token_of_string(identifiers, t->value, -1, -1, IDENTIFIER);
 
-    add_register(module, t->valor, (range_msb - range_lsb + 1), is_signed);
+    add_register(module, t->value, (range_msb - range_lsb + 1), is_signed);
 
     if (!avanca(&t))
         goto load_reg_bad_eof;
@@ -999,7 +1003,7 @@ load_reg_identifier_list:
 
     if (t->classe != SYM_SEMICOLON) {
         show_error_msg("Simbolo esperado nao foi encontrado",
-                       t->linha, t->coluna, ",' ou ';", t->valor);
+                       t->line, t->column, ",' ou ';", t->value);
         goto load_reg_bad_token;
     }
 
@@ -1014,7 +1018,12 @@ load_reg_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* range_msb, int* range_lsb)
+VerilogError load_range(
+    Token** it,
+    Module* module,
+    ListToken* list_param,
+    int* range_msb,
+    int* range_lsb)
 {
     Token* t = *it;
     
@@ -1025,15 +1034,15 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
         if (!avanca(&t))
             goto load_range_bad_eof;
 
-        if (is_valid_natural_number(t->valor)) {
-            *range_msb = strtol(t->valor, NULL, 10);
+        if (is_valid_natural_number(t->value)) {
+            *range_msb = strtol(t->value, NULL, 10);
         }
-        else if (has_item_of_string_value(list_param, t->valor)) {
-            *range_msb = get_param_by_name(module->list_param, t->valor)->value;
+        else if (has_item_of_string_value(list_param, t->value)) {
+            *range_msb = get_param_by_name(module->list_param, t->value)->value;
         }
         else {
             show_error_msg("Numero para bit mais significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
+                           t->line, t->column, "algum numero", t->value);
             goto load_range_bad_token;
         }
         
@@ -1042,22 +1051,22 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
 
         if (t->classe != SYM_COLON) {
             show_error_msg("Simbolo inesperado",
-                           t->linha, t->coluna, ":", t->valor);
+                           t->line, t->column, ":", t->value);
             goto load_range_bad_token;
         }
 
         if (!avanca(&t))
             goto load_range_bad_eof;
 
-        if (is_valid_natural_number(t->valor)) {
-            *range_lsb = strtol(t->valor, NULL, 10);
+        if (is_valid_natural_number(t->value)) {
+            *range_lsb = strtol(t->value, NULL, 10);
         }
-        else if (has_item_of_string_value(list_param, t->valor)) {
-            *range_lsb = get_param_by_name(module->list_param, t->valor)->value;
+        else if (has_item_of_string_value(list_param, t->value)) {
+            *range_lsb = get_param_by_name(module->list_param, t->value)->value;
         }
         else {
             show_error_msg("Numero para bit menos significativo nao foi encontrado",
-                           t->linha, t->coluna, "algum numero", t->valor);
+                           t->line, t->column, "algum numero", t->value);
             goto load_range_bad_token;
         }
 
@@ -1065,13 +1074,13 @@ VerilogError load_range(Token** it, Module* module, ListToken* list_param, int* 
             goto load_range_bad_eof;
 
         if (t->classe != SYM_CLOSE_SQUAREBRACKET) {
-            show_error_msg("Simbolo inesperado", t->linha, t->coluna, "]", t->valor);
+            show_error_msg("Simbolo inesperado", t->line, t->column, "]", t->value);
             goto load_range_bad_token;
         }
 
         if ( *range_msb < *range_lsb ) {
             show_error_msg("Range invalido",
-                            t->anterior->linha, t->anterior->coluna, NULL, NULL);
+                            t->previous->line, t->previous->column, NULL, NULL);
             goto load_range_bad_token;
         }
 
@@ -1098,15 +1107,15 @@ VerilogError load_directive(Token** it, Module* module)
 
     // note: the pre-processor did some validation
 
-    if (iguais("resetall", t->valor)) {
-        module->timescale_number = (Tempo) 1;
+    if (iguais("resetall", t->value)) {
+        module->timescale_number = (Time) 1;
         module->timescale_unit = UN_NS;
-        module->timescale_precision_number = (Tempo) 1;
+        module->timescale_precision_number = (Time) 1;
         module->timescale_precision_unit = UN_NS;
 
         // FIXME: should not be module wide
     }
-    else if (iguais("timescale", t->valor)) {
+    else if (iguais("timescale", t->value)) {
         // time_unit / time_precision
         // ex.: 1 ns / 1 ps
 
@@ -1114,16 +1123,16 @@ VerilogError load_directive(Token** it, Module* module)
 
         // [time_unit] / time_precision
         // [number] unit / number unit
-        if (!is_valid_natural_number(t->valor))
+        if (!is_valid_natural_number(t->value))
             goto load_directive_bad_number;
         
-        module->timescale_number = (Tempo) strtol(t->valor, NULL, 10);
+        module->timescale_number = (Time) strtol(t->value, NULL, 10);
 
         avanca(&t);
 
         // [time_unit] / time_precision
         // number [unit] / number unit
-        module->timescale_unit = get_timeunit_from_str(t->valor);
+        module->timescale_unit = get_timeunit_from_str(t->value);
         if (module->timescale_unit == UN_INVALID)
             goto load_directive_bad_time_unit;
 
@@ -1131,8 +1140,8 @@ VerilogError load_directive(Token** it, Module* module)
 
         // time_unit [/] time_precision
         // number unit [/] number unit
-        if (!iguais("/", t->valor)) {
-            show_error_msg("Token inesperado", t->linha, t->coluna, "/", t->valor);
+        if (!iguais("/", t->value)) {
+            show_error_msg("Token inesperado", t->line, t->column, "/", t->value);
             goto load_directive_bad_token;
         }
 
@@ -1140,16 +1149,16 @@ VerilogError load_directive(Token** it, Module* module)
 
         // time_unit / [time_precision]
         // number unit / [number] unit
-        if (!is_valid_natural_number(t->valor))
+        if (!is_valid_natural_number(t->value))
             goto load_directive_bad_number;
         
-        module->timescale_precision_number = (Tempo) strtol(t->valor, NULL, 10);
+        module->timescale_precision_number = (Time) strtol(t->value, NULL, 10);
 
         avanca(&t);
 
         // time_unit / [time_precision]
         // number unit / number [unit]
-        module->timescale_precision_unit = get_timeunit_from_str(t->valor);
+        module->timescale_precision_unit = get_timeunit_from_str(t->value);
         if (module->timescale_precision_unit == UN_INVALID)
             goto load_directive_bad_time_unit;
     }
@@ -1159,13 +1168,13 @@ VerilogError load_directive(Token** it, Module* module)
     return NO_ERROR_VERILOG;
 
 load_directive_bad_number:
-    show_error_msg("Numero invalido", t->linha, t->coluna,
-                   "numero inteiro nao negativo", t->valor);
+    show_error_msg("Numero invalido", t->line, t->column,
+                   "numero inteiro nao negativo", t->value);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_directive_bad_time_unit:
-    show_error_msg("Unidade invalida", t->linha, t->coluna,
-                   "unidade de tempo (us, ns, ps, ...)", t->valor);
+    show_error_msg("Unidade invalida", t->line, t->column,
+                   "unidade de tempo (us, ns, ps, ...)", t->value);
     return ERROR_VERILOG_BAD_TOKEN;
 
 load_directive_bad_token:
@@ -1177,11 +1186,11 @@ VerilogError load_initial_block(
     ListToken* identifiers,
     ListToken* list_param,
     Module* module,
-    Evento** initial_events)
+    Event** initial_events)
 {
     VerilogError err;
     int is_single_statement = 1;
-    Tempo t = 0;
+    Time t = (Time) 0;
     Token* it = *pit;
 
     if ( !avanca(&it) ) {
@@ -1201,10 +1210,10 @@ initial_block_loop:
     if ( it->classe == KW_END ) {
         if ( is_single_statement ) {
             show_error_msg("Palavra chave 'end' sem o 'begin' correspondente",
-                           it->linha,
-                           it->coluna,
+                           it->line,
+                           it->column,
                            NULL,
-                           it->valor);
+                           it->value);
             goto load_initial_block_bad_token;
         }
 
@@ -1217,16 +1226,16 @@ initial_block_loop:
             goto load_initial_block_bad_eof;
         }
 
-        if ( !is_valid_natural_number(it->valor) ) {
+        if ( !is_valid_natural_number(it->value) ) {
             show_error_msg("Token inesperado foi encontrado",
-                           it->linha,
-                           it->coluna,
+                           it->line,
+                           it->column,
                            "um numero inteiro nao negativo",
-                           it->valor);
+                           it->value);
             goto load_initial_block_bad_token;
         }
 
-        Tempo delay = strtol(it->valor, NULL, 10);
+        Time delay = (Time) strtol(it->value, NULL, 10);
 
         // update next event time
         t = t + delay;
@@ -1252,12 +1261,12 @@ initial_block_loop:
     else {
         // try to treat a single statement attribution, for now
 
-        if ( !has_item_of_string_value(identifiers, it->valor) ) {
+        if ( !has_item_of_string_value(identifiers, it->value) ) {
             show_error_msg("Note, initial blocks aren't yet fully implemented",
-                           it->linha,
-                           it->coluna,
+                           it->line,
+                           it->column,
                            "just an attribution",
-                           it->valor);
+                           it->value);
             goto load_initial_block_bad_token;
         }
 
@@ -1284,9 +1293,9 @@ initial_block_expect_semicolon:
 
     if ( it->classe != SYM_SEMICOLON ) {
         show_error_msg("Token inesperado foi encontrado",
-                        it->linha, it->coluna,
+                        it->line, it->column,
                         ";",
-                        it->valor);
+                        it->value);
         goto load_initial_block_bad_token;
     }
 
@@ -1313,22 +1322,22 @@ VerilogError load_reg_attribution(
     Token** it,
     ListToken* list_param,
     Module* module,
-    Evento** initial_events,
-    Tempo t_ev)
+    Event** initial_events,
+    Time t_ev)
 {
     Register* left_reg = NULL;
     Component* reg_net = NULL;
     Param* p = NULL;
-    ValorLogico logic_value = VAL_X;
+    LogicValue logic_value = VAL_X;
     
     Token* t = *it;
 
     // waiting for a reg, for now
-    left_reg = get_reg_by_name(module->list_register, t->valor);
+    left_reg = get_reg_by_name(module->list_register, t->value);
 
     if ( !left_reg ) {
         show_error_msg("Comando sem suporte dentro do bloco initial",
-                       t->linha, t->coluna, "um registrador", t->valor);
+                       t->line, t->column, "um registrador", t->value);
         goto load_reg_attribution_bad_token;
     }
 
@@ -1336,7 +1345,8 @@ VerilogError load_reg_attribution(
         goto load_reg_attribution_bad_eof;
     
     if ( t->classe != SYM_EQ ) {
-        show_error_msg("Token inesperado foi encontrado", t->linha, t->coluna, "=", t->valor);
+        show_error_msg("Token inesperado foi encontrado",
+                       t->line, t->column, "=", t->value);
         goto load_reg_attribution_bad_token;
     }
 
@@ -1344,8 +1354,8 @@ VerilogError load_reg_attribution(
         goto load_reg_attribution_bad_eof;
 
     // agora ele espera um literal ou parametro
-    if ( is_valid_natural_number(t->valor) ) {
-        left_reg->value = strtol(t->valor, NULL, 10);
+    if ( is_valid_natural_number(t->value) ) {
+        left_reg->value = strtol(t->value, NULL, 10);
     }
     else if ( t->classe == NUM_BASE_BINARY ) {
         // if number size is greater than register size: error
@@ -1354,25 +1364,25 @@ VerilogError load_reg_attribution(
 
         if ( bit_size > left_reg->size ) {
             show_error_msg("Valor literal tem mais bits do que o registrador",
-                           t->linha, t->coluna, NULL, t->valor);
+                           t->line, t->column, NULL, t->value);
             goto load_reg_attribution_bad_token;
         }
 
         if ( bit_size < left_reg->size ) {
             // show_warning_msg("Valor literal tem menos bits do que o registrador",
-            //                  t->linha, t->coluna, NULL, t->valor);
+            //                  t->line, t->column, NULL, t->value);
         }
 
         left_reg->size = bit_size;
         left_reg->value = get_value_from_literal_token(t);
     }
-    else if ( has_item_of_string_value(list_param, t->valor) ) {
-        p = get_param_by_name(module->list_param, t->valor);
+    else if ( has_item_of_string_value(list_param, t->value) ) {
+        p = get_param_by_name(module->list_param, t->value);
         left_reg->value = p->value;
     }
     else {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, "um numero ou parametro", t->valor);
+                        t->line, t->column, "um numero ou parametro", t->value);
         goto load_reg_attribution_bad_token;
     }
 
@@ -1411,7 +1421,7 @@ VerilogError load_assign(
 
     if (!is_allowed_identifier(t)) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, "um identificador", t->valor);
+                       t->line, t->column, "um identificador", t->value);
         goto load_assign_bad_token;
     }
 
@@ -1419,22 +1429,22 @@ VerilogError load_assign(
 
     // TODO: check for impossible cases
     
-    if (has_item_of_string_value(list_wire, t->valor)) {
+    if (has_item_of_string_value(list_wire, t->value)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = get_component_by_name(module->list_wire_net, t->valor);
+        out = get_component_by_name(module->list_wire_net, t->value);
         insert_component(gate->list_output, out);
         insert_component(out->list_input, gate);
     }
-    else if (has_item_of_string_value(list_out, t->valor)) {
+    else if (has_item_of_string_value(list_out, t->value)) {
         // inserir, na lista de saidas da gate, esta saida
-        out = get_component_by_name(module->list_output_net, t->valor);
+        out = get_component_by_name(module->list_output_net, t->value);
         insert_component(gate->list_output, out);
         insert_component(out->list_input, gate);
     }
     else {
         show_error_msg("Identificador previamente declarado nao foi encontrado",
-                       t->linha, t->coluna,
-                       "identificador para wire ou output", t->valor);
+                       t->line, t->column,
+                       "identificador para wire ou output", t->value);
         goto load_assign_bad_token;
     }
 
@@ -1443,7 +1453,7 @@ VerilogError load_assign(
 
     if (t->classe != SYM_EQ) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, "=", t->valor);
+                       t->line, t->column, "=", t->value);
         goto load_assign_bad_token;
     }
 
@@ -1456,8 +1466,8 @@ VerilogError load_assign(
 
     if ( t->classe == NUM_BASE_DECIMAL ) {
         // inserir, na lista de entradas da gate, esta entrada
-        gate->atributos.role = ROLE_LITERAL_NUMBER;
-        gate->dynamic_value = long_to_logicvalue(strtol(t->valor, NULL, 10));
+        gate->attributes.role = ROLE_LITERAL_NUMBER;
+        gate->dynamic_value = long_to_logicvalue(strtol(t->value, NULL, 10));
         out->dynamic_value = gate->dynamic_value; // propagate value to output net
 
         if (!avanca(&t))
@@ -1467,7 +1477,7 @@ VerilogError load_assign(
             goto load_assign_sucess;
 
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, ";", t->valor);
+                       t->line, t->column, ";", t->value);
         goto load_assign_bad_token;
     }
 
@@ -1476,7 +1486,7 @@ VerilogError load_assign(
     // negation (~) is also simple, it creates a not.
 
     if ( t->classe == SYM_TILDE ) {
-        gate->atributos.role = ROLE_NOT;
+        gate->attributes.role = ROLE_NOT;
 
     if (!avanca(&t))
         goto load_assign_bad_eof;
@@ -1486,38 +1496,38 @@ load_assign_identifiers:
 
     if ( !is_allowed_identifier(t) ) {
         show_error_msg("Token inesperado foi encontrado",
-                        t->linha, t->coluna, "algum identificador", t->valor);
+                        t->line, t->column, "algum identificador", t->value);
         goto load_assign_bad_token;
     }
 
-    if ( has_item_of_string_value(list_wire, t->valor) ) {
+    if ( has_item_of_string_value(list_wire, t->value) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->list_wire_net, t->valor);
+        in = get_component_by_name(module->list_wire_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
-    else if ( has_item_of_string_value(list_in, t->valor) ) {
+    else if ( has_item_of_string_value(list_in, t->value) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->list_input_net, t->valor);
+        in = get_component_by_name(module->list_input_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
-    else if ( has_item_of_string_value(list_out, t->valor) ) {
+    else if ( has_item_of_string_value(list_out, t->value) ) {
         // inserir, na lista de entradas da gate, esta entrada
-        in = get_component_by_name(module->list_output_net, t->valor);
+        in = get_component_by_name(module->list_output_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
-    else if ( get_reg_by_name(module->list_register, t->valor) ) {
-        in = get_component_by_name(module->list_reg_net, t->valor);
+    else if ( get_reg_by_name(module->list_register, t->value) ) {
+        in = get_component_by_name(module->list_reg_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
     else {
         show_error_msg("Este identificador nao consta como alguma net declarada",
-                        t->linha, t->coluna,
+                        t->line, t->column,
                         "identificador ja declarado (tipos: input, output ou wire)",
-                        t->valor);
+                        t->value);
         goto load_assign_bad_token;
     }
 
@@ -1529,19 +1539,19 @@ load_assign_identifiers:
     if (t->classe == SYM_SEMICOLON)
         goto load_assign_sucess;
 
-    if ( gate->atributos.role == ROLE_NOT ||
+    if ( gate->attributes.role == ROLE_NOT ||
          (t->classe != SYM_AMPERSAND && t->classe != SYM_PIPE) || 
-         (gate->atributos.role == ROLE_AND && t->classe != SYM_AMPERSAND) ||
-         (gate->atributos.role == ROLE_OR && t->classe != SYM_PIPE) ) {
+         (gate->attributes.role == ROLE_AND && t->classe != SYM_AMPERSAND) ||
+         (gate->attributes.role == ROLE_OR && t->classe != SYM_PIPE) ) {
         show_error_msg("Token inesperado foi encontrado",
-                       t->linha, t->coluna, NULL, t->valor);
+                       t->line, t->column, NULL, t->value);
         goto load_assign_bad_token;
     }
 
     if (t->classe == SYM_AMPERSAND)
-        gate->atributos.role = ROLE_AND;
+        gate->attributes.role = ROLE_AND;
     else
-        gate->atributos.role = ROLE_OR;
+        gate->attributes.role = ROLE_OR;
 
     if (!avanca(&t))
         goto load_assign_bad_eof;
@@ -1562,7 +1572,7 @@ load_assign_bad_eof:
     return ERROR_VERILOG_BAD_EOF;
 }
 
-VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
+VerilogError load_systask(Token** pit, Event** initial_task_events, Time t)
 {
     SystemTask task = TASK_UNKNOWN;
     ListSystemTaskArg args;
@@ -1577,36 +1587,36 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     if ( !is_allowed_identifier(it) ) {
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        "o nome de uma task",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
-    if ( iguais(it->valor, "display") ) {
+    if ( iguais(it->value, "display") ) {
         task = TASK_DISPLAY;
     }
-    else if ( iguais(it->valor, "write") ) {
+    else if ( iguais(it->value, "write") ) {
         task = TASK_WRITE;
     }
-    else if ( iguais(it->valor, "dumpfile") ) {
+    else if ( iguais(it->value, "dumpfile") ) {
         task = TASK_DUMPFILE;
     }
-    else if ( iguais(it->valor, "finish") ) {
+    else if ( iguais(it->value, "finish") ) {
         task = TASK_FINISH;
         goto load_systask_sucess;
     }
-    else if ( iguais(it->valor, "stop") ) {
+    else if ( iguais(it->value, "stop") ) {
         task = TASK_STOP;
         goto load_systask_sucess;
     }
     else {
         show_error_msg("Task invalida ou nao suportada",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        "o nome de uma task suportada",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
@@ -1615,10 +1625,10 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
 
     if (it->classe != SYM_OPEN_BRACKET) {
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        "(",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
@@ -1642,14 +1652,14 @@ VerilogError load_systask(Token** pit, Evento** initial_task_events, Tempo t)
         }
 
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        "uma string",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
-    copy_removing_quotes(args.itens[0].string_literal, it->valor);
+    copy_removing_quotes(args.itens[0].string_literal, it->value);
     args.types[0] = ARG_STRING_LITERAL;
 
     // for Sdisplay: there may be zero to n more args
@@ -1669,19 +1679,19 @@ systask_args_load:
 
     if ( task == TASK_DUMPFILE ) {
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        ");",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
     if ( it->classe != SYM_COMMA ) {
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        ", ou )",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
 
@@ -1693,19 +1703,19 @@ systask_args_load:
 
     // check the next argument type
     if ( it->classe == STRING ) {
-        copy_removing_quotes(args.itens[args.count].string_literal, it->valor);
+        copy_removing_quotes(args.itens[args.count].string_literal, it->value);
         args.types[args.count] = ARG_STRING_LITERAL;
     }
     else if ( it->classe == NUM_BASE_DECIMAL ) {
-        args.itens[args.count].number_literal = strtol(it->valor, NULL, 10);
+        args.itens[args.count].number_literal = strtol(it->value, NULL, 10);
         args.types[args.count] = ARG_NUMBER_LITERAL;
     }
     else {
         show_error_msg("Token inesperado foi encontrado",
-                       it->linha,
-                       it->coluna,
+                       it->line,
+                       it->column,
                        "uma string ou numero",
-                       it->valor);
+                       it->value);
         goto load_systask_bad_token;
     }
     

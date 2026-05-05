@@ -134,31 +134,38 @@ typedef struct st_pair_string_tokenclass
     TokenClass token_class;
 } PairStringTokenClass;
 
-/** @brief Tipo basico para o elemento que representa um token.
+/** @brief Basic type for a lexical token representation.
+ *  @note Each token has a string value, line and column information,
+ *        a class indicating its type (keyword, symbol, identifier, etc.),
+ *        and pointers for linking tokens in a doubly linked list structure.
  */
 typedef struct st_token {
-    char valor[MAX_TOKEN_SIZE];
-    int linha;
-    int coluna;
+    char value[MAX_TOKEN_SIZE];
+    int line;
+    int column;
     TokenClass classe;
-    struct st_token* anterior;
-    struct st_token* seguinte;
+    struct st_token* previous;
+    struct st_token* next;
 } Token;
 
-/** @brief Tipo para uma lista encadeada de Tokens.
+/** @brief Type for storing a linked list of tokens, with pointers to the
+ *         first and last elements, a count of the total number of tokens,
+ *         and the name of the file from which they were extracted.
  */
 typedef struct st_list_token {
-    Token* primeiro;
-    Token* ultimo;
-    int tamanho;
+    Token* first;
+    Token* last;
+    int count;
     char file[MAX_PATH_LENGTH];
 } ListToken;
 
-/** @brief Inicializa uma lista vazia, isto é, com zero elementos.
+/** @brief Initializes an empty list, that is, a list with zero elements.
+ *  @return A pointer to the newly created ListToken structure.
  */
 ListToken* new_list_token();
 
 /** @brief Delete the list and its contents from memory.
+ *  @param list Pointer to the ListToken structure to be deleted.
  */
 void delete_lista_token(ListToken* list);
 
@@ -174,42 +181,47 @@ Token* new_token(const char* value, int line, int column, TokenClass t_class);
 /** @brief Adiciona um token inicializado ao final da lista de tokens.
  *  @param list Ponteiro para a struct da lista onde o token sera adicionado.
  *  @param tok Ponteiro para o token a ser adicionado.
- *  @return void.
  */
 void add_token_to_list(ListToken* list, Token* tok);
 
 /** @brief Insere na lista um novo token a partir de um caractere,
            deve-se especificar a posicao do mesmo no arquivo.
- *  @param lista Onde sera inserido o token.
+ *  @param list Onde sera inserido o token.
  *  @param tok Um único caractere que representa o token.
- *  @param p_linha Linha no arquivo onde está o token.
- *  @param p_coluna Coluna no arquivo onde inicia-se o token.
- *  @return void.
+ *  @param line Linha no arquivo onde está o token.
+ *  @param column Coluna no arquivo onde inicia-se o token.
  */
-void insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna);
+void insert_token_of_char(
+    ListToken* list,
+    char tok,
+    int line,
+    int column);
 
 /** @brief Insere na lista um novo token a partir de uma string,
            deve-se especificar a posicao do mesmo no arquivo.
- *  @param lista Onde sera inserido o token.
+ *  @param list Onde sera inserido o token.
  *  @param tok Uma string que representa o token.
- *  @param p_linha Linha no arquivo onde está o token.
- *  @param p_coluna Coluna no arquivo onde inicia-se o token.
+ *  @param line Linha no arquivo onde está o token.
+ *  @param column Coluna no arquivo onde inicia-se o token.
  *  @param tok_class A classe do token, conforme a enum TokenClass.
- *  @return void.
  */
-void insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna, TokenClass tok_class);
+void insert_token_of_string(
+    ListToken* list,
+    const char* tok,
+    int line,
+    int column,
+    TokenClass tok_class);
 
 /** @brief Remove the token, specified by its pointer, from the list.
  *  @param list The list from which the token will be removed.
  *  @param tok Pointer to the token to be removed.
- *  @return void.
  */
 void remove_token(ListToken* list, Token* tok);
 
-/** @brief Remove all tokens matching the indicated token string, from the list.
+/** @brief Remove all tokens matching the indicated token string from the list.
  *  @param lst The list from which the tokens will be removed.
  *  @param tok The string representing the tokens to be removed.
- *  @return ...
+ *  @return 1 if at least one token was removed, 0 if no tokens were removed.
  */
 int remove_tokens_by_value(ListToken* lst, const char* tok);
 
@@ -220,22 +232,22 @@ int remove_tokens_by_value(ListToken* lst, const char* tok);
 int is_single_char_symbol(char c);
 
 /** @brief Imprime na tela os tokens dessa lista, um por linha.
- *  @return Void.
+ *  @param tokens Uma lista de tokens a ser exibida.
  */
 void show_token_list(ListToken* tokens);
 
 /**
- * @brief Avanca o iterador de token para o próximo da lista encadeada respectiva.
+ * @brief Avanca o iterador de token para o próximo na lista encadeada.
  * @param it Um ponteiro para um ponteiro de um Token.
  * @return O endereço do próximo token, que já estará atualizado no iterador.
  *         Este pode ser NULL, que indica o final da lista.
- *         Caso o argumento passado seja NULL ou a derreferenciação deste argumento
- *         também o seja, será retornado NULL.
+ *         Caso o argumento passado seja NULL ou a derreferenciação deste
+ *         argumento também o seja, será retornado NULL.
  */
 Token* avanca(Token** it);
 
 /** 
- * @brief Retrocede o iterador de token para o anterior da lista encadeada respectiva.
+ * @brief Retrocede o iterador de token para o anterior na lista encadeada.
  * @param it Um ponteiro para um ponteiro de um Token.
  * @return O endereço do token anterior, que já estará atualizado no iterador.
 */
@@ -243,33 +255,36 @@ Token* backtrack(Token** it);
 
 /** @brief Verifica se um token é uma palavra reservada em Verilog.
  *  @param tk Um ponteiro para Token.
- *  @return Verdadeiro se o valor do token for palavra reservada em Verilog, falso c. c.
+ *  @return Verdadeiro se o valor do token for palavra reservada em Verilog,
+ *          falso caso ccontrário.
  */
 int is_reserverd_word(Token* tk);
 
 /** @brief Verifica se um token possui um nome permitido para identificador.
  *  @param tk Um ponteiro para Token.
- *  @return Verdadeiro se o valor do token for um nome permitido de identificador, falso c.c.
+ *  @return Verdadeiro se o valor do token for um nome permitido de
+ *          identificador, falso caso ccontrário.
  */
 int is_allowed_identifier(Token* tk);
 
 /** @brief Retorna verdadeiro se a string esta contida em algum token da lista.
  *  @param lst Uma lista de Tokens.
  *  @param str Uma string qualquer.
- *  @return Verdadeiro se str é o valor de algum Token em lst, falso caso contrário.
+ *  @return Verdadeiro se str é o valor de algum Token em lst,
+ *          falso caso contrário.
  */
 int has_item_of_string_value(ListToken* lst, const char* str);
 
 /** @brief Cria uma lista de Tokens que tem significado para o processamento
-            sintatico, a partir do arquivo com o codigo fonte em Verilog.
- *  @param arquivo O handler do arquivo a ser processado.
+           sintatico, a partir do arquivo com o codigo fonte em Verilog.
+ *  @param file_handler O handler do arquivo a ser processado.
  *  @return A lista de tokens.
  */
-ListToken* tokeniza(FILE *arquivo);
+ListToken* tokenize(FILE* file_handler);
 
 /** @brief Get the TokenClass enum value from its respective token string.
  *  @param s_tok Token string.
- *  @return Respective TokenClass value, in case of a match. Otherwise: _UNKNOWN
+ *  @return Respective TokenClass value, in case of match. Otherwise: _UNKNOWN
  */
 TokenClass get_token_class(const char* s_tok);
 

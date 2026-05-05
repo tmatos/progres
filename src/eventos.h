@@ -90,7 +90,7 @@ typedef enum {
 typedef union un_systemtask_arg {
     char string_literal[MAX_TOKEN_SIZE];
     int number_literal;
-    ValorLogico logic_value;
+    LogicValue logic_value;
     Component* net;
     Register* reg;
 } SystemTaskArg;
@@ -118,29 +118,30 @@ typedef struct st_list_systemtaskarg {
     SystemTaskArgType* types; // parallel array to 'itens' indicating type of each arg
 } ListSystemTaskArg;
 
-typedef struct st_transicao Transicao;
+typedef struct st_transition Transition;
 
 /**
- * @brief Estrutura que representa uma transição do valor lógico de um fio.
-          Um lista é formada pelo encadeamento dessas transições.
+ * @brief Estrutura que representa uma transição do valor lógico de um wire.
+          Uma lista é formada pelo encadeamento dessas transições.
           Esta lista é referenciada pelo seu primeiro elemento,
           e temos que o último precede um NULL.
  */
-struct st_transicao {
+struct st_transition {
     SystemTask task_type;
     ListSystemTaskArg task_args;
 
     Component* net; // indicates the net over wich the event originates
     Register* reg; // in case of a transition in register value
-    ValorLogico new_value; // new value of the net/register after transition
+    LogicValue new_value; // new value of the net/register after transition
 
-    Transicao* next;
+    Transition* next;
 };
 
-typedef Transicao* ListTransicao;
+typedef Transition* ListTransicao;
 
 /**
- * @brief Enum para identificação dos tipos de evento que podem ocorrer na simulação.
+ * @brief Enum para identificação dos tipos de evento que podem ocorrer
+ *        durante a simulação.
  */
 typedef enum en_event_kind
 {
@@ -149,50 +150,52 @@ typedef enum en_event_kind
     EVT_SYS_TASK,
 } EventKind;
 
-typedef struct st_evento Evento;
+typedef struct st_event Event;
 
 /**
- * @brief Estrutura para um evento. Um lista é formada pelo encadeamento desses eventos.
-          Como toda inserção nessa lista é ordenada por tempo, temos assim uma fila de eventos.
-          Esta fila é referenciada pelo seu primeiro elemento, e temos que o último precede um NULL.
+ * @brief Estrutura para um evento. Um lista é formada pelo encadeamento
+ *        desses eventos. Como toda inserção nessa lista é ordenada por tempo,
+ *        temos assim uma fila de eventos. Esta fila é referenciada pelo seu
+ *        primeiro elemento, e temos que o último precede um NULL.
  */
-struct st_evento {
-    Tempo instant; // indicates the instant at which the event occurs
+struct st_event {
+    Time instant; // indicates the instant at which the event occurs
 
     EventKind kind;
 
-    Transicao* list_transition;
-    Transicao* last_transition;
+    Transition* list_transition;
+    Transition* last_transition;
 
-    Evento* next;
+    Event* next;
 };
 
-typedef Evento* FilaEventos;
+typedef Event* EventQueue;
 
 /** @brief Desalocar da memória a lista passada.
  *  @param list Ponteiro para a lista de transições a ser desalocada.
  *  @note A lista é desalocada, mas não os componentes ou registradores
  *        que ela possa estar referenciando.
  */
-void delete_list_transicao(Transicao** list);
+void delete_list_transition(Transition** list);
 
 /** @brief Create a new event (or queue) at time 0 without a transi list.
  *         This is used to initialize the event queue, if needed.
  *         The only event will have no transitions defined.
- * @return Ponteiro para Evento alocado.
+ * @return Pointer to the allocated Event struct.
  */
-Evento* new_empty_event();
+Event* new_empty_event();
 
 /** @brief Insere um novo evento na fila de eventos, ordenando-o pelo tempo.
- *         Se já houver um evento no tempo t, adiciona à lista de transições desse evento.
+ *         Se já houver um evento no tempo t, adiciona à lista de transições
+ *         desse evento.
  * @param queue Ponteiro para a fila de eventos.
  * @param t Tempo em que ocorre o evento.
  * @param sys_task Tipo desta system task, conforme a enum SystemTask.
  * @param sys_task_args Lista de argumentos fornecidos à task em questão.
  */
 void insert_task_event(
-    Evento** queue,
-    Tempo t,
+    Event** queue,
+    Time t,
     SystemTask sys_task,
     ListSystemTaskArg sys_task_args);
 
@@ -209,39 +212,39 @@ void insert_task_event(
  *       to that event's transition list.
  */
 void insert_event(
-    Evento** queue,
-    Tempo t,
+    Event** queue,
+    Time t,
     EventKind kind,
     Component* comp,
     Register* reg,
-    ValorLogico new_value);
+    LogicValue new_value);
 
 /** @brief Libera completamente a fila de eventos da memória.
  *  @param queue Ponteiro para a fila de eventos a ser liberada.
  */
-void delete_event_queue(Evento **queue);
+void delete_event_queue(Event **queue);
 
 /** @brief Cria um novo evento, sem transições definidas, no tempo t.
  *  @param t Tempo em que ocorre o evento.
  *  @param k Tipo do evento, conforme EventKind.
- *  @return Ponteiro para Evento alocado.
+ *  @return Ponteiro para Event alocado.
  */
-Evento* new_event_at(Tempo t, EventKind k);
+Event* new_event_at(Time t, EventKind k);
 
 /** @brief Retorna uma lista das transições que ocorrem exatamente em determinado tempo t.
  *         Se não houver evento nesse tempo t, retornará NULL.
  *  @param queue Ponteiro para a fila de eventos.
  *  @param t Tempo em que se deseja obter as transições.
- *  @return Ponteiro para struct Transicao, ou NULL caso não haja eventos no tempo t.
+ *  @return Ponteiro para struct Transition, ou NULL caso não haja eventos no tempo t.
  */
-Transicao* get_transitions_at_time(Evento* queue, Tempo t);
+Transition* get_transitions_at_time(Event* queue, Time t);
 
 /** @brief Remove da fila o evento mais próximo e devolve a lista de transições referente.
  *  @param queue Ponteiro para a fila de eventos.
- *  @return Ponteiro para struct Transicao, ou NULL caso a fila esteja vazia.
+ *  @return Ponteiro para struct Transition, ou NULL caso a fila esteja vazia.
  *  @note A fila é atualizada, removendo o evento mais próximo.
  */
-Transicao* pop_event(Evento** queue);
+Transition* pop_event(Event** queue);
 
 #ifdef __cplusplus
 }

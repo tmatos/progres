@@ -28,9 +28,9 @@ public:
     std::string nome("entrada_0");
     Component* c0 = new_component( nome.c_str(), ROLE_INPUT );
     CPPUNIT_ASSERT(c0);
-    std::string nome_em_c0(c0->nome);
+    std::string nome_em_c0(c0->name);
     CPPUNIT_ASSERT_EQUAL( nome, nome_em_c0 );
-    CPPUNIT_ASSERT_EQUAL( c0->atributos.role, ROLE_INPUT );
+    CPPUNIT_ASSERT_EQUAL( c0->attributes.role, ROLE_INPUT );
     CPPUNIT_ASSERT_EQUAL( c0->dynamic_value, VAL_X );
     CPPUNIT_ASSERT( c0->list_input );
     CPPUNIT_ASSERT( c0->list_output );
@@ -40,7 +40,7 @@ public:
   {
     ListComponent* list = new_list_component();
     CPPUNIT_ASSERT(list);
-    CPPUNIT_ASSERT_EQUAL(list->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(list->total, 0);
     CPPUNIT_ASSERT(!list->itens);
   }
 
@@ -48,7 +48,7 @@ public:
   {
     ListComponent* list = new_list_component_of_size(50);
     CPPUNIT_ASSERT(list);
-    CPPUNIT_ASSERT_EQUAL(list->tamanho, 50);
+    CPPUNIT_ASSERT_EQUAL(list->total, 50);
     CPPUNIT_ASSERT(list->itens);
   }
 
@@ -58,19 +58,19 @@ public:
     CPPUNIT_ASSERT(circ);
 
     CPPUNIT_ASSERT(circ->list_input_net);
-    CPPUNIT_ASSERT_EQUAL(circ->list_input_net->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(circ->list_input_net->total, 0);
     CPPUNIT_ASSERT(!circ->list_input_net->itens);
 
     CPPUNIT_ASSERT(circ->list_output_net);
-    CPPUNIT_ASSERT_EQUAL(circ->list_output_net->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(circ->list_output_net->total, 0);
     CPPUNIT_ASSERT(!circ->list_output_net->itens);
 
     CPPUNIT_ASSERT(circ->list_wire_net);
-    CPPUNIT_ASSERT_EQUAL(circ->list_wire_net->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(circ->list_wire_net->total, 0);
     CPPUNIT_ASSERT(!circ->list_wire_net->itens);
 
     CPPUNIT_ASSERT(circ->list_all_components);
-    CPPUNIT_ASSERT_EQUAL(circ->list_all_components->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(circ->list_all_components->total, 0);
     CPPUNIT_ASSERT(!circ->list_all_components->itens);
   }
 
@@ -86,20 +86,20 @@ public:
     CPPUNIT_ASSERT(c0);
     CPPUNIT_ASSERT(c1);
     CPPUNIT_ASSERT(list);
-    CPPUNIT_ASSERT_EQUAL(list->tamanho, 0);
+    CPPUNIT_ASSERT_EQUAL(list->total, 0);
 
     insert_component(list, c0);
-    CPPUNIT_ASSERT_EQUAL(list->tamanho, 1);
+    CPPUNIT_ASSERT_EQUAL(list->total, 1);
     CPPUNIT_ASSERT(list->itens);
     CPPUNIT_ASSERT_EQUAL(list->itens[0], c0);
 
     insert_component(list, c1);
-    CPPUNIT_ASSERT_EQUAL(list->tamanho, 2);
+    CPPUNIT_ASSERT_EQUAL(list->total, 2);
     CPPUNIT_ASSERT(list->itens);
     CPPUNIT_ASSERT_EQUAL(list->itens[1], c1);
 
-    std::string nome_em_c0(c0->nome);
-    std::string nome_em_c1(c1->nome);
+    std::string nome_em_c0(c0->name);
+    std::string nome_em_c1(c1->name);
     CPPUNIT_ASSERT_EQUAL( str_c0, nome_em_c0 );
     CPPUNIT_ASSERT_EQUAL( str_c1, nome_em_c1 );
   }

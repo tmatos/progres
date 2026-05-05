@@ -26,7 +26,7 @@ int anexa(char* str, char c);
 /** @brief Retorna verdadeiro se duas strings são iguais.
  *  @param a Uma string qualquer.
  *  @param b Uma string qualquer.
- *  return O resultado é a negação de strcmp(a,b).
+ *  @return O resultado é a negação de strcmp(a,b).
  */
 int iguais(const char* a, const char* b);
 

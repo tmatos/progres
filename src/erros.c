@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -22,13 +22,23 @@ void show_error_lexical(const char* msg, int lin, int col)
     return show_error_msg(msg, lin, col, NULL, NULL);
 }
 
-void show_error_size_exceeded(const char* msg, int lin, int col, const char* tok, int max)
+void show_error_size_exceeded(
+    const char* msg,
+    int lin,
+    int col,
+    const char* tok,
+    int max)
 {
     print("%d:%d: erro: '%s' relativo a '%s'. Maximo permitido: %d.\n",
           lin, col, msg, tok, max);
 }
 
-void show_error_msg(const char* msg, int lin, int col, const char* expected, const char* found)
+void show_error_msg(
+    const char* msg,
+    int lin,
+    int col,
+    const char* expected,
+    const char* found)
 {
     if (lin > 0) {
         print("%d:", lin);

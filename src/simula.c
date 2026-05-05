@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -17,20 +17,20 @@
 #include "eventos.h"
 #include "erros.h"
 
-int validate_input_signals(Module* module, Sinais* signals)
+int validate_input_signals(Module* module, SignalArray* signals)
 {
     int i;
     int j;
     int validos = 0;
 
     // Validacao da correspencia das signals entre os arquivos '.v' e '.in'
-    for ( i=0 ; i < module->list_input_net->tamanho ; i++ )
+    for ( i=0 ; i < module->list_input_net->total ; i++ )
     {
-        for ( j=0 ; j < signals->quantidade ; j++ )
+        for ( j=0 ; j < signals->count ; j++ )
         {
-            if ( iguais(module->list_input_net->itens[i]->nome,
-                        signals->lista[j].nome) ) {
-                module->list_input_net->itens[i]->input_signal = &(signals->lista[j]);
+            if ( iguais(module->list_input_net->itens[i]->name,
+                        signals->itens[j].name) ) {
+                module->list_input_net->itens[i]->input_signal = &(signals->itens[j]);
                 validos++;
                 break;
             }
@@ -44,41 +44,41 @@ int validate_input_signals(Module* module, Sinais* signals)
           "  .in = %d\n"
           "match = %d\n"
           "----------\n",
-          module->list_input_net->tamanho,
-          signals->quantidade,
+          module->list_input_net->total,
+          signals->count,
           validos);
 
     return validos;
 }
 
-Sinais* simula(
+SignalArray* simula(
     Module* module,
-    Sinais* input_stimulus,
-    Evento** initial_events,
+    SignalArray* input_stimulus,
+    Event** initial_events,
     FILE** f_dump)
 {
     int i;
     int validos; // conta correspencias de entradas entre arquivos '.v' e '.in'
-    Tempo t;
+    Time t;
 
-    Transicao* list_tr = NULL;
-    Transicao* tr = NULL; // iterator
+    Transition* list_tr = NULL;
+    Transition* tr = NULL; // iterator
 
-    Evento* queue = NULL;
-    Pulso* p = NULL;
+    Event* queue = NULL;
+    Pulse* p = NULL;
 
     ListComponent* list_changed_gates = NULL;
     Component* gate = NULL;
 
-    ValorLogico result;
-    ValorLogico valor_xor_in_a;
-    ValorLogico valor_xor_in_b;
-    ValorLogico valor_xnor_in_a;
-    ValorLogico valor_xnor_in_b;
-    ValorLogico valor_control;
-    ValorLogico valor_data;
+    LogicValue result;
+    LogicValue valor_xor_in_a;
+    LogicValue valor_xor_in_b;
+    LogicValue valor_xnor_in_a;
+    LogicValue valor_xnor_in_b;
+    LogicValue valor_control;
+    LogicValue valor_data;
 
-    Sinais* saidas = new_signal_list();
+    SignalArray* saidas = new_signal_list();
 
     if (!module || !input_stimulus) {
         return NULL;
@@ -86,7 +86,7 @@ Sinais* simula(
 
     validos = validate_input_signals(module, input_stimulus);
 
-    if (validos < module->list_input_net->tamanho) {
+    if (validos < module->list_input_net->total) {
         print("AVISO: O arquivo de entradas tem menos "
               "sinais de entrada que o circuito.\n");
 
@@ -94,10 +94,10 @@ Sinais* simula(
     }
 
     // initial event ocurrences are copied into the event queue
-    Evento* evt_it = initial_events ? *initial_events : NULL;
+    Event* evt_it = initial_events ? *initial_events : NULL;
     while (evt_it)
     {
-        Transicao* tran_it = evt_it->list_transition;
+        Transition* tran_it = evt_it->list_transition;
         while (tran_it)
         {
             if ( tran_it->task_type == IS_NOT_A_TASK ) {
@@ -122,21 +122,21 @@ Sinais* simula(
     }
 
     // Inicializacao da fila de eventos com os valores das entradas
-    for ( i=0 ; i < module->list_input_net->tamanho ; i++ )
+    for ( i=0 ; i < module->list_input_net->total ; i++ )
     {
         t = 0;
 
-        p = module->list_input_net->itens[i]->input_signal->pulsos;
-        while (p->valor != VAL_BLANK)
+        p = module->list_input_net->itens[i]->input_signal->pulses;
+        while (p->value != VAL_BLANK)
         {
             insert_event(&queue,
                          t,
                          EVT_NET_TRANSITION,
                          module->list_input_net->itens[i],
                          NULL,
-                         p->valor);
+                         p->value);
 
-            t = t + p->tempo * module->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
+            t = t + p->time * module->timescale_number /* * (circuto->timescale_unit/UN_FS) */;
             p++;
         }
 
@@ -172,7 +172,7 @@ Sinais* simula(
             if ( (tr->task_type == IS_NOT_A_TASK) &&
                  (tr->net->dynamic_value != tr->new_value) )
             {
-                for ( i=0 ; i < tr->net->list_output->tamanho ; i++ )
+                for ( i=0 ; i < tr->net->list_output->total ; i++ )
                 {
                     if ( !has_component_by_pointer(list_changed_gates,
                                                    tr->net->list_output->itens[i]) ) {
@@ -181,9 +181,9 @@ Sinais* simula(
                     }
                 }
 
-                if (tr->net->atributos.role == ROLE_OUTPUT) {
+                if (tr->net->attributes.role == ROLE_OUTPUT) {
                     if ( !(tr->net->output_signal) ) {
-                        tr->net->output_signal = new_signal( tr->net->nome );
+                        tr->net->output_signal = new_signal( tr->net->name );
                     }
                     add_new_pulse(tr->net->output_signal,
                                   tr->net->dynamic_value,
@@ -220,9 +220,9 @@ Sinais* simula(
             case TASK_FINISH:
                 while (queue)
                 {
-                    Transicao* lt = pop_event(&queue);
+                    Transition* lt = pop_event(&queue);
                     if (lt)
-                        delete_list_transicao(&lt);
+                        delete_list_transition(&lt);
                 }
                 tr = NULL; // exit outer while loop
                 continue;
@@ -241,19 +241,19 @@ Sinais* simula(
         }
 
         // pop_event() nao liberou mem da lista de transicoes, fazemos isso aqui
-        delete_list_transicao(&list_tr);
+        delete_list_transition(&list_tr);
 
-        for ( i=0 ; i < list_changed_gates->tamanho ; i++ )
+        for ( i=0 ; i < list_changed_gates->total ; i++ )
         {
             gate = list_changed_gates->itens[i];
 
             // be prepared, in case of 3 stage logic gates
-            if (gate->list_input->tamanho == 2) {
+            if (gate->list_input->total == 2) {
                 valor_data = gate->list_input->itens[0]->dynamic_value;
                 valor_control =gate->list_input->itens[1]->dynamic_value;
             }
 
-            switch (gate->atributos.role)
+            switch (gate->attributes.role)
             {
             case ROLE_NOT:
                 result = compute_not_gate(gate->list_input->itens[0]->dynamic_value);
@@ -307,16 +307,16 @@ Sinais* simula(
         }
 
         // free mem
-        if (list_changed_gates->tamanho != 0)
+        if (list_changed_gates->total != 0)
             free(list_changed_gates->itens);
         free(list_changed_gates);
         list_changed_gates = NULL;
     }
 
     // move as saidas da simulacao do circuito para o retorno da funcao
-    for ( i=0 ; i < module->list_output_net->tamanho ; i++ )
+    for ( i=0 ; i < module->list_output_net->total ; i++ )
     {
-        Sinal* s = module->list_output_net->itens[i]->output_signal;
+        Signal* s = module->list_output_net->itens[i]->output_signal;
 
         if (s) {
             insert_signal(saidas, s);
@@ -325,8 +325,8 @@ Sinais* simula(
         }
 
         // cria sinal de saida constante com o valor dinamico do componente
-        ValorLogico v = module->list_output_net->itens[i]->dynamic_value;
-        Sinal* s_temp = new_signal(module->list_output_net->itens[i]->nome);
+        LogicValue v = module->list_output_net->itens[i]->dynamic_value;
+        Signal* s_temp = new_signal(module->list_output_net->itens[i]->name);
         add_new_pulse(s_temp, v, t); // dynamic value for all the simulat. time
         insert_signal(saidas, s_temp);
         free_signal(&s_temp);
@@ -336,7 +336,7 @@ Sinais* simula(
 }
 
 // IEEE Std 1364-2005, Table 7-4
-ValorLogico compute_not_gate(ValorLogico input)
+LogicValue compute_not_gate(LogicValue input)
 {
     if (input == VAL_0)
         return VAL_1;
@@ -348,7 +348,7 @@ ValorLogico compute_not_gate(ValorLogico input)
 }
 
 // IEEE Std 1364-2005, Table 7-4
-ValorLogico compute_buf_gate(ValorLogico input)
+LogicValue compute_buf_gate(LogicValue input)
 {
     if (input == VAL_Z)
         return VAL_X;
@@ -357,7 +357,7 @@ ValorLogico compute_buf_gate(ValorLogico input)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico compute_xor_gate(ValorLogico a, ValorLogico b)
+LogicValue compute_xor_gate(LogicValue a, LogicValue b)
 {
     if (a == VAL_X || b == VAL_X)
         return VAL_X;
@@ -372,7 +372,7 @@ ValorLogico compute_xor_gate(ValorLogico a, ValorLogico b)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico compute_xnor_gate(ValorLogico a, ValorLogico b)
+LogicValue compute_xnor_gate(LogicValue a, LogicValue b)
 {
     if (a == VAL_X || b == VAL_X)
         return VAL_X;
@@ -387,14 +387,14 @@ ValorLogico compute_xnor_gate(ValorLogico a, ValorLogico b)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico compute_or_gate(ListComponent* inputs)
+LogicValue compute_or_gate(ListComponent* inputs)
 {
-    ValorLogico out = VAL_0;
+    LogicValue out = VAL_0;
     
     // compute the logic value of the 'or' operation over all its inputs
-    for ( int i=0 ; i < inputs->tamanho ; i++ )
+    for ( int i=0 ; i < inputs->total ; i++ )
     {
-        ValorLogico input_at_i = inputs->itens[i]->dynamic_value;
+        LogicValue input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_1) {
             out = VAL_1;
@@ -410,14 +410,14 @@ ValorLogico compute_or_gate(ListComponent* inputs)
 }
 
 // Std 1364-2005, Table 7-3
-ValorLogico compute_and_gate(ListComponent* inputs)
+LogicValue compute_and_gate(ListComponent* inputs)
 {
-    ValorLogico out = VAL_1;
+    LogicValue out = VAL_1;
 
     // compute the logic value of the 'and' operation over all its inputs
-    for ( int i=0 ; i < inputs->tamanho ; i++ )
+    for ( int i=0 ; i < inputs->total ; i++ )
     {
-        ValorLogico input_at_i = inputs->itens[i]->dynamic_value;
+        LogicValue input_at_i = inputs->itens[i]->dynamic_value;
 
         if (input_at_i == VAL_0) {
             out = VAL_0;
@@ -432,9 +432,9 @@ ValorLogico compute_and_gate(ListComponent* inputs)
     return out;
 }
 
-ValorLogico compute_nor_gate(ListComponent* inputs)
+LogicValue compute_nor_gate(ListComponent* inputs)
 {
-    ValorLogico out = compute_or_gate(inputs);
+    LogicValue out = compute_or_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -444,9 +444,9 @@ ValorLogico compute_nor_gate(ListComponent* inputs)
     return out;
 }
 
-ValorLogico compute_nand_gate(ListComponent* inputs)
+LogicValue compute_nand_gate(ListComponent* inputs)
 {
-    ValorLogico out  = compute_and_gate(inputs);
+    LogicValue out  = compute_and_gate(inputs);
 
     // fazemos a negativa do resultado se este for diferente de X e Z
     if ( (out != VAL_X) && (out != VAL_Z) ) {
@@ -456,7 +456,7 @@ ValorLogico compute_nand_gate(ListComponent* inputs)
     return out;
 }
 
-ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data)
+LogicValue compute_buf_if0_gate(LogicValue control, LogicValue data)
 {
     if (control == VAL_1)
         return VAL_Z;
@@ -473,7 +473,7 @@ ValorLogico compute_buf_if0_gate(ValorLogico control, ValorLogico data)
     return data;
 }
 
-ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data)
+LogicValue compute_buf_if1_gate(LogicValue control, LogicValue data)
 {
     if (control == VAL_0)
         return VAL_Z;
@@ -490,7 +490,7 @@ ValorLogico compute_buf_if1_gate(ValorLogico control, ValorLogico data)
     return data;
 }
 
-ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data)
+LogicValue compute_not_if0_gate(LogicValue control, LogicValue data)
 {
     if (control == VAL_1)
         return VAL_Z;
@@ -523,7 +523,7 @@ ValorLogico compute_not_if0_gate(ValorLogico control, ValorLogico data)
     }
 }
 
-ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
+LogicValue compute_not_if1_gate(LogicValue control, LogicValue data)
 {
     if (control == VAL_0)
         return VAL_Z;
@@ -557,17 +557,17 @@ ValorLogico compute_not_if1_gate(ValorLogico control, ValorLogico data)
 }
 
 void create_events_from_outputs(
-    Evento** queue,
-    Tempo t,
-    Tempo timescale,
+    Event** queue,
+    Time t,
+    Time timescale,
     Component* gate,
-    ValorLogico result)
+    LogicValue result)
 {
     // create events related to the gate outputs
-    for ( int j=0 ; j < gate->list_output->tamanho ; j++ )
+    for ( int j=0 ; j < gate->list_output->total ; j++ )
     {
         insert_event(queue,
-                     t + gate->atributos.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,
+                     t + gate->attributes.delay * timescale /* * (circuito->timescale_unit/UN_FS) */,
                      EVT_NET_TRANSITION,
                      gate->list_output->itens[j],
                      NULL,
@@ -590,7 +590,7 @@ void set_dumpfile(FILE** pp_file, const char* s_path)
     }
 }
 
-void inspection_console(Module* module, Tempo t)
+void inspection_console(Module* module, Time t)
 {
     int code;
     print("[$stop call] in module: '%s'\n", module->name);

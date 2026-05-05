@@ -72,7 +72,10 @@ PreprocesorResult pre_processor(ListToken* lst);
  *  @param list_macro Pointer to the list of macros.
  *  @return VerilogError indicating success or type of failure.
  */
-VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+VerilogError preproc_define(
+    ListToken* list_tok,
+    Token** p_tok_it,
+    ListMacro* list_macro);
 
 /** @brief Process the `undef` directive.
  *  @param list_tok Pointer to the list of tokens of the source.
@@ -80,7 +83,10 @@ VerilogError preproc_define(ListToken* list_tok, Token** p_tok_it, ListMacro* li
  *  @param list_macro Pointer to the list of macros.
  *  @return VerilogError indicating success or type of failure.
  */
-VerilogError preproc_undef(ListToken* list_tok, Token** p_tok_it, ListMacro* list_macro);
+VerilogError preproc_undef(
+    ListToken* list_tok,
+    Token** p_tok_it,
+    ListMacro* list_macro);
 
 /** @brief Process the `timescale` directive.
  *  @param p_tok_it Pointer to the current token iterator.

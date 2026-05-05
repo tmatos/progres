@@ -41,12 +41,12 @@ public:
   void test_simula_CircuitoNull()
   {
     Module *circ = NULL;
-    Sinais *inputs = NULL;
-    Sinais *outputs = NULL;
+    SignalArray *inputs = NULL;
+    SignalArray *outputs = NULL;
     FILE* f_dump = NULL;
 
     outputs = simula(circ, inputs, NULL, &f_dump);
-    CPPUNIT_ASSERT_EQUAL( (Sinais*)NULL, outputs );
+    CPPUNIT_ASSERT_EQUAL( (SignalArray*)NULL, outputs );
 
     helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
@@ -57,8 +57,8 @@ public:
   void test_simula_CircuitoVazio()
   {
     Module *circ = new_module();
-    Sinais *inputs = new_signal_list();
-    Sinais *outputs = NULL;
+    SignalArray *inputs = new_signal_list();
+    SignalArray *outputs = NULL;
     FILE* f_dump = NULL;
 
     CPPUNIT_ASSERT(circ);
@@ -66,8 +66,8 @@ public:
 
     outputs = simula(circ, inputs, NULL, &f_dump);
     CPPUNIT_ASSERT(outputs);
-    CPPUNIT_ASSERT_EQUAL( outputs->quantidade, 0 );
-    CPPUNIT_ASSERT_EQUAL( (Sinal*)NULL, outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( outputs->count, 0 );
+    CPPUNIT_ASSERT_EQUAL( (Signal*)NULL, outputs->itens );
 
     helper_close_dump_file(&f_dump);
     free_signal_list(&inputs);
@@ -78,31 +78,31 @@ public:
   void test_simula_CircuitoUmaEntrada()
   {
     Module *circ = new_module();
-    Sinais *inputs = new_signal_list();
-    Sinais *outputs = NULL;
+    SignalArray *inputs = new_signal_list();
+    SignalArray *outputs = NULL;
     FILE* f_dump = NULL;
 
-    char str_nome_entrada_1[50] = "sinal_in_1";
+    char str_name_entrada_1[50] = "sinal_in_1";
 
     CPPUNIT_ASSERT(circ);
     CPPUNIT_ASSERT(inputs);
 
-    add_new_signal( inputs, str_nome_entrada_1 );
-    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)20 );  // 0
-    add_new_pulse( &(inputs->lista[0]), VAL_0, (Tempo)50 );  // 1
-    add_new_pulse( &(inputs->lista[0]), VAL_1, (Tempo)105 ); // 2
+    add_new_signal( inputs, str_name_entrada_1 );
+    add_new_pulse( &(inputs->itens[0]), VAL_1, (Time)20 );  // 0
+    add_new_pulse( &(inputs->itens[0]), VAL_0, (Time)50 );  // 1
+    add_new_pulse( &(inputs->itens[0]), VAL_1, (Time)105 ); // 2
 
-    CPPUNIT_ASSERT_EQUAL( 1, inputs->quantidade );
-    CPPUNIT_ASSERT( inputs->lista );
-    CPPUNIT_ASSERT( inputs->lista[0].pulsos );
+    CPPUNIT_ASSERT_EQUAL( 1, inputs->count );
+    CPPUNIT_ASSERT( inputs->itens );
+    CPPUNIT_ASSERT( inputs->itens[0].pulses );
 
-    Component* cp_in_wire = new_component(str_nome_entrada_1, ROLE_WIRE);
+    Component* cp_in_wire = new_component(str_name_entrada_1, ROLE_WIRE);
 
     add_input(circ, cp_in_wire);
 
-    CPPUNIT_ASSERT_EQUAL( 1, circ->list_input_net->tamanho );
+    CPPUNIT_ASSERT_EQUAL( 1, circ->list_input_net->total );
     CPPUNIT_ASSERT( circ->list_input_net->itens );
-    CPPUNIT_ASSERT( ! strcmp(str_nome_entrada_1, circ->list_input_net->itens[0]->nome) );
+    CPPUNIT_ASSERT( ! strcmp(str_name_entrada_1, circ->list_input_net->itens[0]->name) );
 
     outputs = simula(circ, inputs, NULL, &f_dump);
     CPPUNIT_ASSERT(outputs);
@@ -117,9 +117,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_andgates_v[] = "./verilog_sample_src/andgates.v";
     FILE* f_andgates_v = fopen(s_andgates_v, "r");
@@ -136,21 +136,21 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
+    CPPUNIT_ASSERT( outputs->itens[0].pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)25, outputs->itens[0].total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->itens[0].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->itens[0].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)15, outputs->itens[0].pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->itens[0].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[2].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_andgates_in);
@@ -164,9 +164,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
     
     char s_orgates_v[] = "./verilog_sample_src/orgates.v";
     FILE* f_orgates_v = fopen(s_orgates_v, "r");
@@ -183,21 +183,21 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
+    CPPUNIT_ASSERT( outputs->itens[0].pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)25, outputs->itens[0].total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->itens[0].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->itens[0].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->itens[0].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)15, outputs->itens[0].pulses[2].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_orgates_in);
@@ -211,9 +211,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
     
     char s_nandgates_v[] = "./verilog_sample_src/nandgates.v";
     FILE* f_nandgates_v = fopen(s_nandgates_v, "r");
@@ -230,21 +230,21 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
+    CPPUNIT_ASSERT( outputs->itens[0].pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)25, outputs->itens[0].total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->itens[0].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->itens[0].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)15, outputs->itens[0].pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->itens[0].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[2].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_nandgates_in);
@@ -258,9 +258,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_norgates_v[] = "./verilog_sample_src/norgates.v";
     FILE* f_norgates_v = fopen(s_norgates_v, "r");
@@ -277,21 +277,21 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
-    CPPUNIT_ASSERT( outputs->lista[0].pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)25, outputs->lista[0].total_time );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
+    CPPUNIT_ASSERT( outputs->itens[0].pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)25, outputs->itens[0].total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->lista[0].pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, outputs->itens[0].pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->lista[0].pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, outputs->lista[0].pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, outputs->itens[0].pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, outputs->itens[0].pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->lista[0].pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)15, outputs->lista[0].pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, outputs->itens[0].pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)15, outputs->itens[0].pulses[2].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_norgates_in);
@@ -305,10 +305,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
-    Sinal s;
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
+    Signal s;
     
     char s_notgates_v[] = "./verilog_sample_src/notgates.v";
     FILE* f_notgates_v = fopen(s_notgates_v, "r");
@@ -325,44 +325,44 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 2, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 2, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    s = outputs->lista[0];
+    s = outputs->itens[0];
 
-    CPPUNIT_ASSERT( ! strcmp("na", s.nome ) );
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.total_time );
+    CPPUNIT_ASSERT( ! strcmp("na", s.name ) );
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[3].time );
 
-    s = outputs->lista[1];
+    s = outputs->itens[1];
 
-    CPPUNIT_ASSERT( ! strcmp("nnb", s.nome ) );
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)20, s.total_time );
+    CPPUNIT_ASSERT( ! strcmp("nnb", s.name ) );
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)20, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[3].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_notgates_in);
@@ -376,10 +376,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
-    Sinal s;
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
+    Signal s;
     
     char s_bufgates_v[] = "./verilog_sample_src/bufgates.v";
     FILE* f_bufgates_v = fopen(s_bufgates_v, "r");
@@ -396,32 +396,32 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    s = outputs->lista[0];
+    s = outputs->itens[0];
 
-    CPPUNIT_ASSERT( ! strcmp("y", s.nome ) );
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)48, s.total_time );
+    CPPUNIT_ASSERT( ! strcmp("y", s.name ) );
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)48, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)10, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)10, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)13, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)13, s.pulses[3].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[4].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[4].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[5].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[5].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_bufgates_in);
@@ -435,10 +435,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
-    Sinal s;
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
+    Signal s;
     
     char s_xorgates_v[] = "./verilog_sample_src/xorgates.v";
     FILE* f_xorgates_v = fopen(s_xorgates_v, "r");
@@ -455,32 +455,32 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
 
-    s = outputs->lista[0];
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.total_time );
+    s = outputs->itens[0];
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)35, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)10, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[3].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[4].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[4].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[5].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[5].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[5].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_xorgates_in);
@@ -494,10 +494,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
-    Sinal s;
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
+    Signal s;
 
     char s_xnorgates_v[] = "./verilog_sample_src/xnorgates.v";
     FILE * f_xnorgates_v = fopen(s_xnorgates_v, "r");
@@ -514,32 +514,32 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 1, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 1, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("y", outputs->lista[0].nome ) );
+    CPPUNIT_ASSERT( ! strcmp("y", outputs->itens[0].name ) );
 
-    s = outputs->lista[0];
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)35, s.total_time );
+    s = outputs->itens[0];
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)35, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)10, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)10, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[3].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[4].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[4].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[4].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[4].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[5].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)5, s.pulsos[5].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[5].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)5, s.pulses[5].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_xnorgates_in);
@@ -553,10 +553,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Sinais* sim_outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    SignalArray* sim_outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_delays_v[] = "./verilog_sample_src/delays.v";
     FILE* f_delays_v = fopen(s_delays_v, "r");
@@ -577,13 +577,13 @@ public:
     outputs = load_input_signals(f_delays_in_out);
     CPPUNIT_ASSERT(outputs);
 
-    CPPUNIT_ASSERT_EQUAL(8, outputs->quantidade);
-    CPPUNIT_ASSERT(outputs->lista);
+    CPPUNIT_ASSERT_EQUAL(8, outputs->count);
+    CPPUNIT_ASSERT(outputs->itens);
 
     sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
-    CPPUNIT_ASSERT_EQUAL(8, sim_outputs->quantidade);
-    CPPUNIT_ASSERT(sim_outputs->lista);
+    CPPUNIT_ASSERT_EQUAL(8, sim_outputs->count);
+    CPPUNIT_ASSERT(sim_outputs->itens);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
     
@@ -601,9 +601,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* sim_outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* sim_outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_display_v[] = "./verilog_sample_src/display.v";
     FILE* f_display_v = fopen(s_display_v, "r");
@@ -629,9 +629,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* sim_outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* sim_outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_finish_v[] = "./verilog_sample_src/finish.v";
     FILE* f_finish_v = fopen(s_finish_v, "r");
@@ -657,9 +657,9 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* sim_outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* sim_outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_dumpfile_v[] = "./verilog_sample_src/dumpfile.v";
     char s_dumpfile_vcd[] = "./dumpfile.vcd";
@@ -694,10 +694,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Evento* q = new_empty_event();
-    Sinal s;
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    Event* q = new_empty_event();
+    Signal s;
 
     char s_v[] = "./verilog_sample_src/tri_state_gates.v";
     FILE* f_v = fopen(s_v, "r");
@@ -714,26 +714,26 @@ public:
 
     outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT( outputs );
-    CPPUNIT_ASSERT_EQUAL( 4, outputs->quantidade );
-    CPPUNIT_ASSERT( outputs->lista );
+    CPPUNIT_ASSERT_EQUAL( 4, outputs->count );
+    CPPUNIT_ASSERT( outputs->itens );
 
-    CPPUNIT_ASSERT( ! strcmp("o0", outputs->lista[0].nome ) );
+    CPPUNIT_ASSERT( ! strcmp("o0", outputs->itens[0].name ) );
 
-    s = outputs->lista[0];
-    CPPUNIT_ASSERT( s.pulsos );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)12, s.total_time );
+    s = outputs->itens[0];
+    CPPUNIT_ASSERT( s.pulses );
+    CPPUNIT_ASSERT_EQUAL( (Time)12, s.total_time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulsos[0].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)4, s.pulsos[0].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_X, s.pulses[0].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)4, s.pulses[0].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulsos[1].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[1].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_0, s.pulses[1].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)2, s.pulses[1].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_Z, s.pulsos[2].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[2].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_Z, s.pulses[2].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)2, s.pulses[2].time );
 
-    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulsos[3].valor );
-    CPPUNIT_ASSERT_EQUAL( (Tempo)2, s.pulsos[3].tempo );
+    CPPUNIT_ASSERT_EQUAL( VAL_1, s.pulses[3].value );
+    CPPUNIT_ASSERT_EQUAL( (Time)2, s.pulses[3].time );
 
     helper_close_dump_file(&f_dump);
     fclose(f_in);
@@ -749,10 +749,10 @@ public:
   {
     FILE* f_dump = NULL;
     ListModule* circuit = NULL;
-    Sinais* inputs = NULL;
-    Sinais* outputs = NULL;
-    Sinais* sim_outputs = NULL;
-    Evento* q = new_empty_event();
+    SignalArray* inputs = NULL;
+    SignalArray* outputs = NULL;
+    SignalArray* sim_outputs = NULL;
+    Event* q = new_empty_event();
 
     char s_v[] = "./verilog_sample_src/numbers.v";
     FILE* f_v = fopen(s_v, "r");
@@ -769,18 +769,18 @@ public:
 
     inputs = load_input_signals(f_in);
     CPPUNIT_ASSERT(inputs);
-    CPPUNIT_ASSERT_EQUAL(1, inputs->quantidade);
-    CPPUNIT_ASSERT(inputs->lista);
+    CPPUNIT_ASSERT_EQUAL(1, inputs->count);
+    CPPUNIT_ASSERT(inputs->itens);
 
     outputs = load_input_signals(f_out);
     CPPUNIT_ASSERT(outputs);
-    CPPUNIT_ASSERT_EQUAL(2, outputs->quantidade);
-    CPPUNIT_ASSERT(outputs->lista);
+    CPPUNIT_ASSERT_EQUAL(2, outputs->count);
+    CPPUNIT_ASSERT(outputs->itens);
 
     sim_outputs = simula(circuit->itens[0], inputs, &q, &f_dump);
     CPPUNIT_ASSERT(sim_outputs);
-    CPPUNIT_ASSERT_EQUAL(2, sim_outputs->quantidade);
-    CPPUNIT_ASSERT(sim_outputs->lista);
+    CPPUNIT_ASSERT_EQUAL(2, sim_outputs->count);
+    CPPUNIT_ASSERT(sim_outputs->itens);
 
     CPPUNIT_ASSERT( helper_compare_signal_lists(outputs, sim_outputs) );
 
@@ -920,33 +920,33 @@ public:
     CPPUNIT_ASSERT_EQUAL(VAL_0, compute_not_if1_gate(VAL_1, VAL_H));
   }
 
-  bool helper_compare_signal_lists(Sinais* list_a, Sinais* list_b)
+  bool helper_compare_signal_lists(SignalArray* list_a, SignalArray* list_b)
   {
-    Sinal os;
-    Sinal ss;
-    Pulso* pos;
-    Pulso* pss;
+    Signal os;
+    Signal ss;
+    Pulse* pos;
+    Pulse* pss;
 
     // basic len check
-    if ( list_a->quantidade != list_b->quantidade ) {
+    if ( list_a->count != list_b->count ) {
       return false;
     }
 
     // compare all pairs
-    for (int i = 0; i < list_a->quantidade; i++)
+    for (int i = 0; i < list_a->count; i++)
     {
-      os = list_a->lista[i];
-      ss = list_b->lista[i];
+      os = list_a->itens[i];
+      ss = list_b->itens[i];
 
-      pos = os.pulsos;
-      pss = ss.pulsos;
+      pos = os.pulses;
+      pss = ss.pulses;
 
       // check all the signal in the pair
-      while ( pos->valor != VAL_BLANK && pss->valor != VAL_BLANK )
+      while ( pos->value != VAL_BLANK && pss->value != VAL_BLANK )
       {
-        if ( pos->tempo != pss->tempo ||
-             pos->unidade != pss->unidade ||
-             pos->valor != pss->valor ) {
+        if ( pos->time != pss->time ||
+             pos->unit != pss->unit ||
+             pos->value != pss->value ) {
           return false;
         }
 

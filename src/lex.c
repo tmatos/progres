@@ -133,9 +133,9 @@ ListToken* new_list_token()
 {
     ListToken* l = (ListToken*) xmalloc(sizeof(ListToken));
 
-    l->primeiro = NULL;
-    l->ultimo = NULL;
-    l->tamanho = 0;
+    l->first = NULL;
+    l->last = NULL;
+    l->count = 0;
     l->file[0] = '\0';
 
     return l;
@@ -146,16 +146,16 @@ void delete_lista_token(ListToken* list)
     if(!list)
         return;
 
-    if(list->tamanho == 0) {
+    if(list->count == 0) {
         free(list);
         return;
     }
 
-    Token* it = list->primeiro;
+    Token* it = list->first;
 
     while(it) {
         Token* an = it;
-        it = it->seguinte;
+        it = it->next;
         free(an);
     }
 
@@ -343,11 +343,11 @@ Token* new_token(const char* value, int line, int column, TokenClass t_class)
 {
     Token* tk = (Token*) xmalloc(sizeof(Token));
 
-    copy(tk->valor, value);
-    tk->linha = line;
-    tk->coluna = column;
-    tk->anterior = NULL;
-    tk->seguinte = NULL;
+    copy(tk->value, value);
+    tk->line = line;
+    tk->column = column;
+    tk->previous = NULL;
+    tk->next = NULL;
 
     if ( t_class == _TO_DETECT )
         tk->classe = get_token_class(value);
@@ -359,68 +359,73 @@ Token* new_token(const char* value, int line, int column, TokenClass t_class)
 
 void add_token_to_list(ListToken* list, Token* tok)
 {
-    if (list->tamanho == 0) {
-        list->primeiro = tok;
-        list->ultimo = tok;
+    if (list->count == 0) {
+        list->first = tok;
+        list->last = tok;
     }
     else {
-        tok->seguinte = NULL;
-        tok->anterior = list->ultimo;
-        list->ultimo->seguinte = tok;
-        list->ultimo = tok;
+        tok->next = NULL;
+        tok->previous = list->last;
+        list->last->next = tok;
+        list->last = tok;
     }
 
-    list->tamanho++;
+    list->count++;
 }
 
-void insert_token_of_string(ListToken* lista, const char* tok, int p_linha, int p_coluna, TokenClass tok_class)
+void insert_token_of_string(
+    ListToken* list,
+    const char* tok,
+    int line,
+    int column,
+    TokenClass tok_class)
 {
-    Token* newtok = new_token(tok, p_linha, p_coluna, tok_class);
+    Token* newtok = new_token(tok, line, column, tok_class);
 
     // TODO: Checagens...
 
-    add_token_to_list(lista, newtok);
+    add_token_to_list(list, newtok);
 }
 
-void insert_token_of_char(ListToken* lista, char tok, int p_linha, int p_coluna)
+void insert_token_of_char(ListToken* list, char tok, int line, int column)
 {
     char str[2];
     str[0] = tok;
     str[1] = '\0';
 
-    insert_token_of_string(lista, str, p_linha, p_coluna, _TO_DETECT);
+    insert_token_of_string(list, str, line, column, _TO_DETECT);
 }
 
 void remove_token(ListToken* list, Token* tok)
 {
-    Token* it = list->primeiro;
+    Token* it = list->first;
     
     while (it)
     {
         if (it == tok)
         {
-            if (it->anterior) {
-                if (it->seguinte) {
-                    it->anterior->seguinte = it->seguinte;
-                    it->seguinte->anterior = it->anterior;
+            if (it->previous) {
+                if (it->next) {
+                    it->previous->next = it->next;
+                    it->next->previous = it->previous;
                 }
                 else { // caso em que removemos item no final da lista
-                    list->ultimo = it->anterior;
-                    it->anterior->seguinte = NULL;
+                    list->last = it->previous;
+                    it->previous->next = NULL;
                 }
             }
             else {
-                if (it->seguinte) { // primeiro da lista eh removido e ha outros itens
-                    list->primeiro = it->seguinte;
-                    it->seguinte->anterior = NULL;
+                if (it->next) { // primeiro da lista eh removido e ha outros itens
+                    list->first = it->next;
+                    it->next->previous = NULL;
                 }
                 else { // lista com um unico item e que sera removido
-                    list->primeiro = NULL;
-                    list->ultimo = NULL;
+                    list->first = NULL;
+                    list->last = NULL;
                 }
             }
             
-            list->tamanho--;
+            list->count--;
             free(it);
             break;
         }
@@ -432,58 +437,58 @@ void remove_token(ListToken* list, Token* tok)
 int remove_tokens_by_value(ListToken* lst, const char* tok)
 {
     Token* tmp = NULL;
-    Token* anterior = NULL;
+    Token* previous = NULL;
     Token* it = NULL;
 
     if (!lst || !tok)
         return 0;
 
-    it = lst->primeiro;
+    it = lst->first;
     while (it)
     {
-        if (iguais(it->valor, tok))
+        if (iguais(it->value, tok))
         {
-            if (anterior) {
-                if (it->seguinte) {
-                    anterior->seguinte = it->seguinte;
-                    it->seguinte->anterior = anterior;
+            if (previous) {
+                if (it->next) {
+                    previous->next = it->next;
+                    it->next->previous = previous;
                     tmp = it;
                     avanca(&it);
                     free(tmp);
-                    lst->tamanho--;
+                    lst->count--;
                     continue;
                 }
                 else { // caso em que removemos item no final da lista
                     tmp = it;
-                    anterior->seguinte = NULL;
-                    lst->ultimo = anterior;
-                    lst->tamanho--;
+                    previous->next = NULL;
+                    lst->last = previous;
+                    lst->count--;
                     free(tmp);
                     break;
                 }
             }
             else {
-                if (it->seguinte) { // primeiro da lista eh removido e ha outros itens
+                if (it->next) { // primeiro da lista eh removido e ha outros itens
                     tmp = it;
-                    lst->primeiro = it->seguinte;
+                    lst->first = it->next;
                     avanca(&it);
-                    it->anterior = NULL;
+                    it->previous = NULL;
                     free(tmp);
-                    lst->tamanho--;
+                    lst->count--;
                     continue;
                 }
                 else { // lista com um unico item e que sera removido
                     tmp = it;
-                    lst->primeiro = NULL;
-                    lst->ultimo = NULL;
-                    lst->tamanho = 0;
+                    lst->first = NULL;
+                    lst->last = NULL;
+                    lst->count = 0;
                     free(tmp);
                     break;
                 }
             }
         }
 
-        anterior = it;
+        previous = it;
         avanca(&it);
     }
 
@@ -532,9 +537,9 @@ void show_token_list(ListToken* tokens)
 
     print("-- LISTA DE TOKENS CAPTURADOS --\n\n");
 
-    it = tokens->primeiro;
+    it = tokens->first;
     while (it) {
-        print("%s\t\t\t\t\t%d\n", it->valor, it->classe);
+        print("%s\t\t\t\t\t%d\n", it->value, it->classe);
         avanca(&it);
     }
 
@@ -550,13 +555,13 @@ int has_item_of_string_value(ListToken* lst, const char* str)
     if (!lst || !str)
         return retorno;
 
-    if (!lst->primeiro)
+    if (!lst->first)
         return retorno;
 
-    it = lst->primeiro;
+    it = lst->first;
     while (it)
     {
-        if (iguais(it->valor, str)) {
+        if (iguais(it->value, str)) {
             retorno = 1;
             break;
         }
@@ -572,7 +577,7 @@ Token* avanca(Token** it)
     if ( !it || !*it )
         return NULL;
 
-    *it = (*it)->seguinte;
+    *it = (*it)->next;
 
     return *it;
 }
@@ -582,21 +587,19 @@ Token* backtrack(Token** it)
     if ( !it || !*it )
         return NULL;
 
-    *it = (*it)->anterior;
+    *it = (*it)->previous;
 
     return *it;
 }
 
 int is_reserverd_word(Token* tk)
 {
-    int i;
-
     if (!tk)
         return 0;
 
-    for (i = 0; i < NUM_RESERV_KEYWORDS; ++i)
+    for ( unsigned int i = 0; i < NUM_RESERV_KEYWORDS; ++i )
     {
-        if ( iguais(tk->valor, array_reserverd_keywords[i]) )
+        if ( iguais(tk->value, array_reserverd_keywords[i]) )
             return 1;    
     }
     
@@ -606,25 +609,25 @@ int is_reserverd_word(Token* tk)
 int is_allowed_identifier(Token* tk)
 {
     unsigned int i;
-    int simbol = 0;
+    int symbol = 0;
 
     if (!tk)
         return 0;
 
     // se nao comeca com letra ou underscore, nao eh identificador valido
-    if ( !isalpha(tk->valor[0]) && (tk->valor[0] != '_') )
+    if ( !isalpha(tk->value[0]) && (tk->value[0] != '_') )
         return 0;
 
-    for ( i = 1; i < len(tk->valor); ++i )
+    for ( i = 1; i < len(tk->value); ++i )
     {
-        if ( !isalnum(tk->valor[i]) && (tk->valor[i] != '_') ) {
-            simbol = 1;
+        if ( !isalnum(tk->value[i]) && (tk->value[i] != '_') ) {
+            symbol = 1;
             break;
         }
     }
  
     // se contem algo a mais que letras ou numeros, nao eh identificador valido
-    if (simbol)
+    if (symbol)
         return 0;
 
     // palavra reservada nao pode ser identificador
@@ -634,12 +637,12 @@ int is_allowed_identifier(Token* tk)
     return 1;
 }
 
-ListToken* tokeniza(FILE* arquivo)
+ListToken* tokenize(FILE* file_handler)
 {
     unsigned int number_size; // usado quando se define o tamanho de numeros literais
     unsigned int num_size_count; // contador auxiliar para a qtde de digitos em numeros literais
-    int linha = 1; // contador para linha corrente do arquivo
-    int coluna = 0; // contador para coluna corrente (em determinada linha do arquivo)
+    int line = 1; // contador para linha corrente do arquivo
+    int column = 0; // contador para coluna corrente (em determinada linha do arquivo)
 
     char c = '\0'; // usado para leitura de um caraceter
     char* tok; // usado para a leitura de uma string que representa um token
@@ -654,7 +657,7 @@ ListToken* tokeniza(FILE* arquivo)
 
 start_state: // label para a parte inicial do automato
 
-    c = fgetc(arquivo);
+    c = fgetc(file_handler);
 
 start_after_getc_state: // estado apos inicio, pula captura de novo char
     
@@ -665,11 +668,11 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
 
     if (isspace(c)) {
         if (c == '\n') {
-            coluna = 0;
-            linha++;
+            column = 0;
+            line++;
         }
         else {
-            coluna++;
+            column++;
         }
 
         goto start_state;
@@ -678,30 +681,30 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
     if (c == '/') {
     comments_state: // label para inicio da parte que trata os comentarios
 
-        coluna++;
-        c = fgetc(arquivo);
+        column++;
+        c = fgetc(file_handler);
 
         if (c == '/') { // single line comment
-            coluna++;
+            column++;
 
             while (c != '\n')
             {
-                c = fgetc(arquivo);
-                coluna++;
+                c = fgetc(file_handler);
+                column++;
 
                 if (c == EOF)
                     goto end_state;
             }
 
-            coluna = 0;
-            linha++;
+            column = 0;
+            line++;
 
             goto start_state;
         }
         else if (c == '*') { // multi-line comment
-            coluna++;
+            column++;
 
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
 
             while (1)
             {
@@ -711,64 +714,64 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     goto end_state;
 
                 if (c == '\n') {
-                    coluna = 0;
-                    linha++;
+                    column = 0;
+                    line++;
                 }
                 else
-                    coluna++;
+                    column++;
 
                 if (c == '*') {
-                    c = fgetc(arquivo);
+                    c = fgetc(file_handler);
 
                     if (c == '/') {
-                        coluna++;
+                        column++;
                         break;
                     }
                     else
                         goto multiline_comments_state;
                 }
 
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
             }
 
             goto start_state;
         }
         else {
             // recognize SYM_SLASH
-            insert_token_of_char(tokens, '/', linha, coluna);
+            insert_token_of_char(tokens, '/', line, column);
             goto start_after_getc_state;
         }
     }
     else if (c == '"') {
-        coluna++;
+        column++;
 
         anexa(tok, c);
 
-        c = fgetc(arquivo);
+        c = fgetc(file_handler);
 
         while (1)
         {
         // S: captura de strings literais
             if (c == EOF) {
-                insert_token_of_string(tokens, tok, linha, coluna - len(tok), STRING);
+                insert_token_of_string(tokens, tok, line, column - len(tok), STRING);
                 goto end_state;
             }
 
             if (c == '\n') {
-                coluna = 0;
-                linha++;
+                column = 0;
+                line++;
             }
             else
-                coluna++;
+                column++;
 
             anexa(tok, c);
 
             if (c == '"') {
-                insert_token_of_string(tokens, tok, linha, coluna - len(tok), STRING);
+                insert_token_of_string(tokens, tok, line, column - len(tok), STRING);
                 break;
             }
 
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
         }
 
         goto start_state;
@@ -778,181 +781,181 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
 
     if ( is_single_char_symbol(c) ) {
     symbols_capture_state:
-        coluna++;
+        column++;
         char previous_c = c;
 
         switch (c)
         {
         case '*':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '*') {
-                insert_token_of_string(tokens, "**", linha, coluna, SYM_DOUBLE_ASTERISK);
-                coluna += 2;
+                insert_token_of_string(tokens, "**", line, column, SYM_DOUBLE_ASTERISK);
+                column += 2;
                 goto start_state;
             }
             break;
         case '<':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '=') {
-                insert_token_of_string(tokens, "<=", linha, coluna, SYM_LESS_OR_EQUAL);
-                coluna += 2;
+                insert_token_of_string(tokens, "<=", line, column, SYM_LESS_OR_EQUAL);
+                column += 2;
                 goto start_state;
             }
             else if (c == '<') {
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
                 if (c == '<') {
-                    insert_token_of_string(tokens, "<<<", linha, coluna, SYM_TRIPLE_LESS_THAN);
-                    coluna += 3;
+                    insert_token_of_string(tokens, "<<<", line, column, SYM_TRIPLE_LESS_THAN);
+                    column += 3;
                     goto start_state;
                 }
                 else {
-                    ungetc(c, arquivo);
+                    ungetc(c, file_handler);
                 }
-                insert_token_of_string(tokens, "<<", linha, coluna, SYM_DOUBLE_LESS_THAN);
-                coluna += 2;
+                insert_token_of_string(tokens, "<<", line, column, SYM_DOUBLE_LESS_THAN);
+                column += 2;
                 goto start_state;
             }
             break;
         case '>':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '=') {
-                insert_token_of_string(tokens, ">=", linha, coluna, SYM_GREATER_OR_EQUAL);
-                coluna += 2;
+                insert_token_of_string(tokens, ">=", line, column, SYM_GREATER_OR_EQUAL);
+                column += 2;
                 goto start_state;
             }
             else if (c == '>') {
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
                 if (c == '>') {
-                    insert_token_of_string(tokens, ">>>", linha, coluna, SYM_TRIPLE_GREATER_THAN);
-                    coluna += 3;
+                    insert_token_of_string(tokens, ">>>", line, column, SYM_TRIPLE_GREATER_THAN);
+                    column += 3;
                     goto start_state;
                 }
                 else {
-                    ungetc(c, arquivo);
+                    ungetc(c, file_handler);
                 }
-                insert_token_of_string(tokens, ">>", linha, coluna, SYM_DOUBLE_GREATER_THAN);
-                coluna += 2;
+                insert_token_of_string(tokens, ">>", line, column, SYM_DOUBLE_GREATER_THAN);
+                column += 2;
                 goto start_state;
             }
             break;
         case '&':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '&') {
-                insert_token_of_string(tokens, "&&", linha, coluna, SYM_DOUBLE_AMPERSAND);
-                coluna += 2;
+                insert_token_of_string(tokens, "&&", line, column, SYM_DOUBLE_AMPERSAND);
+                column += 2;
                 goto start_state;
             }
             break;
         case '|':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '|') {
-                insert_token_of_string(tokens, "||", linha, coluna, SYM_DOUBLE_PIPE);
-                coluna += 2;
+                insert_token_of_string(tokens, "||", line, column, SYM_DOUBLE_PIPE);
+                column += 2;
                 goto start_state;
             }
             break;
         case '=':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '=') {
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
                 if (c == '=') {
-                    insert_token_of_string(tokens, "===", linha, coluna, SYM_TRIPLE_EQ);
-                    coluna += 3;
+                    insert_token_of_string(tokens, "===", line, column, SYM_TRIPLE_EQ);
+                    column += 3;
                     goto start_state;
                 }
                 else {
-                    ungetc(c, arquivo);
+                    ungetc(c, file_handler);
                 }
-                insert_token_of_string(tokens, "==", linha, coluna, SYM_DOUBLE_EQ);
-                coluna += 2;
+                insert_token_of_string(tokens, "==", line, column, SYM_DOUBLE_EQ);
+                column += 2;
                 goto start_state;
             }
             break;
         case '!':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '=') {
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
                 if (c == '=') {
-                    insert_token_of_string(tokens, "!==", linha, coluna, SYM_EXCLAMATION_DOUBLE_EQ);
-                    coluna += 3;
+                    insert_token_of_string(tokens, "!==", line, column, SYM_EXCLAMATION_DOUBLE_EQ);
+                    column += 3;
                     goto start_state;
                 }
                 else {
-                    ungetc(c, arquivo);
+                    ungetc(c, file_handler);
                 }
-                insert_token_of_string(tokens, "!=", linha, coluna, SYM_EXCLAMATION_EQ);
-                coluna += 2;
+                insert_token_of_string(tokens, "!=", line, column, SYM_EXCLAMATION_EQ);
+                column += 2;
                 goto start_state;
             }
             break;
         case '^':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '~') {
-                insert_token_of_string(tokens, "^~", linha, coluna, SYM_CIRCUMFLEX_TILDE);
-                coluna += 2;
+                insert_token_of_string(tokens, "^~", line, column, SYM_CIRCUMFLEX_TILDE);
+                column += 2;
                 goto start_state;
             }
             break;
         case '~':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '^') {
-                insert_token_of_string(tokens, "~^", linha, coluna, SYM_TILDE_CIRCUMFLEX);
-                coluna += 2;
+                insert_token_of_string(tokens, "~^", line, column, SYM_TILDE_CIRCUMFLEX);
+                column += 2;
                 goto start_state;
             }
             else if (c == '&') {
-                insert_token_of_string(tokens, "~&", linha, coluna, SYM_TILDE_AMPERSAND);
-                coluna += 2;
+                insert_token_of_string(tokens, "~&", line, column, SYM_TILDE_AMPERSAND);
+                column += 2;
                 goto start_state;
             }
             else if (c == '|') {
-                insert_token_of_string(tokens, "~|", linha, coluna, SYM_TILDE_PIPE);
-                coluna += 2;
+                insert_token_of_string(tokens, "~|", line, column, SYM_TILDE_PIPE);
+                column += 2;
                 goto start_state;
             }   
             break;
         case '?':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == ':') {
-                insert_token_of_string(tokens, "?:", linha, coluna, SYM_QUESTION_COLON);
-                coluna += 2;
+                insert_token_of_string(tokens, "?:", line, column, SYM_QUESTION_COLON);
+                column += 2;
                 goto start_state;
             }
             break;
         case '{':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '{') {
-                insert_token_of_string(tokens, "{{", linha, coluna, SYM_DOUBLE_OPEN_BRACE);
-                coluna += 2;
+                insert_token_of_string(tokens, "{{", line, column, SYM_DOUBLE_OPEN_BRACE);
+                column += 2;
                 goto start_state;
             }
             break;
         case '}':
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
             if (c == '}') {
-                insert_token_of_string(tokens, "}}", linha, coluna, SYM_DOUBLE_CLOSE_BRACE);
-                coluna += 2;
+                insert_token_of_string(tokens, "}}", line, column, SYM_DOUBLE_CLOSE_BRACE);
+                column += 2;
                 goto start_state;
             }
             break;
         default:
-            insert_token_of_char(tokens, c, linha, coluna);
+            insert_token_of_char(tokens, c, line, column);
             goto start_state;
         }
 
-        insert_token_of_char(tokens, previous_c, linha, coluna);
+        insert_token_of_char(tokens, previous_c, line, column);
         goto start_after_getc_state;
     }
 
     if ( !isalnum(c) && c != '_' ) {
-        show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
+        show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, line, column);
         goto end_state;
     }
 
     while ( isdigit(c) ) {
-        coluna++;
+        column++;
         anexa(tok, c);
-        c = fgetc(arquivo);
+        c = fgetc(file_handler);
     }
 
     // got some digit
@@ -960,32 +963,32 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
         tok_class = NUM_BASE_DECIMAL;
         if ( c != '\'' ) {
             // just a decimal number literal
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), tok_class);
+            insert_token_of_string(tokens, tok, line, column - len(tok), tok_class);
             goto start_after_getc_state;
         }
         else {
             // sized number literal declaration
             number_size = strtol(tok, NULL, 10);
             if ( number_size == 0 || number_size > MAX_SIZE_NUMBER ) {
-                show_error_lexical(MSG_ERROR_LEX_INVALID_NUMBER_SIZE, linha, coluna - len(tok));
+                show_error_lexical(MSG_ERROR_LEX_INVALID_NUMBER_SIZE, line, column - len(tok));
                 goto end_state;
             }
 
-            coluna++;
+            column++;
             anexa(tok, c);
-            c = fgetc(arquivo);
+            c = fgetc(file_handler);
 
             if ( c == 'b' || c == 'B' ) {
                 tok_class = NUM_BASE_BINARY;
-                coluna++;
+                column++;
                 anexa(tok, c);
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
 
                 if ( c != '0' && c != '1' ) {
                     if ( c == '_' )
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, line, column);
                     else
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, line, column);
 
                     goto end_state;
                 }
@@ -995,22 +998,22 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     if ( c != '_') {
                         num_size_count++;
                     }
-                    coluna++;
+                    column++;
                     anexa(tok, c);
-                    c = fgetc(arquivo);
+                    c = fgetc(file_handler);
                 }
             }
             else if ( c == 'o' || c == 'O' ) {
                 tok_class = NUM_BASE_OCTAL;
-                coluna++;
+                column++;
                 anexa(tok, c);
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
 
                 if ( c < '0' || c > '7' ) {
                     if ( c == '_' )
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, line, column);
                     else
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, line, column);
 
                     goto end_state;
                 }
@@ -1020,22 +1023,22 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     if ( c != '_') {
                         num_size_count++;
                     }
-                    coluna++;
+                    column++;
                     anexa(tok, c);
-                    c = fgetc(arquivo);
+                    c = fgetc(file_handler);
                 }
             }
             else if ( c == 'd' || c == 'D' ) {
                 tok_class = NUM_BASE_DECIMAL;
-                coluna++;
+                column++;
                 anexa(tok, c);
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
 
                 if ( !isdigit(c) ) {
                     if ( c == '_' )
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, line, column);
                     else
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, line, column);
 
                     goto end_state;
                 }
@@ -1045,22 +1048,22 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     if ( c != '_') {
                         num_size_count++;
                     }
-                    coluna++;
+                    column++;
                     anexa(tok, c);
-                    c = fgetc(arquivo);
+                    c = fgetc(file_handler);
                 }
             }
             else if ( c == 'h' || c == 'H' ) {
                 tok_class = NUM_BASE_HEX;
-                coluna++;
+                column++;
                 anexa(tok, c);
-                c = fgetc(arquivo);
+                c = fgetc(file_handler);
 
                 if ( !isxdigit(c) ) {
                     if ( c == '_' )
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_UNDERSCORE, line, column);
                     else
-                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, linha, coluna);
+                        show_error_lexical(MSG_ERROR_LEX_UNEXPECTED_CHAR, line, column);
 
                     goto end_state;
                 }
@@ -1070,78 +1073,78 @@ start_after_getc_state: // estado apos inicio, pula captura de novo char
                     if ( c != '_') {
                         num_size_count++;
                     }
-                    coluna++;
+                    column++;
                     anexa(tok, c);
-                    c = fgetc(arquivo);
+                    c = fgetc(file_handler);
                 }
             }
             else {
-                show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
+                show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, line, column);
                 goto end_state;
             }
             
             if ( num_size_count == 0 ) {
-                show_error_lexical(MSG_ERROR_LEX_NO_DIGITS, linha, coluna);
+                show_error_lexical(MSG_ERROR_LEX_NO_DIGITS, line, column);
                 goto end_state;
             }
             
             if ( num_size_count > number_size ) {
-                show_error_lexical(MSG_ERROR_LEX_NUMBER_SIZE_EXCEEDED, linha, coluna - len(tok));
+                show_error_lexical(MSG_ERROR_LEX_NUMBER_SIZE_EXCEEDED, line, column - len(tok));
                 goto end_state;
             }
 
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), tok_class);
+            insert_token_of_string(tokens, tok, line, column - len(tok), tok_class);
             goto start_after_getc_state;
         }
     }
 
     if (isalnum(c) || c == '_') {
-        coluna++;
+        column++;
         anexa(tok, c);
 
     expecting_identifiers_state:
 
-        c = fgetc(arquivo);
+        c = fgetc(file_handler);
 
         if (isspace(c)) {
             if (c == '\n') {
-                coluna = 0;
-                linha++;
+                column = 0;
+                line++;
             }
             else {
-                coluna++;
+                column++;
             }
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), _TO_DETECT);
+            insert_token_of_string(tokens, tok, line, column - len(tok), _TO_DETECT);
             goto start_state;
         }
         else if (c == '/') {
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), _TO_DETECT);
+            insert_token_of_string(tokens, tok, line, column - len(tok), _TO_DETECT);
             goto comments_state;
         }
         else if (is_single_char_symbol(c)) {
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), _TO_DETECT);
+            insert_token_of_string(tokens, tok, line, column - len(tok), _TO_DETECT);
             goto symbols_capture_state;
         }
         else if(isalnum(c) || c == '_') {
-            coluna++;
+            column++;
             anexa(tok, c);
 
             // verificar tamanho maximo de palavra
             if (len(tok) > MAX_TOKEN_SIZE) {
                 show_error_lexical(MSG_ERROR_LEX_TOKEN_SIZE_MAXED,
-                                   linha,
-                                   coluna - len(tok) );
+                                   line,
+                                   column - len(tok) );
                 goto end_state;
             }
 
             goto expecting_identifiers_state;
         }
         else if (c == EOF) {
-            insert_token_of_string(tokens, tok, linha, coluna - len(tok), _TO_DETECT);
+            insert_token_of_string(tokens, tok, line, column - len(tok), _TO_DETECT);
             goto end_state;
         }
         else {
-            show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, linha, coluna);
+            show_error_lexical(MSG_ERROR_LEX_INVALID_CHAR, line, column);
             goto end_state;
         }
 
@@ -1165,7 +1168,7 @@ unsigned int get_bit_size_from_literal_token(const Token* tok)
     char base = 'd'; // default base is decimal
     char str_value[MAX_TOKEN_SIZE+1] = { 0x00 };
 
-    if ( !tok || tok->valor[0] == 0x00 )
+    if ( !tok || tok->value[0] == 0x00 )
         return 0;
 
     if ( tok->classe != NUM_BASE_BINARY &&
@@ -1174,10 +1177,10 @@ unsigned int get_bit_size_from_literal_token(const Token* tok)
          tok->classe != NUM_BASE_HEX )
         return 0;
 
-    if ( is_valid_natural_number(tok->valor) || tok->valor[0] == '\'' )
+    if ( is_valid_natural_number(tok->value) || tok->value[0] == '\'' )
         return 32; // default size when not specified, as per Verilog standard 
 
-    sscanf(tok->valor,
+    sscanf(tok->value,
            "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
            &size, &base, str_value);
 
@@ -1190,7 +1193,7 @@ unsigned int get_value_from_literal_token(const Token* tok)
     char base = 'd'; // default base is decimal
     char value_str[MAX_TOKEN_SIZE+1] = { 0x00 };
 
-    if ( !tok || tok->valor[0] == 0x00 )
+    if ( !tok || tok->value[0] == 0x00 )
         return 0;
 
     if ( tok->classe != NUM_BASE_BINARY &&
@@ -1199,15 +1202,15 @@ unsigned int get_value_from_literal_token(const Token* tok)
          tok->classe != NUM_BASE_HEX )
         return 0;
 
-    if ( is_valid_natural_number(tok->valor) )
-        return (unsigned int) strtoul(tok->valor, NULL, 10);
+    if ( is_valid_natural_number(tok->value) )
+        return (unsigned int) strtoul(tok->value, NULL, 10);
 
-    if ( tok->valor[0] == '\'' )
-        sscanf(tok->valor,
+    if ( tok->value[0] == '\'' )
+        sscanf(tok->value,
                "'%c%" XSTR(MAX_TOKEN_SIZE) "s",
                &base, value_str);
     else
-        sscanf(tok->valor,
+        sscanf(tok->value,
                "%4u'%c%" XSTR(MAX_TOKEN_SIZE) "s",
                &size, &base, value_str);
 

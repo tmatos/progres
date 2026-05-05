@@ -1,6 +1,6 @@
 /********************************
  Progres - Verilog Simulator
- (C) 2014-2025 Tiago Matos
+ (C) 2014-2026 Tiago Matos
 
  Under terms of the MIT license.
 *********************************/
@@ -15,9 +15,9 @@
 #include "lex.h"
 #include "strutil.h"
 
-Evento* new_event_at(Tempo t, EventKind k)
+Event* new_event_at(Time t, EventKind k)
 {
-    Evento* e = (Evento*) xmalloc(sizeof(Evento));
+    Event* e = (Event*) xmalloc(sizeof(Event));
     e->instant = t;
     e->kind = k;
     e->list_transition = NULL;
@@ -27,29 +27,29 @@ Evento* new_event_at(Tempo t, EventKind k)
     return e;
 }
 
-Evento* new_empty_event()
+Event* new_empty_event()
 {
-    return new_event_at( (Tempo)0, EVT_SYS_TASK );
+    return new_event_at( (Time)0, EVT_SYS_TASK );
 }
 
 void insert_event(
-    Evento** queue,
-    Tempo t,
+    Event** queue,
+    Time t,
     EventKind kind,
     Component* comp,
     Register* reg,
-    ValorLogico new_value)
+    LogicValue new_value)
 {
-    Evento* evt = NULL;
-    Evento* ant = NULL; // evento anterior
-    Evento* it = NULL; // iterador para eventos
+    Event* evt = NULL;
+    Event* ant = NULL; // evento anterior
+    Event* it = NULL; // iterador para eventos
 
     if (!comp)
         return;
 
     evt = new_event_at(t, kind);
 
-    evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
+    evt->list_transition = (Transition*) xmalloc(sizeof(Transition));
     
     evt->list_transition->net = comp;
     evt->list_transition->reg = reg;
@@ -120,21 +120,21 @@ void insert_event(
     }
 }
 
-void delete_event_queue(Evento** queue)
+void delete_event_queue(Event** queue)
 {
     if ( (queue == NULL) || (*queue == NULL) ) {
         return;
     }
 
-    Evento* evt_it = *queue;
+    Event* evt_it = *queue;
 
     while (evt_it)
     {
         if ( evt_it->list_transition ) {
-            delete_list_transicao( &(evt_it->list_transition) );
+            delete_list_transition( &(evt_it->list_transition) );
         }
 
-        Evento* tmp = evt_it;
+        Event* tmp = evt_it;
         evt_it = evt_it->next;
         free(tmp);
     }
@@ -143,18 +143,18 @@ void delete_event_queue(Evento** queue)
 }
 
 void insert_task_event(
-    Evento** queue,
-    Tempo t,
+    Event** queue,
+    Time t,
     SystemTask sys_task,
     ListSystemTaskArg sys_task_args)
 {
-    Evento* evt = NULL;
-    Evento* ant = NULL; // evento anterior
-    Evento* it = NULL;
+    Event* evt = NULL;
+    Event* ant = NULL; // evento anterior
+    Event* it = NULL;
 
     evt = new_event_at(t, EVT_SYS_TASK);
 
-    evt->list_transition = (Transicao*) xmalloc(sizeof(Transicao));
+    evt->list_transition = (Transition*) xmalloc(sizeof(Transition));
 
     evt->list_transition->task_type = sys_task;
     evt->list_transition->task_args = sys_task_args;
@@ -192,7 +192,7 @@ void insert_task_event(
     }
 
     // an event exists at same instant, so
-    // append the new evt transi list to the existing evt transi list 
+    // append the new evt transi list to the existing evt transi list
     if (t == it->instant)
     {
         if (it->last_transition)
@@ -225,9 +225,9 @@ void insert_task_event(
     }
 }
 
-Transicao* get_transitions_at_time(Evento* queue, Tempo t)
+Transition* get_transitions_at_time(Event* queue, Time t)
 {
-    Evento* it = queue; // event iterator
+    Event* it = queue; // event iterator
     
     while( it && (it->instant < t)  )
     {
@@ -240,10 +240,10 @@ Transicao* get_transitions_at_time(Evento* queue, Tempo t)
         return NULL;
 }
 
-Transicao* pop_event(Evento** queue)
+Transition* pop_event(Event** queue)
 {
-    Transicao* ret = NULL;
-    Evento* dead = NULL;
+    Transition* ret = NULL;
+    Event* dead = NULL;
 
     if(!queue)
         return NULL;
@@ -263,17 +263,17 @@ Transicao* pop_event(Evento** queue)
     return ret;
 }
 
-void delete_list_transicao(Transicao** list)
+void delete_list_transition(Transition** list)
 {
     if ( (list == NULL) || (*list == NULL) ) {
         return;
     }
 
-    Transicao* pt = *list;
+    Transition* pt = *list;
 
     while (pt)
     {
-        Transicao* pta = pt;
+        Transition* pta = pt;
         pt = pt->next;
         free(pta);
     }
