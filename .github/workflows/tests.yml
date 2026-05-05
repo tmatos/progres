@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
     - name: Install cppunit and lcov
       run: |
         sudo apt-get update
@@ -27,7 +27,7 @@ jobs:
         cd test
         make coverage
     - name: Archive test coverage artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage
         path: test/coverage.txt
