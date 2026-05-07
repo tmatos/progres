@@ -20,6 +20,21 @@
 #include "lex.h"
 #include "preprocessor.h"
 
+void copy_existing_module_names(
+    const ListModule* list_modules,
+    ListToken* list_identifiers)
+{
+    if (!list_modules)
+        return;
+
+    for ( int i=0; i < list_modules->total; i++ )
+    {
+        insert_token_of_string(list_identifiers,
+                               list_modules->itens[i]->name,
+                               -1, -1, IDENTIFIER);
+    }
+}
+
 int load_module_header(
     Token** it,
     ListToken* identifiers,
@@ -206,7 +221,7 @@ ListModule* load_circuit(
     it = tokens->first;
     while (1)
     {
-        err = load_module(&it, initial_task_events, &mod);
+        err = load_module(&it, initial_task_events, circuit, &mod);
 
         if (err == END_OF_TOKENS)
             break;
@@ -252,13 +267,14 @@ circuit_bad_return:
 VerilogError load_module(
     Token** t,
     Event** initial_task_events,
+    const ListModule* list_module,
     Module** module_pointer)
 {
     Component* in;
     Component* out;
     Component* gate;
     Component* net;
-    Module* circuito = NULL;
+    Module* module = NULL;
 
     int range_msb;
     int range_lsb;
@@ -277,6 +293,8 @@ VerilogError load_module(
     // lista de todos os identificadores
     ListToken* identifiers = new_list_token();
 
+    copy_existing_module_names(list_module, identifiers);
+
     // lista de identificadores de entrada ou saida ainda nao definidos como tal
     ListToken* identifiers_to_be = new_list_token();
 
@@ -294,7 +312,7 @@ VerilogError load_module(
     
     Token* it = *t;
 
-    circuito = new_module();
+    module = new_module();
 
     before_module:
 
@@ -302,7 +320,7 @@ VerilogError load_module(
         goto bad_return;
 
     if (it->classe == SYM_GRAVE_ACCENT) {
-        VerilogError err = load_directive(&it, circuito);
+        VerilogError err = load_directive(&it, module);
 
         switch (err)
         {
@@ -324,7 +342,7 @@ VerilogError load_module(
                              identifiers_to_be,
                              list_input,
                              list_output,
-                             circuito) ) {
+                             module) ) {
         goto bad_return;
     }
 
@@ -399,19 +417,19 @@ VerilogError load_module(
                     insert_token_of_string(list_input, it->value, -1, -1, IDENTIFIER);
 
                     // atribui como entrada o identificador na estrutura
-                    add_input( circuito, new_component(it->value, ROLE_INPUT) );
+                    add_input( module, new_component(it->value, ROLE_INPUT) );
                 }
                 else if ( token_subcase == KW_OUTPUT ) {
                     insert_token_of_string(list_output, it->value, -1, -1, IDENTIFIER);
 
                     // atribui como saida o identificador na estrutura
-                    add_output( circuito, new_component(it->value, ROLE_OUTPUT) );
+                    add_output( module, new_component(it->value, ROLE_OUTPUT) );
                 }
                 else if ( token_subcase == KW_WIRE ) {
                     range_msb = 0;
                     range_lsb = 0;
 
-                    err = load_range(&it, circuito, list_param, &range_msb, &range_lsb);
+                    err = load_range(&it, module, list_param, &range_msb, &range_lsb);
                     switch (err)
                     {
                     case ERROR_VERILOG_BAD_EOF:
@@ -442,7 +460,7 @@ VerilogError load_module(
                     // atribui como wire o identificador na estrutura
                     net = new_component(it->value, ROLE_WIRE);
                     net->size = (range_msb - range_lsb + 1);
-                    add_wire(circuito, net);
+                    add_wire(module, net);
                 }
 
                 remove_tokens_by_value(identifiers_to_be, it->value);
@@ -453,7 +471,7 @@ VerilogError load_module(
             }
         }
         else if (it->classe == KW_REG) {
-            VerilogError err = load_reg(&it, identifiers, list_param, circuito);
+            VerilogError err = load_reg(&it, identifiers, list_param, module);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -580,13 +598,13 @@ VerilogError load_module(
 
             if (has_item_of_string_value(list_wire, it->value)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->list_wire_net, it->value);
+                out = get_component_by_name(module->list_wire_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
             }
             else if (has_item_of_string_value(list_output, it->value)) {
                 // inserir na lista de saidas da gate, esta saida
-                out = get_component_by_name(circuito->list_output_net, it->value);
+                out = get_component_by_name(module->list_output_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
             }
@@ -629,19 +647,19 @@ VerilogError load_module(
             }
             else if (has_item_of_string_value(list_wire, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_wire_net, it->value);
+                in = get_component_by_name(module->list_wire_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_input, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_input_net, it->value);
+                in = get_component_by_name(module->list_input_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_output, it->value)) {
                 // inserir na lista de entradas da gate, esta entrada
-                in = get_component_by_name(circuito->list_output_net, it->value);
+                in = get_component_by_name(module->list_output_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
@@ -698,8 +716,8 @@ VerilogError load_module(
                 goto bad_return;
             }
 
-            // finalmente, inserimos a gate na lista de portas logicas do circuito
-            add_gate(circuito, gate);
+            // finalmente, inserimos a gate na lista de portas logicas do module
+            add_gate(module, gate);
         }
         else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
@@ -713,13 +731,13 @@ VerilogError load_module(
             delete_lista_token(list_wire);
             delete_lista_token(list_param);
 
-            *module_pointer = circuito;
+            *module_pointer = module;
             *t = it;
 
             return NO_ERROR_VERILOG;
         }
         else if (it->classe == SYM_GRAVE_ACCENT) {
-            VerilogError err = load_directive(&it, circuito);
+            VerilogError err = load_directive(&it, module);
             switch (err)
             {
             case ERROR_VERILOG_BAD_TOKEN:
@@ -731,7 +749,7 @@ VerilogError load_module(
             }
         }
         else if( it->classe == KW_INITIAL ) {
-            VerilogError err = load_initial_block(&it, identifiers, list_param, circuito, initial_task_events);
+            VerilogError err = load_initial_block(&it, identifiers, list_param, module, initial_task_events);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -815,10 +833,10 @@ VerilogError load_module(
             }
 
             // include the param in the circuit struct
-            add_param(circuito, param);
+            add_param(module, param);
         }
         else if (it->classe == KW_ASSIGN) {
-            VerilogError err = load_assign(&it, list_wire, list_input, list_output, circuito);
+            VerilogError err = load_assign(&it, list_wire, list_input, list_output, module);
             switch (err)
             {
             case ERROR_VERILOG_BAD_EOF:
@@ -858,7 +876,7 @@ bad_return:
     if (initial_tran_events)
         delete_event_queue(&initial_tran_events);
 
-    free_module(&circuito);
+    free_module(&module);
 
     *t = it;
     *module_pointer = NULL;

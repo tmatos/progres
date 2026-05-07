@@ -28,6 +28,17 @@ typedef enum en_verilog_error {
     END_OF_TOKENS = 20
 } VerilogError;
 
+/** @brief Copia os nomes dos modules já carregados para uma lista de tokens
+ *         relacionada aos identificadores, para ser utilizada no parsing.
+ *  @param list_modules Lista de modules já carregados até o momento. Será a
+ *         origem dos identificadores que nomeiam modules e serão copiados.
+ *  @param list_identifiers Lista de tokens para conter identificadores.
+ *         Nela, serão inseridos os nomes de module citados anteriormente.
+ */
+void copy_existing_module_names(
+    const ListModule* list_modules,
+    ListToken* list_identifiers);
+
 /** @brief Processar a parte do código que possui a declaração
  *         de cabecalho do module, até o token ';'.
  *  @param it Endereço para o iterador dos tokens do código fonte.
@@ -51,6 +62,8 @@ int load_module_header(
            dos tokens seguintes no fonte que contenham tal declaracao.
  *  @param t Endereço para o iterador dos tokens.
  *  @param initial_task_events Pointer para uma fila de eventos (para systasks).
+ *  @param list_module Lista de modules já carregados, para verificar possíveis
+ *                     instanciações destes no module em carregamento. Ou erros.
  *  @param module_pointer Endereco do ponteiro para a struct do module a ser criado.
  *  @return Código de erro do tipo VerilogError. Caso carregue um module com
  *          sucesso, retorna NO_ERROR_VERILOG e o module_pointer vai referir
@@ -61,6 +74,7 @@ int load_module_header(
 VerilogError load_module(
     Token** t,
     Event** initial_task_events,
+    const ListModule* list_module,
     Module** module_pointer);
 
 /** @brief Cria a estrutura de dados (no momento, uma lista de modules)

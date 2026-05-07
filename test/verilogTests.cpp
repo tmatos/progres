@@ -37,6 +37,7 @@ class Testes_verilog : public CppUnit::TestFixture
   CPPUNIT_TEST( test_load_module_port_directions_in_header_v );
   CPPUNIT_TEST( test_load_module_badverilog_XX_v );
   CPPUNIT_TEST( test_load_module_badtimescale_XX_v );
+  CPPUNIT_TEST( test_load_circuit_badcircuit_XX );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -139,7 +140,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( !mod );
     CPPUNIT_ASSERT_EQUAL( END_OF_TOKENS, err );
 
@@ -154,7 +155,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -169,7 +170,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -207,7 +208,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
 
     CPPUNIT_ASSERT_EQUAL( (int)regs_info.size(), mod->list_register.total );
@@ -234,7 +235,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
     CPPUNIT_ASSERT( mod->list_param.total == 2 );
     CPPUNIT_ASSERT( !strcmp(mod->list_param.itens[0]->name, "VER_NUM") );
@@ -254,7 +255,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
     
     delete_event_queue(&q);
@@ -269,7 +270,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
 
     CPPUNIT_ASSERT_EQUAL( 1, mod->list_param.total );
@@ -290,7 +291,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
 
     const int expected_param_value = 1;
     const int expected_liter_value = 0;
@@ -316,7 +317,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT(mod);
 
     // TODO: more inspections
@@ -333,7 +334,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT( mod );
     CPPUNIT_ASSERT_EQUAL(1, mod->list_input_net->total);
     CPPUNIT_ASSERT_EQUAL(2, mod->list_output_net->total);
@@ -359,7 +360,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT(mod);
     
     delete_event_queue(&q);
@@ -378,7 +379,7 @@ public:
     Module* mod = NULL;
     Token* it = helper_tokenize_preproc(path_file.c_str());
 
-    VerilogError err = load_module(&it, &q, &mod);
+    VerilogError err = load_module(&it, &q, NULL, &mod);
     CPPUNIT_ASSERT(mod);
 
     CPPUNIT_ASSERT_EQUAL( static_cast<int>( expected_inputs.size() ),
@@ -420,7 +421,7 @@ public:
         if (mod)
           free_module(&mod);
         
-        err = load_module(&it, &q, &mod);
+        err = load_module(&it, &q, NULL, &mod);
       }
       while (err == NO_ERROR_VERILOG);
       
@@ -456,7 +457,7 @@ public:
       
         it = tokens->first;
 
-        VerilogError err = load_module(&it, &q, &mod);
+        VerilogError err = load_module(&it, &q, NULL, &mod);
         CPPUNIT_ASSERT( !mod );
         CPPUNIT_ASSERT( err != NO_ERROR_VERILOG );
 
@@ -469,6 +470,32 @@ public:
     }
 
     delete_event_queue(&q);
+  }
+
+  void test_load_circuit_badcircuit_XX()
+  {
+      std::list<std::string> *list_bad_files;
+      list_bad_files = helper_list_files_in_dir("./verilog_sample_src/",
+                                                "badcircuit_*.v");
+  
+      FILE* f = NULL;
+      Event* q = new_empty_event();
+      ListModule* circuit = NULL;
+  
+      for ( std::string path : *list_bad_files )
+      {
+        //std::cout << "test_load_circuit_badcircuit_XX: " << path << std::endl;
+  
+        f = fopen(path.c_str(), "r");
+        CPPUNIT_ASSERT( f );
+  
+        circuit = load_circuit(f, &q, path.c_str());
+        CPPUNIT_ASSERT( !circuit );
+  
+        // Obs.: fclose is done inside func load_circuit()
+      }
+  
+      delete_event_queue(&q);
   }
 
 };
