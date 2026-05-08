@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([progres], [0.0.7], [tiago@tmatos.net])
+AC_INIT([progres], [0.0.9], [tiago@tmatos.net])
 AM_INIT_AUTOMAKE(foreign -Wall)
 AC_CONFIG_SRCDIR([./])
 AC_CONFIG_HEADERS([config.h])
@@ -23,7 +23,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([strtol strncat])
+AC_CHECK_FUNCS([strtol strncat strnlen])
 
 AC_CONFIG_FILES([Makefile])
 

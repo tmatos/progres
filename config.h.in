@@ -38,6 +38,9 @@
 /* Define to 1 if you have the `strncat' function. */
 #undef HAVE_STRNCAT
 
+/* Define to 1 if you have the `strnlen' function. */
+#undef HAVE_STRNLEN
+
 /* Define to 1 if you have the `strtol' function. */
 #undef HAVE_STRTOL
 

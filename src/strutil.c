@@ -14,6 +14,8 @@
 #include "lex.h"
 #include "strutil.h"
 
+#include "../config.h"
+
 int anexa(char* str, char c)
 {
     char tmp[2];
@@ -68,8 +70,13 @@ int is_valid_natural_number(const char* str)
 
 size_t len(const char* str)
 {
-    // TODO: restrict to a maximum length
-    return strlen(str);
+#if HAVE_STRNLEN
+    return strnlen(str, MAX_TOKEN_SIZE);
+#else
+    size_t i;
+    for ( i = 0; i < MAX_TOKEN_SIZE && str[i] != '\0'; i++ );
+    return i;
+#endif
 }
 
 char* copy(char* dest, const char* src)
