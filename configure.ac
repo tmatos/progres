@@ -5,7 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([progres], [0.0.9], [tiago@tmatos.net])
 AM_INIT_AUTOMAKE(foreign -Wall)
 AC_CONFIG_SRCDIR([./])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([src/config.h])
 
 # Checks for programs.
 AC_PROG_CC

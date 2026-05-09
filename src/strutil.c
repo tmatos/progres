@@ -11,10 +11,10 @@
 #include <stdarg.h>
 #include <ctype.h>
 
+#include "config.h"
+
 #include "lex.h"
 #include "strutil.h"
-
-#include "../config.h"
 
 int anexa(char* str, char c)
 {

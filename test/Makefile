@@ -30,7 +30,13 @@ $(ODIR)/%.o: $(TDIR)/%.cpp
 SRC = $(shell find $(SRCDIR) -maxdepth 1 -type f \( -iname '*.c' ! -iname 'progres.c' \))
 OBJ = $(patsubst $(SRCDIR)/%.c, $(ODIR)/%.o, $(SRC))
 
-$(ODIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
+$(TDIR)/../configure: $(TDIR)/../configure.ac 
+	cd $(TDIR)/.. && autoreconf -vif 
+
+$(IDIR)/config.h: $(TDIR)/../configure
+	cd $(TDIR)/.. && if [ -e Makefile ]; then make distclean; fi && ./configure
+
+$(ODIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h $(IDIR)/config.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(TARGET): $(OBJ) $(OBJTEST)
