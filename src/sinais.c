@@ -56,20 +56,13 @@ int set_pulse_blank(Pulse* p)
 
 int add_new_pulse(Signal* s, LogicValue value, Time time_length)
 {
-    int size;
-    int count;
-    Pulse* it;
-
-    if (!s)
+    if ( !s || !s->pulses )
         return 0;
 
-    if (!s->pulses)
-        return 0;
+    int size = 2;  // minimum size for an array of pulses with some value
 
-    size = 2; // tamanho minimo de array de pulsos com algum valor
-
-    count = 0;
-    it = s->pulses;
+    int count = 0;
+    Pulse* it = s->pulses;
 
     // add na contagem a quantidade de pulsos (com valor) ja existente
     while(it->value != VAL_BLANK)
@@ -141,8 +134,6 @@ void free_signal_list(SignalArray** list)
 
 int add_new_signal(SignalArray* list, const char* name)
 {
-    Signal* s;
-
     list->count++;
 
     if ( list->count == 1 ) {
@@ -153,7 +144,7 @@ int add_new_signal(SignalArray* list, const char* name)
                                          sizeof(Signal) * list->count );
     }
 
-    s = list->itens + (list->count - 1);
+    Signal* s = list->itens + (list->count - 1);
     set_signal_name(s, name);
 
     s->pulses = (Pulse*) xmalloc(sizeof(Pulse));

@@ -38,12 +38,10 @@ int iguais(const char* a, const char* b)
 
 int has_only_digits(const char* str)
 {
-    unsigned int i;
-
     if (!str)
         return 0;
 
-    for ( i=0; i < len(str); i++ )
+    for ( unsigned int i=0; i < len(str); i++ )
     {
         if ( !isdigit(str[i]) ) {
             return 0;

@@ -19,14 +19,12 @@
 
 int validate_input_signals(Module* module, SignalArray* signals)
 {
-    int i;
-    int j;
     int validos = 0;
 
     // Validacao da correspencia das signals entre os arquivos '.v' e '.in'
-    for ( i=0 ; i < module->list_input_net->total ; i++ )
+    for ( int i=0 ; i < module->list_input_net->total ; i++ )
     {
-        for ( j=0 ; j < signals->count ; j++ )
+        for ( int j=0 ; j < signals->count ; j++ )
         {
             if ( iguais(module->list_input_net->itens[i]->name,
                         signals->itens[j].name) ) {
@@ -37,7 +35,6 @@ int validate_input_signals(Module* module, SignalArray* signals)
         }
     }
 
-    // print matches msg
     print("----------\n"
           "Entradas: \n"
           "   .v = %d\n"

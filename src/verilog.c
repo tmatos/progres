@@ -66,7 +66,7 @@ int load_module_header(
         goto load_module_header_bad_return;
     }
     else {
-        // senao, adicione-o a lista de identifiers
+        // else, add it to the list of identifiers and set as module name
         insert_token_of_string(identifiers, t->value, -1, -1, IDENTIFIER);
         copy(module->name, t->value);
     }
@@ -77,17 +77,17 @@ int load_module_header(
         goto load_module_header_bad_return;
     }
     else if (t->classe != SYM_OPEN_BRACKET && t->classe != SYM_SEMICOLON) {
-        // se t->valor nao eh '(' ou ';', pare
+        // case t->value is not '(' or ';', stop and show error
         show_error_msg("Simbolo esperado nao foi encontrado",
                      t->line, t->column, "(' ou ';", t->value);
         goto load_module_header_bad_return;
     }
 
     if (t->classe == SYM_OPEN_BRACKET) {
-        // devemos agora ler os argumentos do module
+        // we shall now read the module arguments
         avanca(&t);
 
-        expect_comma = 0; // nao esperando por virgula, por enquanto
+        expect_comma = 0;  // not expecting a comma, initially
 
         while (1)
         {
@@ -104,10 +104,8 @@ int load_module_header(
                 goto load_module_header_bad_return;
             }
 
-            if (t->classe == SYM_CLOSE_BRACKET) {
-                // t->valor eh ')'
+            if (t->classe == SYM_CLOSE_BRACKET)  // t->value is ')'
                 break;
-            }
 
             if (expect_comma) {
                 if (t->classe == SYM_COMMA) {
@@ -327,8 +325,7 @@ VerilogError load_module(
         case ERROR_VERILOG_BAD_TOKEN:
             goto bad_return;
             break;
-        default:
-            // no error
+        default: // no error
             break;
         }
 
@@ -438,14 +435,14 @@ VerilogError load_module(
                     case ERROR_VERILOG_BAD_TOKEN:
                         goto bad_return;
                         break;
-                    default:
-                        // no error
+                    default: // no error
                         break;
                     }
 
                     if ( !is_allowed_identifier(it) ) {
                         show_error_msg("Identificador nao foi encontrado",
-                                       it->line, it->column, "um identificador", it->value);
+                                       it->line, it->column,
+                                       "um identificador", it->value);
                         goto bad_return;
                     }
 
@@ -464,7 +461,6 @@ VerilogError load_module(
                 }
 
                 remove_tokens_by_value(identifiers_to_be, it->value);
-
                 expect_comma = 1;
 
                 avanca(&it);
@@ -480,8 +476,7 @@ VerilogError load_module(
             case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
                 break;
-            default:
-                // no error
+            default: // no error
                 break;
             }
         }
@@ -570,7 +565,7 @@ VerilogError load_module(
                     goto bad_return;
                 }
                 else {
-                    // Guardar o delay dessa gate
+                    // storing this logic gate delay
                     gate->attributes.delay = strtol(it->value, NULL, 10); //FIXME: tipo errado!
                 }
 
@@ -594,16 +589,14 @@ VerilogError load_module(
 
             output_count = 0;
 
-        //gate_outputs: // Label para a parte onde ha leitura de saidas da porta logica
+        // gate_outputs:  // label to the logic gate outputs reading section
 
             if (has_item_of_string_value(list_wire, it->value)) {
-                // inserir na lista de saidas da gate, esta saida
                 out = get_component_by_name(module->list_wire_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
             }
             else if (has_item_of_string_value(list_output, it->value)) {
-                // inserir na lista de saidas da gate, esta saida
                 out = get_component_by_name(module->list_output_net, it->value);
                 insert_component(gate->list_output, out);
                 insert_component(out->list_input, gate);
@@ -632,7 +625,7 @@ VerilogError load_module(
 
             input_count = 0;
 
-        gate_inputs: // Label para a parte onde ha leitura de entradas da porta logica
+        gate_inputs:  // label to the part where the logic gate inputs are read
 
             if (!avanca(&it)) {
                 show_error_msg("Final do arquivo nao esperado",
@@ -646,19 +639,16 @@ VerilogError load_module(
                 insert_component(gate->list_input, num); // TODO: free mem later
             }
             else if (has_item_of_string_value(list_wire, it->value)) {
-                // inserir na lista de entradas da gate, esta entrada
                 in = get_component_by_name(module->list_wire_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_input, it->value)) {
-                // inserir na lista de entradas da gate, esta entrada
                 in = get_component_by_name(module->list_input_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
             }
             else if (has_item_of_string_value(list_output, it->value)) {
-                // inserir na lista de entradas da gate, esta entrada
                 in = get_component_by_name(module->list_output_net, it->value);
                 insert_component(gate->list_input, in);
                 insert_component(in->list_output, gate);
@@ -695,10 +685,8 @@ VerilogError load_module(
                     goto bad_return;
                 }
                 
-                if (it->classe == SYM_COMMA) {
-                    // keep reading all the gate inputs
-                    goto gate_inputs;
-                }
+                if (it->classe == SYM_COMMA)
+                    goto gate_inputs; // keep reading all the gate inputs
                 
                 show_error_msg("Simbolo esperado nao foi encontrado",
                                it->line, it->column, ")' ou ',", it->value);
@@ -716,14 +704,14 @@ VerilogError load_module(
                 goto bad_return;
             }
 
-            // finalmente, inserimos a gate na lista de portas logicas do module
+            // finally, insert the gate into the module's logic gates list
             add_gate(module, gate);
         }
         else if (it->classe == KW_ENDMODULE) {
             avanca(&it);
 
 //load_module_sucess:
-            // Liberar a memoria alocada no inicio da funcao
+            // free all the memory allocated in the head of this function
             delete_lista_token(identifiers);
             delete_lista_token(identifiers_to_be);
             delete_lista_token(list_input);
@@ -743,8 +731,7 @@ VerilogError load_module(
             case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
                 break;
-            default:
-                // no error
+            default: // no error
                 break;
             }
         }
@@ -758,8 +745,7 @@ VerilogError load_module(
             case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
                 break;
-            default:
-                // no error
+            default: // no error
                 break;
             }
         }
@@ -784,7 +770,6 @@ VerilogError load_module(
             if (len(it->value) > MAX_PARAM_NAME_SIZE) {
                 show_error_size_exceeded("Excedido o tamanho de caracteres para o parametro",
                                          it->line, it->column, it->value, MAX_PARAM_NAME_SIZE);
-
                 goto bad_return;
             }
 
@@ -845,8 +830,7 @@ VerilogError load_module(
             case ERROR_VERILOG_BAD_TOKEN:
                 goto bad_return;
                 break;
-            default:
-                // no error
+            default: // no error
                 break;
             }
         }
@@ -886,8 +870,6 @@ bad_return:
 
 int is_logic_gate(const Token* t)
 {
-    int i;
-
     TokenClass g[13] = {
         KW_AND,    // 0
         KW_OR,     // 1
@@ -903,7 +885,7 @@ int is_logic_gate(const Token* t)
         KW_NOTIF1, // 12
     };
 
-    for ( i = 0; i < 13; i++ )
+    for ( int i = 0; i < 13; i++ )
     {
         if (t->classe == g[i])
             return 1;
@@ -914,8 +896,6 @@ int is_logic_gate(const Token* t)
 
 int is_tristate_logic(const Component* gate)
 {
-    int i;
-
     Role op[4] = {
         ROLE_BUF_IF0, // 0
         ROLE_BUF_IF1, // 1
@@ -923,7 +903,7 @@ int is_tristate_logic(const Component* gate)
         ROLE_NOT_IF1, // 3
     };
 
-    for ( i = 0; i < 4; i++ )
+    for ( int i = 0; i < 4; i++ )
     {
         if (gate->attributes.role == op[i])
             return 1;
@@ -951,29 +931,21 @@ VerilogError load_reg(
     ListToken* list_param,
     Module* module)
 {
-    int is_signed;
-    int range_msb;
-    int range_lsb;
-    VerilogError err;
+    int range_msb = 0;
+    int range_lsb = 0;
+    int is_signed = 0;
 
+    VerilogError err;
     Token* t = *it;
 
     if (!avanca(&t))
         goto load_reg_bad_eof;
 
-    is_signed = 0;
-
     if (t->classe == KW_SIGNED) {
         is_signed = 1;
-        
-        if (!avanca(&t)) {
+        if ( !avanca(&t) )
             goto load_reg_bad_eof;
-        }
     }
-
-    // range specification
-    range_msb = 0;
-    range_lsb = 0;
 
     err = load_range(&t, module, list_param, &range_msb, &range_lsb);
 
@@ -985,8 +957,7 @@ VerilogError load_reg(
     case ERROR_VERILOG_BAD_TOKEN:
         goto load_reg_bad_token;
         break;
-    default:
-        // no error
+    default: // no error
         break;
     }
 
@@ -1211,13 +1182,11 @@ VerilogError load_initial_block(
     Time t = (Time) 0;
     Token* it = *pit;
 
-    if ( !avanca(&it) ) {
+    if ( !avanca(&it) )
         goto load_initial_block_bad_eof;
-    }
 
     if ( it->classe == KW_BEGIN ) {
         is_single_statement = 0;
-
         if ( !avanca(&it) ) {
             goto load_initial_block_bad_eof;
         }
@@ -1255,12 +1224,10 @@ initial_block_loop:
 
         Time delay = (Time) strtol(it->value, NULL, 10);
 
-        // update next event time
-        t = t + delay;
+        t = t + delay;  // update next event time
 
-        if ( !avanca(&it) ) {
+        if ( !avanca(&it) )
             goto load_initial_block_bad_eof;
-        }
 
         // handle optional semicolon after delay number
         if ( it->classe == SYM_SEMICOLON ) {
@@ -1299,8 +1266,7 @@ initial_block_loop:
     case ERROR_VERILOG_BAD_TOKEN:
         goto load_initial_block_bad_token;
         break;
-    default:
-        // no error
+    default: // no error
         goto initial_block_expect_semicolon;
     }
 
@@ -1321,7 +1287,6 @@ initial_block_expect_semicolon:
         if ( !avanca(&it) ) {
             goto load_initial_block_bad_eof;
         }
-
         goto initial_block_loop;
     }
 
@@ -1431,7 +1396,6 @@ VerilogError load_assign(
     Component* in;
     Component* out;
     Component* gate = NULL;
-
     Token* t = *it;
 
     if (!avanca(&t))
@@ -1506,8 +1470,8 @@ VerilogError load_assign(
     if ( t->classe == SYM_TILDE ) {
         gate->attributes.role = ROLE_NOT;
 
-    if (!avanca(&t))
-        goto load_assign_bad_eof;
+        if (!avanca(&t))
+            goto load_assign_bad_eof;
     }
 
 load_assign_identifiers:
@@ -1519,19 +1483,16 @@ load_assign_identifiers:
     }
 
     if ( has_item_of_string_value(list_wire, t->value) ) {
-        // inserir, na lista de entradas da gate, esta entrada
         in = get_component_by_name(module->list_wire_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
     else if ( has_item_of_string_value(list_in, t->value) ) {
-        // inserir, na lista de entradas da gate, esta entrada
         in = get_component_by_name(module->list_input_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
     }
     else if ( has_item_of_string_value(list_out, t->value) ) {
-        // inserir, na lista de entradas da gate, esta entrada
         in = get_component_by_name(module->list_output_net, t->value);
         insert_component(gate->list_input, in);
         insert_component(in->list_output, gate);
@@ -1691,9 +1652,8 @@ systask_args_load:
 
     args.count++;
 
-    if ( it->classe == SYM_CLOSE_BRACKET ) {
+    if ( it->classe == SYM_CLOSE_BRACKET )
         goto load_systask_sucess;
-    }
 
     if ( task == TASK_DUMPFILE ) {
         show_error_msg("Token inesperado foi encontrado",
@@ -1745,7 +1705,6 @@ systask_args_load:
 load_systask_sucess:
     insert_task_event(initial_task_events, t, task, args);
     *pit = it;
-
     return NO_ERROR_VERILOG;
 
 load_systask_bad_token:
