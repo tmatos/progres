@@ -118,11 +118,22 @@ typedef struct st_list_register {
     Register** itens;
 } ListRegister;
 
-#define MAX_MODULE_NAME 1024
+#define MAX_MODULE_NAME 1024  /// Maximum size for the string of a module name.
 
-/** @brief Estrutura que representa um circuito, mais especificamente um 'module'.
+typedef struct st_module Module;
+typedef struct st_list_module ListModule;
+
+/** @brief Struct for a list of modules, either for the full circuit
+ *         or the instantiated submodules list inside a module.
+*/
+struct st_list_module {
+    int total;
+    Module** itens;
+}; /* ListModule */
+
+/** @brief Struct which represents a module in the memory.
  */
-typedef struct st_module {
+struct st_module {
     char name[MAX_MODULE_NAME];
 
     ListComponent* list_input_net;
@@ -132,40 +143,34 @@ typedef struct st_module {
     SignalArray* sinais_output;
 
     ListComponent* list_wire_net;
-    ListComponent* list_reg_net; // complementar
+    ListComponent* list_reg_net;  // complementar
     ListComponent* list_all_components;
 
     ListRegister list_register;
     ListParam list_param;
 
+    ListModule list_submodules;  // instantiated submodules
+
     Time timescale_number;
     TimeUnit timescale_unit;
     Time timescale_precision_number;
     TimeUnit timescale_precision_unit;
-} Module;
-
-/** @brief Estrutura para a lista de modules.
-*/
-typedef struct st_list_module {
-    int total;
-    Module** itens;
-} ListModule;
+}; /* Module */
 
 /** @brief Dealocate all the memory of a ListModule structure.
  *  @param circuit Pointer to a pointer of ListModule type.
  */
-void free_circuit(ListModule** circuit);
+void free_circuit(ListModule** pp_list_module);
 
-/** @brief Alocação e inicialização de uma struct Module.
- *  @return Um ponteiro para a struct Module alocada e pre-inicializada.
+/** @brief Allocation and initialization of a Module struct.
+ *  @return A pointer to the allocated and pre-initialized Module struct.
  */
 Module* new_module();
 
 /** @brief Dealocate all the memory of a Module structure.
- *  @param mod Pointer to a pointer of Module type.
- *  @return void
+ *  @param pp_mod Pointer to a pointer of Module type.
  */
-void free_module(Module** mod);
+void free_module(Module** pp_mod);
 
 /** @brief Inserir um registrador novo no module.
  *  @param mod Pointer to a Module type.

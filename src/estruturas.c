@@ -19,74 +19,85 @@
 
 Module* new_module()
 {
-    Module *circuito = (Module*) xmalloc(sizeof(Module));
+    Module *mod = (Module*) xmalloc(sizeof(Module));
 
-    circuito->list_input_net = new_list_component();
-    circuito->sinais_input = NULL;
+    mod->list_input_net = new_list_component();
+    mod->sinais_input = NULL;
 
-    circuito->list_output_net = new_list_component();
-    circuito->sinais_output = NULL;
+    mod->list_output_net = new_list_component();
+    mod->sinais_output = NULL;
 
-    circuito->list_wire_net = new_list_component();
-    circuito->list_reg_net = new_list_component();
+    mod->list_wire_net = new_list_component();
+    mod->list_reg_net = new_list_component();
 
-    circuito->list_all_components = new_list_component();
+    mod->list_all_components = new_list_component();
 
-    circuito->list_register.total = 0;
-    circuito->list_register.itens = NULL;
+    mod->list_register.total = 0;
+    mod->list_register.itens = NULL;
 
-    circuito->list_param.total = 0;
-    circuito->list_param.itens = NULL;
+    mod->list_param.total = 0;
+    mod->list_param.itens = NULL;
 
-    circuito->timescale_number = (Time) 1;
-    circuito->timescale_unit = UN_NS;
-    circuito->timescale_precision_number = (Time) 1;
-    circuito->timescale_precision_unit = UN_NS;
+    mod->list_submodules.total = 0;
+    mod->list_submodules.itens = NULL;
 
-    copy(circuito->name, "");
+    mod->timescale_number = (Time) 1;
+    mod->timescale_unit = UN_NS;
+    mod->timescale_precision_number = (Time) 1;
+    mod->timescale_precision_unit = UN_NS;
 
-    return circuito;
+    copy(mod->name, "");
+
+    return mod;
 }
 
-void free_module(Module** mod)
+void free_module(Module** pp_mod)
 {
-    if ( !mod || *mod == NULL )
+    if ( !pp_mod || *pp_mod == NULL )
         return;
 
-    delete_list_component( &((**mod).list_input_net) );
-    delete_list_component( &((**mod).list_output_net) );
-    delete_list_component( &((**mod).list_all_components) );
-    delete_list_component( &((**mod).list_wire_net) );
-    delete_list_component( &((**mod).list_reg_net) );
+    delete_list_component( &((**pp_mod).list_input_net) );
+    delete_list_component( &((**pp_mod).list_output_net) );
+    delete_list_component( &((**pp_mod).list_all_components) );
+    delete_list_component( &((**pp_mod).list_wire_net) );
+    delete_list_component( &((**pp_mod).list_reg_net) );
 
-    delete_list_param( &((**mod).list_param) );
-    delete_list_register( &((**mod).list_register) );
+    delete_list_param( &((**pp_mod).list_param) );
+    delete_list_register( &((**pp_mod).list_register) );
 
-    if ( (**mod).sinais_input )
-        free( (**mod).sinais_input );
-    
-    if ( (**mod).sinais_output )
-        free( (**mod).sinais_output );
-    
-    free( *mod );
-    *mod = NULL;
-}
-
-void free_circuit(ListModule** circuit)
-{
-    if ( !circuit || *circuit == NULL )
-        return;
-
-    for ( int i = 0 ; i < (**circuit).total ; i++ )
+    for ( int i = 0; i < (**pp_mod).list_submodules.total ; i++ )
     {
-        free_module( (**circuit).itens + i );
+        free_module( (**pp_mod).list_submodules.itens + i );
     }
 
-    if ( (**circuit).itens )
-        free( (**circuit).itens );
+    if ( (**pp_mod).list_submodules.itens )
+        free( (**pp_mod).list_submodules.itens );
 
-    free( *circuit );
-    *circuit = NULL;
+    if ( (**pp_mod).sinais_input )
+        free( (**pp_mod).sinais_input );
+    
+    if ( (**pp_mod).sinais_output )
+        free( (**pp_mod).sinais_output );
+    
+    free( *pp_mod );
+    *pp_mod = NULL;
+}
+
+void free_circuit(ListModule** pp_list_module)
+{
+    if ( !pp_list_module || *pp_list_module == NULL )
+        return;
+
+    for ( int i = 0 ; i < (**pp_list_module).total ; i++ )
+    {
+        free_module( (**pp_list_module).itens + i );
+    }
+
+    if ( (**pp_list_module).itens )
+        free( (**pp_list_module).itens );
+
+    free( *pp_list_module );
+    *pp_list_module = NULL;
 }
 
 void add_input(Module* circ, Component* comp)
